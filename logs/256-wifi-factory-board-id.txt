@@ -1,0 +1,144 @@
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+   3800 deviceinfo
+   38e1 error lsadc0 index %d
+   3913 ro.fh.boardid
+   3970 ro.fh.lsadcix
+   39bc ro.product.model
+   39d9 ro.product.submodel
+   39f7 deviceid
+   3a00 devicetype
+   3a0b devicemodel
+   3a17 hardwareversion
+   3a40 modulevendor
+   3a62 error lsadc0 index %s
+   3a98 ro.deviceid
+   3ab7 ro.model
+   3acf ro.model.hardware
+   3b0e ro.fh.module.vendor
+   3fa0 unknown deviceinfo type
+   5a62 .gnu.version
+   5a6f .gnu.version_r
+   5b01 .note.gnu.gold-version
+extracted/init.bigfish.rc.vendor:49:    # insmod usb ko early for camera hal
+extracted/init.bigfish.rc.vendor:50:    setprop vendor.insmod.ko 1
+extracted/init.bigfish.rc.vendor:58:    mkdir /data/vendor/misc 0770 wifi wifi
+extracted/init.bigfish.rc.vendor:59:    mkdir /data/vendor/wifi 0770 wifi wifi
+extracted/init.bigfish.rc.vendor:60:    mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+extracted/init.bigfish.rc.vendor:61:    chown wifi wifi /data/vendor/wifi/wpa/wpa_supplicant.conf
+extracted/init.bigfish.rc.vendor:62:    chown wifi wifi /data/vendor/wifi/wpa/p2p_supplicant.conf
+extracted/init.bigfish.rc.vendor:63:    mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
+extracted/init.bigfish.rc.vendor:65:    insmod /vendor/lib/modules/g_ffs.ko idVendor=0x18d1 iSerialNumber=${ro.serialno}
+extracted/init.bigfish.rc.vendor:74:    # insmod tntfs drivers
+extracted/init.bigfish.rc.vendor:155:on property:vendor.insmod.ko=1
+extracted/init.bigfish.rc.vendor:156:    # to insmod usb drivers before camera hal-service starts.
+extracted/init.bigfish.rc.vendor:157:    #insmod /vendor/lib/modules/hi_sdio_detect.ko
+extracted/init.bigfish.rc.vendor:158:    insmod /vendor/lib/modules/ehci-platform.ko
+extracted/init.bigfish.rc.vendor:159:    insmod /vendor/lib/modules/ohci-platform.ko
+extracted/init.bigfish.rc.vendor:160:    insmod /vendor/lib/modules/xhci-plat-hcd.ko
+extracted/init.bigfish.rc.vendor:161:    insmod /vendor/lib/modules/create.ko
+extracted/init.bigfish.rc.vendor:162:    insmod /vendor/lib/modules/libahci.ko
+extracted/init.bigfish.rc.vendor:163:    insmod /vendor/lib/modules/libahci_platform.ko
+extracted/init.bigfish.rc.vendor:164:    insmod /vendor/lib/modules/ahci_platform.ko
+extracted/init.bigfish.rc.vendor:165:    insmod /vendor/lib/modules/hid-pt71600-remote.ko
+extracted/init.bigfish.rc.vendor:166:    insmod /vendor/lib/modules/g_ffs.ko idVendor=0x18d1 iSerialNumber=${ro.serialno}
+extracted/init.bigfish.rc.vendor:168:on property:vendor.wifi_driver.needunload=1
+extracted/init.bigfish.rc.vendor:169:    start wifi_bt_suspend
+extracted/init.bigfish.rc.vendor:175:on property:vendor.insmod.ko=1
+extracted/init.bigfish.rc.vendor:176:    #insmod /vendor/lib64/modules/hi_sdio_detect.ko
+extracted/init.bigfish.rc.vendor:177:    insmod /vendor/lib64/modules/ehci-platform.ko
+extracted/init.bigfish.rc.vendor:178:    insmod /vendor/lib64/modules/ohci-platform.ko
+extracted/init.bigfish.rc.vendor:179:    insmod /vendor/lib64/modules/xhci-plat-hcd.ko
+extracted/init.bigfish.rc.vendor:180:    insmod /vendor/lib64/modules/create.ko
+extracted/init.bigfish.rc.vendor:181:    insmod /vendor/lib64/modules/libahci.ko
+extracted/init.bigfish.rc.vendor:182:    insmod /vendor/lib64/modules/libahci_platform.ko
+extracted/init.bigfish.rc.vendor:183:    insmod /vendor/lib64/modules/ahci_platform.ko
+extracted/init.bigfish.rc.vendor:185:# wifi driver
+extracted/init.bigfish.rc.vendor:186:on property:vendor.insmod.ko=1 && property:wifi.driver.enable=true
+extracted/init.bigfish.rc.vendor:187:    insmod /vendor/lib/modules/bcmdhd.ko firmware_path=/vendor/etc/firmware/fw_bcm4356a2_ag.bin nvram_path=/vendor/etc/firmware/nvram_ap6356s.txt
+extracted/init.bigfish.rc.vendor:207:    insmod /vendor/lib/modules/btmtk_uart_unify.ko
+extracted/init.bigfish.rc.vendor:291:     -ip2p0 -Dnl80211 -c/data/vendor/wifi/wpa/p2p_supplicant.conf \
+extracted/init.bigfish.rc.vendor:292:     -e/data/misc/wifi/entropy.bin -N \
+extracted/init.bigfish.rc.vendor:293:     -iwlan0 -Dnl80211 -c/data/vendor/wifi/wpa/wpa_supplicant.conf \
+extracted/init.bigfish.rc.vendor:294:     -O/data/vendor/wifi/wpa/sockets \
+extracted/init.bigfish.rc.vendor:295:     -g@android:wpa_wlan0
+extracted/init.bigfish.rc.vendor:296:     socket wpa_wlan0 dgram 660 wifi wifi
+extracted/init.bigfish.rc.vendor:302:     -ip2p0 -Dnl80211 -c/data/vendor/wifi/wpa/p2p_supplicant.conf \
+extracted/init.bigfish.rc.vendor:303:     -I/vendor/etc/wifi/icomm_p2p_supplicant_overlay.conf \
+extracted/init.bigfish.rc.vendor:304:     -e/data/misc/wifi/entropy.bin -N \
+extracted/init.bigfish.rc.vendor:305:     -iwlan0 -Dnl80211 -c/data/vendor/wifi/wpa/wpa_supplicant.conf \
+extracted/init.bigfish.rc.vendor:306:     -O/data/vendor/wifi/wpa/sockets \
+extracted/init.bigfish.rc.vendor:307:     -g@android:wpa_wlan0
+extracted/init.bigfish.rc.vendor:308:     socket wpa_wlan0 dgram 660 wifi wifi
+extracted/init.bigfish.rc.vendor:314:     -ip2p0 -Dnl80211 -c/data/vendor/wifi/wpa/p2p_supplicant.conf \
+extracted/init.bigfish.rc.vendor:315:     -I/vendor/etc/wifi/icomm_p2p_supplicant_overlay.conf \
+extracted/init.bigfish.rc.vendor:316:     -e/data/misc/wifi/entropy.bin -N \
+extracted/init.bigfish.rc.vendor:317:     -iwlan0 -Dnl80211 -c/data/vendor/wifi/wpa/wpa_supplicant.conf \
+extracted/init.bigfish.rc.vendor:318:     -O/data/vendor/wifi/wpa/sockets \
+extracted/init.bigfish.rc.vendor:319:     -g@android:wpa_wlan0
+extracted/init.bigfish.rc.vendor:320:     socket wpa_wlan0 dgram 660 wifi wifi
+extracted/init.bigfish.rc.vendor:329:    seclabel u:r:wifi_bt:s0
+extracted/init.bigfish.rc.vendor:336:    seclabel u:r:wifi_bt:s0
+extracted/init.bigfish.rc.vendor:343:    seclabel u:r:wifi_bt:s0
+extracted/init.bigfish.rc.vendor:345:#fiberhome add by jlei for unisoc wifi
+extracted/init.bigfish.rc.vendor:347:    -iwlan0 -Dnl80211 -c/data/vendor/wifi/wpa/wpa_supplicant.conf \
+extracted/init.bigfish.rc.vendor:349:    -m/data/vendor/wifi/wpa/p2p_supplicant.conf \
+extracted/init.bigfish.rc.vendor:350:    -e/data/misc/wifi/entropy.bin -O/data/vendor/wifi/wpa/sockets \
+extracted/init.bigfish.rc.vendor:351:    -g@android:wpa_wlan0
+extracted/init.bigfish.rc.vendor:352:    socket wpa_wlan0 dgram 660 wifi wifi
+extracted/init.bigfish.rc.vendor:385:service vendor.gpio-led /vendor/bin/gpio-led
+extracted/init.bigfish.rc.vendor:419:service wifi_bt_suspend /vendor/bin/wifi_bt suspend
+extracted/init.bigfish.rc.vendor:423:    seclabel u:r:wifi_bt:s0
+extracted/init.bigfish.rc.vendor:425:# fiberhome add by jlei for wifi through put
+extracted/init.bigfish.rc.vendor:426:service wifi_perf_service /system/bin/opt/etc/wifi_perf_service.sh
+6d7397368126facdc5b215f552edaaa44a6f6a500ada2392ce6dd10cdbaa1451  extracted/socwifi.cfg
+e8dc8afb9d8b40d0df7600afd6d407e7ad46a35bda67636c12e29e3f5123309b  extracted/init_hardware_info.vendor
+9d850235d4b4bfc664db21b2aff5d24b62e4b10a2fb46d5c264ad38bdafdc0a9  extracted/init.bigfish.rc.vendor
+9f9a6021086153f366c2d03d8cb3513cf30d4803528d3b973fd42e6df1ac970e  extracted/fstab.bigfish.vendor
+total 0
+drwxr-xr-x 1 hedc hedc 462 Nov 21 17:33 bc-1.07.1
+drwxr-xr-x 1 hedc hedc 988 Sep 27  2024 busybox-1.37.0
+drwxr-xr-x 1 hedc hedc 446 Nov  6 10:46 fastfetch-2.71.0
+drwxr-xr-x 1 hedc hedc  60 Nov 21 20:38 gcc-14.2.0-nolibc
+drwxr-xr-x 1 hedc hedc 616 Nov 21 21:12 linux-6.18.64
+drwxr-xr-x 1 hedc hedc 614 Sep 11 17:51 linux-7.2.5
+drwxr-xr-x 1 hedc hedc 240 Mar  1  2024 musl-1.2.5
+drwxr-xr-x 1 hedc hedc       26 Nov 21 20:48 musl-arm64
+drwxr-xr-x 1 hedc hedc       48 Nov 21 20:48 musl-arm64-build
+-rw-r--r-- 1 hedc hedc  1947803 Nov 21 20:48 musl-arm64.log
+drwxr-xr-x 1 hedc hedc       48 Nov 21 17:41 musl-build
+-rw-r--r-- 1 hedc hedc  1215961 Nov 21 17:42 musl.log
+drwxr-xr-x 1 hedc hedc      248 Nov 21 21:17 release-arm32
+drwxr-xr-x 1 hedc hedc      256 Nov 21 19:36 release-arm32-all
+drwxr-xr-x 1 hedc hedc      262 Nov 21 20:25 release-arm32-all-2g
+-rw-r--r-- 1 hedc hedc 10280574 Nov 21 20:25 release-arm32-all-2g.tar.gz
+drwxr-xr-x 1 hedc hedc      256 Nov 21 20:10 release-arm32-all-fastfetch
+-rw-r--r-- 1 hedc hedc 10140323 Nov 21 20:10 release-arm32-all-fastfetch.tar.gz
+-rw-r--r-- 1 hedc hedc  7578730 Nov 21 19:36 release-arm32-all.tar.gz
+drwxr-xr-x 1 hedc hedc      258 Nov 21 19:20 release-arm32-emmc
+-rw-r--r-- 1 hedc hedc  4658599 Nov 21 19:20 release-arm32-emmc.tar.gz
+drwxr-xr-x 1 hedc hedc      256 Nov 21 19:33 release-arm32-gpu
+-rw-r--r-- 1 hedc hedc  5012973 Nov 21 19:33 release-arm32-gpu.tar.gz
+drwxr-xr-x 1 hedc hedc      256 Nov 21 19:09 release-arm32-net
+-rw-r--r-- 1 hedc hedc  5852784 Nov 21 19:09 release-arm32-net.tar.gz
+drwxr-xr-x 1 hedc hedc      258 Nov 21 18:43 release-arm32-sdio
+-rw-r--r-- 1 hedc hedc  4700678 Nov 21 18:43 release-arm32-sdio.tar.gz
+drwxr-xr-x 1 hedc hedc      264 Nov 21 18:48 release-arm32-storage
+-rw-r--r-- 1 hedc hedc  5298729 Nov 21 18:48 release-arm32-storage.tar.gz
+drwxr-xr-x 1 hedc hedc      256 Nov 21 18:31 release-arm32-usb
+-rw-r--r-- 1 hedc hedc  4929961 Nov 21 18:31 release-arm32-usb.tar.gz
+-rw-r--r-- 1 hedc hedc  4302931 Nov 21 21:17 release-arm32.tar.gz
+drwxr-xr-x 1 hedc hedc      238 Nov 21 21:47 release-arm64-7.2.5-all-2g
+-rw-r--r-- 1 hedc hedc 11233865 Nov 21 21:47 release-arm64-7.2.5-all-2g.tar.gz
+drwxr-xr-x 1 hedc hedc      238 Nov 21 21:15 release-arm64-all-2g
+drwxr-xr-x 1 hedc hedc      248 Nov 21 22:29 release-arm64-all-2g-hdmi
+-rw-r--r-- 1 hedc hedc 11316090 Nov 21 22:29 release-arm64-all-2g-hdmi.tar.gz
+-rw-r--r-- 1 hedc hedc 10929961 Nov 21 21:15 release-arm64-all-2g.tar.gz
+drwxr-xr-x 1 hedc hedc      224 Nov 21 20:54 release-arm64-core
+-rw-r--r-- 1 hedc hedc  7150631 Nov 21 20:54 release-arm64-core.tar.gz
+-rw-r--r-- 1 hedc hedc      381 Nov 21 17:42 source-SHA256SUMS
+-rw-r--r-- 1 hedc hedc      656 Nov 21 18:14 source-of-core-SHA256SUMS
+State  Recv-Q Send-Q                      Local Address:Port Peer Address:Port
+UNCONN 0      0                               127.0.0.1:7891      0.0.0.0:*
+UNCONN 0      0      [fe80::98e9:e48a:c588:62a0]%enp6s0:546          [::]:*

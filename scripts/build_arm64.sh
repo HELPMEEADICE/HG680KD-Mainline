@@ -22,16 +22,21 @@ board=hi3798mv320-fiberhome-hg680kd-arm64
 release="$root/out/release-arm64-$variant"
 variant_key=
 hdmi=
+wifi_probe=
 case "$base_variant" in
     core) ;;
-    all-2g|all-2g-hdmi)
+    all-2g|all-2g-hdmi|all-2g-hdmi-wifi-probe)
         variant_key="ARCH_HISI USB_XHCI_HI3798MV320 MMC_SDHCI_HI3798MV320 HIX5HD2_GMAC DRM_LIMA COMMON_CLK_HI3798MV320_RESET"
         bbout="$root/out/busybox-arm64-all-2g"
         board=hi3798mv320-fiberhome-hg680kd-arm64-all-2g
-        if [[ $base_variant == all-2g-hdmi ]]; then
+        if [[ $base_variant == all-2g-hdmi* ]]; then
             hdmi=y
             bbout="$root/out/busybox-arm64-all-2g-hdmi"
             variant_key+=" DRM_SIMPLEDRM DRM_FBDEV_EMULATION DRM_CLIENT_DEFAULT_FBDEV FB_DEVICE VT VT_CONSOLE FRAMEBUFFER_CONSOLE"
+        fi
+        if [[ $base_variant == all-2g-hdmi-wifi-probe ]]; then
+            wifi_probe=y
+            variant_key+=" GPIOLIB GPIO_PL061 PWRSEQ_SIMPLE CMDLINE_PARTITION MSDOS_PARTITION EXT4_FS"
         fi
         ;;
     *) echo "Unknown arm64 variant: $variant" >&2; exit 2 ;;
@@ -81,6 +86,10 @@ fi
 install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/$board.dts"
 if [[ $hdmi ]]; then
     board+=-hdmi
+    install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/$board.dts"
+fi
+if [[ $wifi_probe ]]; then
+    board+=-wifi-probe
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/$board.dts"
 fi
 if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
@@ -223,7 +232,12 @@ if [[ $base_variant != core ]]; then
     if [[ $hdmi ]]; then
         sed '/^CONFIG_LOCALVERSION=/d; /^CONFIG_CMDLINE=/d' "$inputs/arm64.config" >"$config"
         sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g.config" >>"$config"
-        cat "$inputs/arm64-all-2g-hdmi.config" >>"$config"
+        if [[ $wifi_probe ]]; then
+            sed '/^CONFIG_LOCALVERSION=/d; /^CONFIG_CMDLINE=/d' "$inputs/arm64-all-2g-hdmi.config" >>"$config"
+            cat "$inputs/arm64-all-2g-hdmi-wifi-probe.config" >>"$config"
+        else
+            cat "$inputs/arm64-all-2g-hdmi.config" >>"$config"
+        fi
     else
         {
             sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64.config"

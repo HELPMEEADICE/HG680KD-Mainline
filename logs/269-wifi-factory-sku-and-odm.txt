@@ -1,0 +1,57 @@
+extracted/opt-etc/etc/ledctl_auto.sh:4:HARDWARE_TYPE=`getprop ro.hardware.type`
+extracted/opt-etc/etc/init.fhservice.sh:28:BOARDID=`getprop ro.fh.boardid`
+extracted/opt-etc/etc/init.fhservice.sh:29:LSADCIX=`getprop ro.fh.lsadcix`
+extracted/opt-etc/etc/init.fhservice.sh:30:if [ "$BOARDID" == "0" ];then
+extracted/opt-etc/etc/init.fhservice.sh:33:if [ "$BOARDID" == "3" ];then
+extracted/opt-etc/etc/init.fhservice.sh:36:if [ "$BOARDID" == "1" ] || [ "$BOARDID" == "2" ] || [ "$BOARDID" == "4" ];then
+extracted/opt-etc/etc/init.fhservice.sh:39:if [ "$BOARDID" == "7" ];then
+extracted/opt-etc/etc/init.fhservice.sh:40:    if [ "$LSADCIX" == "12" ] || [ "$LSADCIX" == "8" ];then
+extracted/opt-etc/etc/init.fhservice.sh:122:    hardwarename=`getprop ro.hardware.type`
+extracted/opt-etc/etc/init.fhservice.sh:145:    TYPE=`getprop ro.hardware.type`
+extracted/opt-etc/etc/init.fhservice.sh:307:    hardwaretype=`getprop ro.hardware.type`
+extracted/opt-etc/etc/write_hardware_info.sh:65:function product_wifi_bt_mac {
+extracted/opt-etc/etc/write_hardware_info.sh:67:	echo "product_wifi_bt_mac $1"
+extracted/opt-etc/etc/write_hardware_info.sh:101:LSADCIX=`getprop ro.fh.lsadcix`
+extracted/opt-etc/etc/write_hardware_info.sh:102:BOARDID=`getprop ro.fh.boardid`
+extracted/opt-etc/etc/write_hardware_info.sh:103:if [ "$LSADCIX$BOARDID" != "40" ];then
+extracted/opt-etc/etc/write_hardware_info.sh:105:    if [ "$BOARDID" == "7" ];then
+extracted/opt-etc/etc/write_hardware_info.sh:106:        if [ "$LSADCIX" == "12" ] || [ "$LSADCIX" == "8" ];then
+extracted/opt-etc/etc/write_hardware_info.sh:137:product_wifi_bt_mac $2
+extracted/opt-etc/etc/write_hardware_info.sh:145:product_wifi_bt_mac $wmac
+extracted/opt-etc/etc/setledcolor.sh:3:HARDWARE_TYPE=`getprop ro.hardware.type`
+extracted/opt-etc/etc/net_green_blink.sh:3:HARDWARE_TYPE=`getprop ro.hardware.type`
+extracted/opt-etc/etc/net_red_blink.sh:3:HARDWARE_TYPE=`getprop ro.hardware.type`
+extracted/opt-etc/etc/init.common.sh:184:DEVICEMODEL=`getprop ro.hardware.type`
+extracted/opt-etc/etc/wifi_perf_service.sh:4:BOARDID=`getprop ro.fh.boardid`
+extracted/opt-etc/etc/wifi_perf_service.sh:30:    if [ "$BOARDID" == "7" ];then
+extracted/opt-etc/etc/wifi_bt_init.sh:3:BOARDID=`getprop ro.fh.boardid`
+extracted/opt-etc/etc/wifi_bt_init.sh:4:LSADCIX=`getprop ro.fh.lsadcix`
+extracted/opt-etc/etc/wifi_bt_init.sh:5:if [ "$BOARDID" == "1" ] || [ "$BOARDID" == "2" ] || [ "$BOARDID" == "4" ];then
+extracted/opt-etc/etc/wifi_bt_init.sh:25:elif [ "$BOARDID" == "0" ] ;then
+extracted/opt-etc/etc/wifi_bt_init.sh:39:if [ "$BOARDID" == "7" ] ;then
+extracted/opt-etc/etc/wifi_bt_init.sh:40:    if [ "$LSADCIX" == "12" ] || [ "$LSADCIX" == "8" ];then
+extracted/opt-etc/etc/wifi_bt_init.sh:62:setprop ctl.start wifi_bt
+extracted/opt-etc/etc/fac_wifi_test.sh:2:BOARDID=`getprop ro.fh.boardid`
+extracted/opt-etc/etc/fac_wifi_test.sh:3:if [ "$BOARDID" = "7" ];then
+debugfs 1.47.4 (6-Mar-2025)
+     34   40755 (2)      0      0    4096  1-Jan-2009 00:00 .
+      2   40755 (2)      0      0    4096  1-Jan-2009 00:00 ..
+     35  120644 (7)      0      0      21  1-Jan-2009 00:00 framework
+     36  120644 (7)      0      0      17  1-Jan-2009 00:00 lib64
+     37  120644 (7)      0      0      20  1-Jan-2009 00:00 firmware
+     38  120644 (7)      0      0      15  1-Jan-2009 00:00 lib
+     39  120644 (7)      0      0      20  1-Jan-2009 00:00 priv-app
+     40  120644 (7)      0      0      15  1-Jan-2009 00:00 bin
+     41  120644 (7)      0      0      19  1-Jan-2009 00:00 overlay
+     42  120644 (7)      0      0      15  1-Jan-2009 00:00 app
+     43  120644 (7)      0      0      15  1-Jan-2009 00:00 etc
+
+debugfs 1.47.4 (6-Mar-2025)
+-l: Ext2 inode is not a directory 
+
+debugfs 1.47.4 (6-Mar-2025)
+-l: Ext2 inode is not a directory 
+
+debugfs 1.47.4 (6-Mar-2025)
+-l: Ext2 inode is not a directory 
+

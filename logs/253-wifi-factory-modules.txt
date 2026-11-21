@@ -1,0 +1,546 @@
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+f7cb57a91615a8f60130667048e8a6da978e1a94fc9b39c6eade3cce7af1055f  android.hardware.wifi@1.0-service.rc
+00937a63798321728b69500a2409fc2bba6542bc625f9e398e2e568c364cb01a  build.prop
+d7d4f22ddda4495701d31cdc4a8df6b98d663903f4b4b3a111ad4616ce4103e0  hi_sdio_detect.ko
+2b792378c4f724ff6129644fef553f131c96d3bb61c955cf3710c3f18e873971  init.bigfish.rc
+22c2a705f0ca08b59d73a4ba259a770b31ae2348043818e84d2ed76d5d21f694  init.fhservice.rc
+4eaec6c55298a4da651bbe408a8fd025e4964e302684976065498668449162ab  init.hi.rc
+1b06abc138dca26e3d5af9b15e95aa6f618a56458357361a8915f99287374f85  init.rc
+ce074afcf5f7597252830d6cc60b73309b41ee182cc82bf5d61d3044b6a557d6  init.wifibt.rc
+99de3a68caf88f57bb89f7362f067f5fa6ad9649b3cf51d62b7957c2e65a8cf9  libwifi-hal.so
+4844c2a7c3f5c6210e8b9dcf0ac7c80efde6ab4de59cad29c8ae1208eb92aa1f  rtl8822cs.ko
+1aadd1c47a55f8d9c06c0f6e9464bd37dc1a5e09de8bf06273d2f610ac6ed2e5  rtl8822cs_config
+fe67d4be37230b7e3c8161c5a26e0d4ab54a83657b18fe1188a02a91adaaa8c8  rtl8822cs_fw
+c1449080b9eeeaa2beab942c4261f2349bd8b5e051a501ec5862ad56045c8997  uwe5621_bsp_sdio.ko
+304f394fb2ee0896194cf42f78f73da7c48e3ba942dd919c10709920de8f8d2f  uwe5621_wifi_sdio.ko
+f7eea2125163fc063bb583c016b5b3a0ea0affcf2237486ba741c4b234268f91  wcnmodem.bin
+d094f5bda205ef32d6643075290c51f1d3a1211973106bd5df1c5d4d45a32f3e  wifi_56630001_3ant.ini
+38e2be85db24c820f5c3f5c7373131cd17028f321592997156768049c1367d11  wlan_mt7961_pcie.ko
+# on early-boot
+on boot
+    # insmod bluetooth drivers
+    insmod /vendor/lib/modules/rtk_btusb.ko
+
+    # FIXME because nonencrypted doesn't trigger!
+    class_start main
+    class_start late_start
+    start wifi_bt
+    start wifi_bt_check
+
+on property:vendor.insmod.ko=1
+    # to insmod usb drivers before camera hal-service starts.
+    insmod /vendor/lib/modules/btusb.ko
+
+on property:vendor.insmod.ko=1
+    insmod /vendor/lib64/modules/btusb.ko
+
+# wifi/bt detect
+service wifi_bt /vendor/bin/wifi_bt
+    user root
+    group root system
+    oneshot
+    seclabel u:r:wifi_bt:s0
+
+# wifi/bt init
+service wifi_bt_check /system/bin/opt/etc/wifi_bt_init.sh
+    user root
+    group root system
+    oneshot
+    disabled
+    
+on post-fs-data
+    mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+
+service vendor.wifi_hal_legacy /vendor/bin/hw/android.hardware.wifi@1.0-service
+    class hal
+    capabilities NET_ADMIN NET_RAW SYS_MODULE
+    user wifi
+    group wifi gps
+android.hardware.wifi@1.0-service.rc:2:    mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+android.hardware.wifi@1.0-service.rc:4:service vendor.wifi_hal_legacy /vendor/bin/hw/android.hardware.wifi@1.0-service
+android.hardware.wifi@1.0-service.rc:7:    user wifi
+android.hardware.wifi@1.0-service.rc:8:    group wifi gps
+init.bigfish.rc:46:    # rfkill
+init.bigfish.rc:47:    chmod 0660 /sys/class/rfkill/rfkill0/state
+init.bigfish.rc:48:    chmod 0660 /sys/class/rfkill/rfkill0/type
+init.bigfish.rc:49:    chown bluetooth net_bt_admin /sys/class/rfkill/rfkill0/state
+init.bigfish.rc:50:    chown bluetooth net_bt_admin /sys/class/rfkill/rfkill0/type
+init.bigfish.rc:51:    write /sys/class/rfkill/rfkill0/state 1
+init.bigfish.rc:97:service ipconflict_wlan0 /system/bin/ipconflict
+init.bigfish.rc:123:service pppoe_conn_wlan0 /system/etc/ppp/ppp.connect
+init.bigfish.rc:152:    group system dhcp wifi shell
+init.bigfish.rc:157:    group system dhcp wifi
+init.bigfish.rc:162:    group system dhcp wifi shell
+init.bigfish.rc:166:service dhclient_wlan0 /system/bin/dhclient -lf /data/misc/dhcp/dhclient6_wlan0.leases -D LL -6 -nw -d wlan0 
+init.bigfish.rc:167:    group system dhcp wifi shell
+init.bigfish.rc:172:    group system dhcp wifi
+init.bigfish.rc:177:    group system dhcp wifi shell
+init.bigfish.rc:183:    group system dhcp wifi shell
+init.bigfish.rc:188:    group system dhcp wifi shell
+init.bigfish.rc:192:service release_wlan0 /system/bin/dhclient -lf /data/misc/dhcp/dhclient6_wlan0.leases -D LL -6 -r wlan0
+init.bigfish.rc:193:    group system dhcp wifi shell
+init.bigfish.rc:198:    group system dhcp wifi
+init.bigfish.rc:204:    group system dhcp wifi shell
+init.bigfish.rc:209:    group system dhcp wifi shell
+init.bigfish.rc:214:    group system dhcp wifi shell
+init.bigfish.rc:219:    group system dhcp wifi shell
+init.bigfish.rc:223:service dhclientDns_wlan0 /system/bin/dhclient -6 -S -lf /data/misc/dhcp/dhclient6_wlan0.leases -D LL wlan0
+init.bigfish.rc:224:    group system dhcp wifi shell
+init.bigfish.rc:229:    group system dhcp wifi shell
+init.bigfish.rc:240:# wifi Stateless auto config
+init.bigfish.rc:241:on property:persist.sys.ipv6.slaac.wlan0=true
+init.bigfish.rc:242:    write /proc/sys/net/ipv6/conf/wlan0/autoconf 1
+init.bigfish.rc:244:on property:persist.sys.ipv6.slaac.wlan0=false
+init.bigfish.rc:245:    write /proc/sys/net/ipv6/conf/wlan0/autoconf 0
+init.fhservice.rc:130:service wifiadjust /system/bin/opt/etc/wifiadjust.sh
+init.rc:316:    #     /odm/build.prop,
+init.rc:442:    mkdir /data/misc/wifi 0770 wifi wifi
+init.rc:443:    mkdir /data/misc/wifi/sockets 0770 wifi wifi
+init.rc:444:    mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
+init.rc:450:    chmod 0660 /data/misc/wifi/wpa_supplicant.conf
+init.rc:487:    mkdir /data/vendor/tombstones/wifi 0771 wifi wifi
+init.wifibt.rc:3:    # insmod bluetooth drivers
+init.wifibt.rc:4:    insmod /vendor/lib/modules/rtk_btusb.ko
+init.wifibt.rc:9:    start wifi_bt
+init.wifibt.rc:10:    start wifi_bt_check
+init.wifibt.rc:12:on property:vendor.insmod.ko=1
+init.wifibt.rc:13:    # to insmod usb drivers before camera hal-service starts.
+init.wifibt.rc:14:    insmod /vendor/lib/modules/btusb.ko
+init.wifibt.rc:16:on property:vendor.insmod.ko=1
+init.wifibt.rc:17:    insmod /vendor/lib64/modules/btusb.ko
+init.wifibt.rc:19:# wifi/bt detect
+init.wifibt.rc:20:service wifi_bt /vendor/bin/wifi_bt
+init.wifibt.rc:24:    seclabel u:r:wifi_bt:s0
+init.wifibt.rc:26:# wifi/bt init
+init.wifibt.rc:27:service wifi_bt_check /system/bin/opt/etc/wifi_bt_init.sh
+build.prop:59:persist.sys_im.smart_suspend.wifi_off=false
+build.prop:65:persist.wifi.checkinternet=false
+build.prop:109:persist.ethernet.wifidisguise=false
+build.prop:121:persist.network.wifiap_netshare=false
+build.prop:127:wifi.interface=wlan0
+==== hi_sdio_detect.ko
+
+String dump of section '.modinfo':
+  [     0]  license=GPL
+  [     c]  description=hivendor sdio detect
+  [    30]  depends=
+  [    39]  intree=Y
+  [    42]  vermagic=4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+
+==== rtl8822cs.ko
+
+String dump of section '.modinfo':
+  [     0]  parmtype=rtw_8822c_xcap_overwrite:uint
+  [    27]  parmtype=rtw_ch_switch_offload:int
+  [    4a]  parmtype=rtw_iqk_fw_offload:int
+  [    6a]  parmtype=rtw_en_gro:int
+  [    82]  parmtype=rtw_napi_threshold:int
+  [    a2]  parmtype=rtw_en_napi:int
+  [    bb]  parmtype=rtw_halrf_ability:uint
+  [    db]  parmtype=rtw_phydm_ability:uint
+  [    fb]  parm=rtw_trx_share_mode:TRx FIFO Shared
+  [   123]  parmtype=rtw_trx_share_mode:int
+  [   143]  parm=rtw_decrypt_phy_file:Enable Decrypt PHY File
+  [   175]  parmtype=rtw_decrypt_phy_file:int
+  [   197]  parm=rtw_load_phy_file:PHY File Bit Map
+  [   1bf]  parmtype=rtw_load_phy_file:int
+  [   1de]  parm=rtw_phy_file_path:The path of phy parameter
+  [   20f]  parmtype=rtw_phy_file_path:charp
+  [   230]  parm=rtw_tsf_update_restore_factor:num of bcn intervals to stay TSF update restore status
+  [   28a]  parmtype=rtw_tsf_update_restore_factor:int
+  [   2b5]  parm=rtw_tsf_update_pause_factor:num of bcn intervals to stay TSF update pause status
+  [   30b]  parmtype=rtw_tsf_update_pause_factor:int
+  [   334]  parm=rtw_tx_npath_enable:0:Disable, 1:TX-2PATH
+  [   363]  parmtype=rtw_tx_npath_enable:int
+  [   384]  parm=rtw_target_tx_pwr_5g_d:5G target tx power (unit:dBm) of RF path D for each rate section, should match the real calibrate power, -1: undefined
+  [   417]  parmtype=rtw_target_tx_pwr_5g_d:array of int
+  [   444]  parm=rtw_target_tx_pwr_5g_c:5G target tx power (unit:dBm) of RF path C for each rate section, should match the real calibrate power, -1: undefined
+  [   4d7]  parmtype=rtw_target_tx_pwr_5g_c:array of int
+  [   504]  parm=rtw_target_tx_pwr_5g_b:5G target tx power (unit:dBm) of RF path B for each rate section, should match the real calibrate power, -1: undefined
+  [   597]  parmtype=rtw_target_tx_pwr_5g_b:array of int
+  [   5c4]  parm=rtw_target_tx_pwr_5g_a:5G target tx power (unit:dBm) of RF path A for each rate section, should match the real calibrate power, -1: undefined
+  [   657]  parmtype=rtw_target_tx_pwr_5g_a:array of int
+  [   684]  parm=rtw_target_tx_pwr_2g_d:2.4G target tx power (unit:dBm) of RF path D for each rate section, should match the real calibrate power, -1: undefined
+  [   719]  parmtype=rtw_target_tx_pwr_2g_d:array of int
+  [   746]  parm=rtw_target_tx_pwr_2g_c:2.4G target tx power (unit:dBm) of RF path C for each rate section, should match the real calibrate power, -1: undefined
+  [   7db]  parmtype=rtw_target_tx_pwr_2g_c:array of int
+  [   808]  parm=rtw_target_tx_pwr_2g_b:2.4G target tx power (unit:dBm) of RF path B for each rate section, should match the real calibrate power, -1: undefined
+  [   89d]  parmtype=rtw_target_tx_pwr_2g_b:array of int
+  [   8ca]  parm=rtw_target_tx_pwr_2g_a:2.4G target tx power (unit:dBm) of RF path A for each rate section, should match the real calibrate power, -1: undefined
+  [   95f]  parmtype=rtw_target_tx_pwr_2g_a:array of int
+  [   98c]  parm=rtw_tx_pwr_lmt_enable:0:Disable, 1:Enable, 2: Depend on efuse
+  [   9cf]  parmtype=rtw_tx_pwr_lmt_enable:int
+  [   9f2]  parm=rtw_tx_pwr_by_rate:0:Disable, 1:Enable, 2: Depend on efuse
+  [   a32]  parmtype=rtw_tx_pwr_by_rate:int
+  [   a52]  parm=rtw_pll_ref_clk_sel:force pll_ref_clk_sel, 0xF:use autoload value
+  [   a99]  parmtype=rtw_pll_ref_clk_sel:uint
+  [   abb]  parm=rtw_rxgain_offset_5gm:default RF Gain 5GL Offset value:0
+  [   af9]  parmtype=rtw_rxgain_offset_5gh:uint
+  [   b1d]  parm=rtw_rxgain_offset_5gm:default RF Gain 5GM Offset value:0
+  [   b5b]  parmtype=rtw_rxgain_offset_5gm:uint
+  [   b7f]  parm=rtw_rxgain_offset_5gl:default RF Gain 5GL Offset value:0
+  [   bbd]  parmtype=rtw_rxgain_offset_5gl:uint
+  [   be1]  parm=rtw_rxgain_offset_2g:default RF Gain 2G Offset value:0
+  [   c1d]  parmtype=rtw_rxgain_offset_2g:uint
+  [   c40]  parm=rtw_FileMaskEfuse:default drv Mask Efuse value:0
+  [   c76]  parmtype=rtw_FileMaskEfuse:uint
+  [   c96]  parm=rtw_OffEfuseMask:default open Efuse Mask value:0
+  [   ccc]  parmtype=rtw_OffEfuseMask:uint
+  [   ceb]  parm=rtw_TxBBSwing_5G:default init value:0xFF
+  [   d19]  parmtype=rtw_TxBBSwing_5G:uint
+  [   d38]  parm=rtw_TxBBSwing_2G:default init value:0xFF
+  [   d66]  parmtype=rtw_TxBBSwing_2G:uint
+  [   d85]  parm=rtw_GLNA_type:default init value:0
+  [   dad]  parmtype=rtw_GLNA_type:uint
+  [   dc9]  parm=rtw_powertracking_type:default init value:64
+  [   dfb]  parmtype=rtw_powertracking_type:uint
+  [   e20]  parm=rtw_RFE_type:default init value:64
+  [   e48]  parmtype=rtw_RFE_type:uint
+  [   e63]  parm=rtw_amplifier_type_5g:BIT6:5G ext-PA, BIT7:5G ext-LNA
+  [   e9e]  parmtype=rtw_amplifier_type_5g:uint
+  [   ec2]  parm=rtw_amplifier_type_2g:BIT3:2G ext-PA, BIT4:2G ext-LNA
+  [   efd]  parmtype=rtw_amplifier_type_2g:uint
+  [   f21]  parm=rtw_adaptivity_th_edcca_hl_diff:th_edcca_hl_diff for Adaptivity
+  [   f66]  parmtype=rtw_adaptivity_th_edcca_hl_diff:int
+  [   f93]  parm=rtw_adaptivity_th_l2h_ini:th_l2h_ini for Adaptivity
+  [   fcc]  parmtype=rtw_adaptivity_th_l2h_ini:int
+  [   ff3]  parm=rtw_adaptivity_mode:0:normal, 1:carrier sense
+  [  1026]  parmtype=rtw_adaptivity_mode:uint
+  [  1048]  parm=rtw_adaptivity_en:0:disable, 1:enable
+  [  1073]  parmtype=rtw_adaptivity_en:uint
+  [  1093]  parm=rtw_hiq_filter:0:allow all, 1:allow special, 2:deny all
+  [  10d0]  parmtype=rtw_hiq_filter:uint
+  [  10ed]  parm=rtw_notch_filter:0:Disable, 1:Enable, 2:Enable only for P2P
+  [  112e]  parmtype=rtw_notch_filter:uint
+  [  114d]  parmtype=rtw_advnace_ota:int
+  [  116a]  parmtype=rtw_mc2u_disable:int
+  [  1188]  parm=rtw_max_roaming_times:The max roaming times to try
+  [  11c0]  parmtype=rtw_max_roaming_times:uint
+  [  11e4]  parmtype=rtw_check_hw_status:int
+  [  1205]  parmtype=rtw_hw_wps_pbc:int
+  [  1221]  parmtype=rtw_hwpwrp_detect:int
+  [  1240]  parmtype=rtw_hwpdn_mode:int
+  [  125c]  parmtype=rtw_enusbss:int
+  [  1275]  parmtype=rtw_switch_usb_mode:int
+  [  1296]  parmtype=rtw_single_ant_path:int
+  [  12b7]  parmtype=rtw_drv_ant_band_switch:int
+  [  12dc]  parmtype=rtw_antdiv_type:int
+  [  12f9]  parmtype=rtw_antdiv_cfg:int
+  [  1315]  parmtype=rtw_full_ch_in_p2p_handshake:int
+  [  133f]  parmtype=rtw_wifi_spec:int
+  [  135a]  parmtype=rtw_low_power:int
+  [  1375]  parmtype=rtw_smart_ps:int
+  [  138f]  parmtype=rtw_power_mgnt:int
+  [  13ab]  parmtype=rtw_lowrate_two_xmit:int
+  [  13cd]  parmtype=rtw_beamform_cap:int
+  [  13eb]  parmtype=rtw_quick_addba_req:int
+  [  140c]  parmtype=rtw_tx_ampdu_amsdu:int
+  [  142c]  parmtype=rtw_rx_ampdu_amsdu:int
+  [  144c]  parmtype=rtw_rx_stbc:int
+  [  1465]  parmtype=rtw_ampdu_enable:int
+  [  1483]  parmtype=rtw_bw_mode:int
+  [  149c]  parmtype=rtw_ht_enable:int
+  [  14b7]  parmtype=rtw_busy_thresh:int
+  [  14d4]  parmtype=rtw_vcs_type:int
+  [  14ee]  parmtype=rtw_vrtl_carrier_sense:int
+  [  1512]  parmtype=rtw_wmm_smart_ps:int
+  [  1530]  parmtype=rtw_uapsd_ac_enable:int
+  [  1551]  parmtype=rtw_uapsd_max_sp:int
+  [  156f]  parmtype=rtw_wmm_enable:int
+  [  158b]  parmtype=rtw_mp_mode:int
+  [  15a4]  parmtype=rtw_channel:int
+  [  15bd]  parmtype=rtw_network_mode:int
+  [  15db]  parmtype=rtw_lbkmode:int
+  [  15f4]  parmtype=rtw_rfintfs:int
+  [  160d]  parmtype=rtw_chip_version:int
+  [  162b]  parmtype=rtw_special_rf_path:int
+  [  164c]  parmtype=rtw_initmac:charp
+  [  1667]  parmtype=rtw_pwrtrim_enable:int
+  [  1687]  parmtype=rtw_wowlan_sta_mix_mode:int
+  [  16ac]  parmtype=rtw_sel_p2p_iface:int
+  [  16cb]  parm=if2name:The default name to allocate for second interface
+  [  170a]  parmtype=if2name:charp
+  [  1721]  parm=ifname:The default name to allocate for first interface
+  [  175e]  parmtype=ifname:charp
+  [  1774]  parmtype=rtw_qos_opt_enable:int
+  [  1794]  parm=rtw_ant_num:Antenna number setting, 0:by efuse
+  [  17c8]  parmtype=rtw_ant_num:int
+  [  17e1]  parm=rtw_btcoex_enable:BT co-existence on/off, 0:off, 1:on, 2:by efuse
+  [  1828]  parmtype=rtw_btcoex_enable:int
+  [  1847]  parm=rtw_excl_chs:exclusive channel array
+  [  1871]  parmtype=rtw_excl_chs:array of uint
+  [  1895]  parm=rtw_channel_plan:The default chplan ID when rtw_alpha2 is not specified or valid
+  [  18eb]  parmtype=rtw_channel_plan:int
+  [  1909]  parm=rtw_country_code:The default country code (in alpha2)
+  [  1944]  parmtype=rtw_country_code:charp
+  [  1964]  parmtype=rtw_rf_config:int
+  [  197f]  parm=rtw_vht_rx_mcs_map:VHT RX MCS map
+  [  19a6]  parmtype=rtw_vht_rx_mcs_map:uint
+  [  19c7]  parmtype=rtw_vht_enable:int
+  [  19e3]  parm=rtw_rx_ampdu_sz_limit_4ss:RX AMPDU size limit for 4SS link of each BW, 0xFF: no limitation
+  [  1a43]  parmtype=rtw_rx_ampdu_sz_limit_4ss:array of uint
+  [  1a74]  parm=rtw_rx_ampdu_sz_limit_3ss:RX AMPDU size limit for 3SS link of each BW, 0xFF: no limitation
+  [  1ad4]  parmtype=rtw_rx_ampdu_sz_limit_3ss:array of uint
+  [  1b05]  parm=rtw_rx_ampdu_sz_limit_2ss:RX AMPDU size limit for 2SS link of each BW, 0xFF: no limitation
+  [  1b65]  parmtype=rtw_rx_ampdu_sz_limit_2ss:array of uint
+  [  1b96]  parm=rtw_rx_ampdu_sz_limit_1ss:RX AMPDU size limit for 1SS link of each BW, 0xFF: no limitation
+  [  1bf6]  parmtype=rtw_rx_ampdu_sz_limit_1ss:array of uint
+  [  1c27]  parm=rtw_tx_bw_mode:The max tx bw for 2.4G and 5G. format is the same as rtw_bw_mode
+  [  1c7c]  parmtype=rtw_tx_bw_mode:uint
+  [  1c99]  parm=rtw_tx_aclt_conf_ap_m2u:device TX AC queue lifetime config for AP mode M2U status
+  [  1cf0]  parmtype=rtw_tx_aclt_conf_ap_m2u:array of uint
+  [  1d1f]  parm=rtw_tx_aclt_conf_default:device TX AC queue lifetime config for default status
+  [  1d73]  parmtype=rtw_tx_aclt_conf_default:array of uint
+  [  1da3]  parm=rtw_tx_aclt_flags:device TX AC queue packet lifetime control flags
+  [  1deb]  parmtype=rtw_tx_aclt_flags:uint
+  [  1e0b]  parm=rtw_drv_log_level:set log level when insert driver module, default log level is _DRV_INFO_ = 4
+  [  1e6f]  parmtype=rtw_drv_log_level:uint
+  [  1e8f]  parmtype=rtw_dynamic_agg_enable:int
+  [  1eb3]  parmtype=rtw_usb_rxagg_mode:int
+  [  1ed3]  parmtype=rtw_max_bss_cnt:int
+  [  1ef0]  parmtype=rtw_lps_chk_by_tp:int
+  [  1f0f]  parm=rtw_lps_level:The default LPS level
+  [  1f38]  parmtype=rtw_lps_level:int
+  [  1f53]  parm=rtw_ips_mode:The default IPS mode
+  [  1f7a]  parmtype=rtw_ips_mode:int
+  [  1f94]  parmtype=rtw_wireless_mode:int
+  [  1fb3]  parmtype=rtw_la_mode_en:int
+  [  1fcf]  version=v5.7.3.4_36176.20200217_COEX20190531-0e0e
+  [  2001]  author=Realtek Semiconductor Corp.
+  [  2024]  description=Realtek Wireless Lan Driver
+  [  204c]  license=GPL
+  [  2058]  srcversion=533BB7E5866E52F63B9ACCB
+  [  207b]  alias=sdio:c07v024CdD821*
+  [  2095]  alias=sdio:c07v024CdC822*
+  [  20b0]  depends=
+  [  20b9]  intree=Y
+  [  20c2]  vermagic=4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+
+==== uwe5621_bsp_sdio.ko
+
+String dump of section '.modinfo':
+  [     0]  author=Yufeng Yang <yufeng.yang@spreadtrum.com>
+  [    30]  description=Spreadtrum  WCN Marlin Driver
+  [    5a]  license=GPL v2
+  [    6c]  depends=
+  [    75]  intree=Y
+  [    7e]  vermagic=4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+
+==== uwe5621_wifi_sdio.ko
+
+String dump of section '.modinfo':
+  [     0]  parm=tcp_ack_drop_cnt:valid values: [1, 13]
+  [    2c]  parmtype=tcp_ack_drop_cnt:uint
+  [    4b]  parm=wfa_cap:set capability for WFA test
+  [    74]  parmtype=wfa_cap:uint
+  [    8a]  license=GPL
+  [    96]  author=Spreadtrum WCN Division
+  [    b5]  description=Spreadtrum Wireless LAN Driver
+  [    e0]  alias=of:N*T*Csprd,unisoc-wifiC*
+  [   101]  alias=of:N*T*Csprd,unisoc-wifi
+  [   120]  depends=uwe5621_bsp_sdio
+  [   139]  intree=Y
+  [   142]  vermagic=4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+
+==== wlan_mt7961_pcie.ko
+
+String dump of section '.modinfo':
+  [     0]  license=Dual BSD/GPL
+  [    15]  description=NIC_DESC
+  [    2a]  author=NIC_AUTHOR
+  [    3c]  alias=pci:v000014C3d00007961sv*sd*bc*sc*i*
+  [    68]  depends=
+  [    71]  intree=Y
+  [    7a]  vermagic=4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+
+== Wi-Fi files in vendor bin/lib and board configuration ==
+/293/100755/0/2000/rmbtdriver.sh/1103/
+/362/100755/0/2000/init_hardware_info/24472/
+/371/100755/0/2000/wifi_bt/28700/
+/418/100755/0/2000/rtlbtmp_clt/20216/
+/446/100755/0/2000/sample_ipcfg/20604/
+/463/100755/0/2000/rtlbtmp/24796/
+/473/100755/0/2000/wifitest/4462308/
+/497/100755/0/2000/rtlbtmp_skt/28888/
+/381/100755/0/2000/android.hardware.wifi@1.0-service/267868/
+/95/100644/0/0/libteec.so/41076/
+/107/100644/0/0/libbt-sprd_suite.so/55536/
+/113/100644/0/0/libwifi-hal.so/26016/
+/121/100644/0/0/libbt-vendor-rtk.so/176556/
+/130/100644/0/0/libwifi-hal-rtk.so/89196/
+/132/100644/0/0/libhi_subtitle.so/57296/
+/138/100644/0/0/libbt-vendor-unisoc.so/66520/
+/190/100644/0/0/libbt-vendor-mtk.so/15920/
+/195/100644/0/0/libbt-vendor-sprd.so/53940/
+/196/100644/0/0/libbt-vendor.so/28872/
+/230/100644/0/0/libkeystore-wifi-hidl.so/16124/
+/237/100644/0/0/libwifi-hal-bcm.so/89296/
+/238/100644/0/0/libkeystore-engine-wifi-hidl.so/20772/
+/178/100644/0/0/btmp.default.so/286700/
+/535/040755/0/2000/init//
+/580/040755/0/2000/wifi//
+
+hi_sdio_detect.ko:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <hi_gpio_set_value>:
+   0:	e92d43f0 	push	{r4, r5, r6, r7, r8, r9, lr}
+   4:	e24dd00c 	sub	sp, sp, #12
+   8:	e59f70a0 	ldr	r7, [pc, #160]	@ b0 <hi_gpio_set_value+0xb0>
+   c:	e1a09001 	mov	r9, r1
+  10:	e1a08000 	mov	r8, r0
+  14:	e5973000 	ldr	r3, [r7]
+  18:	e58d3004 	str	r3, [sp, #4]
+  1c:	ebfffffe 	bl	0 <gpio_to_desc>
+			1c: R_ARM_CALL	gpio_to_desc
+  20:	e3a01000 	mov	r1, #0
+  24:	ebfffffe 	bl	0 <gpiod_direction_output_raw>
+			24: R_ARM_CALL	gpiod_direction_output_raw
+  28:	e2504000 	subs	r4, r0, #0
+  2c:	1a000015 	bne	88 <hi_gpio_set_value+0x88>
+  30:	e59f607c 	ldr	r6, [pc, #124]	@ b4 <hi_gpio_set_value+0xb4>
+  34:	e30f5d78 	movw	r5, #64888	@ 0xfd78
+  38:	e3475fff 	movt	r5, #32767	@ 0x7fff
+  3c:	e3a04064 	mov	r4, #100	@ 0x64
+  40:	e5963004 	ldr	r3, [r6, #4]
+  44:	e1a00005 	mov	r0, r5
+  48:	e12fff33 	blx	r3
+  4c:	e2544001 	subs	r4, r4, #1
+  50:	1afffffa 	bne	40 <hi_gpio_set_value+0x40>
+  54:	e1a00008 	mov	r0, r8
+  58:	ebfffffe 	bl	0 <gpio_to_desc>
+			58: R_ARM_CALL	gpio_to_desc
+  5c:	e1a01009 	mov	r1, r9
+  60:	ebfffffe 	bl	0 <gpiod_direction_output_raw>
+			60: R_ARM_CALL	gpiod_direction_output_raw
+  64:	e2504000 	subs	r4, r0, #0
+  68:	1a00000b 	bne	9c <hi_gpio_set_value+0x9c>
+  6c:	e59d2004 	ldr	r2, [sp, #4]
+  70:	e1a00004 	mov	r0, r4
+  74:	e5973000 	ldr	r3, [r7]
+  78:	e1520003 	cmp	r2, r3
+  7c:	1a000005 	bne	98 <hi_gpio_set_value+0x98>
+  80:	e28dd00c 	add	sp, sp, #12
+  84:	e8bd83f0 	pop	{r4, r5, r6, r7, r8, r9, pc}
+  88:	e1a01008 	mov	r1, r8
+  8c:	e59f0024 	ldr	r0, [pc, #36]	@ b8 <hi_gpio_set_value+0xb8>
+  90:	ebfffffe 	bl	0 <printk>
+			90: R_ARM_CALL	printk
+  94:	eafffff4 	b	6c <hi_gpio_set_value+0x6c>
+  98:	ebfffffe 	bl	0 <__stack_chk_fail>
+			98: R_ARM_CALL	__stack_chk_fail
+  9c:	e1a02009 	mov	r2, r9
+  a0:	e1a01008 	mov	r1, r8
+  a4:	e59f0010 	ldr	r0, [pc, #16]	@ bc <hi_gpio_set_value+0xbc>
+  a8:	ebfffffe 	bl	0 <printk>
+			a8: R_ARM_CALL	printk
+  ac:	eaffffee 	b	6c <hi_gpio_set_value+0x6c>
+	...
+			b0: R_ARM_ABS32	__stack_chk_guard
+			b4: R_ARM_ABS32	arm_delay_ops
+			b8: R_ARM_ABS32	.rodata.str1.4
+  bc:	0000003c 	.word	0x0000003c
+			bc: R_ARM_ABS32	.rodata.str1.4
+
+000000c0 <init_module>:
+  c0:	e92d41f0 	push	{r4, r5, r6, r7, r8, lr}
+  c4:	e24dd008 	sub	sp, sp, #8
+  c8:	e59f709c 	ldr	r7, [pc, #156]	@ 16c <init_module+0xac>
+  cc:	e3a01000 	mov	r1, #0
+  d0:	e59f8098 	ldr	r8, [pc, #152]	@ 170 <init_module+0xb0>
+  d4:	e30f6d78 	movw	r6, #64888	@ 0xfd78
+  d8:	e59f5094 	ldr	r5, [pc, #148]	@ 174 <init_module+0xb4>
+  dc:	e3476fff 	movt	r6, #32767	@ 0x7fff
+  e0:	e5973000 	ldr	r3, [r7]
+  e4:	e3a04064 	mov	r4, #100	@ 0x64
+  e8:	e5980000 	ldr	r0, [r8]
+  ec:	e58d3004 	str	r3, [sp, #4]
+  f0:	ebffffc2 	bl	0 <hi_gpio_set_value>
+  f4:	e59f007c 	ldr	r0, [pc, #124]	@ 178 <init_module+0xb8>
+  f8:	ebfffffe 	bl	0 <printk>
+			f8: R_ARM_CALL	printk
+  fc:	e5953004 	ldr	r3, [r5, #4]
+ 100:	e1a00006 	mov	r0, r6
+ 104:	e12fff33 	blx	r3
+ 108:	e2544001 	subs	r4, r4, #1
+ 10c:	1afffffa 	bne	fc <init_module+0x3c>
+ 110:	e3a01001 	mov	r1, #1
+ 114:	e5980000 	ldr	r0, [r8]
+ 118:	ebffffb8 	bl	0 <hi_gpio_set_value>
+ 11c:	e59f0058 	ldr	r0, [pc, #88]	@ 17c <init_module+0xbc>
+ 120:	ebfffffe 	bl	0 <printk>
+			120: R_ARM_CALL	printk
+ 124:	e30f6d78 	movw	r6, #64888	@ 0xfd78
+ 128:	e3476fff 	movt	r6, #32767	@ 0x7fff
+ 12c:	e3a04064 	mov	r4, #100	@ 0x64
+ 130:	e5953004 	ldr	r3, [r5, #4]
+ 134:	e1a00006 	mov	r0, r6
+ 138:	e12fff33 	blx	r3
+ 13c:	e2544001 	subs	r4, r4, #1
+ 140:	1afffffa 	bne	130 <init_module+0x70>
+ 144:	e3a00001 	mov	r0, #1
+ 148:	ebfffffe 	bl	0 <sdhci_nebula_sdio_rescan>
+			148: R_ARM_CALL	sdhci_nebula_sdio_rescan
+ 14c:	e1a00004 	mov	r0, r4
+ 150:	e59d2004 	ldr	r2, [sp, #4]
+ 154:	e5973000 	ldr	r3, [r7]
+ 158:	e1520003 	cmp	r2, r3
+ 15c:	1a000001 	bne	168 <init_module+0xa8>
+ 160:	e28dd008 	add	sp, sp, #8
+ 164:	e8bd81f0 	pop	{r4, r5, r6, r7, r8, pc}
+ 168:	ebfffffe 	bl	0 <__stack_chk_fail>
+			168: R_ARM_CALL	__stack_chk_fail
+	...
+			16c: R_ARM_ABS32	__stack_chk_guard
+			170: R_ARM_ABS32	.data
+			174: R_ARM_ABS32	arm_delay_ops
+ 178:	00000078 	.word	0x00000078
+			178: R_ARM_ABS32	.rodata.str1.4
+ 17c:	00000098 	.word	0x00000098
+			17c: R_ARM_ABS32	.rodata.str1.4
+
+00000180 <cleanup_module>:
+ 180:	e92d4010 	push	{r4, lr}
+ 184:	e24dd008 	sub	sp, sp, #8
+ 188:	e59f4038 	ldr	r4, [pc, #56]	@ 1c8 <cleanup_module+0x48>
+ 18c:	e59f0038 	ldr	r0, [pc, #56]	@ 1cc <cleanup_module+0x4c>
+ 190:	e5943000 	ldr	r3, [r4]
+ 194:	e58d3004 	str	r3, [sp, #4]
+ 198:	ebfffffe 	bl	0 <printk>
+			198: R_ARM_CALL	printk
+ 19c:	e59d2004 	ldr	r2, [sp, #4]
+ 1a0:	e5943000 	ldr	r3, [r4]
+ 1a4:	e1520003 	cmp	r2, r3
+ 1a8:	1a000005 	bne	1c4 <cleanup_module+0x44>
+ 1ac:	e59f301c 	ldr	r3, [pc, #28]	@ 1d0 <cleanup_module+0x50>
+ 1b0:	e3a01000 	mov	r1, #0
+ 1b4:	e5930000 	ldr	r0, [r3]
+ 1b8:	e28dd008 	add	sp, sp, #8
+ 1bc:	e8bd4010 	pop	{r4, lr}
+ 1c0:	eaffff8e 	b	0 <hi_gpio_set_value>
+ 1c4:	ebfffffe 	bl	0 <__stack_chk_fail>
+			1c4: R_ARM_CALL	__stack_chk_fail
+ 1c8:	00000000 	.word	0x00000000
+			1c8: R_ARM_ABS32	__stack_chk_guard
+ 1cc:	000000b0 	.word	0x000000b0
+			1cc: R_ARM_ABS32	.rodata.str1.4
+ 1d0:	00000000 	.word	0x00000000
+			1d0: R_ARM_ABS32	.data

@@ -1,0 +1,247 @@
+debugfs 1.47.4 (6-Mar-2025)
+Inode: 371   Type: regular    Mode:  0755   Flags: 0x80000
+Generation: 0    Version: 0x00000000
+User:     0   Group:  2000   Size: 28700
+File ACL: 25974
+Links: 1   Blockcount: 72
+Fragment:  Address: 0    Number: 0    Size: 0
+ctime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+atime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+mtime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+Extended attributes:
+  security.selinux (27) = "u:object_r:wifi_bt_exec:s0\000"
+EXTENTS:
+(0-7):16731-16738
+debugfs 1.47.4 (6-Mar-2025)
+Inode: 580   Type: directory    Mode:  0755   Flags: 0x80000
+Generation: 0    Version: 0x00000000
+User:     0   Group:  2000   Size: 4096
+File ACL: 26183
+Links: 2   Blockcount: 16
+Fragment:  Address: 0    Number: 0    Size: 0
+ctime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+atime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+mtime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+Extended attributes:
+  security.selinux (34) = "u:object_r:vendor_configs_file:s0\000"
+EXTENTS:
+(0):19228
+debugfs 1.47.4 (6-Mar-2025)
+Inode: 274   Type: directory    Mode:  0755   Flags: 0x80000
+Generation: 0    Version: 0x00000000
+User:     0   Group:  2000   Size: 4096
+File ACL: 25877
+Links: 4   Blockcount: 16
+Fragment:  Address: 0    Number: 0    Size: 0
+ctime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+atime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+mtime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+Extended attributes:
+  security.selinux (26) = "u:object_r:vendor_file:s0\000"
+EXTENTS:
+(0):15967
+debugfs 1.47.4 (6-Mar-2025)
+Inode: 93   Type: regular    Mode:  0644   Flags: 0x80000
+Generation: 0    Version: 0x00000000
+User:     0   Group:     0   Size: 3628
+File ACL: 25696
+Links: 1   Blockcount: 16
+Fragment:  Address: 0    Number: 0    Size: 0
+ctime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+atime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+mtime: 0x495b9700 -- Thu Jan  1 00:00:00 2009
+Extended attributes:
+  security.selinux (26) = "u:object_r:vendor_file:s0\000"
+EXTENTS:
+(0):4404
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+#!/system/bin/sh
+
+BOARDID=`getprop ro.fh.boardid`
+LSADCIX=`getprop ro.fh.lsadcix`
+if [ "$BOARDID" == "1" ] || [ "$BOARDID" == "2" ] || [ "$BOARDID" == "4" ];then
+    #for lan & pon rtl8761b
+    ETHERNETMAC=`getprop ro.mac`
+    if [ -n "$ETHERNETMAC" ]; then
+        SimpleMac=`echo "$ETHERNETMAC" | busybox sed 's/://g'`
+        #bt mac = eth mac + 1
+        LowBtMac=$((16#${SimpleMac:6:6}+1))
+        HightBtMac=$((16#${SimpleMac:0:6}))
+        if [ $LowBtMac -gt $((16#FFFFFF)) ];then
+            LowBtMac=$(($LowBtMac-$((16#FFFFFF))-1))
+            HightBtMac=$(($HightBtMac+1))
+        fi
+        BtMac=`busybox printf "%06x%06x" $HightBtMac $LowBtMac | busybox tr a-z A-Z`
+        FinalBtMac=$(echo "${BtMac:0:2}:${BtMac:2:2}:${BtMac:4:2}:${BtMac:6:2}:${BtMac:8:2}:${BtMac:10:2}")
+        BTMACSTATUS=`getprop persist.vendor.rtkbt.bdaddr_path`
+        if [ "$BTMACSTATUS" != "default" ];then
+            setprop persist.vendor.rtkbt.bdaddr_path default
+        fi
+        setprop ro.boot.btmacaddr $FinalBtMac
+    fi
+elif [ "$BOARDID" == "0" ] ;then
+    insmod /vendor/lib/modules/hi_sdio_detect.ko
+    insmod /vendor/lib/modules/btmtksdio.ko
+    insmod /vendor/lib/modules/wlan_mt7663_sdio_prealloc.ko
+    insmod /vendor/lib/modules/uwe5621_bsp_sdio.ko
+    insmod /vendor/lib/modules/uwe5621_bt_sdio.ko
+    chown bluetooth net_bt_admin /dev/ttyBT0
+    chown bluetooth net_bt_admin /sys/bus/platform/devices/mtty.0/at
+    chown bluetooth net_bt_admin /sys/bus/platform/devices/mtty.0/woble_set
+    chmod 660 /dev/ttyBT0
+    chmod 660 /sys/bus/platform/devices/mtty.0/at
+    chmod 660 /sys/bus/platform/devices/mtty.0/woble_set
+fi
+
+if [ "$BOARDID" == "7" ] ;then
+    if [ "$LSADCIX" == "12" ] || [ "$LSADCIX" == "8" ];then
+        #reset only in MT7920QEN
+        chmod 644 /sys/hi_rfkill/reset_onresume
+        echo 0 > /sys/hi_rfkill/reset_onresume
+    else
+        setprop persist.wifi.ap.interface ap0
+        echo 0 > /proc/sys/kernel/printk
+        /system/bin/opt/etc/gpio_ctl.sh 35 off
+        sleep 0.2                
+        /system/bin/opt/etc/gpio_ctl.sh 35 on
+        sleep 0.5                         
+        echo 1 > /sys/class/pci_bus/0000\:01/device/remove
+        echo 1 > /sys/class/pci_bus/0000\:00/rescan
+        insmod /vendor/lib/modules/btmtk_uart_unify.ko
+        start mtk_uart_launcher
+    fi
+else
+    #reset only in MT7920QEN
+    chmod 644 /sys/hi_rfkill/reset_onresume
+    echo 0 > /sys/hi_rfkill/reset_onresume
+fi
+
+setprop ctl.start wifi_bt
+
+#bt wifi check
+/system/bin/opt/etc/hw.detect.sh &
+
+
+#!/system/bin/sh
+
+FILE_WIFIADJUST="/data/data/wifiadjust"
+
+svc wifi enable
+
+sleep 2
+
+if [ -f /system/bin/wifitest_dump_only ] ;then
+    /system/bin/wifitest_dump_only -H 1 > $FILE_WIFIADJUST
+else
+    wifitest -H 1 > $FILE_WIFIADJUST
+fi
+chmod 644 $FILE_WIFIADJUST
+sync
+858939bc35b1306f67294e0491adf6a16e413048eef7bb2648bbeb681eddba9b  extracted/wifi_bt
+4279118caef7fb9cf0352b65d355e05611b7df5a421f3125d6440613aeb0f35a  extracted/wifi_bt_init.sh
+    5dd delete_module
+   4530 wifi_bt
+   4538 enter wifi_unload_driver
+   458b proc_wifibt_suspend enter!
+   45ac No plug wifi device, please plug wifi device!!!!
+   45de UWE5621DS
+   45e8 UWE5621DS driver need unload!
+   4607 get WLAN_DRIVER_STATUS failed!
+   462a UWE5621DS driver is unloaded!
+   4674 /vendor/etc/wifi/socwifi.cfg
+   46d7 ERROR in parse socwifi.cfg !!please check the socwifi.cfg!!
+   4714 detect_wifi_device device_count = %d retry = %d
+   4745 Unable to unload driver module '%s'
+   4769 ro.fh.boardid
+   4787 ro.fh.module.vendor
+   47cb Can not open wifi config %s,please check !
+   490e parse_config_line:parse module_num fail
+   4937 parse_config_line:parse module_name fail
+   4961 parse_config_line:parse module_arg fail
+   498a parse_config_line:parse wifi_hal_lib fail
+   4bd8 ERROR in socwifi.cfg!!!! socwifi.cfg %s 'order' number,should not the same num!!
+   4d24 wifi_only
+   4d5c parse_module_num:parse module_num fail
+   4d84 parse_driver_module_name:parse module_name fail
+   4dbb /vendor/lib/modules
+   4dcf parse_driver_module_arg:parse module_arg null
+   4dfe parse_driver_module_tag:parse module_tag fail
+   4e2d parse_wifi_hal_lib:parse wifi_hal_lib fail
+   4fb0 parse_driver_module_tag:parse bt_woble fail
+   5019 wifi_device_list[%d] = %d
+   5086 /sys/bus/usb/devices
+   50d1 get_wifi_usb_device_num is %d
+   50f0 /sys/bus/sdio/devices
+   513c get_wifi_sdio_device_num is %d
+   515c /sys/bus/pci/devices
+   5171 get_wifi_pci_device_num is %d
+   5224 p2p-dev-wlan0
+   5245 ws73_detected
+   5264 /vendor/lib/modules/sle_soc.ko
+   5296 /vendor/lib/modules/ble_soc.ko
+   52d3 /vendor/lib/modules/plat_soc.ko
+   5340 finit_module return: %d
+   558e index inlined table detected but pr function requires extra words
+   5700 wlan.driver.tag
+   5710 wlan.driver.status
+   5723 wlan.driver
+   572f wlan.vendor.hal.lib
+   5743 wlan.supplicant.name
+   5758 wlan.user.load.driver
+   576e wlan.driver.wow.mode
+   5783 wlan.driver.path
+   5794 wlan.driver.args
+   57ef wifi.direct.interface
+== hi_sdio_detect
+filename:       /home/hedc/hg680kd-mainline/analysis/wifi/extracted/hi_sdio_detect.ko
+license:        GPL
+description:    hivendor sdio detect
+depends:        
+intree:         Y
+vermagic:       4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+== rtl8822cs
+filename:       /home/hedc/hg680kd-mainline/analysis/wifi/extracted/rtl8822cs.ko
+version:        v5.7.3.4_36176.20200217_COEX20190531-0e0e
+author:         Realtek Semiconductor Corp.
+description:    Realtek Wireless Lan Driver
+license:        GPL
+srcversion:     533BB7E5866E52F63B9ACCB
+alias:          sdio:c07v024CdD821*
+alias:          sdio:c07v024CdC822*
+depends:        
+intree:         Y
+vermagic:       4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+== uwe5621_bsp_sdio
+filename:       /home/hedc/hg680kd-mainline/analysis/wifi/extracted/uwe5621_bsp_sdio.ko
+author:         Yufeng Yang <yufeng.yang@spreadtrum.com>
+description:    Spreadtrum  WCN Marlin Driver
+license:        GPL v2
+depends:        
+intree:         Y
+vermagic:       4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+== uwe5621_wifi_sdio
+filename:       /home/hedc/hg680kd-mainline/analysis/wifi/extracted/uwe5621_wifi_sdio.ko
+license:        GPL
+author:         Spreadtrum WCN Division
+description:    Spreadtrum Wireless LAN Driver
+alias:          of:N*T*Csprd,unisoc-wifiC*
+alias:          of:N*T*Csprd,unisoc-wifi
+depends:        uwe5621_bsp_sdio
+intree:         Y
+vermagic:       4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+== wlan_mt7961_pcie
+filename:       /home/hedc/hg680kd-mainline/analysis/wifi/extracted/wlan_mt7961_pcie.ko
+license:        Dual BSD/GPL
+description:    NIC_DESC
+author:         NIC_AUTHOR
+alias:          pci:v000014C3d00007961sv*sd*bc*sc*i*
+depends:        
+intree:         Y
+vermagic:       4.9.118_hi3798mv320 SMP preempt mod_unload modversions ARMv7 p2v8 
+
+extracted/hi_sdio_detect.ko:     file format elf32-littlearm
+
+Contents of section .data:
+ 0000 23000000                             #...            

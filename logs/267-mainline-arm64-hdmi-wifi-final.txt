@@ -1,0 +1,426 @@
+<INTERRUPT>
+fastboot#md.b f8b220e0 1
+f8b220e0: 20                                                
+fastboot#md.b f8b22400 1
+f8b22400: 40                                               @
+fastboot#md.l f8a20870 1
+f8a20870: 00f00005                             ....
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.160
+fastboot#setenv tftpdstp 1069
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+172463104 Bytes/s
+fastboot#tftpboot 1fdffc0 hg680kd-arm64-all-2g-hdmi-wifi-probe.img
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.160; our IP address is 192.168.6.249
+Filename 'hg680kd-arm64-all-2g-hdmi-wifi-probe.img'.
+Load address: 0x1fdffc0
+Loading: *#	[ Connected ]
+################################	[ 2.888 MB]
+################################	[ 5.752 MB]
+################################	[ 8.616 MB]
+################################	[11.480 MB]
+###
+	 3 MiB/s
+done
+Bytes transferred = 12386376 (bd0048 hex)
+fastboot#crc32 1fdffc0 bd0048
+CRC32 for 01fdffc0 ... 02bb0007 ==> 0c5f261f
+fastboot#
+[host] CRC32 matches local image: 0c5f261f
+bootm 0x1fdffc0
+## Booting kernel from Legacy Image at 01fdffc0 ...
+   Image Name:   Linux HG680KD ARM64
+   Image Type:   AArch64 Linux Kernel Image (uncompressed)
+   Data Size:    12386312 Bytes = 11.8 MiB
+   Load Address: 01fe0000
+   Entry Point:  01fe0000
+   XIP Kernel Image
+
+Starting kernel ...
+
+Start ATF with aarch64 kernel...
+bl33_ep->spsr = 0x3C5
+Start Warm Reseting
+[   52.199885][cpu0]NOTICE:  BL31: lts-v2.8.6(release):98d5f24
+[   52.203975][cpu0]NOTICE:  BL31: Built : 21:47:11, Jul 22 2024
+[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+[    0.000000] Linux version 6.18.64-hg680kd-arm64-all-2g-hdmi-wifi-probe (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP 2025-12-01 00:00:00 UTC
+[    0.000000] Machine model: FiberHome HG680KD (ARM64)
+[    0.000000] earlycon: pl11 at MMIO32 0x00000000f8b00000 (options '')
+[    0.000000] printk: legacy bootconsole [pl11] enabled
+[    0.000000] printk: debug: ignoring loglevel setting.
+[    0.000000] OF: reserved mem: 0x00000000053e0000..0x0000000005bdffff (8192 KiB) nomap non-reusable firmware-log@53e0000
+[    0.000000] OF: reserved mem: 0x00000000063dc000..0x00000000063dffff (16 KiB) nomap non-reusable crash-log@63dc000
+[    0.000000] OF: reserved mem: 0x0000000008000000..0x00000000083fffff (4096 KiB) nomap non-reusable atf@8000000
+[    0.000000] OF: reserved mem: 0x0000000017ff8000..0x0000000017ffffff (32 KiB) nomap non-reusable uboot-resmem-low@17ff8000
+[    0.000000] OF: reserved mem: 0x000000007f67f000..0x000000007f6c0fff (264 KiB) nomap non-reusable uboot-resmem-high@7f67f000
+[    0.000000] OF: reserved mem: 0x000000007f6c1000..0x000000007fea9fff (8100 KiB) nomap non-reusable framebuffer@7f6c1000
+[    0.000000] OF: reserved mem: 0x000000007feaa000..0x000000007fffffff (1368 KiB) nomap non-reusable uboot-resmem-tail@7feaa000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000000000000-0x000000007fffffff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000053dffff]
+[    0.000000]   node   0: [mem 0x00000000053e0000-0x0000000005bdffff]
+[    0.000000]   node   0: [mem 0x0000000005be0000-0x00000000063dbfff]
+[    0.000000]   node   0: [mem 0x00000000063dc000-0x00000000063dffff]
+[    0.000000]   node   0: [mem 0x00000000063e0000-0x0000000007ffffff]
+[    0.000000]   node   0: [mem 0x0000000008000000-0x00000000083fffff]
+[    0.000000]   node   0: [mem 0x0000000008400000-0x0000000017ff7fff]
+[    0.000000]   node   0: [mem 0x0000000017ff8000-0x0000000017ffffff]
+[    0.000000]   node   0: [mem 0x0000000018000000-0x000000007f67efff]
+[    0.000000]   node   0: [mem 0x000000007f67f000-0x000000007fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000007fffffff]
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.2
+[    0.000000] percpu: Embedded 14 pages/cpu s27928 r0 d29416 u57344
+[    0.000000] pcpu-alloc: s27928 r0 d29416 u57344 alloc=14*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+[    0.000000] Detected VIPT I-cache on CPU0
+[    0.000000] CPU features: detected: GICv3 CPU interface
+[    0.000000] alternatives: applying boot alternatives
+[    0.000000] Kernel command line: console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro
+[    0.000000] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+[    0.000000] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.000000] software IO TLB: SWIOTLB bounce buffer size adjusted to 2MB
+[    0.000000] software IO TLB: area num 4.
+[    0.000000] software IO TLB: mapped [mem 0x000000007cd00000-0x000000007cf00000] (2MB)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 524288
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] GICv3: 224 SPIs implemented
+[    0.000000] GICv3: 0 Extended SPIs implemented
+[    0.000000] Root IRQ handler: gic_handle_irq
+[    0.000000] GICv3: GICv3 features: 16 PPIs
+[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0x00000000f1040000
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.000000] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.008208] Console: colour dummy device 80x25
+[    0.012712] printk: legacy console [tty0] enabled
+[    0.017816] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+[    0.028215] pid_max: default: 32768 minimum: 301
+[    0.032989] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.040492] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.049643] rcu: Hierarchical SRCU implementation.
+[    0.054527] rcu: 	Max phase no-delay instances is 1000.
+[    0.060346] smp: Bringing up secondary CPUs ...
+[    0.065295] Detected VIPT I-cache on CPU1
+[    0.065362] GICv3: CPU1: found redistributor 100 region 0:0x00000000f1060000
+[    0.065397] CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
+[    0.065788] Detected VIPT I-cache on CPU2
+[    0.065842] GICv3: CPU2: found redistributor 200 region 0:0x00000000f1080000
+[    0.065866] CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
+[    0.066224] Detected VIPT I-cache on CPU3
+[    0.066271] GICv3: CPU3: found redistributor 300 region 0:0x00000000f10a0000
+[    0.066294] CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
+[    0.066357] smp: Brought up 1 node, 4 CPUs
+[    0.123877] SMP: Total of 4 processors activated.
+[    0.128639] CPU: All CPU(s) started at EL1
+[    0.132785] CPU features: detected: 32-bit EL0 Support
+[    0.137986] CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+[    0.146705] CPU features: detected: CRC32 instructions
+[    0.151909] CPU features: detected: RCpc load-acquire (LDAPR)
+[    0.157730] CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+[    0.164807] alternatives: applying system-wide alternatives
+[    0.171022] Memory: 2017040K/2097152K available (5504K kernel code, 768K rwdata, 1388K rodata, 4160K init, 252K bss, 76672K reserved, 0K cma-reserved)
+[    0.185312] devtmpfs: initialized
+[    0.189980] posixtimers hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    0.197557] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.206408] pinctrl core: initialized pinctrl subsystem
+[    0.212072] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.218413] DMA: preallocated 256 KiB GFP_KERNEL pool for atomic allocations
+[    0.225599] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.233473] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.241721] ASID allocator initialised with 65536 entries
+[    0.247248] Serial: AMBA PL011 UART driver
+[    0.252595] f8b00000.serial: ttyAMA0 at MMIO 0xf8b00000 (irq = 13, base_baud = 0) is a PL011 rev2
+[    0.261624] printk: console [ttyAMA0] enabled
+[    0.261624] printk: console [ttyAMA0] enabled
+[    0.270396] printk: legacy bootconsole [pl11] disabled
+[    0.270396] printk: legacy bootconsole [pl11] disabled
+[    0.282934] SCSI subsystem initialized
+[    0.283090] usbcore: registered new interface driver usbfs
+[    0.283127] usbcore: registered new interface driver hub
+[    0.283169] usbcore: registered new device driver usb
+[    0.283759] clocksource: Switched to clocksource arch_sys_counter
+[    0.289395] NET: Registered PF_INET protocol family
+[    0.289563] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    0.290919] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.290955] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.290980] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    0.291086] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+[    0.291472] TCP: Hash tables configured (established 16384 bind 16384)
+[    0.291564] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.291629] UDP-Lite hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.304970] workingset: timestamp_bits=62 max_order=19 bucket_order=0
+[    0.311152] pl061_gpio f8b24000.gpio: PL061 GPIO chip registered
+[    0.312099] [drm] Initialized simpledrm 1.0.0 for 7f6c1000.framebuffer on minor 0
+[    0.329915] Console: switching to colour frame buffer device 240x67
+[    0.347785] simple-framebuffer 7f6c1000.framebuffer: [drm] fb0: simpledrmdrmfb frame buffer device
+[    0.359917] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+[    0.360020] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+[    0.360073] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+[    0.360126] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+[    0.360170] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+[    0.361097] lima f9200000.gpu: bus rate = 200000000
+[    0.361153] lima f9200000.gpu: mod rate = 200000000
+[    0.361721] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 1
+[    0.368716] (unnamed net_device) (uninitialized): using random MAC address b2:95:1e:60:6f:6d
+[    0.371708] xhci-hi3798mv320 f98a0000.usb: xHCI Host Controller
+[    0.371791] xhci-hi3798mv320 f98a0000.usb: new USB bus registered, assigned bus number 1
+[    0.372285] xhci-hi3798mv320 f98a0000.usb: hcc params 0x0228fe6d hci version 0x110 quirks 0x0000000020000010
+[    0.372383] xhci-hi3798mv320 f98a0000.usb: irq 17, io mem 0xf98a0000
+[    0.372533] xhci-hi3798mv320 f98a0000.usb: xHCI Host Controller
+[    0.372575] xhci-hi3798mv320 f98a0000.usb: new USB bus registered, assigned bus number 2
+[    0.372620] xhci-hi3798mv320 f98a0000.usb: Host supports USB 3.0 SuperSpeed
+[    0.373945] hub 1-0:1.0: USB hub found
+[    0.374015] hub 1-0:1.0: 2 ports detected
+[    0.374612] usb usb2: We don't know the algorithms for LPM for this host, disabling LPM.
+[    0.375324] hub 2-0:1.0: USB hub found
+[    0.375507] hub 2-0:1.0: 1 port detected
+[    0.376092] usbcore: registered new interface driver usb-storage
+[    0.376332] sdhci: Secure Digital Host Controller Interface driver
+[    0.376366] sdhci: Copyright(c) Pierre Ossman
+[    0.376391] sdhci-pltfm: SDHCI platform and OF driver helper
+[    0.407761] mmc0: SDHCI controller on f9830000.mmc [f9830000.mmc] using ADMA
+[    0.408223] sdhci-hi3798mv320 f9c40000.mmc: allocated mmc-pwrseq
+[    0.619761] usb 1-2: new high-speed USB device number 2 using xhci-hi3798mv320
+[    0.704926] mmc0: new high speed MMC card at address 0001
+[    0.705594] mmcblk0: mmc0:0001 B10030 7.28 GiB (ro)
+[    0.706239]  mmcblk0: p1(system) p2(vendor)
+[    0.706792] mmcblk0rpmb: mmc0:0001 B10030 4.00 MiB, chardev (253:0)
+[    0.761254] usb-storage 1-2:1.0: USB Mass Storage device detected
+[    0.761770] scsi host0: usb-storage 1-2:1.0
+[    1.135763] mmc1: SDHCI controller on f9c40000.mmc [f9c40000.mmc] using ADMA
+[    1.136111] NET: Registered PF_PACKET protocol family
+[    1.144895] clk: Not disabling unused clocks
+[    1.157484] Freeing unused kernel memory: 4160K
+[    1.157647] Run /init as init process
+[    1.157682]   with arguments:
+[    1.157705]     /init
+[    1.159451]   with environment:
+[    1.161122]     HOME=/
+[    1.162754]     TERM=linux
+
+HG680KD AArch64 RAM bring-up
+Linux hg680kd 6.18.64-hg680kd-arm64-all-2g-hdmi-wifi-probe #1 SMP 2025-12-01 00:00:00 UTC aarch64
+Online CPUs: 0-3
+Clocksource: arch_sys_counter
+Timer interrupt counts before and after one second:
+           CPU0       CPU1       CPU2       CPU3       
+ 11:        272        261        231        287    GICv3  27 Level     arch_timer
+1.08 3.53
+[    1.192707] mmc1: Failed to initialize a non-removable card
+[    1.772935] scsi 0:0:0:0: Direct-Access      USB      SanDisk 3.2Gen1 1.00 PQ: 0 ANSI: 6
+[    1.792398] sd 0:0:0:0: [sda] 60125184 512-byte logical blocks: (30.8 GB/28.7 GiB)
+[    1.795104] sd 0:0:0:0: [sda] Write Protect is off
+[    1.796946] sd 0:0:0:0: [sda] Mode Sense: 43 00 00 00
+[    1.800744] sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+[    1.836718]  sda: sda1
+[    1.839922] sd 0:0:0:0: [sda] Attached SCSI removable disk
+           CPU0       CPU1       CPU2       CPU3       
+ 11:        523        512        480        539    GICv3  27 Level     arch_timer
+2.08 7.40
+
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+# uname -a; cat /sys/block/mmcblk0/ro /sys/block/mmcblk0/mmcblk0p1/ro /sys/block/mmcblk0/mmcblk0p2/ro; cat /proc/partitions
+Linux hg680kd 6.18.64-hg680kd-arm64-all-2g-hdmi-wifi-probe #1 SMP 2025-12-01 00:00:00 UTC aarch64
+1
+1
+1
+major minor  #blocks  name
+
+ 179        0    7634944 mmcblk0
+ 179        1    1228800 mmcblk0p1
+ 179        2     409600 mmcblk0p2
+   8        0   30062592 sda
+   8        1   30061568 sda1
+# 
+[host] shell command elapsed: 0.05 s
+mount -t ext4 -o ro,noload /dev/mmcblk0p1 /tmp && ls -ld /tmp/odm /tmp/odm/* && sha256sum /tmp/system/bin/opt/etc/wifi_bt_init.sh /tmp/system/bin/opt/etc/hw.detect.sh; cat /proc/mounts; umount /tmp
+[    2.281201] EXT4-fs (mmcblk0p1): mounted filesystem 767dd423-3509-5aca-95d1-93bc8119e0a4 ro without journal. Quota mode: disabled.
+lrw-r--r--    1        20 /tmp/odm/priv-app -> /vendor/odm/priv-app
+lrw-r--r--    1        19 /tmp/odm/overlay -> /vendor/odm/overlay
+lrw-r--r--    1        17 /tmp/odm[    2.309096] EXT4-fs (mmcblk0p1): unmounting filesystem 767dd423-3509-5aca-95d1-93bc8119e0a4.
+/lib64 -> /vendor/odm/lib64
+lrw-r--r--    1        15 /tmp/odm/lib -> /vendor/odm/lib
+lrw-r--r--    1        21 /tmp/odm/framework -> /vendor/odm/framework
+lrw-r--r--    1        20 /tmp/odm/firmware -> /vendor/odm/firmware
+lrw-r--r--    1        15 /tmp/odm/etc -> /vendor/odm/etc
+lrw-r--r--    1        15 /tmp/odm/bin -> /vendor/odm/bin
+lrw-r--r--    1        15 /tmp/odm/app -> /vendor/odm/app
+drwxr-xr-x    2      4096 /tmp/odm
+4279118caef7fb9cf0352b65d355e05611b7df5a421f3125d6440613aeb0f35a  /tmp/system/bin/opt/etc/wifi_bt_init.sh
+b85422e33649f0cb6a96a3b282e0e4910f3448ece199b6975f70ad8bc81767d0  /tmp/system/bin/opt/etc/hw.detect.sh
+rootfs / rootfs rw,size=1010240k,nr_inodes=252560 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=1010240k,nr_inodes=252560,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+/dev/mmcblk0p1 /tmp ext4 ro,relatime,norecovery 0 0
+# 
+[host] shell command elapsed: 0.14 s
+mount -t ext4 -o ro,noload /dev/mmcblk0p2 /tmp && ls /tmp/lib/modules && sha256sum /tmp/etc/init/init.wifibt.rc /tmp/etc/wifi/socwifi.cfg /tmp/firmware/wcnmodem.bin /tmp/firmware/rtl8822cs_fw; cat /proc/mounts; umount /tmp
+[    2.427501] EXT4-fs (mmcblk0p2): mounted filesystem 44ece2da-c47b-50d6-8cde-be2d0b6157db ro without journal. Quota mode: disabled.
+rtl8822cs.ko          uwe5621_bt_sdio.ko    hi_sdio_detect.ko
+rtk_btusb.ko          uwe5621_bsp_sdio.ko   wlan_mt7961_pcie.ko
+btmtk_uart_unify.ko   uwe5621_wifi_sdio.ko
+ce074afcf5f7597252830d6cc60b73309b41ee182cc82bf5d61d3044b6a557d6  /tmp/etc/init/init.wifibt.rc
+6d7397368126facdc5b215f552edaaa44a6f6a500ada2392ce6dd10cdbaa1451  /tmp/etc/wifi/socwifi.cfg
+f7eea2125163fc063bb583c016b5b3a0ea0affcf2237486ba741c4b234268f91  /tmp/firmware/wcnmodem.bin
+fe67d4be37230b7e[    2.483416] EXT4-fs (mmcblk0p2): unmounting filesystem 44ece2da-c47b-50d6-8cde-be2d0b6157db.
+3c8161c5a26e0d4ab54a83657b18fe1188a02a91adaaa8c8  /tmp/firmware/rtl8822cs_fw
+rootfs / rootfs rw,size=1010240k,nr_inodes=252560 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=1010240k,nr_inodes=252560,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+/dev/mmcblk0p2 /tmp ext4 ro,relatime,norecovery 0 0
+# 
+[host] shell command elapsed: 0.12 s
+dd if=/dev/mmcblk0 bs=512 skip=229376 count=24032 | sha256sum; cat /sys/block/mmcblk0/ro
+24032+0 records in
+24032+0 records out
+97f4e2b5d88ee6d6fae8ced4809420d7f875c4ff8b0acfe817c6409b6f02a6b8  -
+1
+# 
+[host] shell command elapsed: 0.50 s
+ls /sys/bus/sdio/devices; ls /sys/class/net; mount -t debugfs debugfs /sys/kernel/debug; cat /sys/kernel/debug/mmc1/ios; cat /sys/kernel/debug/gpio
+eth0  lo
+clock:		0 Hz
+vdd:		0 (invalid)
+bus mode:	2 (push-pull)
+chip select:	0 (don't care)
+power mode:	0 (off)
+bus width:	0 (1 bits)
+timing spec:	0 (legacy)
+signal voltage:	0 (3.30 V)
+driver type:	0 (driver type B)
+gpiochip0: 8 GPIOs, parent: amba/f8b24000.gpio, f8b24000.gpio:
+ gpio-3   (                    |reset               ) out lo ACTIVE LOW
+# 
+[host] shell command elapsed: 0.05 s
+echo "file drivers/mmc/core/core.c +p" >/sys/kernel/debug/dynamic_debug/control; echo f9c40000.mmc >/sys/bus/platform/drivers/sdhci-hi3798mv320/unbind; echo f9c40000.mmc >/sys/bus/platform/drivers/sdhci-hi3798mv320/bind; sleep 2
+[    3.090140] sdhci-hi3798mv320 f9c40000.mmc: allocated mmc-pwrseq
+[    3.096274] mmc1: clock 0Hz busmode 2 powermode 1 cs 0 Vdd 21 width 1 timing 0
+[    3.103802] sdhci-hi3798mv320 f9c40000.mmc: Initial signal voltage of 3.3v
+[    3.539754] mmc1: clock 400000Hz busmode 2 powermode 2 cs 0 Vdd 21 width 1 timing 0
+[    3.851774] mmc1: SDHCI controller on f9c40000.mmc [f9c40000.mmc] using ADMA
+[    3.853801] mmc1: mmc_rescan_try_freq: trying to init card at 400000 Hz
+[    3.855523] mmc1: starting CMD52 arg 00000c00 flags 00000195
+[    3.870096] mmc1: req done (CMD52): -110: 00000000 00000000 00000000 00000000
+[    3.871901] mmc1: starting CMD52 arg 80000c08 flags 00000195
+[    3.886296] mmc1: req done (CMD52): -110: 00000000 00000000 00000000 00000000
+[    3.888080] mmc1: clock 400000Hz busmode 2 powermode 2 cs 1 Vdd 21 width 1 timing 0
+[    3.902622] mmc1: starting CMD0 arg 00000000 flags 000000c0
+[    3.904566] mmc1: req done (CMD0): 0: 00000000 00000000 00000000 00000000
+[    3.931435] mmc1: clock 400000Hz busmode 2 powermode 2 cs 0 Vdd 21 width 1 timing 0
+[    3.946114] mmc1: starting CMD5 arg 00000000 flags 000002e1
+[    3.960676] mmc1: req failed (CMD5): -110, retrying...
+[    3.975213] mmc1: req failed (CMD5): -110, retrying...
+[    3.989785] mmc1: req failed (CMD5): -110, retrying...
+[    4.004291] mmc1: req done (CMD5): -110: 00000000 00000000 00000000 00000000
+[    4.006039] mmc1: clock 0Hz busmode 2 powermode 0 cs 0 Vdd 0 width 1 timing 0
+# 
+[host] shell command elapsed: 2.78 s
+echo "file drivers/mmc/core/core.c -p" >/sys/kernel/debug/dynamic_debug/control; ls /sys/bus/sdio/devices; ls /sys/class/net
+eth0  lo
+# 
+[host] shell command elapsed: 0.01 s
+ls -l /dev/dri /dev/fb0; cat /sys/kernel/debug/dri/0/name; lima-test
+crw-------    1   29,   0 /dev/fb0
+
+/dev/dri:
+crw-------    1  226,   0 card0
+crw-------    1  226, 128 renderD128
+crw-------    1  226,   1 card1
+simpledrm dev=7f6c1000.framebuffer unique=7f6c1000.framebuffer
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+# 
+[host] shell command elapsed: 0.09 s
+cat /sys/devices/system/cpu/online; free -m; memtest-2g 1840; fastfetch --pipe
+0-3
+              total        used        free      shared  buff/cache   available
+Mem:        2024640       31084     1981668       11044       11888     1972368
+Swap:             0           0           0
+memtest-2g: MemFree=1935 MiB, testing 1840 MiB (115 x 16 MiB chunks)
+memtest-2g: verified 1840 MiB, pages=471040, paddr=[0x01c00000..0x7ccff000]
+memtest-2g: >128M=454599 pages, >760M=294039 pages, >1536M=96407 pages
+MEMTEST-2G: PASS
+        #####            root@hg680kd
+       #######           ------------
+       ##O#O##           OS: HG680KD Mainline Linux 6.18.64 (ARM64) aarch64
+       #######           Host: FiberHome HG680KD (ARM64)
+     ###########         Kernel: Linux 6.18.64-hg680kd-arm64-all-2g-hdmi-wifi-probe
+    #############        Uptime: 8 seconds
+   ###############       Shell: sh
+   ################      Terminal: /dev/ttyAMA0
+  #################      CPU: hi3798mv320 (4)
+#####################    GPU: Arm mali-450 [Integrated]
+#####################    Memory: 111.54 MiB / 1.93 GiB (6%)
+  #################      Swap: Unused
+                         Disk (/): 2.88 MiB / 986.56 MiB (0%) - rootfs
+                         Locale: C
+# 
+[host] shell command elapsed: 2.59 s
+mount -t vfat -o ro /dev/sda1 /tmp && ls /tmp; cat /proc/mounts; umount /tmp; ls /sys/bus/usb/devices; cat /sys/bus/usb/devices/1-2/idVendor /sys/bus/usb/devices/1-2/idProduct /sys/bus/usb/devices/1-2/speed
+Android                    HG680KD
+LOST.DIR                   System Volume Information
+rootfs / rootfs rw,size=1010240k,nr_inodes=252560 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=1010240k,nr_inodes=252560,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+/dev/sda1 /tmp vfat ro,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+2-0:1.0  1-2      1-0:1.0  usb2     usb1     1-2:1.0
+0781
+5591
+480
+# 
+[host] shell command elapsed: 0.14 s
+ifconfig eth0 hw ether 54:0A:77:88:B7:2C; ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 2; ping -c 3 192.168.6.160
+[    4.020592] mmc1: Failed to initialize a non-removable card
+[    8.711272] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+64 bytes from 192.168.6.160: seq=0 ttl=64 time=0.536 ms
+64 bytes from 192.168.6.160: seq=1 ttl=64 time=0.321 ms
+64 bytes from 192.168.6.160: seq=2 ttl=64 time=0.280 ms
+
+--- 192.168.6.160 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.280/0.379/0.536 ms
+# 
+[host] shell command elapsed: 4.03 s
+echo N >/sys/module/printk/parameters/ignore_loglevel; dmesg -n 4; echo 0 >/sys/class/graphics/fbcon/cursor_blink; printf "\033[?25l" >/dev/tty1; fb-test; cat /sys/block/mmcblk0/ro
+fbdev color bars: 1920x1080, pitch 7680, 1080 rows read back
+1
+# 
+[host] shell command elapsed: 0.09 s

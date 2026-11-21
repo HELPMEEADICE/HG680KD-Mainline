@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi.dts"
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	sdio_clock: clock-25000000 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <25000000>;
+	};
+
+	wifi-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&gpio4 3 GPIO_ACTIVE_LOW>;
+		post-power-on-delay-ms = <100>;
+	};
+
+	aliases {
+		mmc0 = "/soc/mmc@f9830000";
+		mmc1 = "/soc/mmc@f9c40000";
+	};
+};
+
+&{/soc/usb@f98a0000} {
+	/* Preserve the PHY's default trim during this OTP-free RAM test. */
+	reg = <0x0 0xf98a0000 0x0 0x10000>,
+	      <0x0 0xf9866000 0x0 0x1000>,
+	      <0x0 0xf9960000 0x0 0x1000>;
+	reg-names = "xhci", "phy0", "phy1";
+};
+
+&{/soc} {
+	gpio4: gpio@f8b24000 {
+		compatible = "arm,pl061", "arm,primecell";
+		reg = <0x0 0xf8b24000 0x0 0x1000>;
+		interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&uart_clock>;
+		clock-names = "apb_pclk";
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	mmc@f9c40000 {
+		compatible = "hisilicon,hi3798mv320-sdio";
+		reg = <0x0 0xf9c40000 0x0 0x1000>;
+		interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&sdio_clock>;
+		hisilicon,crg = <&crg>;
+		mmc-pwrseq = <&{/wifi-pwrseq}>;
+		non-removable;
+		no-sd;
+		no-mmc;
+		no-1-8-v;
+		bus-width = <4>;
+		max-frequency = <25000000>;
+		post-power-on-delay-ms = <300>;
+	};
+};

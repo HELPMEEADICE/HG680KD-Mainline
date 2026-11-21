@@ -1,0 +1,233 @@
+=== extracted/uwe5621_bsp_sdio.ko ===
+         U drv_gpio_set_direction_bit
+         U drv_gpio_write_bit
+         U gpio_free
+         U gpio_request
+         U gpio_to_desc
+         U gpiod_direction_input
+         U gpiod_direction_output_raw
+         U gpiod_to_irq
+000011d8 t hi_gpio_set_value.constprop.12
+0000e744 T sdiohal_sdio_pt_read
+0000e508 T sdiohal_sdio_pt_write
+0000e3a4 T sdiohal_sdio_tx_status
+=== extracted/rtl8822cs.ko ===
+0000938c r PINMUX_LIST_GPIO0_8822C
+00009734 r PINMUX_LIST_GPIO10_8822C
+00009744 r PINMUX_LIST_GPIO11_8822C
+0000976c r PINMUX_LIST_GPIO12_8822C
+0000979c r PINMUX_LIST_GPIO13_8822C
+000097dc r PINMUX_LIST_GPIO14_8822C
+00009804 r PINMUX_LIST_GPIO15_8822C
+00009404 r PINMUX_LIST_GPIO1_8822C
+0000947c r PINMUX_LIST_GPIO2_8822C
+000094cc r PINMUX_LIST_GPIO3_8822C
+00009524 r PINMUX_LIST_GPIO4_8822C
+00009584 r PINMUX_LIST_GPIO5_8822C
+000095ec r PINMUX_LIST_GPIO6_8822C
+00009664 r PINMUX_LIST_GPIO7_8822C
+000096d4 r PINMUX_LIST_GPIO8_8822C
+000096f4 r PINMUX_LIST_GPIO9_8822C
+000e2588 T ex_hal_sdio_multi_if_bus_available
+000055e0 B oob_gpio
+000f58b8 T pinmux_gpio_mode_88xx
+000f5934 T pinmux_gpio_output_88xx
+0015a54c T platform_wifi_power_off
+0015a544 T platform_wifi_power_on
+0007f0c8 t rtw_drv_init
+000ad338 T rtw_wifi_gpio_init
+000ad340 T rtw_wifi_gpio_wlan_ctrl
+
+extracted/uwe5621_bsp_sdio.ko:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00003848 <chip_power_on>:
+    3848:	e59f30ec 	ldr	r3, [pc, #236]	@ 393c <chip_power_on+0xf4>
+    384c:	e92d4070 	push	{r4, r5, r6, lr}
+    3850:	e5933000 	ldr	r3, [r3]
+    3854:	e3530001 	cmp	r3, #1
+    3858:	0a000031 	beq	3924 <chip_power_on+0xdc>
+    385c:	e59f40dc 	ldr	r4, [pc, #220]	@ 3940 <chip_power_on+0xf8>
+    3860:	e3a05000 	mov	r5, #0
+    3864:	e59f10d8 	ldr	r1, [pc, #216]	@ 3944 <chip_power_on+0xfc>
+    3868:	e1a02004 	mov	r2, r4
+    386c:	e4923274 	ldr	r3, [r2], #628	@ 0x274
+    3870:	e2830064 	add	r0, r3, #100	@ 0x64
+    3874:	e5835060 	str	r5, [r3, #96]	@ 0x60
+    3878:	ebfffffe 	bl	0 <__init_waitqueue_head>
+			3878: R_ARM_CALL	__init_waitqueue_head
+    387c:	e1a01005 	mov	r1, r5
+    3880:	e3a00001 	mov	r0, #1
+    3884:	ebfffffe 	bl	a44 <marlin_chip_en>
+			3884: R_ARM_CALL	marlin_chip_en
+    3888:	e3a00014 	mov	r0, #20
+    388c:	ebfffffe 	bl	0 <msleep>
+			388c: R_ARM_CALL	msleep
+    3890:	e3a00001 	mov	r0, #1
+    3894:	ebfff5bd 	bl	f90 <chip_reset_release>
+    3898:	ebfffffe 	bl	78 <get_wcn_bus_ops>
+			3898: R_ARM_CALL	get_wcn_bus_ops
+    389c:	e3500000 	cmp	r0, #0
+    38a0:	0a000003 	beq	38b4 <chip_power_on+0x6c>
+    38a4:	e5903080 	ldr	r3, [r0, #128]	@ 0x80
+    38a8:	e1530005 	cmp	r3, r5
+    38ac:	0a000000 	beq	38b4 <chip_power_on+0x6c>
+    38b0:	e12fff33 	blx	r3
+    38b4:	ebfffffe 	bl	78 <get_wcn_bus_ops>
+			38b4: R_ARM_CALL	get_wcn_bus_ops
+    38b8:	e3500000 	cmp	r0, #0
+    38bc:	0a000003 	beq	38d0 <chip_power_on+0x88>
+    38c0:	e5903070 	ldr	r3, [r0, #112]	@ 0x70
+    38c4:	e3530000 	cmp	r3, #0
+    38c8:	0a000000 	beq	38d0 <chip_power_on+0x88>
+    38cc:	e12fff33 	blx	r3
+    38d0:	e5940000 	ldr	r0, [r4]
+    38d4:	e3001bb8 	movw	r1, #3000	@ 0xbb8
+    38d8:	e2800060 	add	r0, r0, #96	@ 0x60
+    38dc:	ebfffffe 	bl	0 <wait_for_completion_timeout>
+			38dc: R_ARM_CALL	wait_for_completion_timeout
+    38e0:	e3500000 	cmp	r0, #0
+    38e4:	0a00000a 	beq	3914 <chip_power_on+0xcc>
+    38e8:	ebfffffe 	bl	c4b4 <loopcheck_first_boot_set>
+			38e8: R_ARM_CALL	loopcheck_first_boot_set
+    38ec:	e5943000 	ldr	r3, [r4]
+    38f0:	e5933020 	ldr	r3, [r3, #32]
+    38f4:	e3530000 	cmp	r3, #0
+    38f8:	da000003 	ble	390c <chip_power_on+0xc4>
+    38fc:	e3a00001 	mov	r0, #1
+    3900:	ebfffffe 	bl	1420c <sdio_pub_int_poweron>
+			3900: R_ARM_CALL	sdio_pub_int_poweron
+    3904:	e3a00000 	mov	r0, #0
+    3908:	e8bd8070 	pop	{r4, r5, r6, pc}
+    390c:	e3a00000 	mov	r0, #0
+    3910:	e8bd8070 	pop	{r4, r5, r6, pc}
+    3914:	e59f002c 	ldr	r0, [pc, #44]	@ 3948 <chip_power_on+0x100>
+    3918:	ebfffffe 	bl	0 <printk>
+			3918: R_ARM_CALL	printk
+    391c:	e3e00000 	mvn	r0, #0
+    3920:	e8bd8070 	pop	{r4, r5, r6, pc}
+    3924:	e59f3020 	ldr	r3, [pc, #32]	@ 394c <chip_power_on+0x104>
+    3928:	e3002c76 	movw	r2, #3190	@ 0xc76
+    392c:	e59f001c 	ldr	r0, [pc, #28]	@ 3950 <chip_power_on+0x108>
+    3930:	e1a01003 	mov	r1, r3
+    3934:	ebfffffe 	bl	0 <printk>
+			3934: R_ARM_CALL	printk
+    3938:	eaffffc7 	b	385c <chip_power_on+0x14>
+    393c:	00000000 	.word	0x00000000
+			393c: R_ARM_ABS32	wcn_print_level
+    3940:	00000684 	.word	0x00000684
+			3940: R_ARM_ABS32	.bss
+    3944:	00000728 	.word	0x00000728
+			3944: R_ARM_ABS32	.rodata.str1.4
+    3948:	000016b4 	.word	0x000016b4
+			3948: R_ARM_ABS32	.rodata.str1.4
+    394c:	00000328 	.word	0x00000328
+			394c: R_ARM_ABS32	.rodata
+    3950:	00000ca0 	.word	0x00000ca0
+			3950: R_ARM_ABS32	.rodata.str1.4
+
+Disassembly of section .text.unlikely:
+
+Disassembly of section .init.text:
+
+Disassembly of section .exit.text:
+
+extracted/uwe5621_bsp_sdio.ko:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+000011d8 <hi_gpio_set_value.constprop.12>:
+    11d8:	e92d4070 	push	{r4, r5, r6, lr}
+    11dc:	e1a05000 	mov	r5, r0
+    11e0:	e59f1074 	ldr	r1, [pc, #116]	@ 125c <hi_gpio_set_value.constprop.12+0x84>
+    11e4:	e59f0074 	ldr	r0, [pc, #116]	@ 1260 <hi_gpio_set_value.constprop.12+0x88>
+    11e8:	ebfffffe 	bl	0 <printk>
+			11e8: R_ARM_CALL	printk
+    11ec:	e3a01000 	mov	r1, #0
+    11f0:	e3a00022 	mov	r0, #34	@ 0x22
+    11f4:	ebfffffe 	bl	0 <drv_gpio_set_direction_bit>
+			11f4: R_ARM_CALL	drv_gpio_set_direction_bit
+    11f8:	e2504000 	subs	r4, r0, #0
+    11fc:	1a00000b 	bne	1230 <hi_gpio_set_value.constprop.12+0x58>
+    1200:	e59f305c 	ldr	r3, [pc, #92]	@ 1264 <hi_gpio_set_value.constprop.12+0x8c>
+    1204:	e30f0d78 	movw	r0, #64888	@ 0xfd78
+    1208:	e3470fff 	movt	r0, #32767	@ 0x7fff
+    120c:	e5933004 	ldr	r3, [r3, #4]
+    1210:	e12fff33 	blx	r3
+    1214:	e1a01005 	mov	r1, r5
+    1218:	e3a00022 	mov	r0, #34	@ 0x22
+    121c:	ebfffffe 	bl	0 <drv_gpio_write_bit>
+			121c: R_ARM_CALL	drv_gpio_write_bit
+    1220:	e2504000 	subs	r4, r0, #0
+    1224:	1a000006 	bne	1244 <hi_gpio_set_value.constprop.12+0x6c>
+    1228:	e1a00004 	mov	r0, r4
+    122c:	e8bd8070 	pop	{r4, r5, r6, pc}
+    1230:	e3a01022 	mov	r1, #34	@ 0x22
+    1234:	e59f002c 	ldr	r0, [pc, #44]	@ 1268 <hi_gpio_set_value.constprop.12+0x90>
+    1238:	ebfffffe 	bl	0 <printk>
+			1238: R_ARM_CALL	printk
+    123c:	e1a00004 	mov	r0, r4
+    1240:	e8bd8070 	pop	{r4, r5, r6, pc}
+    1244:	e1a02005 	mov	r2, r5
+    1248:	e3a01022 	mov	r1, #34	@ 0x22
+    124c:	e59f0018 	ldr	r0, [pc, #24]	@ 126c <hi_gpio_set_value.constprop.12+0x94>
+    1250:	ebfffffe 	bl	0 <printk>
+			1250: R_ARM_CALL	printk
+    1254:	e1a00004 	mov	r0, r4
+    1258:	e8bd8070 	pop	{r4, r5, r6, pc}
+    125c:	00000150 	.word	0x00000150
+			125c: R_ARM_ABS32	.rodata
+    1260:	000004ac 	.word	0x000004ac
+			1260: R_ARM_ABS32	.rodata.str1.4
+    1264:	00000000 	.word	0x00000000
+			1264: R_ARM_ABS32	arm_delay_ops
+    1268:	000004c0 	.word	0x000004c0
+			1268: R_ARM_ABS32	.rodata.str1.4
+    126c:	00000500 	.word	0x00000500
+			126c: R_ARM_ABS32	.rodata.str1.4
+
+Disassembly of section .text.unlikely:
+
+Disassembly of section .init.text:
+
+Disassembly of section .exit.text:
+
+extracted/uwe5621_bsp_sdio.ko:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00013684 <sdio_rescan>:
+   13684:	eafffffe 	b	10324 <sdiohal_scan_card>
+			13684: R_ARM_JUMP24	sdiohal_scan_card
+
+Disassembly of section .text.unlikely:
+
+Disassembly of section .init.text:
+
+Disassembly of section .exit.text:
+
+extracted/hi_sdio_detect.ko:     file format elf32-littlearm
+
+Contents of section .data:
+ 0000 23000000                             #...            
+
+extracted/hi_sdio_detect.ko:     file format elf32-littlearm
+
+Contents of section .rodata.str1.4:
+ 0000 42434d44 48443a67 70696f28 25642920  BCMDHD:gpio(%d) 
+ 0010 6770696f 5f646972 65637469 6f6e5f6f  gpio_direction_o
+ 0020 75747075 74204849 5f444952 5f4f5554  utput HI_DIR_OUT
+ 0030 20666169 6c656420 0a000000 42434d44   failed ....BCMD
+ 0040 48443a67 70696f28 25642920 6770696f  HD:gpio(%d) gpio
+ 0050 5f646972 65637469 6f6e5f6f 75747075  _direction_outpu
+ 0060 74207661 6c756528 25642920 6661696c  t value(%d) fail
+ 0070 6564200a 00000000 3d3d3d3d 77726974  ed .....====writ
+ 0080 65206269 74206c6f 772c6465 6c617920  e bit low,delay 
+ 0090 3130306d 73200a00 3d3d3d3d 77726974  100ms ..====writ
+ 00a0 65206269 74206465 6c617920 0a000000  e bit delay ....
+ 00b0 3d3d3d3d 77726974 6520776c 616e5f67  ====write wlan_g
+ 00c0 70696f5f 6f6e206c 6f770a00           pio_on low..    

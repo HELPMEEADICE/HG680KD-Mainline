@@ -88,7 +88,7 @@ static int hg680kd_xhci_probe(struct platform_device *pdev)
 	struct hg680kd_xhci *host;
 	struct resource *resource;
 	void __iomem *regs, *phy0, *phy1, *trim_reg;
-	unsigned int status, trim;
+	unsigned int status, trim = 0;
 	int ret;
 
 	host = devm_kzalloc(dev, sizeof(*host), GFP_KERNEL);
@@ -108,10 +108,12 @@ static int hg680kd_xhci_probe(struct platform_device *pdev)
 	phy1 = devm_platform_ioremap_resource_byname(pdev, "phy1");
 	if (IS_ERR(phy1))
 		return PTR_ERR(phy1);
-	trim_reg = devm_platform_ioremap_resource_byname(pdev, "trim");
-	if (IS_ERR(trim_reg))
-		return PTR_ERR(trim_reg);
-	trim = FIELD_GET(GENMASK(6, 2), readl(trim_reg));
+	if (platform_get_resource_byname(pdev, IORESOURCE_MEM, "trim")) {
+		trim_reg = devm_platform_ioremap_resource_byname(pdev, "trim");
+		if (IS_ERR(trim_reg))
+			return PTR_ERR(trim_reg);
+		trim = FIELD_GET(GENMASK(6, 2), readl(trim_reg));
+	}
 
 	ret = regmap_read(host->crg, USB3_HOST_CRG, &host->clock);
 	ret = ret ?: regmap_read(host->crg, USB2_PHY0_CRG, &host->phy0);

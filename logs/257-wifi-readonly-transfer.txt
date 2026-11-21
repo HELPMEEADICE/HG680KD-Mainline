@@ -1,0 +1,7 @@
+Listening for partition probes
+Serving HTTP on 192.168.6.160 port 18081 (http://192.168.6.160:18081/) ...
+192.168.6.249 - - [21/Nov/2026 22:44:49] "GET /sendbin HTTP/1.1" 200 -
+deviceinfo.img ca257ac237ca98a14b6442bb256617cae03b3372bffb99cd96d4c1a2966a6e9b
+dtbo.img 6d2395df7e940530d2d780cd9e4afce843eca89772cd79371badd99a7a4df468
+live/deviceinfo.img: data
+live/dtbo.img:       data

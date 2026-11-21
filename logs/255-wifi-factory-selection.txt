@@ -1,0 +1,222 @@
+debugfs 1.47.4 (6-Mar-2025)
+/583/100644/0/0/socwifi.cfg/2897/
+debugfs 1.47.4 (6-Mar-2025)
+/550/100644/0/0/init.bigfish.rc/13902/
+debugfs 1.47.4 (6-Mar-2025)
+/533/100644/0/0/fstab.bigfish/3978/
+/535/040755/0/2000/init//
+/580/040755/0/2000/wifi//
+debugfs 1.47.4 (6-Mar-2025)
+/293/100755/0/2000/rmbtdriver.sh/1103/
+/362/100755/0/2000/init_hardware_info/24472/
+/371/100755/0/2000/wifi_bt/28700/
+/418/100755/0/2000/rtlbtmp_clt/20216/
+/446/100755/0/2000/sample_ipcfg/20604/
+/463/100755/0/2000/rtlbtmp/24796/
+/473/100755/0/2000/wifitest/4462308/
+/497/100755/0/2000/rtlbtmp_skt/28888/
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+/etc/wifi/wifi.cfg: File not found by ext2_lookup 
+debugfs 1.47.4 (6-Mar-2025)
+/etc/wifi/wifi_bt.cfg: File not found by ext2_lookup 
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+#wlan_vendor_name;order;vid_pid_num;vid_pid;chip_type;module_num;driver_name;driver_arg;driver_tag;wlan_vendor_hal_lib;wlan_supplicant_name;wlan_driver_wow_mode;wlan_user_load_driver;bt_vendor;bt_stack;audio_a2dp;bt_woble
+#bt_only(without vid_pid) example
+RTL8761BTV;1;0;bt_only;0;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+#bt_only(with vid_pid) example
+#RTL8761AUV;12;1;0x0bda:0xb761;bt_only;0;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+#wifi_bt example
+RTL8723DU;2;1;0x0bda:0xd723;wifi_bt;1;rtl8723du.ko;ifname=wlan0 if2name=p2p0;rtl8723du;libwifi-hal-rtk;wpa_supplicant;1;1;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+#wifi_only example
+ATBM6022;3;1;0x007a:0x8888;wifi_only;1;atbm6022.ko;;atbm6022;libwifi-hal-bcm;wpa_supplicant;0;1;;;;;
+RTL8822BE;4;1;0x10ec:0xb822;wifi_bt;1;88x2be.ko;ifname=wlan0 if2name=p2p0;88x2be;libwifi-hal-rtk;wpa_supplicant;0;1;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+RTL8822BU;5;1;0x0bda:0xb82c;wifi_bt;1;88x2bu.ko;ifname=wlan0 if2name=p2p0;88x2bu;libwifi-hal-rtk;wpa_supplicant;0;1;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+RTL8188FTV;6;1;0x0bda:0xf179;wifi_only;1;rtl8188ftv.ko;ifname=wlan0 if2name=p2p0;rtl8188ftv;libwifi-hal-rtk;wpa_supplicant;0;1;;;;;
+RTL8822BS;7;1;0x024c:0xb822;wifi_bt;1;rtl8822bs.ko;ifname=wlan0 if2name=p2p0;rtl8822bs;libwifi-hal-rtk;wpa_supplicant;0;1;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+RTL8822CS;8;1;0x024c:0xc822;wifi_bt;1;rtl8822cs.ko;ifname=wlan0 if2name=p2p0;rtl8822cs;libwifi-hal-rtk;wpa_supplicant;0;1;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+MT7668U;9;1;0x0e8d:0x7668;wifi_bt;2;mt7668u_prealloc.ko;;mt7668u_prealloc;mt7668u.ko;;mt7668u;libwifi-hal-bcm;wpa_supplicant;0;1;libbt-vendor-mtk.so;libbluetooth.mtk.so;mtk;0;
+SSV6X5X;10;2;0x3030:0x3030;0x8065:0x6000;wifi_only;2;mac80211.ko;;mac80211;ssv6x5x.ko;stacfgpath=/vendor/etc/firmware/ssv6x5x-wifi.cfg;ssv6x5x;libwifi-hal-ssv;ssv_supplicant;0;1;;;;;
+MT7661RS;11;1;0x037a:0x7603;wifi_bt;1;wlan_mt7663_sdio.ko;;wlan_mt7663_sdio;libwifi-hal-bcm;wpa_supplicant;0;1;libbt-vendor-mtk.so;libbluetooth-mtk.so;default;0;
+UWE5621DS;12;1;0x0000:0x0000;wifi_bt;1;uwe5621_wifi_sdio.ko;;uwe5621_wifi_sdio;libwifi-hal-bcm;unisoc_supplicant;0;1;libbt-vendor-unisoc.so;libbluetooth.so;default;0;
+RTL8852BS;13;1;0x024c:0xb852;wifi_bt;1;rtl8852bs.ko;ifname=wlan0 if2name=p2p0;rtl8852bs;libwifi-hal-rtk;wpa_supplicant;0;1;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+RTL8852BE;14;1;0x10ec:0xb852;wifi_bt;1;rtl8852be.ko;ifname=wlan0 if2name=p2p0;rtl8852be;libwifi-hal-rtk;wpa_supplicant;0;1;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+MT7920EN;15;1;0x14c3:0x7961;wifi_bt;1;wlan_mt7961_pcie.ko;ifname=wlan0 if2name=p2p0;wlan_mt7961_pcie;libwifi-hal-bcm;mtk_supplicant;0;1;libbt-vendor-mtk.so;libbluetooth.so;default;0;
+WS73;16;1;0xffff:0x3733;wifi_bt;1;wifi_soc.ko;;wifi_soc;libwifi-hal-bcm;wpa_supplicant;0;1;libbt-vendor-nl.so;libbluetooth.so;default;0;
+#!/system/bin/sh
+
+#Begin:add by jlei, check is bt supported @2018-9-17
+DEVICEMODEL=`getprop ro.product.model`
+bt_check_cnt=10
+sleep 1
+if [ ${DEVICEMODEL:0:2} == "MR"];then
+    echo "no need to check"
+###Begin add by jlei, check the device VID:PID on sdio bus @2019-7-11
+else
+    while [ $bt_check_cnt -gt 0 ]
+    do
+        echo "[MARK] bt_check_cnt" $bt_check_cnt
+        check_result=`lsmod | grep hi_sdio_detect`
+        if [ -z "$check_result" ]; then
+            echo "[MARK] not found hi_sdio_detect try again"
+            sleep 0.5
+        else
+            echo "[MARK] hi_sdio_detect exist break"
+            break
+        fi
+        bt_check_cnt=$(($bt_check_cnt-1))
+    done
+    sleep 2
+    wifi_chip_type=`cat /sys/bus/sdio/devices/*/uevent 2>&- | grep SDIO_ID | grep -Ei "037A:7608|024C:B822|037A:7603|0000:0000"`
+    if [ -n "$wifi_chip_type" ]; then
+        echo "[MARK] bt wifi chip type is $wifi_chip_type"
+        result=$(echo $wifi_chip_type | grep -Ei "037A:7603|037A:7663|0000:0000")
+        if [ "$result" != "" ]; then
+            if [[ "$result" == *0000* ]]; then
+               setprop ro.product.wifichiptype UWE5621DS
+            else
+               setprop ro.product.wifichiptype MT7661RS
+            fi
+        fi
+    fi
+###End @2019-7-11
+fi
+#End @2018-9-17
+
+
+#!/system/bin/sh
+
+gpio_num=$1
+gpio_state=$2
+((group_num = gpio_num / 8))
+((port_num = gpio_num % 8))
+echo current modify GPIO${group_num}_${port_num}
+
+gpio_group_dir_addr_arr=("0xfffff000" "0xfffff000" "0xf8b22400" "0xf8b23400" "0xf8b24400" "0xf8004400"  "0xf8b26400" "0xf8b27400" "0xf8b28400")
+
+function print_help() {
+    echo "$0 [gpio_num] [on|off]"
+    echo "e.g."
+    echo "    $0 44 on"
+    echo "    $0 44 off"
+}
+
+if [ "$#" != "2" ]; then
+    echo "wrong args!"
+    print_help
+    exit 1
+elif [ -z "$gpio_state" ]; then
+    echo "wrong args!"
+    print_help
+    exit 1
+fi
+
+if [ -n "$gpio_num" ] && [ "$gpio_num" -eq "$gpio_num" ]; then
+
+    if [ "$group_num" -gt "8" ] ; then
+        echo "group_num > 8 is not support"
+        print_help
+        exit 1
+    elif [ "$group_num" -lt "2" ] ; then
+        echo "group_num < 2 is not support"
+        print_help
+        exit 1
+    fi
+
+    gpio_dir_addr=${gpio_group_dir_addr_arr[$group_num]}
+    cur_output_state=$(busybox devmem ${gpio_dir_addr} 32)
+    #echo $cur_output_state
+    gpio_left_shift=$((1 << $port_num))
+    target_output_state=$((cur_output_state | gpio_left_shift))
+    target_output_state=$(busybox printf "0x%04x" $target_output_state)
+    #echo $target_output_state
+    busybox devmem ${gpio_dir_addr} 32 ${target_output_state}
+    current_port_reg=$((4 << $port_num))
+    gpio_value_addr=${gpio_dir_addr:0:7}$(busybox printf "%03x" $current_port_reg)
+    #echo $gpio_value_addr
+    cur_output_value=$(busybox devmem ${gpio_value_addr} 32)
+    #echo $cur_output_value
+    
+    gpio_high_value=$(busybox printf "0x%02x" $gpio_left_shift)
+    gpio_low_value=0x0
+    if [ "$gpio_state" == "on" ]; then
+        busybox devmem ${gpio_value_addr} 32 $gpio_high_value
+    else
+        busybox devmem ${gpio_value_addr} 32 $gpio_low_value
+    fi
+else
+    echo "wrong args!"
+    print_help
+    exit 1
+fi8:#wifi5硬件版本号
+9:ro.fh.ddr4.wifi=9900E00100062401ND0YX1L1
+13:#ro.fh.ddr4.nowifi=
+14:#wifi6硬件版本号
+15:ro.fh.ddr4.wifi6=9900E00100062402ND04X1L1
+111:#默认关闭设置的WiFi入口
+112:persist.sys.wifi.hiddenswitch=0
+== extracted/uwe5621_bsp_sdio.ko
+/lib/firmware/
+/system/etc/firmware/
+/vendor/etc/firmware/
+/vendor/firmware/
+3WCN_ERR: %s firmware parse AA\AB error
+3WCN_ERR: %s firmware write error
+3WCN_ERR: %s request firmware error
+3WCN_ERR: gnss download firmware fail
+6WCN: %s Cannot find Chip Firmware
+6WCN: %s request_firmware %s start!
+6WCN_DEBUG: %s: [%d]:btwf firmware path is %s
+6WCN_DEBUG: %s: [%d]:gnss firmware path is %s
+6sdiohal:sdhci_nebula_sdio_rescan
+7request_firmware
+BTWF_FIRMWARE_PATH
+GNSS_FIRMWARE_PATH
+btwifi_download_firmware
+drelease_firmware
+find_firmware_path
+gnss_download_firmware
+load_firmware_data_path
+load_firmware_data_path.constprop.17
+marlin_firmware_parse_image
+marlin_firmware_write
+marlin_request_firmware
+parse_firmware_path
+pre_gnss_download_firmware
+release_firmware
+request_firmware
+sdhci_nebula_sdio_rescan
+wcnmodem
+wcnmodem.bin
+== extracted/uwe5621_wifi_sdio.ko
+/vendor/firmware
+== extracted/rtl8822cs.ko
+/lib/firmware/
+EXhalbtcoutsrc_PreLoadFirmware
+RTW: %s Download Firmware from %s success
+RTW: %s: wait external auth trigger
+RTW: EEPROM LNAType_2G is 0x%x, ExternalLNA_2G = %d
+RTW: EEPROM LNAType_5G is 0x%x, external_lna_5g = %d
+RTW: EEPROM PAType_2G is 0x%x, ExternalPA_2G = %d
+RTW: EEPROM PAType_5G is 0x%x, external_pa_5g = %d
+RTW: ERROR %s Download Firmware from %s failed
+RTW: ERROR %s: Fail to get Firmware MAX size(err=%d)
+RTW: ERROR %s: download firmware FAIL! status=0x%02x
+RTW: ERROR %s: halmac_free_download_firmware fail(err=0x%x)
+RTW: SAE: start external auth
+download_firmware_88xx
+free_download_firmware_88xx
+hal_btcoex_PreLoadFirmware
+rtw_btc_ex_pre_load_firmware
+rtw_btcoex_PreLoadFirmware
+rtw_cfg80211_external_auth_request
+rtw_cfg80211_external_auth_status
+rtw_halmac_init_hal_fw_file
+rtw_set_external_auth_status
+ls: cannot access '/srv/tftp': No such file or directory
+/srv/ftp:
+total 0
+dr-xr-xr-x 1 root ftp   0 Oct 13  2025 .
+drwxr-xr-x 1 root root 14 Aug  1 00:15 ..

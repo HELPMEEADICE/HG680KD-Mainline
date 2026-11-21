@@ -1,0 +1,345 @@
+init_hardware_info SHA256: e8dc8afb9d8b40d0df7600afd6d407e7ad46a35bda67636c12e29e3f5123309b
+Thumb add at 0x194c with literal 0x19f8 resolves to 0x3ecc
+Thumb add at 0x1a34 with literal 0x1ad0 resolves to 0x3970
+ro.fh.lsadcix
+Thumb add at 0x1a70 with literal 0x1ae0 resolves to 0x3913
+ro.fh.boardid
+GPIO indices for LSADC 11: (19, 20, 21)
+U-Boot GPIO2 masked 0xe0 read 0x20; GPIO2 direction read 0x40.
+GPIO19, 20, 21 levels = 0, 0, 1, giving boardid = 4.
+Factory kernel SHA256: a47592ad5a842035f0bd6e41fdce71cb89c2238aff57e2b333d60213af176724
+Kernel _text: 0xc0008000
+Stock PCIe disable message: 3PCIe hard disable
+
+g_crg_mask 0xc110a130
+000: 00070000 00000018 07000000 00000003
+010: 00000002 00000200 00000400 00001000
+020: 000f8000 00000011 00000022
+SDIO register table 0xc110a1cc
+000: 00000098 0000009c ffffffff ffffffff
+010: 00000094 00000090 000000a4 000000a0
+020: 00000000 00000000 00000000 00000000
+030: 000001f0 00000000 00000000 00000000
+040: 00000000 000002a4 000002a8 000002ac
+050: 000002b8 00000000 00000000 00000000
+060: 00000000 00000000 00000007 c17a3cf8
+SDIO legacy timing 0xc17a3cf8
+000: 00000001 80000000 800000a0 00000000
+010: 00000000 800000a0 80080000 80000000
+    1940:	f7ff eda6 	blx	1490 <HI_UNF_GPIO_Init@plt>
+    1944:	482c      	ldr	r0, [pc, #176]	@ (19f8 <dl_iterate_phdr@plt+0x4cc>)
+    1946:	eb04 0644 	add.w	r6, r4, r4, lsl #1
+    194a:	2101      	movs	r1, #1
+    194c:	4478      	add	r0, pc
+    194e:	f850 4026 	ldr.w	r4, [r0, r6, lsl #2]
+    1952:	4620      	mov	r0, r4
+    1954:	f7ff eda2 	blx	149c <HI_UNF_GPIO_SetDirBit@plt>
+    1958:	4669      	mov	r1, sp
+    195a:	4620      	mov	r0, r4
+    195c:	f7ff eda4 	blx	14a8 <HI_UNF_GPIO_ReadBit@plt>
+    1960:	4826      	ldr	r0, [pc, #152]	@ (19fc <dl_iterate_phdr@plt+0x4d0>)
+    1962:	9900      	ldr	r1, [sp, #0]
+    1964:	4478      	add	r0, pc
+    1966:	f7ff ed5e 	blx	1424 <printf@plt>
+    196a:	9800      	ldr	r0, [sp, #0]
+    196c:	2400      	movs	r4, #0
+    196e:	2101      	movs	r1, #1
+    1970:	2801      	cmp	r0, #1
+    1972:	4823      	ldr	r0, [pc, #140]	@ (1a00 <dl_iterate_phdr@plt+0x4d4>)
+    1974:	bf04      	itt	eq
+    1976:	9400      	streq	r4, [sp, #0]
+    1978:	2401      	moveq	r4, #1
+    197a:	4478      	add	r0, pc
+    197c:	eb00 0086 	add.w	r0, r0, r6, lsl #2
+    1980:	6845      	ldr	r5, [r0, #4]
+    1982:	4628      	mov	r0, r5
+    1984:	f7ff ed8a 	blx	149c <HI_UNF_GPIO_SetDirBit@plt>
+    1988:	4669      	mov	r1, sp
+    198a:	4628      	mov	r0, r5
+    198c:	f7ff ed8c 	blx	14a8 <HI_UNF_GPIO_ReadBit@plt>
+    1990:	481c      	ldr	r0, [pc, #112]	@ (1a04 <dl_iterate_phdr@plt+0x4d8>)
+    1992:	9900      	ldr	r1, [sp, #0]
+    1994:	4478      	add	r0, pc
+    1996:	f7ff ed46 	blx	1424 <printf@plt>
+    199a:	9800      	ldr	r0, [sp, #0]
+    199c:	2101      	movs	r1, #1
+    199e:	2801      	cmp	r0, #1
+    19a0:	bf02      	ittt	eq
+    19a2:	2000      	moveq	r0, #0
+    19a4:	9000      	streq	r0, [sp, #0]
+    19a6:	f044 0402 	orreq.w	r4, r4, #2
+    19aa:	4817      	ldr	r0, [pc, #92]	@ (1a08 <dl_iterate_phdr@plt+0x4dc>)
+    19ac:	4478      	add	r0, pc
+    19ae:	eb00 0086 	add.w	r0, r0, r6, lsl #2
+    19b2:	6885      	ldr	r5, [r0, #8]
+    19b4:	4628      	mov	r0, r5
+    19b6:	f7ff ed72 	blx	149c <HI_UNF_GPIO_SetDirBit@plt>
+    19ba:	4669      	mov	r1, sp
+    19bc:	4628      	mov	r0, r5
+    19be:	f7ff ed74 	blx	14a8 <HI_UNF_GPIO_ReadBit@plt>
+    19c2:	4812      	ldr	r0, [pc, #72]	@ (1a0c <dl_iterate_phdr@plt+0x4e0>)
+    19c4:	9900      	ldr	r1, [sp, #0]
+    19c6:	4478      	add	r0, pc
+    19c8:	f7ff ed2c 	blx	1424 <printf@plt>
+    19cc:	9800      	ldr	r0, [sp, #0]
+    19ce:	2801      	cmp	r0, #1
+    19d0:	bf08      	it	eq
+    19d2:	f044 0404 	orreq.w	r4, r4, #4
+    19d6:	f7ff ed6e 	blx	14b4 <HI_UNF_GPIO_DeInit@plt>
+    19da:	480e      	ldr	r0, [pc, #56]	@ (1a14 <dl_iterate_phdr@plt+0x4e8>)
+    19dc:	9901      	ldr	r1, [sp, #4]
+    19de:	4478      	add	r0, pc
+    1a30:	ac18      	add	r4, sp, #96	@ 0x60
+    1a32:	4a28      	ldr	r2, [pc, #160]	@ (1ad4 <dl_iterate_phdr@plt+0x5a8>)
+    1a34:	4478      	add	r0, pc
+    1a36:	4621      	mov	r1, r4
+    1a38:	447a      	add	r2, pc
+    1a3a:	f7ff ed12 	blx	1460 <property_get@plt>
+    1a3e:	4620      	mov	r0, r4
+    1a40:	f7ff ed3e 	blx	14c0 <atoi@plt>
+    1a44:	4604      	mov	r4, r0
+    1a46:	2c0d      	cmp	r4, #13
+    1a48:	d305      	bcc.n	1a56 <dl_iterate_phdr@plt+0x52a>
+    1a4a:	4823      	ldr	r0, [pc, #140]	@ (1ad8 <dl_iterate_phdr@plt+0x5ac>)
+    1a4c:	a918      	add	r1, sp, #96	@ 0x60
+    1a4e:	4478      	add	r0, pc
+    1a50:	f7ff ece8 	blx	1424 <printf@plt>
+    1a54:	2400      	movs	r4, #0
+    1a56:	4620      	mov	r0, r4
+    1a58:	f7ff ff5e 	bl	1918 <dl_iterate_phdr@plt+0x3ec>
+    1a5c:	4a1f      	ldr	r2, [pc, #124]	@ (1adc <dl_iterate_phdr@plt+0x5b0>)
+    1a5e:	4605      	mov	r5, r0
+    1a60:	466e      	mov	r6, sp
+    1a62:	462b      	mov	r3, r5
+    1a64:	447a      	add	r2, pc
+    1a66:	4630      	mov	r0, r6
+    1a68:	f7ff ff32 	bl	18d0 <dl_iterate_phdr@plt+0x3a4>
+    1a6c:	481c      	ldr	r0, [pc, #112]	@ (1ae0 <dl_iterate_phdr@plt+0x5b4>)
+    1a6e:	4631      	mov	r1, r6
+    1a70:	4478      	add	r0, pc
+    1a72:	f7ff ecf0 	blx	1454 <property_set@plt>
+    1a76:	491b      	ldr	r1, [pc, #108]	@ (1ae4 <dl_iterate_phdr@plt+0x5b8>)
+    1a78:	ea45 05c4 	orr.w	r5, r5, r4, lsl #3
+    1a7c:	481a      	ldr	r0, [pc, #104]	@ (1ae8 <dl_iterate_phdr@plt+0x5bc>)
+    1a7e:	4479      	add	r1, pc
+ clk_enable_mmc 0xc0524034 0xc0524058
+c0524034: ldr     r3, [r0, #0xc]
+c0524038: ldr     r3, [r3]
+c052403c: dsb     sy
+c0524040: orr     r3, r3, #3
+c0524044: dsb     st
+c0524048: ldr     r2, [r0, #0xc]
+c052404c: str     r3, [r2]
+c0524050: mov     r0, #0
+c0524054: bx      lr
+ clk_set_rate_mmc 0xc0524078 0xc0524134
+c05240e0: ldr     r3, [r0, #0xc]
+c05240e4: ldr     r3, [r3]
+c05240e8: dsb     sy
+c05240ec: bic     r3, r3, #0x7000000
+c05240f0: orr     r3, r3, r2
+c05240f4: dsb     st
+c05240f8: ldr     r2, [r0, #0xc]
+c05240fc: str     r3, [r2]
+ hiclk_prepare_pcie 0xc05241d8 0xc05243bc
+c05241e0: ldr     r3, [r0, #0x14]
+c05241e4: ldr     r3, [r3, #0x870]
+c05241e8: dsb     sy
+c05241ec: tst     r3, #1
+c05241f0: bne     #0xc0524368 ; 
+c05241f4: ldr     r3, [r0, #0x14]
+c05241f8: ldr     r6, [r3, #0x220]
+c05241fc: dsb     sy
+c0524360: mov     r0, r6
+c0524364: pop     {r4, r5, r6, r7, r8, pc}
+c0524368: ldr     r0, [pc, #0x40] ; = 0xc1365a3c 
+c052436c: bl      #0xc0205aa0 ; printk
+c0524370: dsb     st
+c0524374: mov     r2, #3
+c0524378: ldr     r3, [r4, #0x10]
+c052437c: str     r2, [r3, #0x3a0]
+c0524380: mvn     r0, #0
+c0524384: pop     {r4, r5, r6, r7, r8, pc}
+c0524388: ldr     r0, [pc, #0x24] ; = 0xc1365a7c 
+c052438c: bl      #0xc0205aa0 ; printk
+ plat_dll_reset_assert 0xc0c94c80 0xc0c94cf0
+ plat_host_pre_init 0xc0c95b10 0xc0c95b70
+c0c95b10: ldr     r0, [r1, #0x374]
+c0c95b14: ldr     r3, [pc, #0x4c] ; = 0xc110a130 g_crg_mask
+c0c95b18: cmp     r0, #0
+c0c95b1c: str     r3, [r1, #0x360]
+c0c95b20: beq     #0xc0c95b3c ; 
+c0c95b24: cmp     r0, #1
+c0c95b28: bne     #0xc0c95b54 ; 
+c0c95b2c: add     r3, r3, #0x9c
+c0c95b30: mov     r0, #0
+c0c95b34: str     r3, [r1, #0x364]
+c0c95b38: bx      lr
+c0c95b3c: ldr     r2, [r1, #0x36c]
+ plat_crg_init 0xc0c94d60 0xc0c94f4c
+c0c94e00: ldr     r0, [r4, #0x350]
+c0c94e04: bl      #0xc0a14ba4 ; reset_control_assert
+c0c94e08: ldr     r3, [r6, #4]
+c0c94e0c: movw    r0, #0x3323
+c0c94e10: movt    r0, #0x333
+c0c94e14: blx     r3
+c0c94e18: ldr     r0, [r4, #0x344]
+c0c94e1c: bl      #0xc0a14c6c ; reset_control_deassert
+c0c94e20: ldr     r0, [r4, #0x348]
+c0c94e24: bl      #0xc0a14c6c ; reset_control_deassert
+c0c94e28: ldr     r0, [r4, #0x34c]
+c0c94e2c: bl      #0xc0a14c6c ; reset_control_deassert
+c0c94e30: ldr     r3, [r6, #4]
+c0c94e34: movw    r0, #0xae0e
+c0c94e38: movt    r0, #0x147
+c0c94e3c: blx     r3
+c0c94e40: b       #0xc0c94da4 ; 
+c0c94e44: ldr     r3, [r4, #0x364]
+c0c94e48: mov     r2, sp
+c0c94e4c: ldr     r0, [r4, #0x358]
+c0c94ec0: ldr     r3, [r6, #4]
+c0c94ec4: movw    r0, #0x3323
+c0c94ec8: movt    r0, #0x333
+c0c94ecc: blx     r3
+c0c94f00: str     r2, [sp]
+c0c94f04: bl      #0xc0a67508 ; regmap_write
+c0c94f08: ldr     r3, [r6, #4]
+c0c94f0c: movw    r0, #0xae0e
+ plat_set_drv_phase 0xc0c94b08 0xc0c94b80
+c0c94b10: ldr     ip, [r0, #0x364]
+c0c94b14: mov     r4, r0
+c0c94b18: ldr     r5, [pc, #0x5c] ; = 0xc1715548 __stack_chk_guard
+c0c94b1c: mov     r7, r1
+c0c94b20: mov     r2, sp
+c0c94b24: ldr     r0, [r0, #0x358]
+c0c94b28: ldr     r6, [ip, #0x4c]
+c0c94b2c: ldr     r3, [r5]
+c0c94b30: mov     r1, r6
+c0c94b34: str     r3, [sp, #4]
+c0c94b38: bl      #0xc0a65ee8 ; regmap_read
+c0c94b3c: ldr     r3, [r4, #0x360]
+c0c94b40: mov     r1, r6
+c0c94b44: ldr     r0, [r4, #0x358]
+c0c94b48: ldr     r3, [r3, #0x20]
+c0c94b4c: ldr     r2, [sp]
+c0c94b50: bic     r2, r2, r3
+c0c94b54: orr     r2, r2, r7
+c0c94b58: str     r2, [sp]
+c0c94b5c: bl      #0xc0a67508 ; regmap_write
+ plat_get_drv_samp_phase 0xc0c94a6c 0xc0c94b08
+c0c94aa0: cmp     r2, #0
+c0c94aa4: beq     #0xc0c94ae8 ; 
+c0c94aa8: mov     r1, r3
+c0c94aac: ldr     r3, [r1, #0x18]
+c0c94ab0: bic     r3, r3, #0x80000000
+c0c94ab4: str     r3, [r0, #0x378]
+c0c94ab8: ldr     r3, [r1, #0x1c]
+c0c94abc: cmp     r3, #0
+c0c94ac0: biclt   r3, r3, #0x80000000
+c0c94ac4: ldrge   r3, [r0, #0x380]
+c0c94ac8: str     r3, [r0, #0x37c]
+c0c94acc: bx      lr
+ sdhci_nebula_sdio_rescan 0xc0c95a84 0xc0c95b10
+c0c95a84: cmp     r0, #3
+c0c95a88: push    {r4, r5, r6, lr}
+c0c95a8c: bhi     #0xc0c95aec ; 
+c0c95a90: ldr     r3, [pc, #0x68] ; = 0xc1ae9f1c g_mmc_host
+c0c95a94: mov     r1, r0
+c0c95a98: ldr     r4, [r3, r0, lsl #2]
+c0c95a9c: cmp     r4, #0
+c0c95aa0: beq     #0xc0c95adc ; 
+c0c95aa4: ldr     r0, [pc, #0x58] ; = 0xc1476e24 
+c0c95aa8: bl      #0xc0205aa0 ; printk
+c0c95aac: ldr     r5, [r4, #0x264]
+c0c95ab0: cmp     r5, #0
+c0c95ab4: beq     #0xc0c95ac4 ; 
+c0c95ab8: mov     r0, r4
+c0c95abc: pop     {r4, r5, r6, lr}
+c0c95ac0: b       #0xc0c0ed18 ; mmc_hw_reset
+c0c95ac4: mov     r0, r4
+c0c95ac8: str     r5, [r4, #0x220]
+c0c95acc: mov     r1, r5
+c0c95ad0: bl      #0xc0c11044 ; mmc_detect_change
+c0c95ad4: mov     r0, r5
+c0c95ad8: pop     {r4, r5, r6, pc}
+c0c95adc: ldr     r0, [pc, #0x24] ; = 0xc1476e10 
+c0c95ae0: bl      #0xc0205aa0 ; printk
+c0c95ae4: mvn     r0, #0x15
+c0c95ae8: pop     {r4, r5, r6, pc}
+c0c95aec: mov     r1, r0
+c0c95af0: ldr     r0, [pc, #0x14] ; = 0xc1476de8 
+c0c95af4: bl      #0xc0205aa0 ; printk
+c0c95af8: mvn     r0, #0x15
+c0c95afc: pop     {r4, r5, r6, pc}
+ wifibt_rfkill_set_gpio.constprop.4 0xc0c96cfc 0xc0c96da0
+c0c96d00: mov     r4, r0
+c0c96d04: mov     r0, #0x23
+c0c96d08: mov     r5, r1
+c0c96d0c: bl      #0xc09dfd70 ; gpio_request
+c0c96d10: cmp     r0, #0
+c0c96d14: bge     #0xc0c96d30 ; 
+c0c96d18: mov     r2, r5
+c0c96d1c: mov     r1, #0x23
+c0c96d20: ldr     r0, [pc, #0x6c] ; = 0xc1378608 
+c0c96d24: bl      #0xc0205aa0 ; printk
+c0c96d28: mvn     r0, #0
+c0c96d2c: pop     {r4, r5, r6, pc}
+c0c96d30: mov     r0, #0x23
+c0c96d34: bl      #0xc09db3e4 ; gpio_to_desc
+c0c96d38: mov     r1, r4
+c0c96d3c: bl      #0xc09dd5f8 ; gpiod_direction_output_raw
+c0c96d40: cmp     r0, #0
+c0c96d44: bge     #0xc0c96d5c ; 
+c0c96d48: mov     r3, r5
+c0c96d4c: mov     r2, r4
+c0c96d50: mov     r1, #0x23
+c0c96d54: ldr     r0, [pc, #0x3c] ; = 0xc1378634 
+c0c96d58: bl      #0xc0205aa0 ; printk
+c0c96d5c: mov     r0, #0x23
+c0c96d60: ldr     r6, [pc, #0x34] ; = 0xc14b31d4 arm_delay_ops
+c0c96d64: bl      #0xc09dfd30 ; gpio_free
+c0c96d68: movw    r5, #0xfd78
+c0c96d6c: movt    r5, #0x7fff
+c0c96d70: mov     r4, #0xb
+c0c96d74: subs    r4, r4, #1
+c0c96d78: mov     r0, r5
+c0c96d7c: beq     #0xc0c96d8c ; 
+c0c96d80: ldr     r3, [r6, #4]
+c0c96d84: blx     r3
+c0c96d88: b       #0xc0c96d74 ; 
+c0c96d8c: mov     r0, r4
+ rfkill_set_power 0xc0552240 0xc05522e0
+c0552240: push    {r4, lr}
+c0552244: mov     r0, #0x22
+c0552248: mov     r4, r1
+c055224c: ldr     r1, [pc, #0x74] ; = 0xc137879c 
+c0552250: bl      #0xc09dfd70 ; gpio_request
+c0552254: cmp     r0, #0
+c0552258: blt     #0xc05522b4 ; 
+c055225c: cmp     r4, #0
+c0552260: ldr     r1, [pc, #0x64] ; = 0xc13787d8 
+c0552264: bne     #0xc0552298 ; 
+c0552268: ldr     r0, [pc, #0x60] ; = 0xc1378804 
+c055226c: bl      #0xc0205aa0 ; printk
+c0552270: mov     r0, #0x22
+c0552274: bl      #0xc09db3e4 ; gpio_to_desc
+c0552278: mov     r1, #1
+c055227c: bl      #0xc09dd5f8 ; gpiod_direction_output_raw
+c0552280: mov     r0, #0x22
+c0552284: bl      #0xc09dfd30 ; gpio_free
+c0552288: mov     r0, #0xa
+c055228c: bl      #0xc019d590 ; msleep
+c0552290: mov     r0, #0
+c0552294: pop     {r4, pc}
+c0552298: ldr     r0, [pc, #0x34] ; = 0xc13787e0 
+c055229c: bl      #0xc0205aa0 ; printk
+c05522a0: mov     r0, #0x22
+c05522a4: bl      #0xc09db3e4 ; gpio_to_desc
+c05522a8: mov     r1, #0
+c05522ac: bl      #0xc09dd5f8 ; gpiod_direction_output_raw
+c05522b0: b       #0xc0552280 ; 
+c05522b4: mov     r1, #0x22
+c05522b8: ldr     r0, [pc, #0x18] ; = 0xc13787a8 
+c05522bc: bl      #0xc0205aa0 ; printk
+c05522c0: mvn     r0, #0
+c05522c4: pop     {r4, pc}

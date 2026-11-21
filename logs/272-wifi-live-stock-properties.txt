@@ -1,0 +1,11 @@
+
+# cat /sys/block/mmcblk0/ro; mount -t ext4 -o ro,noload /dev/mmcblk0p2 /tmp; grep -n "ro.fh.ddr4" /tmp/default_stb.prop; ls -ld /tmp/odm; umount /tmp; cat /sys/block/mmcblk0/ro
+1
+9:ro.fh.ddr4.wifi=9900E00100062401ND0YX1L1
+11:ro.fh.ddr4.btonly=9900E00100062401ND0XX1L1
+13:#ro.fh.ddr4.nowifi=
+15:ro.fh.ddr4.wifi6=9900E00100062402ND04X1L1
+ls: /tmp/odm: No such file or directory
+1
+# 
+[host] shell command elapsed: 0.05 s

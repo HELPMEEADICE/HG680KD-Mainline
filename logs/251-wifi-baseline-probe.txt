@@ -1,0 +1,17 @@
+
+# uname -a; cat /sys/block/mmcblk0/ro; cat /proc/partitions; cat /proc/mounts; ls /sys/bus/usb/devices; ls /sys/bus/sdio/devices
+Linux hg680kd 6.18.64-hg680kd-arm64-all-2g-hdmi #1 SMP 2025-12-01 00:00:00 UTC aarch64
+1
+major minor  #blocks  name
+
+ 179        0    7634944 mmcblk0
+   8        0   30062592 sda
+   8        1   30061568 sda1
+rootfs / rootfs rw,size=1010528k,nr_inodes=252632 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=1010528k,nr_inodes=252632,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+2-0:1.0  1-2      1-0:1.0  usb2     usb1     1-2:1.0
+# 
+[host] shell command elapsed: 0.06 s

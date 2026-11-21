@@ -1,0 +1,44 @@
+<INTERRUPT>
+fastboot#md.l f8a21090 6
+f8a21090: 00001071 00001071 00002001 00001071  q...q.... ..q...
+f8a210a0: 00001071 00001071                    q...q...
+fastboot#md.l f8a222a4 6
+f8a222a4: 00070003 00000003 00080400 00000400  ................
+f8a222b4: 00000008 0000000a                    ........
+fastboot#md.b f8b24010 1
+f8b24010: 04                                               .
+fastboot#md.b f8b24020 1
+f8b24020: 08                                               .
+fastboot#md.b f8b24400 1
+f8b24400: 0c                                               .
+fastboot#md.l f8a20210 5
+f8a20210: 020000df 00000000 7e800000 00000000  ...........~....
+f8a20220: 00049140                             @...
+fastboot#md.l f8a22870 1
+f8a22870: 00000000                             ....
+fastboot#md.l f8a20870 1
+f8a20870: 00f00005                             ....
+fastboot#usb start
+starting USB...
+USB0:   Register 1000140 NbrPorts 1
+Starting the controller
+USB XHCI 1.10
+scanning bus 0 for devices... 1 USB Device(s) found
+USB1:   Register 3000140 NbrPorts 3
+Starting the controller
+USB XHCI 1.10
+scanning bus 1 for devices... 2 USB Device(s) found
+       scanning usb for storage devices... 1 Storage Device(s) found
+       scanning usb for ethernet devices... 0 Ethernet Device(s) found
+fastboot#usb tree
+USB device tree:
+  1  Hub (5 Gb/s, 0mA)
+     U-Boot XHCI Host Controller 
+   
+  2  Hub (5 Gb/s, 0mA)
+  |  U-Boot XHCI Host Controller 
+  |
+  |+-3  Mass Storage (480 Mb/s, 224mA)
+        USB  SanDisk 3.2Gen1 0101cfcee42b331f192d48b3e59fbda
+     
+fastboot#

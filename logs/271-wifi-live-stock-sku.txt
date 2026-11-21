@@ -1,0 +1,26 @@
+
+# cat /sys/block/mmcblk0/ro; mount -t ext4 -o ro,noload /dev/mmcblk0p1 /tmp
+1
+# 
+[host] shell command elapsed: 0.02 s
+sha256sum /tmp/system/bin/opt/etc/init.fhservice.sh; grep -n -E "BOARDID|ddr4\." /tmp/system/bin/opt/etc/init.fhservice.sh; umount /tmp
+1a52995d8a4c7654378fe66b6c910d004ab9d3f2683204577357cf3e8b5073e5  /tmp/system/bin/opt/etc/init.fhservice.sh
+28:BOARDID=`getprop ro.fh.boardid`
+30:if [ "$BOARDID" == "0" ];then
+31:    DDRWIFI=`getprop ro.fh.ddr4.wifi`
+33:if [ "$BOARDID" == "3" ];then
+34:    DDRWIFI=`getprop ro.fh.ddr4.btonly`
+36:if [ "$BOARDID" == "1" ] || [ "$BOARDID" == "2" ] || [ "$BOARDID" == "4" ];then
+37:    DDRWIFI=`getprop ro.fh.ddr4.btonly`
+39:if [ "$BOARDID" == "7" ];then
+41:        DDRWIFI=`getprop ro.fh.ddr4.btonly`
+43:        DDRWIFI=`getprop ro.fh.ddr4.wifi6`
+# 
+[host] shell command elapsed: 0.08 s
+mount -t ext4 -o ro,noload /dev/mmcblk0p2 /tmp; sha256sum /tmp/default_stb.prop; grep -B 1 "ro.fh.ddr4" /tmp/default_stb.prop; ls -ld /tmp/odm; umount /tmp; cat /sys/block/mmcblk0/ro
+65d3ac131f0efa801ca7f6ad371321106720514065fc04f2eb15daa39417db51  /tmp/default_stb.prop
+grep: unrecognized option: B
+ls: /tmp/odm: No such file or directory
+1
+# 
+[host] shell command elapsed: 0.03 s

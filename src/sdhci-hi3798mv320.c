@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Read-only bring-up host for the Hi3798MV320 Nebula eMMC and SDIO controllers.
- * The stock bootloader prepares the pads and regulators.
+ * The stock bootloader selects the pad functions.
  */
 #include <linux/clk.h>
 #include <linux/delay.h>
@@ -25,11 +25,15 @@
 #define NEBULA_CRG_EMMC		0x288
 #define NEBULA_CRG_EMMC_PHASE	0x290
 #define NEBULA_CRG_SDIO		0x2a4
+#define NEBULA_CRG_SDIO_DLL	0x2a8
+#define NEBULA_CRG_SDIO_PHASE	0x2ac
 #define NEBULA_CRG_RATE_SHIFT	24
 #define NEBULA_CRG_RATE_SEL	GENMASK(26, 24)
 #define NEBULA_CRG_DRV_PHASE_MASK	GENMASK(19, 15)
 #define NEBULA_CRG_DRV_PHASE_LEGACY	(16 << 15)
 #define NEBULA_CRG_SDIO_RESETS	GENMASK(18, 16)
+#define NEBULA_CRG_SDIO_CLOCKS	GENMASK(1, 0)
+#define NEBULA_CRG_SDIO_DLL_RESET BIT(1)
 
 struct hi3798mv320_sdhci_priv {
 	struct regmap *crg;
@@ -87,23 +91,20 @@ static void hi3798mv320_sdhci_set_clock(struct sdhci_host *host, unsigned int cl
 	regmap_update_bits(priv->crg, priv->clock_reg, NEBULA_CRG_RATE_SEL,
 			   sel << NEBULA_CRG_RATE_SHIFT);
 
-	if (priv->emmc) {
-		u32 samp_phase = (host->mmc->ios.timing == MMC_TIMING_MMC_HS ||
-				  actual >= 48000000) ? 0x04 : 0x00;
+	regmap_update_bits(priv->crg, priv->phase_reg, NEBULA_CRG_DRV_PHASE_MASK,
+			   NEBULA_CRG_DRV_PHASE_LEGACY);
 
-		regmap_update_bits(priv->crg, priv->phase_reg,
-				   NEBULA_CRG_DRV_PHASE_MASK,
-				   NEBULA_CRG_DRV_PHASE_LEGACY);
+	val = sdhci_readl(host, NEBULA_SAMPLE_CTRL);
+	val |= NEBULA_SAMPLE_SW_EN;
+	sdhci_writel(host, val, NEBULA_SAMPLE_CTRL);
 
-		val = sdhci_readl(host, NEBULA_SAMPLE_CTRL);
-		val |= NEBULA_SAMPLE_SW_EN;
-		sdhci_writel(host, val, NEBULA_SAMPLE_CTRL);
-
-		val = sdhci_readl(host, NEBULA_SAMPLE_PHASE);
-		val = (val & ~NEBULA_SAMPLE_PHASE_MASK) | samp_phase;
-		sdhci_writel(host, val, NEBULA_SAMPLE_PHASE);
-		udelay(25);
-	}
+	val = sdhci_readl(host, NEBULA_SAMPLE_PHASE);
+	val &= ~NEBULA_SAMPLE_PHASE_MASK;
+	if (priv->emmc && (host->mmc->ios.timing == MMC_TIMING_MMC_HS ||
+			   actual >= 48000000))
+		val |= 0x04;
+	sdhci_writel(host, val, NEBULA_SAMPLE_PHASE);
+	udelay(25);
 
 	sdhci_enable_clk(host, SDHCI_CLOCK_PLL_EN);
 	host->mmc->actual_clock = actual;
@@ -193,9 +194,19 @@ static int hi3798mv320_sdhci_probe(struct platform_device *pdev)
 
 	priv->crg = crg;
 	priv->clock_reg = clock_reg;
-	priv->phase_reg = NEBULA_CRG_EMMC_PHASE;
+	priv->phase_reg = emmc ? NEBULA_CRG_EMMC_PHASE : NEBULA_CRG_SDIO_PHASE;
 	priv->emmc = emmc;
 
+	if (!emmc) {
+		ret = regmap_set_bits(crg, clock_reg,
+				      NEBULA_CRG_SDIO_CLOCKS | NEBULA_CRG_SDIO_RESETS);
+		if (ret)
+			return ret;
+		ret = regmap_set_bits(crg, NEBULA_CRG_SDIO_DLL, NEBULA_CRG_SDIO_DLL_RESET);
+		if (ret)
+			return ret;
+		udelay(100);
+	}
 	ret = regmap_clear_bits(crg, clock_reg, clock_mask);
 	if (ret)
 		return ret;
@@ -204,6 +215,8 @@ static int hi3798mv320_sdhci_probe(struct platform_device *pdev)
 		return ret;
 	if (value & clock_mask)
 		return dev_err_probe(dev, -EIO, "CRG %#x did not latch: %#x\n", clock_reg, value);
+	if (!emmc)
+		udelay(25);
 
 	ret = mmc_of_parse(host->mmc);
 	if (ret)

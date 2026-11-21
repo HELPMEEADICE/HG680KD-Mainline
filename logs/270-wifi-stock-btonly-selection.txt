@@ -1,0 +1,51 @@
+1a52995d8a4c7654378fe66b6c910d004ab9d3f2683204577357cf3e8b5073e5  extracted/opt-etc/etc/init.fhservice.sh
+65d3ac131f0efa801ca7f6ad371321106720514065fc04f2eb15daa39417db51  extracted/default_stb.prop
+6d7397368126facdc5b215f552edaaa44a6f6a500ada2392ce6dd10cdbaa1451  extracted/socwifi.cfg
+BOARDID=`getprop ro.fh.boardid`
+LSADCIX=`getprop ro.fh.lsadcix`
+if [ "$BOARDID" == "0" ];then
+    DDRWIFI=`getprop ro.fh.ddr4.wifi`
+fi
+if [ "$BOARDID" == "3" ];then
+    DDRWIFI=`getprop ro.fh.ddr4.btonly`
+fi
+if [ "$BOARDID" == "1" ] || [ "$BOARDID" == "2" ] || [ "$BOARDID" == "4" ];then
+    DDRWIFI=`getprop ro.fh.ddr4.btonly`
+fi
+if [ "$BOARDID" == "7" ];then
+    if [ "$LSADCIX" == "12" ] || [ "$LSADCIX" == "8" ];then
+        DDRWIFI=`getprop ro.fh.ddr4.btonly`
+    else
+        DDRWIFI=`getprop ro.fh.ddr4.wifi6`
+    fi
+fi
+PRODUCT_TYPE=`getprop persist.sys.product.type`
+if [ -n "$DDRWIFI" ]; then
+    setprop ro.product.hardware.version $DDRWIFI
+fi
+
+hardwareVersion=`getprop ro.product.hardware.version`
+if [ ! -z $hardwareVersion ];then
+    setprop ro.build.hardware.id $hardwareVersion
+7-
+8-#wifi5硬件版本号
+9:ro.fh.ddr4.wifi=9900E00100062401ND0YX1L1
+10-#单蓝牙硬件版本号
+11:ro.fh.ddr4.btonly=9900E00100062401ND0XX1L1
+12-#MV320不涉及
+13:#ro.fh.ddr4.nowifi=
+14-#wifi6硬件版本号
+15:ro.fh.ddr4.wifi6=9900E00100062402ND04X1L1
+extracted/init.bigfish.rc.vendor:248:service vendor.init_hardware_info /vendor/bin/init_hardware_info
+extracted/init.bigfish.rc.vendor-249-    user root
+extracted/init.bigfish.rc.vendor-250-    group root
+extracted/init.bigfish.rc.vendor-251-    disabled
+extracted/init.bigfish.rc.vendor-252-    oneshot
+extracted/init.bigfish.rc.vendor-253-
+extracted/init.bigfish.rc.vendor-254-service vendor.hioptimizednetwork /vendor/bin/hioptimizednetwork
+extracted/init.bigfish.rc.vendor-255-    user system
+extracted/init.bigfish.rc.vendor-256-    group system
+3:RTL8761BTV;1;0;bt_only;0;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+14:RTL8822CS;8;1;0x024c:0xc822;wifi_bt;1;rtl8822cs.ko;ifname=wlan0 if2name=p2p0;rtl8822cs;libwifi-hal-rtk;wpa_supplicant;0;1;libbt-vendor-rtk.so;libbluetooth.so;default;0;
+18:UWE5621DS;12;1;0x0000:0x0000;wifi_bt;1;uwe5621_wifi_sdio.ko;;uwe5621_wifi_sdio;libwifi-hal-bcm;unisoc_supplicant;0;1;libbt-vendor-unisoc.so;libbluetooth.so;default;0;
+21:MT7920EN;15;1;0x14c3:0x7961;wifi_bt;1;wlan_mt7961_pcie.ko;ifname=wlan0 if2name=p2p0;wlan_mt7961_pcie;libwifi-hal-bcm;mtk_supplicant;0;1;libbt-vendor-mtk.so;libbluetooth.so;default;0;
