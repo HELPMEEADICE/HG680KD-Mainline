@@ -1,0 +1,18 @@
+
+# grep mmc0 /proc/interrupts; cat /proc/uptime; dd if=/dev/mmcblk0 of=/dev/null bs=4M count=16; cat /proc/uptime; grep mmc0 /proc/interrupts
+  19:       4343          0          0          0  GICv3      67 Level     mmc0
+92.23 350.02
+16+0 records in
+16+0 records out
+94.70 359.79
+  19:       4601          0          0          0  GICv3      67 Level     mmc0
+# 
+[host] shell command elapsed: 2.50 s
+echo 2048 >/sys/block/mmcblk0/queue/read_ahead_kb; cat /proc/uptime; dd if=/dev/mmcblk0 of=/dev/null bs=4M count=16 skip=16; cat /proc/uptime; grep mmc0 /proc/interrupts
+94.73 359.90
+16+0 records in
+16+0 records out
+97.26 369.90
+  19:       4869          0          0          0  GICv3      67 Level     mmc0
+# 
+[host] shell command elapsed: 2.56 s

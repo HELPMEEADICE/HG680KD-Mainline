@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt.dts"
+
+&emmc_clock {
+	clock-frequency = <192000000>;
+};
+
+&{/soc} {
+	iocfg: syscon@f8a21000 {
+		compatible = "hisilicon,hi3798mv320-iocfg", "syscon";
+		reg = <0x0 0xf8a21000 0x0 0x1000>;
+	};
+};
+
+&{/soc/mmc@f9830000} {
+	hisilicon,iocfg = <&iocfg>;
+	max-frequency = <192000000>;
+	mmc-hs200-1_8v;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+};

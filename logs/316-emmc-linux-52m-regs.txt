@@ -1,0 +1,13 @@
+
+# devmem 0xf983052c; devmem 0xf9830540; devmem 0xf9830544; devmem 0xf9830548; devmem 0xf983054c; devmem 0xf8a22288; devmem 0xf8a2228c; devmem 0xf8a22290; devmem 0xf8a222a0
+sh: devmem: not found
+sh: devmem: not found
+sh: devmem: not found
+sh: devmem: not found
+sh: devmem: not found
+sh: devmem: not found
+sh: devmem: not found
+sh: devmem: not found
+sh: devmem: not found
+# 
+[host] shell command elapsed: 0.05 s

@@ -1,0 +1,28 @@
+
+# cat /proc/uptime; dd if=/dev/mmcblk0 of=/dev/null bs=2M count=1 skip=16; cat /proc/uptime; dd if=/dev/mmcblk0 bs=512 skip=229376 count=24032 | sha256sum
+125.31 482.10
+1+0 records in
+1+0 records out
+125.40 482.41
+24032+0 records in
+24032+0 records out
+97f4e2b5d88ee6d6fae8ced4809420d7f875c4ff8b0acfe817c6409b6f02a6b8  -
+# 
+[host] shell command elapsed: 0.91 s
+cat /sys/devices/system/cpu/online; lima-test; memtest-2g 1840
+0-3
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+memtest-2g: MemFree=1933 MiB, testing 1840 MiB (115 x 16 MiB chunks)
+memtest-2g: verified 1840 MiB, pages=471040, paddr=[0x01c00000..0x7ccff000]
+memtest-2g: >128M=455389 pages, >760M=316589 pages, >1536M=117933 pages
+MEMTEST-2G: PASS
+# 
+[host] shell command elapsed: 3.12 s

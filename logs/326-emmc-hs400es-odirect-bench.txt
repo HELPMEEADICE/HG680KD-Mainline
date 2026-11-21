@@ -1,0 +1,8 @@
+
+# wget -q -O /tmp/emmc-bench http://192.168.6.160:18080/emmc-bench && chmod +x /tmp/emmc-bench && /tmp/emmc-bench
+/dev/mmcblk0 off=0x2000000 chunk=2048KB count=1 direct=1 same=0: 2.00 MiB in 0.0794 s = 25.20 MiB/s (26.43 MB/s)
+/dev/mmcblk0 off=0x2000000 chunk=2048KB count=10 direct=1 same=1: 20.00 MiB in 0.7691 s = 26.01 MiB/s (27.27 MB/s)
+/dev/mmcblk0 off=0x0 chunk=4096KB count=64 direct=1 same=0: 256.00 MiB in 9.7929 s = 26.14 MiB/s (27.41 MB/s)
+/dev/mmcblk0 off=0x0 chunk=4096KB count=64 direct=0 same=0: 256.00 MiB in 9.8402 s = 26.02 MiB/s (27.28 MB/s)
+# 
+[host] shell command elapsed: 20.59 s

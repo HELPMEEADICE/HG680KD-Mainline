@@ -1,0 +1,8 @@
+
+# cat /sys/kernel/debug/mmc0/clock; grep mmc /proc/interrupts; cat /sys/block/mmcblk0/queue/max_sectors_kb /sys/block/mmcblk0/queue/read_ahead_kb; cat /sys/kernel/debug/mmc0/err_stats
+192000000
+  19:       4343          0          0          0  GICv3      67 Level     mmc0
+512
+128
+# 
+[host] shell command elapsed: 0.03 s

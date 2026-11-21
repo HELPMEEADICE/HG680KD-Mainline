@@ -1,0 +1,7 @@
+
+# wget -q -O /tmp/emmc-bench2 http://192.168.6.160:18080/emmc-bench2 && chmod +x /tmp/emmc-bench2 && /tmp/emmc-bench2
+chunk=4KB count=1000: 3.91 MiB in 0.3278 s = 11.92 MiB/s (0.328 ms/req)
+chunk=64KB count=256: 16.00 MiB in 0.6600 s = 24.24 MiB/s (2.578 ms/req)
+chunk=512KB count=64: 32.00 MiB in 1.2335 s = 25.94 MiB/s (19.274 ms/req)
+# 
+[host] shell command elapsed: 2.25 s

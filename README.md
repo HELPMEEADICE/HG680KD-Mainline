@@ -43,7 +43,8 @@ fb-test
 
 | 用途 | RAM 镜像 | SHA256 |
 | --- | --- | --- |
-| Linux 7.2.5 HDMI + 板载蓝牙 | [arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img) | `8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695` |
+| Linux 7.2.5 HDMI + 板载蓝牙 + eMMC HS400ES | [arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img) | `97a768556f66d01d745ee556785be0bb33c7c4de0ef292079c7a642a2e2502f2` |
+| Linux 7.2.5 HDMI + 板载蓝牙（回退） | [arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img) | `8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695` |
 | 6.18.64 HDMI + 板载蓝牙（回退） | [arm64-all-2g-hdmi-bt/boot.img](artifacts/arm64-all-2g-hdmi-bt/boot.img) | `73d68394f7c1b20c7d031db27773224c87b3a406b09c10220d188f3ab5c3ccc8` |
 | 7.2.5 无显示/蓝牙基线（回退） | [arm64-7.2.5-all-2g/uImage](artifacts/arm64-7.2.5-all-2g/uImage) | `ba478a9a9fc9a6602a1224fbb759f955d68d7e92c43678b2abbdeb331d1aca09` |
 | 无线探测回退 | [arm64-all-2g-hdmi-wifi-probe/boot.img](artifacts/arm64-all-2g-hdmi-wifi-probe/boot.img) | `f57038eb565ef04366282a7b0a6ed2ac53fd3258df5361684a1a4cf5b4d8276d` |
@@ -100,7 +101,8 @@ bash scripts/build.sh full "$root" "$root/inputs" arm64-all-2g-hdmi-wifi-probe
 - ARM64 最小化核心验证镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-core/uImage](artifacts/arm64-core/uImage)（见 [ARM64-HANDOFF.md](ARM64-HANDOFF.md)）
 - ARM64 全功能 + 2 GiB 扩容镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-all-2g/uImage](artifacts/arm64-all-2g/uImage)（`SHA256: 4196860c3e7f499f286661f929c237d5549cb800313b84ec5306c9209228e85d`）
 - ARM64 Linux 7.2.5 全功能 + 2 GiB 扩容镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-7.2.5-all-2g/uImage](artifacts/arm64-7.2.5-all-2g/uImage)（`SHA256: ba478a9a9fc9a6602a1224fbb759f955d68d7e92c43678b2abbdeb331d1aca09`）
-- ARM64 Linux 7.2.5 全功能 + HDMI + 板载蓝牙镜像（纯 RAM Legacy `boot.img`）：[artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img)（`SHA256: 8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695`）
+- ARM64 Linux 7.2.5 全功能 + HDMI + 板载蓝牙镜像（纯 RAM Legacy `boot.img`，回退）：[artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img)（`SHA256: 8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695`）
+- ARM64 Linux 7.2.5 全功能 + HDMI + 板载蓝牙 + eMMC HS400ES 镜像（纯 RAM Legacy `boot.img`）：[artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img)（`SHA256: 97a768556f66d01d745ee556785be0bb33c7c4de0ef292079c7a642a2e2502f2`）
 
 每个产物目录同时保存内核映像（ARM32 的 `zImage` 或 ARM64 的 `Image`）、DTB、initramfs、配置、System.map、vmlinux 和 SHA256 清单。
 
@@ -198,7 +200,10 @@ python .\scripts\serial_boot.py --image .\artifacts\arm32-all\boot.img `
 | 传输模式 SDMA | [arm32-emmc-sdma](artifacts/arm32-emmc-sdma/boot.img) | 52 MHz (48 MHz), 8-bit, `mmc high-speed`, SDMA, `ro=1` | 0.11 s / 一致 | 0.53 s / 一致 | [156](logs/156-mainline-emmc-sdma.txt) |
 | 传输模式 ADMA2 | [arm32-emmc-adma](artifacts/arm32-emmc-adma/boot.img) / [arm32-all](artifacts/arm32-all/boot.img) | 52 MHz (48 MHz), 8-bit, `mmc high-speed`, ADMA2, `ro=1` | 0.11 s / 一致 | 0.55 s / 一致（另测 32 MiB 顺序读无错） | [160](logs/160-mainline-emmc-adma.txt) / [175](logs/175-mainline-all.txt) |
 
-HS200/HS400ES（192 MHz、1.8V 信号电压及 DLL 调谐）与写使能暂未开启。
+HS200/HS400/HS400ES 已在 ARM64 Linux 7.2.5 目标 [arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img) 解锁（保持 `MMC_CAP2_FORCE_READ_ONLY | MMC_CAP2_BOOTPART_NOACC`，`ro=1`）：
+- 板上 eMMC（`B10030` 7.28 GiB）`EXT_CSD[192]=8`（eMMC 5.1）、`EXT_CSD[196]=0x57`（支持 HS26/HS52/DDR52/HS200/HS400 1.8V）、`EXT_CSD[184]=0x1`（支持 Enhanced Strobe）。
+- 反汇编原厂 `fastboot.bin`（`0xc40510`–`0xc41e40`）确认：`CRG 0x288[26:24]=6`（192 MHz）、`CRG 0x290[19:15]=9`（HS400/HS400ES `drv_phase`；HS200 为 `20`）、`IOCFG 0xf8a21010..0x40`（掩码 `0x31f0`，HS400/HS400ES 下 CLK=`0x2020`、CMD/DATA=`0x1020`、RST=`0x10f0`、DS=`0x20f0`）、`SDHCI_HOST_CONTROL2[2:0]=0x7`（非标准 `NEBULA_CTRL_HS400`）、`NEBULA_EMMC_CONTROL 0x52c` 位 8（Enhanced Strobe），以及 `CRG 0x28c` bit 1 DLL 复位并轮询 `CRG 0x2a0` 位 9/10/12（P4/DS/SAMPL DLL 锁定）。
+- 实机 `/sys/kernel/debug/mmc0/ios` 确认稳定运行在 `192000000 Hz`、`8 bits`、`10 (mmc HS400 enhanced strobe)`、`1.80 V`，`err_stats` 与 `dmesg` 全程 0 CRC 错误、0 重试、0 超时降速；`boot.img`（12.3 MB）与连续多轮 256 MiB 读取 SHA256（`2296d2bb85007b58b8686d01e916b3e9ceb39db75b0ba0603baa34ae439091c8`）与 52 MHz 基线 100% 一致，且四核 SMP、1840 MiB 内存、HDMI 1080p simpledrm、Mali-450 Lima、RTL8761BTV 蓝牙、GMAC 与 USB 均回归通过。见 [最终串口](logs/334-mainline-arm64-7.2.5-emmc-hs400-final.txt)。
 
 ### 有线网卡（`0xf9840000` GMAC）
 

@@ -1,0 +1,13 @@
+
+# cat /sys/kernel/debug/mmc0/caps /sys/kernel/debug/mmc0/caps2; dmesg | grep -iE 'mmc|sdhci'
+0xc39f014f
+0x203a8021
+<5>[    0.000000] Linux version 7.2.5-hg680kd-arm64-all-2g-hdmi-bt-emmc-hs400 (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+<5>[    0.000000] Kernel command line: console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro
+<6>[    0.473694] mmc0: SDHCI controller on f9830000.mmc [f9830000.mmc] using ADMA
+<6>[    0.634496] mmc0: new HS400 Enhanced strobe MMC card at address 0001
+<6>[    0.635315] mmcblk0: mmc0:0001 B10030 7.28 GiB (ro)
+<6>[    0.636060]  mmcblk0: p1(system) p2(vendor)
+<6>[    0.636648] mmcblk0rpmb: mmc0:0001 B10030 4.00 MiB, chardev (253:0)
+# 
+[host] shell command elapsed: 0.08 s

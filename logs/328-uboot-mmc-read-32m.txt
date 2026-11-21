@@ -1,0 +1,12 @@
+<INTERRUPT>
+fastboot#mmc read 0 0x10000000 0x0 0x10000
+
+MMC read: dev # 0, block # 0, count 65536 ... 65536 blocks read: OK
+
+207859712 Bytes/s
+fastboot#mmc read 0 0x10000000 0x10000 0x10000
+
+MMC read: dev # 0, block # 65536, count 65536 ... 65536 blocks read: OK
+
+198239232 Bytes/s
+fastboot#

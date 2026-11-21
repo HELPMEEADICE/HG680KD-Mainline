@@ -1,0 +1,1325 @@
+¥Y.´—Åeth0: inconsistent rx_skb
+** 23 printk messages dropped **
+[  154.960825] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.961196] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.961529] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.961873] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.962202] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.962528] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.962852] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.963174] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.963500] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.963823] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.964147] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[  154.964470] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 5 printk messages dropped **
+[  154.966433] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 25 printk messages dropped **
+[  154.974907] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 24 printk messages dropped **
+[  154.983013] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 28 printk messages dropped **
+[  154.992396] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.001458] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.010600] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.019738] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 28 printk messages dropped **
+[  155.029163] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.038292] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.047412] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.056515] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.065633] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 28 printk messages dropped **
+[  155.075098] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.084208] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.093335] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+
+** 27 printk messages dropped **
+[  155.102477] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.111614] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.120763] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.129912] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.139057] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.148179] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.156967] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.166169] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.175286] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.184398] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.193177] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.202334] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.211431] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.220216] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.229326] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.238468] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.247604] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.256412] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.265556] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.274389] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.283523] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.292656] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.301466] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.310622] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.319754] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.328861] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.337995] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.346790] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.355906] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.365011] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.373866] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.383024] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.392144] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.400933] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.410058] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.419161] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.427947] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.437059] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.446186] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.455287] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.464054] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.473160] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.482310] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.491106] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.500237] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.509392] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.518209] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.527324] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.536421] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.545190] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.554332] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.563453] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.572579] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.581426] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.590625] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.599752] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.608863] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.617644] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.626757] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 28 printk messages dropped **
+[  155.707752] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.717657] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.727132] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.735782] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.744740] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.753731] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.762359] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.771286] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.780234] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.788901] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.797925] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.806924] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.815888] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 28 printk messages dropped **
+[  155.825186] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.834152] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.843164] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.852233] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.861312] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.870425] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.879530] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.888321] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.897444] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.906596] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.915699] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.924813] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.933953] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.942742] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.951934] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.961049] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.969851] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.978948] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  155.988050] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  155.996859] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.006091] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.015267] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.024081] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.033209] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.042341] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.051115] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.060216] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.069308] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.078109] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.087225] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.096357] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.105191] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.114351] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.123487] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.132641] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.141434] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.150573] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.159703] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.168488] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.177617] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.186754] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.195540] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.204689] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.213889] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.222731] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.231870] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.241003] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.250128] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.258935] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.268046] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.276833] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.285975] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.295092] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.304203] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.313013] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.322164] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.331292] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.340058] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.349152] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.358262] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.367039] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.376117] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.385215] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.394016] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.403128] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.412269] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.421444] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.430594] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.439716] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.448836] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.457639] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.466778] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.475780] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.484395] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.493335] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.502341] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.511343] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.520088] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.529134] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.538179] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.547185] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.556195] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.564899] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.573959] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.583022] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.591768] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.600873] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.609992] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.618808] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.627993] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.637121] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.645936] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.655048] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.664175] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.672986] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.682129] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.691255] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.700411] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.709236] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.718402] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.727235] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.736387] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.745539] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.754379] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.763505] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.772633] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.781434] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.790556] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.799665] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.808462] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.817576] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.826741] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.835896] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.844702] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.853829] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.862978] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.871775] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.880921] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.890046] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.899167] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.908321] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.917122] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.926262] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.935395] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.944586] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.953397] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.962529] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.971661] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.980791] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  156.989946] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  156.998776] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.007926] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.017073] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.025900] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.035043] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.044194] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.053301] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.062400] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.071166] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.080238] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.089294] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.098384] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.107136] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.116218] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.125336] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.134139] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.143265] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.152396] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.161189] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.170319] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.179434] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.188211] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.197318] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.206428] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.215186] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.224297] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.233432] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.242600] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.251444] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.260560] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.269374] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.278523] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.287656] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.296766] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.305920] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.314750] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.323891] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.333027] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.342177] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.351313] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.360126] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.369244] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.378435] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.387261] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.396399] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.405555] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.414417] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.423559] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.432695] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.441487] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.450634] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.459787] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.468911] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.478044] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.486822] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.495946] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.505076] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.514211] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.523352] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.532474] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.541269] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.550386] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.559469] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.568222] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.577320] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.586449] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.595552] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.604650] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.613443] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.622607] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.631704] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.640470] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.649570] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.658739] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.667890] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.676674] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.685764] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.694885] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.704007] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.713121] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.721921] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.730998] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.740084] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.749222] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.758021] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.767143] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.776271] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.785403] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.794555] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.803352] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.812478] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.821613] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.830443] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.839562] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.848674] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.857475] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.866643] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.875806] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.884930] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.893746] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.902876] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.912006] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.921163] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.930003] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.939161] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.948261] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.957025] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.966130] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  157.974888] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.983971] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  157.993056] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.002149] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.010942] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.020083] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.029219] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.038380] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.047184] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.056329] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.065451] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.074609] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.083449] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.092565] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.101682] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.110807] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.119627] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.128716] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.137804] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.146559] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.155638] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.164716] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.173485] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.182602] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.191683] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.200792] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.209585] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.218727] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.227840] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.236620] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.245762] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.254552] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.263669] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.272753] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.281870] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.290691] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.299808] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.308580] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.317698] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.326834] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.335948] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.344726] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.353834] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.362942] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.371717] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.380810] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.389943] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.399031] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.407811] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.416923] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.426083] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.435157] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.443943] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.453046] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.462188] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.471331] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.480123] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.489254] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.498447] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.507567] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.516686] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.525484] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.534609] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.543716] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.552822] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.561605] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.570722] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.579836] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.588940] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.597754] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.606910] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.616109] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.625259] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.634418] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.643250] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.652407] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.661526] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.670341] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.679444] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.688536] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.697317] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.706494] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.715594] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.724371] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.733478] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.742616] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.751386] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.760488] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.769602] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.778435] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.787546] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.796691] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.805851] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.814661] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.823791] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.832916] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.841731] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.850846] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.859976] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.869071] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.877886] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.887014] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.896153] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.905015] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.914229] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.923378] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.932498] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.941612] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.950433] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.959646] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.968773] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.977882] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  158.986686] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  158.995790] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.004906] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.014077] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.023229] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.032371] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.041156] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.050291] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.059387] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.068478] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.077588] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.086394] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.095493] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.104615] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.113796] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.122621] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.131707] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.140783] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.149871] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.158642] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.167743] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.176843] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.185965] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.195083] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.203868] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.212960] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.222086] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.231221] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.240341] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.249116] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.258247] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.267335] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.276438] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.285225] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.294356] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.303447] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.312543] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.321334] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.330539] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.339656] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.348448] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.357596] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.366759] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.375566] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.384688] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.393836] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.402983] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.411793] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.420939] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.430086] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.438873] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.448016] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.456808] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.465947] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.475076] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.484219] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.493004] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.502147] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.510950] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.520069] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.529175] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.538376] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.547164] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.556283] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.565404] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.574210] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.583318] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.592431] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.601520] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.610324] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.619405] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.628483] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.637618] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.646433] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.655526] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.664587] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.673345] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.682463] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.691567] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.700319] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.709380] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.718480] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.727258] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.736348] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.745499] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.754303] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.763404] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.772506] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.781627] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.790434] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.799547] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.808669] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.817798] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.826578] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.835678] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.844754] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.853872] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.862639] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.871718] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.880823] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.889950] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.899052] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.907821] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.916913] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.926028] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.934794] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.943881] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.953069] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.961866] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.970986] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.980128] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  159.988914] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  159.998054] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.007216] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.016399] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.025222] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.034366] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.043460] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.052247] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.061365] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.070492] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.079331] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.088453] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.097587] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.106795] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.115614] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.124767] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.133930] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.142716] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.151807] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.160958] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.170112] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.178934] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.188084] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.197198] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.206349] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.215158] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.224302] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.233076] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.242201] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.251322] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.260115] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.269234] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.278371] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.287480] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.296279] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.305397] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.314549] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.323356] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.332482] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.341590] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.350423] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.359542] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.368725] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.377542] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.386673] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.395800] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.404594] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.413745] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.422879] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.431991] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.440768] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.449903] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.459011] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.467775] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.476886] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.486020] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.495147] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.504258] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.513381] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.522215] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.531320] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.540084] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.549170] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.558285] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.567048] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.576188] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.585304] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.594451] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.603262] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.612425] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.621580] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.630725] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.639514] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.648645] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.657816] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.666935] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.675732] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.684856] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.693990] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.703123] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.711938] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.721078] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.730240] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.739043] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.748150] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.757265] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.766075] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.775191] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.784359] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.793148] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.802261] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.811375] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.820482] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.829266] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.838396] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.847535] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.856340] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.865472] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.874626] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.883776] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.892592] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.901756] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.910920] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 26 printk messages dropped **
+[  160.919738] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.928855] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.938003] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+** 27 printk messages dropped **
+[  160.947141] hisi-gmac f9840000.ethernet eth0: inconsistent rx_sk

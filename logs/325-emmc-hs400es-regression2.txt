@@ -1,0 +1,52 @@
+
+# bt-test 10; echo BT_EXIT=\True
+hci0: HCI 0x09 rev 0x1ed6, LMP 0x09 subver 0xb420, manufacturer 0x005d
+hci0: controller BD_ADDR 00:E0:4C:23:99:87
+BLE passive scan for 10 s
+LE advertisement 32:65:81:63:8A:B8 type=3 address_type=1 rssi=-76 data=1eff0600010920223f6e73c84d1cb762dcb4f2692d536e415868a46f0351d4
+LE advertisement FC:42:65:AF:36:71 type=0 address_type=0 rssi=-70 data=0201060303271815162718a80151000000007136af6542fc0583000000
+LE advertisement 0E:78:3B:91:04:E1 type=3 address_type=1 rssi=-46 data=1eff0600010920023305110c4f4ffad9d30c2d1ac47c1bd1aa410c71b5410a
+LE advertisement 21:00:3E:C4:87:B6 type=3 address_type=1 rssi=-66 data=1e16f3fe4a1723373032311132ee095e9a6dde32bb56e067aa90e205423ab7
+BLE passive scan: 4 advertising reports
+BT_EXIT=True
+# 
+[host] shell command elapsed: 10.03 s
+ifconfig eth0 hw ether 54:0A:77:88:B7:2C; ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 2; ping -c 3 192.168.6.160; fastfetch --pipe
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+64 bytes from 192.168.6.160: seq=0 ttl=64 time=0.607 ms
+64 bytes from 192.168.6.160: seq=1 ttl=64 time=0.331 ms
+64 bytes from 192.168.6.160: seq=2 ttl=64 time=0.304 ms
+
+--- 192.168.6.160 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.304/0.414/0.607 ms
+        #####            root@hg680kd
+       #######           ------------
+       ##O#O##           OS: HG680KD Mainline Linux 7.2.5 (ARM64) aarch64
+       #######           Host: FiberHome HG680KD (ARM64)
+     ###########         Kernel: Linux 7.2.5-hg680kd-arm64-all-2g-hdmi-bt-emmc-hs400
+    #############        Uptime: 3 mins
+   ###############       Shell: sh
+   ################      Terminal: /dev/ttyAMA0
+  #################      CPU: hi3798mv320 (4)
+#####################    GPU: Arm mali-450 [Integrated]
+#####################    Memory: 41.12 MiB / 1.93 GiB (2%)
+  #################      Swap: Unused
+                         Disk (/): 3.12 MiB / 985.89 MiB (0%) - rootfs
+                         Local IP (eth0): 192.168.6.249/24
+                         Locale: C
+# 
+[host] shell command elapsed: 4.11 s
+mount -t vfat -o ro /dev/sda1 /tmp && ls /tmp && umount /tmp; echo 0 >/sys/class/graphics/fbcon/cursor_blink; printf '\033[?25l' >/dev/tty1; fb-test; dmesg | grep -iE 'mmc|sdhci'
+Android                    HG680KD
+LOST.DIR                   System Volume Information
+fbdev color bars: 1920x1080, pitch 7680, 1080 rows read back
+<5>[    0.000000] Linux version 7.2.5-hg680kd-arm64-all-2g-hdmi-bt-emmc-hs400 (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+<5>[    0.000000] Kernel command line: console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro
+<6>[    0.473694] mmc0: SDHCI controller on f9830000.mmc [f9830000.mmc] using ADMA
+<6>[    0.634496] mmc0: new HS400 Enhanced strobe MMC card at address 0001
+<6>[    0.635315] mmcblk0: mmc0:0001 B10030 7.28 GiB (ro)
+<6>[    0.636060]  mmcblk0: p1(system) p2(vendor)
+<6>[    0.636648] mmcblk0rpmb: mmc0:0001 B10030 4.00 MiB, chardev (253:0)
+# 
+[host] shell command elapsed: 0.22 s

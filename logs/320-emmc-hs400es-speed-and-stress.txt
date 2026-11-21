@@ -1,0 +1,19 @@
+
+# cat /proc/uptime; dd if=/dev/mmcblk0 of=/dev/null bs=4M count=64; cat /proc/uptime; cat /proc/uptime; dd if=/dev/mmcblk0 of=/dev/null bs=4M count=64; cat /proc/uptime
+12.64 49.36
+64+0 records in
+64+0 records out
+22.50 88.36
+22.50 88.36
+64+0 records in
+64+0 records out
+32.35 127.32
+# 
+[host] shell command elapsed: 19.73 s
+dd if=/dev/mmcblk0 bs=512 skip=229376 count=24032 | sha256sum; dd if=/dev/mmcblk0 bs=4M count=64 | sha256sum; dd if=/dev/mmcblk0 bs=4M count=64 | sha256sum
+24032+0 records in
+24032+0 records out
+97f4e2b5d88ee6d6fae8ced4809420d7f875c4ff8b0acfe817c6409b6f02a6b8  -
+64+0 records in
+64+0 records out
+2296d2bb85007b58b8686d01e916b3e9ceb39db75b0ba0603baa34ae439091c8  -
