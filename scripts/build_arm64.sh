@@ -15,9 +15,13 @@ elif [[ $variant == 7.3.5-* ]]; then
     base_variant=${variant#7.3.5-}
 fi
 vpu_probe=
-if [[ $variant == 7.3.5-vpu-probe ]]; then
+vpu_h264_poc=
+if [[ $variant == 7.3.5-vpu-probe || $variant == 7.3.5-vpu-h264-poc ]]; then
     base_variant=all-2g-hdmi-bt-dvfs
     vpu_probe=y
+fi
+if [[ $variant == 7.3.5-vpu-h264-poc ]]; then
+    vpu_h264_poc=y
 fi
 linux="$root/source/linux-$linux_ver"
 busybox="$root/source/busybox-1.37.0"
@@ -162,6 +166,14 @@ if [[ $vpu_probe ]]; then
     apply_board_patch "$inputs/0010-SOC-hisilicon-add-Hi3798MV320-VPU-probe.patch"
     install -m644 "$inputs/hi3798mv320-vpu-probe.c" "$linux/drivers/soc/hisilicon/"
     board=hi3798mv320-fiberhome-hg680kd-arm64-vpu-probe
+    install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
+fi
+if [[ $vpu_h264_poc ]]; then
+    variant_key+=" HI3798MV320_VPU_H264_POC"
+    apply_board_patch "$inputs/0011-SOC-hisilicon-add-Hi3798MV320-H264-poc.patch"
+    install -m644 "$inputs/hi3798mv320-vpu-h264-poc.h" \
+        "$inputs/hi3798mv320-vpu-h264-data.h" "$linux/drivers/soc/hisilicon/"
+    board=hi3798mv320-fiberhome-hg680kd-arm64-vpu-h264-poc
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
 if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
@@ -355,7 +367,10 @@ kernel=(make -C "$linux" O="$out" ARCH=arm64 CROSS_COMPILE="$cross")
 "${kernel[@]}" KCONFIG_ALLCONFIG="$config" allnoconfig
 if [[ $vpu_probe ]]; then
     "$linux/scripts/config" --file "$out/.config" --enable HI3798MV320_VPU_PROBE \
-        --set-str LOCALVERSION "-hg680kd-arm64-vpu-probe"
+        --set-str LOCALVERSION "-hg680kd-arm64-${variant#7.3.5-}"
+fi
+if [[ $vpu_h264_poc ]]; then
+    "$linux/scripts/config" --file "$out/.config" --enable HI3798MV320_VPU_H264_POC
 fi
 if [[ -z $usb_root ]]; then
     "$linux/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/initramfs.cpio"

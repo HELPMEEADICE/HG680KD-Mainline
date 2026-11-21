@@ -1,0 +1,7 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-vpu-probe.dts"
+
+&{/soc/video-decoder@f8c30000} {
+	compatible = "hisilicon,hi3798mv320-vpu-h264-poc";
+};

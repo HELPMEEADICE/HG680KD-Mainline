@@ -59,6 +59,10 @@ static int hi3798mv320_vpu_reset(struct device *dev, void __iomem *global,
 	return 0;
 }
 
+#ifdef CONFIG_HI3798MV320_VPU_H264_POC
+#include "hi3798mv320-vpu-h264-poc.h"
+#endif
+
 static void hi3798mv320_vpu_snapshot(struct device *dev, void __iomem *pxp,
 				    void __iomem *global, void __iomem *scd,
 				    void __iomem *smmu, const char *phase)
@@ -139,11 +143,19 @@ static int hi3798mv320_vpu_probe(struct platform_device *pdev)
 	writel(1, scd + SCD_IRQ_CLEAR);
 	hi3798mv320_vpu_snapshot(dev, vdh + VDH_PXP0, global, scd, smmu,
 				 "after reset");
+#ifdef CONFIG_HI3798MV320_VPU_H264_POC
+	if (of_device_is_compatible(dev->of_node, "hisilicon,hi3798mv320-vpu-h264-poc"))
+		return hi3798mv320_h264_setup(pdev, vdh, global, scd, smmu,
+					   pxp_irq, scd_irq, smmu_irq);
+#endif
 	return 0;
 }
 
 static const struct of_device_id hi3798mv320_vpu_of_match[] = {
 	{ .compatible = "hisilicon,hi3798mv320-vpu-probe" },
+#ifdef CONFIG_HI3798MV320_VPU_H264_POC
+	{ .compatible = "hisilicon,hi3798mv320-vpu-h264-poc" },
+#endif
 	{ }
 };
 MODULE_DEVICE_TABLE(of, hi3798mv320_vpu_of_match);
@@ -153,6 +165,9 @@ static struct platform_driver hi3798mv320_vpu_driver = {
 	.driver = {
 		.name = "hi3798mv320-vpu-probe",
 		.of_match_table = hi3798mv320_vpu_of_match,
+#ifdef CONFIG_HI3798MV320_VPU_H264_POC
+		.suppress_bind_attrs = true,
+#endif
 	},
 };
 module_platform_driver(hi3798mv320_vpu_driver);

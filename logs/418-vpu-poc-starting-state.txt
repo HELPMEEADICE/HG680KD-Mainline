@@ -1,0 +1,5 @@
+
+[?2004l[?2004hroot@hg680kd:~# sha256sum /boot/boot.img && uname -r
+[?2004lf5e3173703253ff79cd4c9e329c9b57856a42e7cbdb745656c19ed8288f67b70  /boot/boot.img
+7.3.5-hg680kd-arm64-armbian-usb
+[?2004hroot@hg680kd:~# 
