@@ -1,0 +1,39 @@
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/realtek,bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/realtek,bluetooth.yaml
+--- a/Documentation/devicetree/bindings/net/bluetooth/realtek,bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/realtek,bluetooth.yaml
+@@ -5,13 +5,14 @@
+ $id: http://devicetree.org/schemas/net/bluetooth/realtek,bluetooth.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+-title: RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS Bluetooth
++title: Realtek H5 UART Bluetooth controllers
+ 
+ maintainers:
+   - Vasily Khoruzhick <anarsoul@gmail.com>
+   - Alistair Francis <alistair@alistair23.me>
+ 
+ description:
++  RTL8761BTV is a standalone Bluetooth controller connected over UART.
+   RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS is a WiFi + BT chip. WiFi part
+   is connected over SDIO, while BT is connected over serial. It speaks
+   H5 protocol with few extra commands to upload firmware and change
+@@ -24,6 +25,7 @@
+           - realtek,rtl8723bs-bt
+           - realtek,rtl8723cs-bt
+           - realtek,rtl8723ds-bt
++          - realtek,rtl8761btv-bt
+           - realtek,rtl8822cs-bt
+       - items:
+           - enum:
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -1106,6 +1106,8 @@
+ #ifdef CONFIG_BT_HCIUART_RTL
+ 	{ .compatible = "realtek,rtl8822cs-bt",
+ 	  .data = (const void *)&h5_data_rtl8822cs },
++	{ .compatible = "realtek,rtl8761btv-bt",
++	  .data = &h5_data_rtl8723bs },
+ 	{ .compatible = "realtek,rtl8723bs-bt",
+ 	  .data = (const void *)&h5_data_rtl8723bs },
+ 	{ .compatible = "realtek,rtl8723cs-bt",

@@ -1,0 +1,185 @@
+571-
+572-		clk_75m {
+573-			compatible = "fixed-clock";
+574-			#clock-cells = <0x00>;
+575-			clock-frequency = <0x47868c0>;
+576-			clock-output-names = "clk75M";
+577:			phandle = <0x10>;
+578-		};
+579-	};
+580-
+  2100c %s : error (%d)
+  2101c host stack: userial error 
+  21038 int userial_coex_recv_data_handler(unsigned char *, int)
+  21071 userial_coex_recv_data_handler
+  21090 %s seg = %d open new file 
+  210ab userial_coex_send_data_handler
+  210ca userial_coex_thread
+  210de bt_upio
+  210e6 bt_wake_up_host_mode_set
+  210ff /proc/bluetooth/sleep/lpm
+  21119 bt_wake_up_host_mode_set path:%s
+  2113a bt_wake_up_host_mode_set fd:%d = open(path, O_RDWR): open(%s) failed: %s (%d)
+  21189 bt_wake_up_host_mode_set fd:%d = open(path, O_RDWR): open(%s) success
+  211d0 bt_wake_up_host_mode_set buffer:%d
+  211f3 bt_wake_up_host_mode_set : write(%s) failed: %s (%d)
+  21228 set_bluetooth_power : open(%s) for write failed: %s (%d)
+  21261 set_bluetooth_power : write(%s) failed: %s (%d)
+  21291 ro.kernel.qemu
+  212a4 ro.rfkilldisabled
+  212b6 /sys/class/rfkill/rfkill%d/type
+  212d6 init_rfkill : open(%s) failed: %s (%d)
+  212fe bluetooth
+  21308 /sys/class/rfkill/rfkill%d/state
+  21329 bt_h5_int
+  21333 skb len > 0xFFF
+  21343 H5: <<<---recv sync req
+  2135b H5: <<<---recv sync resp
+  21374 H5: <<<---recv sync req in H5_INITIALIZED
+  2139e H5: <<<---recv conf req
+  213b6 H5: <<<---recv conf resp
+  213cf rtk_h5.sliding_window_size(%d), oof_flow_control(%d), dic_type(%d)
+
+libbt-vendor-rtk.so:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+0000b36c <bt_wake_up_host_mode_set@@Base>:
+    b36c:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
+    b370:	b096      	sub	sp, #88	@ 0x58
+    b372:	4680      	mov	r8, r0
+    b374:	4841      	ldr	r0, [pc, #260]	@ (b47c <bt_wake_up_host_mode_set@@Base+0x110>)
+    b376:	4c42      	ldr	r4, [pc, #264]	@ (b480 <bt_wake_up_host_mode_set@@Base+0x114>)
+    b378:	2530      	movs	r5, #48	@ 0x30
+    b37a:	4478      	add	r0, pc
+    b37c:	4a41      	ldr	r2, [pc, #260]	@ (b484 <bt_wake_up_host_mode_set@@Base+0x118>)
+    b37e:	447c      	add	r4, pc
+    b380:	6800      	ldr	r0, [r0, #0]
+    b382:	447a      	add	r2, pc
+    b384:	4621      	mov	r1, r4
+    b386:	6800      	ldr	r0, [r0, #0]
+    b388:	9015      	str	r0, [sp, #84]	@ 0x54
+    b38a:	2006      	movs	r0, #6
+    b38c:	f88d 5013 	strb.w	r5, [sp, #19]
+    b390:	f7fa ec2e 	blx	5bf0 <__android_log_print@plt>
+    b394:	4b3c      	ldr	r3, [pc, #240]	@ (b488 <bt_wake_up_host_mode_set@@Base+0x11c>)
+    b396:	af05      	add	r7, sp, #20
+    b398:	447b      	add	r3, pc
+    b39a:	4638      	mov	r0, r7
+    b39c:	f000 f88a 	bl	b4b4 <bt_wake_up_host_mode_set@@Base+0x148>
+    b3a0:	4a3a      	ldr	r2, [pc, #232]	@ (b48c <bt_wake_up_host_mode_set@@Base+0x120>)
+    b3a2:	2006      	movs	r0, #6
+    b3a4:	4621      	mov	r1, r4
+    b3a6:	463b      	mov	r3, r7
+    b3a8:	447a      	add	r2, pc
+    b3aa:	f7fa ec22 	blx	5bf0 <__android_log_print@plt>
+    b3ae:	4638      	mov	r0, r7
+    b3b0:	2101      	movs	r1, #1
+    b3b2:	f7fa ed14 	blx	5ddc <__open_2@plt>
+    b3b6:	4604      	mov	r4, r0
+    b3b8:	f1b4 3fff 	cmp.w	r4, #4294967295	@ 0xffffffff
+    b3bc:	dd22      	ble.n	b404 <bt_wake_up_host_mode_set@@Base+0x98>
+    b3be:	4e34      	ldr	r6, [pc, #208]	@ (b490 <bt_wake_up_host_mode_set@@Base+0x124>)
+    b3c0:	2006      	movs	r0, #6
+    b3c2:	4a34      	ldr	r2, [pc, #208]	@ (b494 <bt_wake_up_host_mode_set@@Base+0x128>)
+    b3c4:	4623      	mov	r3, r4
+    b3c6:	447e      	add	r6, pc
+    b3c8:	9700      	str	r7, [sp, #0]
+    b3ca:	447a      	add	r2, pc
+    b3cc:	4631      	mov	r1, r6
+    b3ce:	f7fa ec10 	blx	5bf0 <__android_log_print@plt>
+    b3d2:	4a31      	ldr	r2, [pc, #196]	@ (b498 <bt_wake_up_host_mode_set@@Base+0x12c>)
+    b3d4:	f1b8 0f01 	cmp.w	r8, #1
+    b3d8:	bf08      	it	eq
+    b3da:	2531      	moveq	r5, #49	@ 0x31
+    b3dc:	2006      	movs	r0, #6
+    b3de:	447a      	add	r2, pc
+    b3e0:	4631      	mov	r1, r6
+    b3e2:	462b      	mov	r3, r5
+    b3e4:	f88d 5013 	strb.w	r5, [sp, #19]
+    b3e8:	f7fa ec02 	blx	5bf0 <__android_log_print@plt>
+    b3ec:	f10d 0113 	add.w	r1, sp, #19
+    b3f0:	4620      	mov	r0, r4
+    b3f2:	2201      	movs	r2, #1
+    b3f4:	2301      	movs	r3, #1
+    b3f6:	f7fa ed82 	blx	5efc <__write_chk@plt>
+    b3fa:	f1b0 3fff 	cmp.w	r0, #4294967295	@ 0xffffffff
+    b3fe:	dd16      	ble.n	b42e <bt_wake_up_host_mode_set@@Base+0xc2>
+    b400:	2500      	movs	r5, #0
+    b402:	e02a      	b.n	b45a <bt_wake_up_host_mode_set@@Base+0xee>
+    b404:	f7fa ebe2 	blx	5bcc <__errno@plt>
+    b408:	4605      	mov	r5, r0
+    b40a:	6828      	ldr	r0, [r5, #0]
+    b40c:	f7fa ebea 	blx	5be4 <strerror@plt>
+    b410:	4925      	ldr	r1, [pc, #148]	@ (b4a8 <bt_wake_up_host_mode_set@@Base+0x13c>)
+    b412:	4a26      	ldr	r2, [pc, #152]	@ (b4ac <bt_wake_up_host_mode_set@@Base+0x140>)
+    b414:	682b      	ldr	r3, [r5, #0]
+    b416:	4479      	add	r1, pc
+    b418:	447a      	add	r2, pc
+    b41a:	e9cd 7000 	strd	r7, r0, [sp]
+    b41e:	9302      	str	r3, [sp, #8]
+    b420:	2006      	movs	r0, #6
+    b422:	4623      	mov	r3, r4
+    b424:	f7fa ebe4 	blx	5bf0 <__android_log_print@plt>
+    b428:	f04f 35ff 	mov.w	r5, #4294967295	@ 0xffffffff
+    b42c:	e018      	b.n	b460 <bt_wake_up_host_mode_set@@Base+0xf4>
+    b42e:	481b      	ldr	r0, [pc, #108]	@ (b49c <bt_wake_up_host_mode_set@@Base+0x130>)
+    b430:	4478      	add	r0, pc
+    b432:	6805      	ldr	r5, [r0, #0]
+    b434:	f7fa ebca 	blx	5bcc <__errno@plt>
+    b438:	4606      	mov	r6, r0
+    b43a:	6830      	ldr	r0, [r6, #0]
+    b43c:	f7fa ebd2 	blx	5be4 <strerror@plt>
+    b440:	4917      	ldr	r1, [pc, #92]	@ (b4a0 <bt_wake_up_host_mode_set@@Base+0x134>)
+    b442:	6833      	ldr	r3, [r6, #0]
+    b444:	4a17      	ldr	r2, [pc, #92]	@ (b4a4 <bt_wake_up_host_mode_set@@Base+0x138>)
+    b446:	4479      	add	r1, pc
+    b448:	447a      	add	r2, pc
+    b44a:	e9cd 0300 	strd	r0, r3, [sp]
+    b44e:	2006      	movs	r0, #6
+    b450:	462b      	mov	r3, r5
+    b452:	f7fa ebce 	blx	5bf0 <__android_log_print@plt>
+    b456:	f04f 35ff 	mov.w	r5, #4294967295	@ 0xffffffff
+    b45a:	4620      	mov	r0, r4
+    b45c:	f7fa ecca 	blx	5df4 <close@plt>
+    b460:	4813      	ldr	r0, [pc, #76]	@ (b4b0 <bt_wake_up_host_mode_set@@Base+0x144>)
+    b462:	9915      	ldr	r1, [sp, #84]	@ 0x54
+    b464:	4478      	add	r0, pc
+    b466:	6800      	ldr	r0, [r0, #0]
+    b468:	6800      	ldr	r0, [r0, #0]
+    b46a:	1a40      	subs	r0, r0, r1
+    b46c:	bf02      	ittt	eq
+    b46e:	4628      	moveq	r0, r5
+    b470:	b016      	addeq	sp, #88	@ 0x58
+    b472:	e8bd 81f0 	ldmiaeq.w	sp!, {r4, r5, r6, r7, r8, pc}
+    b476:	f7fa ebc2 	blx	5bfc <__stack_chk_fail@plt>
+    b47a:	bf00      	nop
+    b47c:	d786      	bvc.n	b38c <bt_wake_up_host_mode_set@@Base+0x20>
+    b47e:	0001      	movs	r1, r0
+    b480:	5d5c      	ldrb	r4, [r3, r5]
+    b482:	0001      	movs	r1, r0
+    b484:	5d60      	ldrb	r0, [r4, r5]
+    b486:	0001      	movs	r1, r0
+    b488:	5d63      	ldrb	r3, [r4, r5]
+    b48a:	0001      	movs	r1, r0
+    b48c:	5d6d      	ldrb	r5, [r5, r5]
+    b48e:	0001      	movs	r1, r0
+    b490:	5d14      	ldrb	r4, [r2, r4]
+    b492:	0001      	movs	r1, r0
+    b494:	5dbb      	ldrb	r3, [r7, r6]
+    b496:	0001      	movs	r1, r0
+    b498:	5dee      	ldrb	r6, [r5, r7]
+    b49a:	0001      	movs	r1, r0
+    b49c:	0d18      	lsrs	r0, r3, #20
+    b49e:	0002      	movs	r2, r0
+    b4a0:	5c94      	ldrb	r4, [r2, r2]
+    b4a2:	0001      	movs	r1, r0
+    b4a4:	5da7      	ldrb	r7, [r4, r6]
+    b4a6:	0001      	movs	r1, r0
+    b4a8:	5cc4      	ldrb	r4, [r0, r3]
+    b4aa:	0001      	movs	r1, r0
+    b4ac:	5d1e      	ldrb	r6, [r3, r4]
+    b4ae:	0001      	movs	r1, r0
+    b4b0:	d69c      	bvs.n	b3ec <bt_wake_up_host_mode_set@@Base+0x80>
+    b4b2:	0001      	movs	r1, r0

@@ -1,0 +1,102 @@
+
+# echo N >/sys/module/printk/parameters/ignore_loglevel; dmesg -n 4; cat /sys/block/mmcblk0/ro /sys/block/mmcblk0/mmcblk0p1/ro /sys/block/mmcblk0/mmcblk0p2/ro
+1
+1
+1
+# 
+[host] shell command elapsed: 0.02 s
+mount -t ext4 -o ro,noload /dev/mmcblk0p1 /tmp && (cat /proc/mounts; ls -l /tmp/odm; grep -inE "btonly|8761|rkbt|rtkbt|btmac" /tmp/system/bin/opt/etc/wifi_bt_init.sh /tmp/system/bin/opt/etc/init.fhservice.sh; find /tmp/system -iname "*bluetooth*" -o -iname "*bt_vendor*"; umount /tmp)
+rootfs / rootfs rw,size=1010240k,nr_inodes=252560 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=1010240k,nr_inodes=252560,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+/dev/mmcblk0p1 /tmp ext4 ro,relatime,norecovery 0 0
+lrw-r--r--    1        20 priv-app -> /vendor/odm/priv-app
+lrw-r--r--    1        15 lib -> /vendor/odm/lib
+lrw-r--r--    1        17 lib64 -> /vendor/odm/lib64
+lrw-r--r--    1        15 app -> /vendor/odm/app
+lrw-r--r--    1        15 etc -> /vendor/odm/etc
+lrw-r--r--    1        15 bin -> /vendor/odm/bin
+lrw-r--r--    1        19 overlay -> /vendor/odm/overlay
+lrw-r--r--    1        21 framework -> /vendor/odm/framework
+lrw-r--r--    1        20 firmware -> /vendor/odm/firmware
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:6:    #for lan & pon rtl8761b
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:11:        LowBtMac=$((16#${SimpleMac:6:6}+1))
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:12:        HightBtMac=$((16#${SimpleMac:0:6}))
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:13:        if [ $LowBtMac -gt $((16#FFFFFF)) ];then
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:14:            LowBtMac=$(($LowBtMac-$((16#FFFFFF))-1))
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:15:            HightBtMac=$(($HightBtMac+1))
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:17:        BtMac=`busybox printf "%06x%06x" $HightBtMac $LowBtMac | busybox tr a-z A-Z`
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:18:        FinalBtMac=$(echo "${BtMac:0:2}:${BtMac:2:2}:${BtMac:4:2}:${BtMac:6:2}:${BtMac:8:2}:${BtMac:10:2}")
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:19:        BTMACSTATUS=`getprop persist.vendor.rtkbt.bdaddr_path`
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:20:        if [ "$BTMACSTATUS" != "default" ];then
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:21:            setprop persist.vendor.rtkbt.bdaddr_path default
+/tmp/system/bin/opt/etc/wifi_bt_init.sh:23:        setprop ro.boot.btmacaddr $FinalBtMac
+/tmp/system/bin/opt/etc/init.fhservice.sh:34:    DDRWIFI=`getprop ro.fh.ddr4.btonly`
+/tmp/system/bin/opt/etc/init.fhservice.sh:37:    DDRWIFI=`getprop ro.fh.ddr4.btonly`
+/tmp/system/bin/opt/etc/init.fhservice.sh:41:        DDRWIFI=`getprop ro.fh.ddr4.btonly`
+/tmp/system/etc/permissions/android.hardware.bluetooth.xml
+/tmp/system/etc/permissions/android.hardware.bluetooth_le.xml
+/tmp/system/etc/bluetooth
+/tmp/system/app/Bluetooth
+/tmp/system/app/Bluetooth/oat/arm/Bluetooth.vdex
+/tmp/system/app/Bluetooth/oat/arm/Bluetooth.odex
+/tmp/system/app/Bluetooth/Bluetooth.apk
+/tmp/system/app/Bluetooth/lib/arm/libbluetooth_jni.so
+/tmp/system/lib/libbluetooth_jni.so
+/tmp/system/lib/android.hardware.bluetooth.a2dp@1.0.so
+/tmp/system/lib/android.hardware.bluetooth@1.0.so
+/tmp/system/lib/libbluetooth-binder.so
+/tmp/system/lib/libbluetooth.so
+# 
+[host] shell command elapsed: 0.28 s
+mount -t ext4 -o ro,noload /dev/mmcblk0p2 /tmp && (cat /proc/mounts; ls -ld /tmp/odm; find /tmp/etc /tmp/bin /tmp/lib /tmp/lib64 /tmp/firmware -iname "*bluetooth*" -o -iname "*bt_vendor*" -o -iname "libbt*" -o -iname "*8761*" -o -iname "*.hcd"; ls /tmp/lib/modules; umount /tmp); cat /sys/block/mmcblk0/ro
+rootfs / rootfs rw,size=1010240k,nr_inodes=252560 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=1010240k,nr_inodes=252560,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+/dev/mmcblk0p2 /tmp ext4 ro,relatime,norecovery 0 0
+ls: /tmp/odm: No such file or directory
+/tmp/etc/bluetooth
+/tmp/etc/init/android.hardware.bluetooth@1.0-service.rc
+/tmp/bin/hw/android.hardware.bluetooth@1.0-service
+/tmp/lib/libbt-sprd_suite.so
+/tmp/lib/libbt-vendor-rtk.so
+/tmp/lib/libbluetooth_mtk.so
+/tmp/lib/libbt-vendor-sprd.so
+/tmp/lib/libbt-vendor-mtk.so
+/tmp/lib/hw/android.hardware.bluetooth@1.0-impl.so
+/tmp/lib/libbt-vendor.so
+/tmp/lib/libbt-vendor-unisoc.so
+find: /tmp/lib64: No such file or directory
+/tmp/firmware/RTL8761BTV-VAT_SYS_eFuseMap.map
+/tmp/firmware/rtl8761btv_vat_fw
+/tmp/firmware/rtl8761b_config
+/tmp/firmware/mp_rtl8761b_fw
+/tmp/firmware/rtl8761btv_vat_config
+/tmp/firmware/RTL8761B_SYS_eFuseMap.map
+/tmp/firmware/mp_rtl8761btv_vat_fw
+/tmp/firmware/RTL8761B_BT_eFuseMap.map
+/tmp/firmware/mp_rtl8761bt_config
+/tmp/firmware/rtl8761au_fw
+/tmp/firmware/rtl8761b_fw
+/tmp/firmware/rtl8761at_config
+/tmp/firmware/rtl8761aw8192eu_fw
+/tmp/firmware/rtl8761aw8192eu_config
+/tmp/firmware/rtl8761au8192ee_fw
+/tmp/firmware/rtl8761bt_fw
+/tmp/firmware/mp_rtl8761btv_vat_config
+/tmp/firmware/rtl8761a_fw
+/tmp/firmware/rtl8761bt_config
+/tmp/firmware/RTL8761BTV-VAT_BT_eFuseMap.map
+/tmp/firmware/rtl8761au8812ae_fw
+/tmp/firmware/rtl8761at_fw
+/tmp/firmware/rtl8761a_config
+rtl8822cs.ko          uwe5621_bt_sdio.ko    hi_sdio_detect.ko
+rtk_btusb.ko          uwe5621_bsp_sdio.ko   wlan_mt7961_pcie.ko
+btmtk_uart_unify.ko   uwe5621_wifi_sdio.ko
+1
+# 
+[host] shell command elapsed: 0.19 s

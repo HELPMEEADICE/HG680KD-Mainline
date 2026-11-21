@@ -1,0 +1,325 @@
+
+libbt-vendor-rtk.so:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+0000b504 <upio_set_bluetooth_power@@Base>:
+    b504:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+    b508:	b0b0      	sub	sp, #192	@ 0xc0
+    b50a:	4604      	mov	r4, r0
+    b50c:	4878      	ldr	r0, [pc, #480]	@ (b6f0 <upio_set_bluetooth_power@@Base+0x1ec>)
+    b50e:	2c01      	cmp	r4, #1
+    b510:	4478      	add	r0, pc
+    b512:	6800      	ldr	r0, [r0, #0]
+    b514:	6800      	ldr	r0, [r0, #0]
+    b516:	902f      	str	r0, [sp, #188]	@ 0xbc
+    b518:	f04f 0030 	mov.w	r0, #48	@ 0x30
+    b51c:	f88d 000f 	strb.w	r0, [sp, #15]
+    b520:	d002      	beq.n	b528 <upio_set_bluetooth_power@@Base+0x24>
+    b522:	b924      	cbnz	r4, b52e <upio_set_bluetooth_power@@Base+0x2a>
+    b524:	2030      	movs	r0, #48	@ 0x30
+    b526:	e000      	b.n	b52a <upio_set_bluetooth_power@@Base+0x26>
+    b528:	2031      	movs	r0, #49	@ 0x31
+    b52a:	f88d 000f 	strb.w	r0, [sp, #15]
+    b52e:	4871      	ldr	r0, [pc, #452]	@ (b6f4 <upio_set_bluetooth_power@@Base+0x1f0>)
+    b530:	ad04      	add	r5, sp, #16
+    b532:	4a71      	ldr	r2, [pc, #452]	@ (b6f8 <upio_set_bluetooth_power@@Base+0x1f4>)
+    b534:	4478      	add	r0, pc
+    b536:	4629      	mov	r1, r5
+    b538:	447a      	add	r2, pc
+    b53a:	f7fa ebc0 	blx	5cbc <property_get@plt>
+    b53e:	496f      	ldr	r1, [pc, #444]	@ (b6fc <upio_set_bluetooth_power@@Base+0x1f8>)
+    b540:	4628      	mov	r0, r5
+    b542:	4479      	add	r1, pc
+    b544:	f7fa eb84 	blx	5c50 <strcmp@plt>
+    b548:	b340      	cbz	r0, b59c <upio_set_bluetooth_power@@Base+0x98>
+    b54a:	486d      	ldr	r0, [pc, #436]	@ (b700 <upio_set_bluetooth_power@@Base+0x1fc>)
+    b54c:	ac04      	add	r4, sp, #16
+    b54e:	4a6d      	ldr	r2, [pc, #436]	@ (b704 <upio_set_bluetooth_power@@Base+0x200>)
+    b550:	4478      	add	r0, pc
+    b552:	4621      	mov	r1, r4
+    b554:	447a      	add	r2, pc
+    b556:	f7fa ebb2 	blx	5cbc <property_get@plt>
+    b55a:	496b      	ldr	r1, [pc, #428]	@ (b708 <upio_set_bluetooth_power@@Base+0x204>)
+    b55c:	4620      	mov	r0, r4
+    b55e:	4479      	add	r1, pc
+    b560:	f7fa eb76 	blx	5c50 <strcmp@plt>
+    b564:	b310      	cbz	r0, b5ac <upio_set_bluetooth_power@@Base+0xa8>
+    b566:	4869      	ldr	r0, [pc, #420]	@ (b70c <upio_set_bluetooth_power@@Base+0x208>)
+    b568:	4478      	add	r0, pc
+    b56a:	6800      	ldr	r0, [r0, #0]
+    b56c:	3001      	adds	r0, #1
+    b56e:	d01f      	beq.n	b5b0 <upio_set_bluetooth_power@@Base+0xac>
+    b570:	4870      	ldr	r0, [pc, #448]	@ (b734 <upio_set_bluetooth_power@@Base+0x230>)
+    b572:	2101      	movs	r1, #1
+    b574:	4478      	add	r0, pc
+    b576:	6800      	ldr	r0, [r0, #0]
+    b578:	f7fa ec30 	blx	5ddc <__open_2@plt>
+    b57c:	4604      	mov	r4, r0
+    b57e:	f1b4 3fff 	cmp.w	r4, #4294967295	@ 0xffffffff
+    b582:	dd6d      	ble.n	b660 <upio_set_bluetooth_power@@Base+0x15c>
+    b584:	f10d 010f 	add.w	r1, sp, #15
+    b588:	4620      	mov	r0, r4
+    b58a:	2201      	movs	r2, #1
+    b58c:	2301      	movs	r3, #1
+    b58e:	f7fa ecb6 	blx	5efc <__write_chk@plt>
+    b592:	f1b0 3fff 	cmp.w	r0, #4294967295	@ 0xffffffff
+    b596:	dd7a      	ble.n	b68e <upio_set_bluetooth_power@@Base+0x18a>
+    b598:	2500      	movs	r5, #0
+    b59a:	e08e      	b.n	b6ba <upio_set_bluetooth_power@@Base+0x1b6>
+    b59c:	486e      	ldr	r0, [pc, #440]	@ (b758 <upio_set_bluetooth_power@@Base+0x254>)
+    b59e:	4478      	add	r0, pc
+    b5a0:	6800      	ldr	r0, [r0, #0]
+    b5a2:	42a0      	cmp	r0, r4
+    b5a4:	d070      	beq.n	b688 <upio_set_bluetooth_power@@Base+0x184>
+    b5a6:	486d      	ldr	r0, [pc, #436]	@ (b75c <upio_set_bluetooth_power@@Base+0x258>)
+    b5a8:	4478      	add	r0, pc
+    b5aa:	6004      	str	r4, [r0, #0]
+    b5ac:	2500      	movs	r5, #0
+    b5ae:	e087      	b.n	b6c0 <upio_set_bluetooth_power@@Base+0x1bc>
+    b5b0:	4857      	ldr	r0, [pc, #348]	@ (b710 <upio_set_bluetooth_power@@Base+0x20c>)
+    b5b2:	ac04      	add	r4, sp, #16
+    b5b4:	4a57      	ldr	r2, [pc, #348]	@ (b714 <upio_set_bluetooth_power@@Base+0x210>)
+    b5b6:	4478      	add	r0, pc
+    b5b8:	4621      	mov	r1, r4
+    b5ba:	447a      	add	r2, pc
+    b5bc:	f7fa eb7e 	blx	5cbc <property_get@plt>
+    b5c0:	4955      	ldr	r1, [pc, #340]	@ (b718 <upio_set_bluetooth_power@@Base+0x214>)
+    b5c2:	4620      	mov	r0, r4
+    b5c4:	4479      	add	r1, pc
+    b5c6:	f7fa eb44 	blx	5c50 <strcmp@plt>
+    b5ca:	2800      	cmp	r0, #0
+    b5cc:	d05c      	beq.n	b688 <upio_set_bluetooth_power@@Base+0x184>
+    b5ce:	4b53      	ldr	r3, [pc, #332]	@ (b71c <upio_set_bluetooth_power@@Base+0x218>)
+    b5d0:	ac1f      	add	r4, sp, #124	@ 0x7c
+    b5d2:	2000      	movs	r0, #0
+    b5d4:	447b      	add	r3, pc
+    b5d6:	9000      	str	r0, [sp, #0]
+    b5d8:	4620      	mov	r0, r4
+    b5da:	f7ff ff6b 	bl	b4b4 <bt_wake_up_host_mode_set@@Base+0x148>
+    b5de:	4620      	mov	r0, r4
+    b5e0:	2100      	movs	r1, #0
+    b5e2:	f7fa ebfc 	blx	5ddc <__open_2@plt>
+    b5e6:	4607      	mov	r7, r0
+    b5e8:	2f00      	cmp	r7, #0
+    b5ea:	db29      	blt.n	b640 <upio_set_bluetooth_power@@Base+0x13c>
+    b5ec:	f8df 8130 	ldr.w	r8, [pc, #304]	@ b720 <upio_set_bluetooth_power@@Base+0x21c>
+    b5f0:	f10d 0a6c 	add.w	sl, sp, #108	@ 0x6c
+    b5f4:	f8df 912c 	ldr.w	r9, [pc, #300]	@ b724 <upio_set_bluetooth_power@@Base+0x220>
+    b5f8:	ae1f      	add	r6, sp, #124	@ 0x7c
+    b5fa:	44f8      	add	r8, pc
+    b5fc:	2400      	movs	r4, #0
+    b5fe:	44f9      	add	r9, pc
+    b600:	4638      	mov	r0, r7
+    b602:	4651      	mov	r1, sl
+    b604:	2210      	movs	r2, #16
+    b606:	2310      	movs	r3, #16
+    b608:	f7fa ebee 	blx	5de8 <__read_chk@plt>
+    b60c:	4605      	mov	r5, r0
+    b60e:	4638      	mov	r0, r7
+    b610:	f7fa ebf0 	blx	5df4 <close@plt>
+    b614:	2d09      	cmp	r5, #9
+    b616:	db06      	blt.n	b626 <upio_set_bluetooth_power@@Base+0x122>
+    b618:	4650      	mov	r0, sl
+    b61a:	4641      	mov	r1, r8
+    b61c:	2209      	movs	r2, #9
+    b61e:	f7fa ec08 	blx	5e30 <memcmp@plt>
+    b622:	2800      	cmp	r0, #0
+    b624:	d059      	beq.n	b6da <upio_set_bluetooth_power@@Base+0x1d6>
+    b626:	4630      	mov	r0, r6
+    b628:	464b      	mov	r3, r9
+    b62a:	3401      	adds	r4, #1
+    b62c:	9400      	str	r4, [sp, #0]
+    b62e:	f7ff ff41 	bl	b4b4 <bt_wake_up_host_mode_set@@Base+0x148>
+    b632:	4630      	mov	r0, r6
+    b634:	2100      	movs	r1, #0
+    b636:	f7fa ebd2 	blx	5ddc <__open_2@plt>
+    b63a:	4607      	mov	r7, r0
+    b63c:	2f00      	cmp	r7, #0
+    b63e:	dadf      	bge.n	b600 <upio_set_bluetooth_power@@Base+0xfc>
+    b640:	f7fa eac4 	blx	5bcc <__errno@plt>
+    b644:	4604      	mov	r4, r0
+    b646:	6820      	ldr	r0, [r4, #0]
+    b648:	f7fa eacc 	blx	5be4 <strerror@plt>
+    b64c:	6823      	ldr	r3, [r4, #0]
+    b64e:	4940      	ldr	r1, [pc, #256]	@ (b750 <upio_set_bluetooth_power@@Base+0x24c>)
+    b650:	4a40      	ldr	r2, [pc, #256]	@ (b754 <upio_set_bluetooth_power@@Base+0x250>)
+    b652:	e9cd 0300 	strd	r0, r3, [sp]
+    b656:	4479      	add	r1, pc
+    b658:	447a      	add	r2, pc
+    b65a:	ab1f      	add	r3, sp, #124	@ 0x7c
+    b65c:	2006      	movs	r0, #6
+    b65e:	e011      	b.n	b684 <upio_set_bluetooth_power@@Base+0x180>
+    b660:	4838      	ldr	r0, [pc, #224]	@ (b744 <upio_set_bluetooth_power@@Base+0x240>)
+    b662:	4478      	add	r0, pc
+    b664:	6804      	ldr	r4, [r0, #0]
+    b666:	f7fa eab2 	blx	5bcc <__errno@plt>
+    b66a:	4605      	mov	r5, r0
+    b66c:	6828      	ldr	r0, [r5, #0]
+    b66e:	f7fa eaba 	blx	5be4 <strerror@plt>
+    b672:	4935      	ldr	r1, [pc, #212]	@ (b748 <upio_set_bluetooth_power@@Base+0x244>)
+    b674:	682b      	ldr	r3, [r5, #0]
+    b676:	4a35      	ldr	r2, [pc, #212]	@ (b74c <upio_set_bluetooth_power@@Base+0x248>)
+    b678:	4479      	add	r1, pc
+    b67a:	447a      	add	r2, pc
+    b67c:	e9cd 0300 	strd	r0, r3, [sp]
+    b680:	2006      	movs	r0, #6
+    b682:	4623      	mov	r3, r4
+    b684:	f7fa eab4 	blx	5bf0 <__android_log_print@plt>
+    b688:	f04f 35ff 	mov.w	r5, #4294967295	@ 0xffffffff
+    b68c:	e018      	b.n	b6c0 <upio_set_bluetooth_power@@Base+0x1bc>
+    b68e:	482a      	ldr	r0, [pc, #168]	@ (b738 <upio_set_bluetooth_power@@Base+0x234>)
+    b690:	4478      	add	r0, pc
+    b692:	6805      	ldr	r5, [r0, #0]
+    b694:	f7fa ea9a 	blx	5bcc <__errno@plt>
+    b698:	4606      	mov	r6, r0
+    b69a:	6830      	ldr	r0, [r6, #0]
+    b69c:	f7fa eaa2 	blx	5be4 <strerror@plt>
+    b6a0:	4926      	ldr	r1, [pc, #152]	@ (b73c <upio_set_bluetooth_power@@Base+0x238>)
+    b6a2:	6833      	ldr	r3, [r6, #0]
+    b6a4:	4a26      	ldr	r2, [pc, #152]	@ (b740 <upio_set_bluetooth_power@@Base+0x23c>)
+    b6a6:	4479      	add	r1, pc
+    b6a8:	447a      	add	r2, pc
+    b6aa:	e9cd 0300 	strd	r0, r3, [sp]
+    b6ae:	2006      	movs	r0, #6
+    b6b0:	462b      	mov	r3, r5
+    b6b2:	f7fa ea9e 	blx	5bf0 <__android_log_print@plt>
+    b6b6:	f04f 35ff 	mov.w	r5, #4294967295	@ 0xffffffff
+    b6ba:	4620      	mov	r0, r4
+    b6bc:	f7fa eb9a 	blx	5df4 <close@plt>
+    b6c0:	4827      	ldr	r0, [pc, #156]	@ (b760 <upio_set_bluetooth_power@@Base+0x25c>)
+    b6c2:	992f      	ldr	r1, [sp, #188]	@ 0xbc
+    b6c4:	4478      	add	r0, pc
+    b6c6:	6800      	ldr	r0, [r0, #0]
+    b6c8:	6800      	ldr	r0, [r0, #0]
+    b6ca:	1a40      	subs	r0, r0, r1
+    b6cc:	bf02      	ittt	eq
+    b6ce:	4628      	moveq	r0, r5
+    b6d0:	b030      	addeq	sp, #192	@ 0xc0
+    b6d2:	e8bd 87f0 	ldmiaeq.w	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
+    b6d6:	f7fa ea92 	blx	5bfc <__stack_chk_fail@plt>
+    b6da:	4a13      	ldr	r2, [pc, #76]	@ (b728 <upio_set_bluetooth_power@@Base+0x224>)
+    b6dc:	4813      	ldr	r0, [pc, #76]	@ (b72c <upio_set_bluetooth_power@@Base+0x228>)
+    b6de:	4914      	ldr	r1, [pc, #80]	@ (b730 <upio_set_bluetooth_power@@Base+0x22c>)
+    b6e0:	447a      	add	r2, pc
+    b6e2:	4478      	add	r0, pc
+    b6e4:	4479      	add	r1, pc
+    b6e6:	6014      	str	r4, [r2, #0]
+    b6e8:	4622      	mov	r2, r4
+    b6ea:	f7fa ece0 	blx	60ac <asprintf@plt>
+    b6ee:	e73f      	b.n	b570 <upio_set_bluetooth_power@@Base+0x6c>
+    b6f0:	d5f0      	bpl.n	b6d4 <upio_set_bluetooth_power@@Base+0x1d0>
+    b6f2:	0001      	movs	r1, r0
+    b6f4:	5d59      	ldrb	r1, [r3, r5]
+    b6f6:	0001      	movs	r1, r0
+    b6f8:	5d64      	ldrb	r4, [r4, r5]
+    b6fa:	0001      	movs	r1, r0
+    b6fc:	5d5c      	ldrb	r4, [r3, r5]
+    b6fe:	0001      	movs	r1, r0
+    b700:	5d50      	ldrb	r0, [r2, r5]
+    b702:	0001      	movs	r1, r0
+    b704:	5d48      	ldrb	r0, [r1, r5]
+    b706:	0001      	movs	r1, r0
+    b708:	5d40      	ldrb	r0, [r0, r5]
+    b70a:	0001      	movs	r1, r0
+    b70c:	daa8      	bge.n	b660 <upio_set_bluetooth_power@@Base+0x15c>
+    b70e:	0001      	movs	r1, r0
+    b710:	5cea      	ldrb	r2, [r5, r3]
+    b712:	0001      	movs	r1, r0
+    b714:	5ce2      	ldrb	r2, [r4, r3]
+    b716:	0001      	movs	r1, r0
+    b718:	5cda      	ldrb	r2, [r3, r3]
+    b71a:	0001      	movs	r1, r0
+    b71c:	5cde      	ldrb	r6, [r3, r3]
+    b71e:	0001      	movs	r1, r0
+    b720:	5d00      	ldrb	r0, [r0, r4]
+    b722:	0001      	movs	r1, r0
+    b724:	5cb4      	ldrb	r4, [r6, r2]
+    b726:	0001      	movs	r1, r0
+    b728:	d930      	bls.n	b78c <upio_set@@Base+0x28>
+    b72a:	0001      	movs	r1, r0
+    b72c:	0a66      	lsrs	r6, r4, #9
+    b72e:	0002      	movs	r2, r0
+    b730:	5c20      	ldrb	r0, [r4, r0]
+    b732:	0001      	movs	r1, r0
+    b734:	0bd4      	lsrs	r4, r2, #15
+    b736:	0002      	movs	r2, r0
+    b738:	0ab8      	lsrs	r0, r7, #10
+    b73a:	0002      	movs	r2, r0
+    b73c:	5a34      	ldrh	r4, [r6, r0]
+    b73e:	0001      	movs	r1, r0
+    b740:	5bb5      	ldrh	r5, [r6, r6]
+    b742:	0001      	movs	r1, r0
+    b744:	0ae6      	lsrs	r6, r4, #11
+    b746:	0002      	movs	r2, r0
+    b748:	5a62      	ldrh	r2, [r4, r1]
+    b74a:	0001      	movs	r1, r0
+    b74c:	5baa      	ldrh	r2, [r5, r6]
+    b74e:	0001      	movs	r1, r0
+    b750:	5a84      	ldrh	r4, [r0, r2]
+    b752:	0001      	movs	r1, r0
+    b754:	5c7a      	ldrb	r2, [r7, r1]
+    b756:	0001      	movs	r1, r0
+    b758:	0bb2      	lsrs	r2, r6, #14
+    b75a:	0002      	movs	r2, r0
+    b75c:	0ba8      	lsrs	r0, r5, #14
+    b75e:	0002      	movs	r2, r0
+    b760:	d43c      	bmi.n	b7dc <ListGetTop@@Base+0x6>
+    b762:	0001      	movs	r1, r0
+   144: 0000b36d   328 FUNC    GLOBAL DEFAULT   12 bt_wake_up_host_mode_set
+   152: 0000b4f5    16 FUNC    GLOBAL DEFAULT   12 upio_init
+   293: 0000b505   608 FUNC    GLOBAL DEFAULT   12 upio_set_bluetooth_power
+   304: 0000b765    60 FUNC    GLOBAL DEFAULT   12 upio_set
+   375: 00008f9d     2 FUNC    GLOBAL DEFAULT   12 upio_cleanup
+   1c8b bt_wake_up_host_mode_set
+  1fa42 bt_wake_up_host_mode_set(1)
+  1fb63 /sys/bus/usb/devices
+  210e6 bt_wake_up_host_mode_set
+  21119 bt_wake_up_host_mode_set path:%s
+  2113a bt_wake_up_host_mode_set fd:%d = open(path, O_RDWR): open(%s) failed: %s (%d)
+  21189 bt_wake_up_host_mode_set fd:%d = open(path, O_RDWR): open(%s) success
+  211d0 bt_wake_up_host_mode_set buffer:%d
+  211f3 bt_wake_up_host_mode_set : write(%s) failed: %s (%d)
+  212a4 ro.rfkilldisabled
+  212b6 /sys/class/rfkill/rfkill%d/type
+  212d6 init_rfkill : open(%s) failed: %s (%d)
+  21308 /sys/class/rfkill/rfkill%d/state
+  22d74 /dev/rtk_btcoex
+  26128 /dev/rtkbt_dev
+00005c08 <write@plt>:
+00005d1c <usleep@plt>:
+00005e18 <read@plt>:
+00005ec0 <tcgetattr@plt>:
+00005ed8 <tcsetattr@plt>:
+00006118 <nanosleep@plt>:
+000066dc <open@plt>:
+    6a52:	f7ff e8da 	blx	5c08 <write@plt>
+    7518:	f7fe ec00 	blx	5d1c <usleep@plt>
+    7a70:	f7fe e9d2 	blx	5e18 <read@plt>
+    887a:	f7fd eb22 	blx	5ec0 <tcgetattr@plt>
+    88f2:	f7fd eaf2 	blx	5ed8 <tcsetattr@plt>
+    8904:	f7fd eae8 	blx	5ed8 <tcsetattr@plt>
+    8930:	f7fd ead2 	blx	5ed8 <tcsetattr@plt>
+    8f2a:	f7fc efd6 	blx	5ed8 <tcsetattr@plt>
+    8fd4:	f7fc ef74 	blx	5ec0 <tcgetattr@plt>
+    8ff2:	f7fc ef72 	blx	5ed8 <tcsetattr@plt>
+    9052:	f7fc ef42 	blx	5ed8 <tcsetattr@plt>
+    910c:	f7fc ed7c 	blx	5c08 <write@plt>
+    92b2:	f7fc ecaa 	blx	5c08 <write@plt>
+    990e:	f7fc ea84 	blx	5e18 <read@plt>
+    9a18:	f7fc e9fe 	blx	5e18 <read@plt>
+    a820:	f7fb e9f2 	blx	5c08 <write@plt>
+    ac9c:	f7fa efb4 	blx	5c08 <write@plt>
+    bb64:	f7fa ead8 	blx	6118 <nanosleep@plt>
+    f2ae:	f7f6 ecac 	blx	5c08 <write@plt>
+   117ea:	f7f4 ea98 	blx	5d1c <usleep@plt>
+   11a38:	f7f4 e8e6 	blx	5c08 <write@plt>
+   122e8:	f7f3 ed96 	blx	5e18 <read@plt>
+   12582:	f7f3 ec4a 	blx	5e18 <read@plt>
+   150a6:	f7f0 ee3a 	blx	5d1c <usleep@plt>
+   16b9c:	f7ef e8be 	blx	5d1c <usleep@plt>
+   17090:	f7ee ee44 	blx	5d1c <usleep@plt>
+   174ea:	f7ef e8f8 	blx	66dc <open@plt>
+   17c38:	f7ee ed50 	blx	66dc <open@plt>
+   17d70:	f7ed ef4a 	blx	5c08 <write@plt>

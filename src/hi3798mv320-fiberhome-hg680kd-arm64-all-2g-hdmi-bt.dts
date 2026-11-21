@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi.dts"
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	aliases {
+		serial1 = &uart2;
+	};
+};
+
+&{/soc/usb@f98a0000} {
+	/* Use the PHY's default trim without accessing OTP. */
+	reg = <0x0 0xf98a0000 0x0 0x10000>,
+	      <0x0 0xf9866000 0x0 0x1000>,
+	      <0x0 0xf9960000 0x0 0x1000>;
+	reg-names = "xhci", "phy0", "phy1";
+};
+
+&{/soc} {
+	gpio4: gpio@f8b24000 {
+		compatible = "arm,pl061", "arm,primecell";
+		reg = <0x0 0xf8b24000 0x0 0x1000>;
+		interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&uart_clock>;
+		clock-names = "apb_pclk";
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	/* The stock DT relies on the bootloader to select the pads. */
+	uart2: serial@f8b02000 {
+		compatible = "arm,pl011", "arm,primecell";
+		arm,primecell-periphid = <0x00241011>;
+		reg = <0x0 0xf8b02000 0x0 0x1000>;
+		interrupts = <GIC_SPI 51 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&uart_clock>, <&uart_clock>;
+		clock-names = "uartclk", "apb_pclk";
+		uart-has-rtscts;
+
+		bluetooth {
+			compatible = "realtek,rtl8761btv-bt";
+			enable-gpios = <&gpio4 2 GPIO_ACTIVE_HIGH>;
+		};
+	};
+};

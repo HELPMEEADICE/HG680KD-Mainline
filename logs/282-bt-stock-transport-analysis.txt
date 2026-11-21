@@ -1,0 +1,251 @@
+				interrupt-controller;
+				#interrupt-cells = <0x02>;
+				clocks = <0x0f>;
+				clock-names = "apb_pclk";
+				phandle = <0x27>;
+			};
+
+			gpio4 {
+				compatible = "arm,pl061", "arm,primecell";
+				arm,primecell-periphid = <0x41061>;
+				reg = <0xf8b24000 0x1000>;
+				interrupts = <0x00 0x70 0x04>;
+				gpio-controller;
+				#gpio-cells = <0x02>;
+				interrupt-controller;
+				#interrupt-cells = <0x02>;
+				clocks = <0x0f>;
+				clock-names = "apb_pclk";
+				phandle = <0x14>;
+			};
+
+			gpio5 {
+				compatible = "arm,pl061", "arm,primecell";
+				arm,primecell-periphid = <0x41061>;
+				reg = <0xf8004000 0x1000>;
+				interrupts = <0x00 0x71 0x00>;
+				gpio-controller;
+				#gpio-cells = <0x02>;
+				interrupt-controller;
+				#interrupt-cells = <0x02>;
+				clocks = <0x0f>;
+				clock-names = "apb_pclk";
+				phandle = <0x28>;
+			};
+
+			gpio6 {
+				compatible = "arm,pl061", "arm,primecell";
+				arm,primecell-periphid = <0x41061>;
+				reg = <0xf8b26000 0x1000>;
+				interrupts = <0x00 0x72 0x04>;
+				gpio-controller;
+				#gpio-cells = <0x02>;
+				interrupt-controller;
+				#interrupt-cells = <0x02>;
+				clocks = <0x0f>;
+				clock-names = "apb_pclk";
+				phandle = <0x29>;
+			};
+
+			gpio7 {
+				compatible = "arm,pl061", "arm,primecell";
+				arm,primecell-periphid = <0x41061>;
+				reg = <0xf8b27000 0x1000>;
+				interrupts = <0x00 0x73 0x04>;
+				gpio-controller;
+				#gpio-cells = <0x02>;
+				interrupt-controller;
+				#interrupt-cells = <0x02>;
+				clocks = <0x0f>;
+				clock-names = "apb_pclk";
+				phandle = <0x2a>;
+129:    chown bluetooth net_bt_admin /dev/ttyAMA1
+130:    chmod 600 /sys/class/rfkill/rfkill0/state
+131:    chown bluetooth net_bt_admin /sys/class/rfkill/rfkill0/state
+134:    chown bluetooth net_bt_admin /dev/rtk_btusb
+205:    write /sys/class/rfkill/rfkill0/state 0
+206:    write /sys/class/rfkill/rfkill0/state 1
+207:    insmod /vendor/lib/modules/btmtk_uart_unify.ko
+208:    start mtk_uart_launcher
+325:service mtk_uart_launcher /vendor/bin/uart_launcher -p /dev/ttyAMA1 -c 3000000 -f3
+331:service mtk_stop_launcher /vendor/bin/uart_launcher -k
+338:service rmmod_mtkko /system/bin/rmmod btmtk_uart_unify
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/net/bluetooth/realtek,bluetooth.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS Bluetooth
+
+maintainers:
+  - Vasily Khoruzhick <anarsoul@gmail.com>
+  - Alistair Francis <alistair@alistair23.me>
+
+description:
+  RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS is a WiFi + BT chip. WiFi part
+  is connected over SDIO, while BT is connected over serial. It speaks
+  H5 protocol with few extra commands to upload firmware and change
+  module speed.
+
+properties:
+  compatible:
+    oneOf:
+      - enum:
+          - realtek,rtl8723bs-bt
+          - realtek,rtl8723cs-bt
+          - realtek,rtl8723ds-bt
+          - realtek,rtl8822cs-bt
+      - items:
+          - enum:
+              - realtek,rtl8821cs-bt
+          - const: realtek,rtl8723bs-bt
+
+  device-wake-gpios:
+    maxItems: 1
+    description: GPIO specifier, used to wakeup the BT module
+
+  enable-gpios:
+    maxItems: 1
+    description: GPIO specifier, used to enable the BT module
+
+  host-wake-gpios:
+    maxItems: 1
+    description: GPIO specifier, used to wakeup the host processor
+
+  max-speed: true
+
+required:
+  - compatible
+
+allOf:
+  - $ref: /schemas/serial/serial-peripheral-props.yaml#
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/gpio/gpio.h>
+
+    uart1 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
+        uart-has-rtscts;
+
+        bluetooth {
+            compatible = "realtek,rtl8723bs-bt";
+            device-wake-gpios = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 */
+            host-wake-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
+        };
+    };
+	.sizeof_priv    = sizeof(struct btrealtek_data),
+};
+
+static const struct h5_device_data h5_data_rtl8822cs = {
+	.vnd = &rtl_vnd,
+};
+
+static const struct h5_device_data h5_data_rtl8723bs = {
+	.driver_info = H5_INFO_WAKEUP_DISABLE,
+	.vnd = &rtl_vnd,
+};
+#endif
+
+#ifdef CONFIG_ACPI
+--
+static const struct of_device_id rtl_bluetooth_of_match[] = {
+#ifdef CONFIG_BT_HCIUART_RTL
+	{ .compatible = "realtek,rtl8822cs-bt",
+	  .data = (const void *)&h5_data_rtl8822cs },
+	{ .compatible = "realtek,rtl8723bs-bt",
+	  .data = (const void *)&h5_data_rtl8723bs },
+	{ .compatible = "realtek,rtl8723cs-bt",
+	  .data = (const void *)&h5_data_rtl8723bs },
+	{ .compatible = "realtek,rtl8723ds-bt",
+	  .data = (const void *)&h5_data_rtl8723bs },
+#endif
+	{ },
+};
+MODULE_DEVICE_TABLE(of, rtl_bluetooth_of_match);
+drivers/clk/hisilicon/crg-hi3798cv200.c:102:	{ HISTB_UART2_CLK, "clk_uart2", "75m",
+drivers/clk/hisilicon/crg-hi3798cv200.c:285:	{ HISTB_UART0_CLK, "clk_uart0", "75m",
+	case 0x04928002:
+
+Elf file type is DYN (Shared object file)
+Entry point 0x0
+There are 8 program headers, starting at offset 52
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  PHDR           0x000034 0x00000034 0x00000034 0x00100 0x00100 R   0x4
+  LOAD           0x000000 0x00000000 0x00000000 0x27114 0x27114 R E 0x1000
+  LOAD           0x02777c 0x0002877c 0x0002877c 0x01de4 0x04828 RW  0x1000
+  DYNAMIC        0x0279e4 0x000289e4 0x000289e4 0x00120 0x00120 RW  0x4
+  NOTE           0x000134 0x00000134 0x00000134 0x00038 0x00038 R   0x4
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10
+  ARM_EXIDX      0x01ef0c 0x0001ef0c 0x0001ef0c 0x009e8 0x009e8 R   0x4
+  GNU_RELRO      0x02777c 0x0002877c 0x0002877c 0x00884 0x00884 RW  0x4
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .note.android.ident .note.gnu.build-id .dynsym .dynstr .gnu.hash .gnu.version .gnu.version_d .gnu.version_r .rel.dyn .rel.plt .plt .text .ARM.exidx .rodata .ARM.extab 
+   02     .fini_array .data.rel.ro .dynamic .got .data .bss 
+   03     .dynamic 
+   04     .note.android.ident .note.gnu.build-id 
+   05     
+   06     .ARM.exidx 
+   07     .fini_array .data.rel.ro .dynamic .got 
+   127: 00007fb1   100 FUNC    GLOBAL DEFAULT   12 rtk_insert_fw_patch_fragment_to_linklist
+   175: 00028780    16 OBJECT  GLOBAL DEFAULT   17 BLUETOOTH_VENDOR_LIB_INTERFACE
+   189: 000115a5    12 FUNC    GLOBAL DEFAULT   12 rtk_parse_manager_get_interface
+   230: 000168c1   276 FUNC    GLOBAL DEFAULT   12 hw_usb_config_start
+   239: 0000f4b9   168 FUNC    GLOBAL DEFAULT   12 rtk_notify_btpatch_version_to_wifi
+   241: 0000d01d    12 FUNC    GLOBAL DEFAULT   12 hci_get_h5_int_interface
+   254: 00007bf1   308 FUNC    GLOBAL DEFAULT   12 rtk_check_epatch_signature
+   296: 00014cb1   312 FUNC    GLOBAL DEFAULT   12 hw_config_start
+   302: 00014f39  3160 FUNC    GLOBAL DEFAULT   12 hw_usb_config_cback
+   363: 0000a7d1    20 FUNC    GLOBAL DEFAULT   12 userial_set_bt_interface_state
+   364: 00007da5   236 FUNC    GLOBAL DEFAULT   12 rtk_get_patch_entry
+   368: 00012c45  4992 FUNC    GLOBAL DEFAULT   12 hw_config_cback
+   382: 00008015   864 FUNC    GLOBAL DEFAULT   12 rtk_get_fw_patch_link_list
+   1c8b bt_wake_up_host_mode_set
+   2468 userial_to_tcio_baud
+   2492 userial_vendor_set_baud
+   2754 h5_alloc_wait_controller_baudrate_ready_timer
+   2807 h5_free_wait_controller_baudrate_ready_timer
+   2900 h5_start_wait_controller_baudrate_ready_timer
+   299b h5_stop_wait_controller_baudrate_ready_timer
+   3392 baudrates
+  1f9f5 20220826_BT_ANDROID_9.0_8761BTV_VAT
+  1fa42 bt_wake_up_host_mode_set(1)
+  203e4 userial vendor open: unsupported baud idx %i
+  20589 userial_vendor_set_baud
+  210e6 bt_wake_up_host_mode_set
+  21119 bt_wake_up_host_mode_set path:%s
+  2113a bt_wake_up_host_mode_set fd:%d = open(path, O_RDWR): open(%s) failed: %s (%d)
+  21189 bt_wake_up_host_mode_set fd:%d = open(path, O_RDWR): open(%s) success
+  211d0 bt_wake_up_host_mode_set buffer:%d
+  211f3 bt_wake_up_host_mode_set : write(%s) failed: %s (%d)
+  21c1e CommandCompleteEvent for command h5_start_wait_controller_baudrate_ready_timer (0x%04X)
+  21ee9 h5_wait_controller_baudrate_ready_timeout_handler H5 is cleanuping, EXIT here!
+  21f38 No Controller retransfer, baudrate of controller ready
+  22d74 /dev/rtk_btcoex
+  242f4 no baudrate to set and no need to set hw flow control
+  2432a no baudrate to set but set hw flow control is needed
+  2435f bt vendor lib: set CONTROLLER UART baud 0x%x
+  2438c bt vendor lib: set HOST UART baud start
+  243b4 bt vendor lib: set HOST UART baud %i
+  24696 8761BT
+  247bd rtl8761btv_vat_fw
+  247cf rtl8761btv_vat_config
+  247e5 rtl8761bt_fw
+  247f2 rtl8761bt_config
+  24bb0 Get config baud rate from config file:0x%x
+  24c57 config baud rate to :0x%08x, hwflowcontrol:0x%x, 0x%x
+  250de userial vendor: unsupported baud speed %d
+  26128 /dev/rtkbt_dev
+  2618a RealtechRTBTCore
+4baf2bc760841cc71ef0fc22ac4548a22b5f711f22cf403ab5d803abe1fa3b60  bluetooth/rtkbt.conf
+a3df4a3c49dc7f930779df7382b1f9243c80f5b7268f6cfe7dc476db91c2834f  libbt-vendor-rtk.so
+3999d5595a6398f64247d12c107ea17adfd8c68c163682b4911be851b0d83a7e  libbt-vendor.so

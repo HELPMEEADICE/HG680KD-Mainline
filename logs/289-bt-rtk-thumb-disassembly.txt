@@ -1,0 +1,349 @@
+hw_config_start
+14cb0 push     {r4, r5, r6, lr}
+14cb2 mov      r4, r0
+14cb4 ldr      r0, [pc, #0xe0]
+14cb6 movs     r1, #0x48
+14cb8 add      r0, pc
+14cba ldr      r5, [r0]
+14cbc mov      r0, r5
+14cbe blx      #0x5c20
+14cc2 ldr      r6, [pc, #0xd8]
+14cc4 movw     r0, #0x11f
+14cc8 ldr      r2, [pc, #0xd4]
+14cca ldr      r3, [pc, #0xd8]
+14ccc add      r6, pc
+14cce add      r2, pc
+14cd0 strh     r0, [r5, #0x1a]
+14cd2 add      r3, pc
+14cd4 movs     r0, #3
+14cd6 mov      r1, r6
+14cd8 blx      #0x5bf0
+14cdc ldr      r2, [pc, #0xc8]
+14cde movs     r0, #3
+14ce0 ldr      r3, [pc, #0xc8]
+14ce2 mov      r1, r6
+14ce4 add      r2, pc
+14ce6 add      r3, pc
+14ce8 blx      #0x5bf0
+14cec ldr      r2, [pc, #0xc0]
+14cee movs     r0, #3
+14cf0 mov      r1, r6
+14cf2 mov      r3, r4
+14cf4 add      r2, pc
+14cf6 blx      #0x5bf0
+14cfa ldr      r0, [pc, #0xb8]
+14cfc add      r0, pc
+14cfe ldr      r0, [r0]
+14d00 ldr      r0, [r0]
+14d02 cbz      r0, #0x14d44
+14d04 ldr      r1, [r0, #0x14]
+14d06 movs     r0, #0xb
+14d08 blx      r1
+14d0a mov      r1, r0
+14d0c cbz      r1, #0x14d52
+14d0e movs     r0, #0
+14d10 mov.w    r2, #0x32000
+14d14 str      r0, [r1, #4]
+14d16 str      r2, [r1]
+14d18 lsls     r2, r4, #0x1a
+14d1a bmi      #0x14d68
+14d1c ldr      r2, [pc, #0xa4]
+14d1e ldr      r3, [pc, #0xa8]
+14d20 add      r2, pc
+14d22 strb     r0, [r1, #0xa]
+14d24 add      r3, pc
+14d26 ldr      r6, [pc, #0xa4]
+14d28 ldr      r0, [r2]
+14d2a ldr      r2, [r3]
+14d2c movw     r3, #0xfcee
+14d30 strh     r3, [r1, #8]
+14d32 movs     r3, #1
+14d34 ldr      r0, [r0]
+14d36 add      r6, pc
+14d38 strb     r3, [r2, #0xe]
+14d3a ldr      r2, [r6]
+14d3c ldr      r3, [r0, #0x1c]
+14d3e movw     r0, #0xfcee
+14d42 b        #0x14d92
+14d44 ldr      r1, [pc, #0x94]
+14d46 ldr      r2, [pc, #0x98]
+14d48 ldr      r3, [pc, #0x98]
+14d4a add      r1, pc
+14d4c add      r2, pc
+14d4e add      r3, pc
+14d50 b        #0x14d5e
+14d52 ldr      r1, [pc, #0x7c]
+14d54 ldr      r2, [pc, #0x7c]
+14d56 ldr      r3, [pc, #0x80]
+14d58 add      r1, pc
+14d5a add      r2, pc
+14d5c add      r3, pc
+14d5e movs     r0, #6
+14d60 pop.w    {r4, r5, r6, lr}
+14d64 b.w      #0x1ed0c
+14d68 ldr      r2, [pc, #0x4c]
+14d6a ldr      r3, [pc, #0x50]
+14d6c add      r2, pc
+14d6e strb     r0, [r1, #0xa]
+14d70 movw     r0, #0x1001
+14d74 add      r3, pc
+14d76 strh     r0, [r1, #8]
+14d78 ldr      r0, [r2]
+14d7a ldr      r2, [r3]
+14d7c movs     r3, #3
+14d7e ldr      r6, [pc, #0x40]
+14d80 strh     r3, [r1, #2]
+14d82 movs     r3, #2
+14d84 ldr      r0, [r0]
+14d86 add      r6, pc
+14d88 strb     r3, [r2, #0xe]
+14d8a ldr      r2, [r6]
+14d8c ldr      r3, [r0, #0x1c]
+14d8e movw     r0, #0x1001
+14d92 blx      r3
+14d94 pop      {r4, r5, r6, pc}
+14d96 nop      
+14d98 subs     r6, #0x80
+14d9a movs     r1, r0
+14d9c adc      r0, pc, #0
+14da0 add      r5, sp, #0x30
+14da2 movs     r0, r0
+14da4 add      r5, sp, #0x7c
+14da6 movs     r0, r0
+rtk_check_epatch_signature
+07bf0 push     {r4, r5, r7, lr}
+07bf2 mov      r4, r0
+07bf4 cmp      r1, #2
+07bf6 beq      #0x7c5e
+07bf8 cmp      r1, #1
+07bfa bne      #0x7c86
+07bfc ldr      r1, [pc, #0xf0]
+07bfe movs     r0, #4
+07c00 ldr      r2, [pc, #0xf0]
+07c02 add      r1, pc
+07c04 add      r2, pc
+07c06 blx      #0x5bf0
+07c0a ldr      r1, [pc, #0xec]
+07c0c movs     r2, #8
+07c0e ldr      r0, [r4, #0x28]
+07c10 add      r1, pc
+07c12 ldrh     r5, [r4, #8]
+07c14 blx      #0x5e30
+07c18 cmp.w    r5, #0x1200
+07c1c bne      #0x7c96
+07c1e cmp      r0, #0
+07c20 beq      #0x7cac
+07c22 ldrd     r0, r1, [r4, #0x1c]
+07c26 add      r0, r1
+07c28 str      r0, [r4, #0x24]
+07c2a blx      #0x5e0c
+07c2e cmp      r0, #0
+07c30 str      r0, [r4, #0x30]
+07c32 beq      #0x7cbc
+07c34 ldr      r1, [pc, #0xcc]
+07c36 movs     r0, #4
+07c38 ldr      r2, [pc, #0xcc]
+07c3a add      r1, pc
+07c3c add      r2, pc
+07c3e blx      #0x5bf0
+07c42 ldr      r2, [r4, #0x1c]
+07c44 ldr      r1, [r4, #0x28]
+07c46 ldr      r0, [r4, #0x30]
+07c48 blx      #0x5e3c
+07c4c ldrd     r0, r2, [r4, #0x1c]
+07c50 ldrd     r1, r3, [r4, #0x2c]
+07c54 add      r0, r3
+07c56 blx      #0x5e3c
+07c5a movs     r0, #1
+07c5c b        #0x7cd2
+07c5e ldr      r1, [pc, #0x7c]
+07c60 movs     r0, #4
+07c62 ldr      r2, [pc, #0x7c]
+07c64 add      r1, pc
+07c66 add      r2, pc
+07c68 blx      #0x5bf0
+07c6c ldr      r1, [pc, #0x74]
+07c6e movs     r2, #8
+07c70 ldr      r0, [r4, #0x28]
+07c72 add      r1, pc
+07c74 blx      #0x5e30
+07c78 movs     r5, #0
+07c7a cbz      r0, #0x7cd6
+07c7c ldr      r1, [pc, #0x68]
+07c7e ldr      r2, [pc, #0x6c]
+07c80 add      r1, pc
+07c82 add      r2, pc
+07c84 b        #0x7ca2
+07c86 ldr      r1, [pc, #0x94]
+07c88 movs     r0, #6
+07c8a ldr      r2, [pc, #0x94]
+07c8c add      r1, pc
+07c8e add      r2, pc
+07c90 blx      #0x5bf0
+07c94 b        #0x7cd4
+07c96 movs     r5, #0
+07c98 cbz      r0, #0x7cd6
+07c9a ldr      r1, [pc, #0x60]
+07c9c ldr      r2, [pc, #0x60]
+07c9e add      r1, pc
+07ca0 add      r2, pc
+07ca2 movs     r0, #6
+07ca4 blx      #0x5bf0
+07ca8 strb     r5, [r4, #0x1b]
+07caa b        #0x7cd4
+07cac ldr      r1, [pc, #0x64]
+07cae movs     r0, #6
+07cb0 ldr      r2, [pc, #0x64]
+07cb2 add      r1, pc
+07cb4 add      r2, pc
+07cb6 blx      #0x5bf0
+07cba b        #0x7cd0
+07cbc blx      #0x5bcc
+07cc0 ldr      r1, [pc, #0x48]
+07cc2 ldr      r2, [pc, #0x4c]
+07cc4 ldr      r3, [r0]
+07cc6 add      r1, pc
+07cc8 add      r2, pc
+07cca movs     r0, #6
+07ccc blx      #0x5bf0
+07cd0 movs     r0, #0
+07cd2 strb     r0, [r4, #0x1b]
+07cd4 movs     r5, #0xff
+07cd6 mov      r0, r5
+07cd8 pop      {r4, r5, r7, pc}
+07cda nop      
+07cdc strh     r2, [r7, #4]
+07cde movs     r1, r0
+07ce0 strh     r1, [r5, #0x14]
+07ce2 movs     r1, r0
+07ce4 b        #0x7720
+07ce6 movs     r1, r0
+07ce8 strh     r6, [r3, #4]
+07cea movs     r1, r0
+07cec strh     r7, [r6, #0x12]
+07cee movs     r1, r0
+07cf0 strh     r4, [r3, #8]
+07cf2 movs     r1, r0
+07cf4 strh     r6, [r6, #0x12]
+07cf6 movs     r1, r0
+07cf8 b        #0x77e8
+07cfa movs     r1, r0
+07cfc strh     r0, [r0, #4]
+07cfe movs     r1, r0
+07d00 strh     r1, [r3, #0x12]
+07d02 movs     r1, r0
+07d04 strh     r4, [r4, #6]
+07d06 movs     r1, r0
+07d08 strh     r6, [r4, #0x14]
+07d0a movs     r1, r0
+07d0c strh     r0, [r3, #2]
+07d0e movs     r1, r0
+07d10 strh     r7, [r5, #0xe]
+07d12 movs     r1, r0
+07d14 strh     r4, [r5, #2]
+07d16 movs     r1, r0
+07d18 strh     r5, [r4, #0xe]
+07d1a movs     r1, r0
+07d1c strh     r2, [r2, #4]
+07d1e movs     r1, r0
+07d20 strh     r5, [r3, #0x14]
+07d22 movs     r1, r0
+userial_vendor_open
+087c0 push.w   {r4, r5, r6, r7, r8, lr}
+087c4 sub      sp, #8
+087c6 mov      r4, r0
+087c8 ldr      r0, [pc, #0x19c]
+087ca ldr      r1, [pc, #0x1a0]
+087cc mov.w    r5, #-1
+087d0 add      r0, pc
+087d2 add      r1, pc
+087d4 ldr      r0, [r0]
+087d6 ldr      r0, [r0]
+087d8 str      r0, [sp, #4]
+087da str      r5, [r1]
+087dc mov      r1, sp
+087de ldrb     r0, [r4, #2]
+087e0 blx      #0x5ea8
+087e4 cmp      r0, #0
+087e6 beq.w    #0x894c
+087ea ldrh     r0, [r4]
+087ec tst.w    r0, #0x3c0
+087f0 beq      #0x8808
+087f2 lsls     r1, r0, #0x1c
+087f4 bmi      #0x8812
+087f6 lsls     r1, r0, #0x1b
+087f8 bmi      #0x8818
+087fa lsls     r1, r0, #0x1a
+087fc bmi      #0x881e
+087fe ldr      r1, [pc, #0x1b8]
+08800 ldr      r2, [pc, #0x1b8]
+08802 add      r1, pc
+08804 add      r2, pc
+08806 b        #0x8832
+08808 ldr      r1, [pc, #0x1b4]
+0880a ldr      r2, [pc, #0x1b8]
+0880c add      r1, pc
+0880e add      r2, pc
+08810 b        #0x8832
+08812 mov.w    r8, #0
+08816 b        #0x8822
+08818 mov.w    r8, #0x100
+0881c b        #0x8822
+0881e mov.w    r8, #0x300
+08822 lsls     r1, r0, #0x1f
+08824 bne      #0x883e
+08826 lsls     r0, r0, #0x1d
+08828 bmi      #0x8842
+0882a ldr      r1, [pc, #0x184]
+0882c ldr      r2, [pc, #0x184]
+0882e add      r1, pc
+08830 add      r2, pc
+08832 movs     r0, #6
+08834 blx      #0x5bf0
+08838 mov.w    r5, #-1
+0883c b        #0x894c
+0883e movs     r7, #0
+08840 b        #0x8844
+08842 movs     r7, #0x40
+08844 ldr      r6, [pc, #0x128]
+08846 movs     r0, #4
+08848 ldr      r1, [pc, #0x128]
+0884a ldr      r2, [pc, #0x12c]
+0884c add      r6, pc
+0884e add.w    r5, r6, #0x44
+08852 add      r1, pc
+08854 add      r2, pc
+08856 mov      r3, r5
+08858 blx      #0x5bf0
+0885c mov      r0, r5
+0885e movs     r1, #2
+08860 blx      #0x5ddc
+08864 adds     r1, r0, #1
+08866 str      r0, [r6]
+08868 beq      #0x88a8
+0886a movs     r1, #2
+0886c blx      #0x5eb4
+08870 ldr      r5, [pc, #0x108]
+08872 add      r5, pc
+08874 ldr      r0, [r5], #0x20
+08878 mov      r1, r5
+0887a blx      #0x5ec0
+0887e mov      r0, r5
+b'rtl8761btv_vat_fw'
+@247bd b'\x00rtl8821as_config\x00rtl8761btv_vat_fw\x00rtl8761btv_v'
+  ref @28190 ff ff ff ff 08 00 00 00 00 00 00 00 bd 47 02 00 cf 47 02 00 3c 00 00 00 11 62 00 00 61 87 00 00
+b'rtl8761bt_fw'
+@247e5 b'761btv_vat_config\x00rtl8761bt_fw\x00rtl8761bt_config\x00'
+  ref @281b8 01 00 00 00 00 40 00 00 00 00 00 00 e5 47 02 00 f2 47 02 00 30 00 00 00 11 a2 00 00 61 87 00 00
+b'rtl8761b_fw'
+@25408 b'761au8812ae_fw\x00mp_rtl8761b_fw\x00rtl8761b_fw\x00rtl876'
+@25414 b'fw\x00mp_rtl8761b_fw\x00rtl8761b_fw\x00rtl8761b_config\x00mp'
+  ref @28a1c 61 87 00 00 00 00 00 00 05 54 02 00 14 54 02 00 20 54 02 00 00 00 00 00 00 00 00 00 30 00 00 00
+  ref @28a44 61 87 00 00 00 00 00 00 05 54 02 00 14 54 02 00 20 54 02 00 00 00 00 00 00 00 00 00 30 00 00 00
+b'BtDeviceNode'
+@1fb56 b'found on line %d.\x00BtDeviceNode\x00/sys/bus/usb/devi'
+b'/sys/class/rfkill'
+@212b6 b'ro.rfkilldisabled\x00/sys/class/rfkill/rfkill%d/typ'
+@21308 b's (%d)\n\x00bluetooth\x00/sys/class/rfkill/rfkill%d/sta'
+b'Realtech'
+@2618a b'ice.sock\x00\x00\x11\x02\x07\x00\t\x02\x07\x00RealtechRTBTCore\x00\x00\xff\xff\xff\xff\x03\x04\x03\x02\x04\x08\x0c\x10'

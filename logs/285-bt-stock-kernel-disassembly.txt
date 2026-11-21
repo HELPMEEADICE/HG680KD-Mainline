@@ -1,0 +1,236 @@
+
+ pl011_probe_dt_alias 0xc0a3a978 0xc0a3aa38
+c0a3a978: push    {r4, r5, r6, lr}
+c0a3a97c: mov     r5, r0
+c0a3a980: ldr     r0, [r1, #0x154]
+c0a3a984: cmp     r0, #0
+c0a3a988: beq     #0xc0a3a9dc ; 
+c0a3a98c: mov     r4, r1
+c0a3a990: ldr     r1, [pc, #0x90] ; = 0xc1447444 
+c0a3a994: bl      #0xc0c7497c ; of_alias_get_id
+c0a3a998: cmp     r0, #0
+c0a3a99c: blt     #0xc0a3a9e4 ; 
+c0a3a9a0: ldr     r6, [pc, #0x84] ; = 0xc1ae359c __key.30168
+c0a3a9a4: cmp     r0, #0xd
+c0a3a9a8: mov     r3, #1
+c0a3a9ac: strb    r3, [r6, #0x39]
+c0a3a9b0: bhi     #0xc0a3a9c0 ; 
+c0a3a9b4: ldr     r3, [r6, r0, lsl #2]
+c0a3a9b8: cmp     r3, #0
+c0a3a9bc: beq     #0xc0a3aa14 ; 
+c0a3a9c0: mov     r2, r0
+c0a3a9c4: ldr     r1, [pc, #0x64] ; = 0xc141c724 
+c0a3a9c8: mov     r0, r4
+c0a3a9cc: bl      #0xc0a48694 ; dev_warn
+c0a3a9d0: ldrb    r3, [r6, #0x39]
+c0a3a9d4: cmp     r3, #0
+c0a3a9d8: bne     #0xc0a3aa10 ; 
+c0a3a9dc: mov     r0, r5
+c0a3a9e0: pop     {r4, r5, r6, pc}
+c0a3a9e4: ldr     r3, [pc, #0x40] ; = 0xc1ae359c __key.30168
+c0a3a9e8: mov     r1, #1
+c0a3a9ec: ldrb    r2, [r3, #0x39]
+c0a3a9f0: strb    r1, [r3, #0x38]
+c0a3a9f4: cmp     r2, #0
+c0a3a9f8: beq     #0xc0a3a9dc ; 
+c0a3a9fc: mov     r0, r4
+c0a3aa00: ldr     r1, [pc, #0x2c] ; = 0xc141c750 
+c0a3aa04: bl      #0xc0a48694 ; dev_warn
+c0a3aa08: mov     r0, r5
+c0a3aa0c: pop     {r4, r5, r6, pc}
+c0a3aa10: mov     r0, r5
+c0a3aa14: ldrb    r3, [r6, #0x38]
+c0a3aa18: cmp     r3, #0
+c0a3aa1c: popeq   {r4, r5, r6, pc}
+c0a3aa20: mov     r5, r0
+c0a3aa24: b       #0xc0a3a9fc ; 
+
+ pl011_probe 0xc0a3b0d8 0xc0a3b244
+c0a3b0d8: push    {r4, r5, r6, r7, r8, lr}
+c0a3b0dc: ldr     r7, [pc, #0x154] ; = 0xc1ae359c __key.30168
+c0a3b0e0: ldr     r4, [r7]
+c0a3b0e4: cmp     r4, #0
+c0a3b0e8: beq     #0xc0a3b118 ; 
+c0a3b0ec: mov     r3, r7
+c0a3b0f0: mov     r4, #1
+c0a3b0f4: b       #0xc0a3b104 ; 
+c0a3b0f8: add     r4, r4, #1
+c0a3b0fc: cmp     r4, #0xe
+c0a3b100: beq     #0xc0a3b220 ; 
+c0a3b104: ldr     r2, [r3, #4]!
+c0a3b108: cmp     r2, #0
+c0a3b10c: bne     #0xc0a3b0f8 ; 
+c0a3b110: cmp     r4, #0
+c0a3b114: blt     #0xc0a3b218 ; 
+c0a3b118: mov     r3, r1
+c0a3b11c: movw    r2, #0x80c0
+c0a3b120: mov     r1, #0x130
+c0a3b124: movt    r2, #0x240
+c0a3b128: mov     r6, r0
+c0a3b12c: ldr     r8, [r3, #8]
+c0a3b130: bl      #0xc0a4fc28 ; devm_kmalloc
+c0a3b134: subs    r5, r0, #0
+c0a3b138: beq     #0xc0a3b214 ; 
+c0a3b13c: mov     r1, #0
+c0a3b140: mov     r0, r6
+c0a3b144: bl      #0xc0a06470 ; devm_clk_get
+c0a3b148: cmn     r0, #0x1000
+c0a3b14c: str     r0, [r5, #0x100]
+c0a3b150: movhi   r4, r0
+c0a3b154: bhi     #0xc0a3b218 ; 
+c0a3b158: ldr     r3, [r8]
+c0a3b15c: mov     r0, r6
+c0a3b160: str     r8, [r5, #0x104]
+c0a3b164: str     r3, [r5, #0xfc]
+c0a3b168: ldr     r3, [r8, #0x20]
+c0a3b16c: blx     r3
+c0a3b170: ldr     lr, [r6, #0x1c0]
+c0a3b174: ldr     ip, [pc, #0xc0] ; = 0xc178a234 amba_pl011_pops
+c0a3b178: mov     r1, #0xc
+c0a3b17c: ldr     r3, [r6, #0x1bc]
+c0a3b180: ldr     r2, [pc, #0xb8] ; = 0xc141c864 
+c0a3b184: ubfx    r3, r3, #0x14, #4
+c0a3b188: str     r0, [r5, #0x114]
+c0a3b18c: ldrb    r0, [r8, #0x18]
+c0a3b190: str     lr, [r5, #0x40]
+c0a3b194: cmp     r0, #0
+c0a3b198: str     ip, [r5, #0xac]
+c0a3b19c: movne   r0, #3
+c0a3b1a0: moveq   r0, #2
+c0a3b1a4: strb    r0, [r5, #0x52]
+c0a3b1a8: add     r0, r5, #0x124
+c0a3b1ac: bl      #0xc04fa650 ; snprintf
+c0a3b1b0: add     r1, r6, #0x198
+c0a3b1b4: mov     r0, r6
+c0a3b1b8: bl      #0xc0509e68 ; devm_ioremap_resource
+c0a3b1bc: cmn     r0, #0x1000
+c0a3b1c0: mov     r8, r0
+c0a3b1c4: bhi     #0xc0a3b22c ; 
+c0a3b1c8: mov     r1, r6
+c0a3b1cc: mov     r0, r4
+c0a3b1d0: bl      #0xc0a3a978 ; pl011_probe_dt_alias
+c0a3b1d4: ldr     ip, [r6, #0x198]
+c0a3b1d8: ldr     r1, [r5, #0x114]
+c0a3b1dc: mov     r2, #0
+c0a3b1e0: mov     r3, #0x10000000
+c0a3b1e4: str     r6, [r5, #0xc4]
+c0a3b1e8: str     r8, [r5, #8]
+c0a3b1ec: str     ip, [r5, #0xbc]
+c0a3b1f0: str     r1, [r5, #0x4c]
+c0a3b1f4: str     r2, [r5, #0x118]
+c0a3b1f8: str     r3, [r5, #0x94]
+c0a3b1fc: str     r0, [r5, #0xb4]
+c0a3b200: str     r5, [r7, r0, lsl #2]
+c0a3b204: str     r5, [r6, #0x58]
+c0a3b208: mov     r0, r5
+c0a3b20c: pop     {r4, r5, r6, r7, r8, lr}
+c0a3b210: b       #0xc0a3aa38 ; pl011_register_port
+c0a3b214: mvn     r4, #0xb
+c0a3b218: mov     r0, r4
+c0a3b21c: pop     {r4, r5, r6, r7, r8, pc}
+c0a3b220: mvn     r4, #0xf
+c0a3b224: mov     r0, r4
+c0a3b228: pop     {r4, r5, r6, r7, r8, pc}
+c0a3b22c: subs    r4, r0, #0
+c0a3b230: bne     #0xc0a3b218 ; 
+c0a3b234: b       #0xc0a3b204 ; 
+
+ sw_rfkill_probe 0xc05521bc 0xc0552240
+c05521bc: push    {r4, r5, lr}
+c05521c0: sub     sp, sp, #0xc
+c05521c4: add     r1, r0, #0x10
+c05521c8: mov     r5, #0
+c05521cc: ldr     r3, [pc, #0x60] ; = 0xc174286c sw_rfkill_ops
+c05521d0: mov     r2, #2
+c05521d4: str     r5, [sp]
+c05521d8: ldr     r0, [pc, #0x58] ; = 0xc1058d1c bt_name
+c05521dc: bl      #0xc0f6f054 ; rfkill_alloc
+c05521e0: ldr     r4, [pc, #0x54] ; = 0xc186e82c sw_rfkill
+c05521e4: cmp     r0, r5
+c05521e8: str     r0, [r4]
+c05521ec: beq     #0xc0552218 ; 
+c05521f0: mov     r2, r5
+c05521f4: mov     r1, #1
+c05521f8: bl      #0xc0f6fa50 ; rfkill_set_states
+c05521fc: ldr     r0, [r4]
+c0552200: bl      #0xc0f6f238 ; rfkill_register
+c0552204: subs    r5, r0, #0
+c0552208: bne     #0xc0552228 ; 
+c055220c: mov     r0, r5
+c0552210: add     sp, sp, #0xc
+c0552214: pop     {r4, r5, pc}
+c0552218: mvn     r5, #0xb
+c055221c: mov     r0, r5
+c0552220: add     sp, sp, #0xc
+c0552224: pop     {r4, r5, pc}
+c0552228: ldr     r0, [r4]
+c055222c: bl      #0xc0f6f434 ; rfkill_destroy
+c0552230: b       #0xc055220c ; 
+c0552234: cmngt   r4, ip, ror #16
+
+ rfkill_set_power 0xc0552240 0xc05522e0
+c0552240: push    {r4, lr}
+c0552244: mov     r0, #0x22
+c0552248: mov     r4, r1
+c055224c: ldr     r1, [pc, #0x74] ; = 0xc137879c 
+c0552250: bl      #0xc09dfd70 ; gpio_request
+c0552254: cmp     r0, #0
+c0552258: blt     #0xc05522b4 ; 
+c055225c: cmp     r4, #0
+c0552260: ldr     r1, [pc, #0x64] ; = 0xc13787d8 
+c0552264: bne     #0xc0552298 ; 
+c0552268: ldr     r0, [pc, #0x60] ; = 0xc1378804 
+c055226c: bl      #0xc0205aa0 ; printk
+c0552270: mov     r0, #0x22
+c0552274: bl      #0xc09db3e4 ; gpio_to_desc
+c0552278: mov     r1, #1
+c055227c: bl      #0xc09dd5f8 ; gpiod_direction_output_raw
+c0552280: mov     r0, #0x22
+c0552284: bl      #0xc09dfd30 ; gpio_free
+c0552288: mov     r0, #0xa
+c055228c: bl      #0xc019d590 ; msleep
+c0552290: mov     r0, #0
+c0552294: pop     {r4, pc}
+c0552298: ldr     r0, [pc, #0x34] ; = 0xc13787e0 
+c055229c: bl      #0xc0205aa0 ; printk
+c05522a0: mov     r0, #0x22
+c05522a4: bl      #0xc09db3e4 ; gpio_to_desc
+c05522a8: mov     r1, #0
+c05522ac: bl      #0xc09dd5f8 ; gpiod_direction_output_raw
+c05522b0: b       #0xc0552280 ; 
+c05522b4: mov     r1, #0x22
+c05522b8: ldr     r0, [pc, #0x18] ; = 0xc13787a8 
+c05522bc: bl      #0xc0205aa0 ; printk
+c05522c0: mvn     r0, #0
+c05522c4: pop     {r4, pc}
+
+ hi_rfkill_store 0xc0551fbc 0xc055203c
+c0551fbc: ldr     r0, [pc, #0x64] ; = 0xc1742628 attr_reset_onresume
+c0551fc0: cmp     r1, r0
+c0551fc4: beq     #0xc0551fd0 ; 
+c0551fc8: mov     r0, r3
+c0551fcc: bx      lr
+c0551fd0: cmp     r2, #0
+c0551fd4: bne     #0xc0551fe0 ; 
+c0551fd8: mvn     r0, #0
+c0551fdc: bx      lr
+c0551fe0: push    {r4, r5, r6, lr}
+c0551fe4: mov     r6, r2
+c0551fe8: mov     r5, r1
+c0551fec: ldr     r0, [pc, #0x38] ; = 0xc1378570 
+c0551ff0: mov     r1, r2
+c0551ff4: mov     r4, r3
+c0551ff8: bl      #0xc0205aa0 ; printk
+c0551ffc: ldrb    r3, [r6]
+c0552000: ldr     r0, [pc, #0x28] ; = 0xc137859c 
+c0552004: cmp     r3, #0x31
+c0552008: ldreq   r1, [pc, #0x24] ; = 0xc1369e90 
+c055200c: moveq   r3, #1
+c0552010: ldrne   r1, [pc, #0x20] ; = 0xc1369e98 
+c0552014: movne   r3, #0
+c0552018: strb    r3, [r5, #0x10]
+c055201c: bl      #0xc0205aa0 ; printk
+c0552020: mov     r0, r4
+c0552024: pop     {r4, r5, r6, pc}
+c0552028: cmngt   r4, r8, lsr #12
+c055202c: teqgt   r7, r0, ror r5

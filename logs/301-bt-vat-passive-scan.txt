@@ -1,0 +1,16 @@
+
+# wget -O /tmp/bt-test http://192.168.6.160:18083/bt-test && chmod 755 /tmp/bt-test && /tmp/bt-test 10; echo BT_EXIT=$?
+Connecting to 192.168.6.160:18083 (192.168.6.160:18083)
+saving to '/tmp/bt-test'
+'/tmp/bt-test' saved
+hci0: HCI 0x09 rev 0x1ed6, LMP 0x09 subver 0xb420, manufacturer 0x005d
+hci0: controller BD_ADDR 00:E0:4C:23:99:87
+BLE passive scan for 10 s
+LE advertisement FC:42:65:AF:36:71 type=0 address_type=0 rssi=-72 data=0201060303271815162718a80151000000007136af6542fc0583000000
+LE advertisement 29:9A:F4:1A:03:E2 type=3 address_type=1 rssi=-48 data=1eff060001092002306e6c239f2a17bbf2d4078c15083ffb2135961b22b377
+LE advertisement 1C:12:F5:E1:BF:26 type=3 address_type=1 rssi=-62 data=1e16f3fe4a172344575a351132bf71cd0bbbbfd00a0ab92700932c9dff2d74
+LE advertisement 16:6D:BC:0E:F9:E8 type=3 address_type=1 rssi=-80 data=1eff06000109202288629f728444c728f3e298300d3cbe4002bceb387e8316
+BLE passive scan: 4 advertising reports
+BT_EXIT=0
+# 
+[host] shell command elapsed: 10.06 s

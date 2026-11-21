@@ -1,0 +1,8 @@
+
+# uname -a; cat /sys/block/mmcblk0/ro /sys/block/mmcblk0/mmcblk0p1/ro /sys/block/mmcblk0/mmcblk0p2/ro
+Linux hg680kd 6.18.64-hg680kd-arm64-all-2g-hdmi-wifi-probe #1 SMP 2025-12-01 00:00:00 UTC aarch64
+1
+1
+1
+# 
+[host] shell command elapsed: 0.01 s

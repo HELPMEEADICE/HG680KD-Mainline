@@ -1,0 +1,22 @@
+
+# cat /sys/class/net/eth0/speed /sys/class/net/eth0/duplex; ls /sys/bus/serial/drivers/hci_uart_h5; ls /sys/bus/serial/devices; cat /sys/block/mmcblk0/ro
+100
+full
+unbind     bind       serial0-0  uevent
+serial0    serial0-0
+1
+# 
+[host] shell command elapsed: 0.01 s
+echo "file drivers/bluetooth/btrtl.c +p" >/sys/kernel/debug/dynamic_debug/control; echo serial0-0 >/sys/bus/serial/drivers/hci_uart_h5/unbind && sleep 1 && echo serial0-0 >/sys/bus/serial/drivers/hci_uart_h5/bind; sleep 3; dmesg | grep -Ei "baudrate|flow control|RTL:|Too short H5" | busybox tail -25; echo "file drivers/bluetooth/btrtl.c -p" >/sys/kernel/debug/dynamic_debug/control
+tail: applet not found
+# 
+[host] shell command elapsed: 4.70 s
+bt-test; echo BT_INFO_EXIT=$?; cat /sys/kernel/debug/gpio; cat /sys/block/mmcblk0/ro
+hci0: HCI 0x09 rev 0x1ed6, LMP 0x09 subver 0xb420, manufacturer 0x005d
+hci0: controller BD_ADDR 00:E0:4C:23:99:87
+BT_INFO_EXIT=0
+gpiochip0: 8 GPIOs, parent: amba/f8b24000.gpio, f8b24000.gpio:
+ gpio-2   (                    |enable              ) out hi 
+1
+# 
+[host] shell command elapsed: 0.05 s

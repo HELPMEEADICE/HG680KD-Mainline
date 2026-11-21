@@ -1,0 +1,67 @@
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -84,6 +84,7 @@ struct id_table {
+ 	bool config_needed;
+ 	bool has_rom_version;
+ 	bool has_msft_ext;
++	bool skip_sec_project;
+ 	char *fw_name;
+ 	char *cfg_name;
+ 	char *hw_info;
+@@ -213,6 +214,15 @@ static const struct id_table ic_id_table[] = {
+ 	  .fw_name  = "rtl_bt/rtl8761a_fw",
+ 	  .cfg_name = "rtl_bt/rtl8761a_config",
+ 	  .hw_info  = "rtl8761au" },
++
++	/* RTL8761BTV-VAT uses the legacy 8761 ROM and an H5 UART. */
++	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_UART),
++	  .config_needed = true,
++	  .has_rom_version = true,
++	  .skip_sec_project = true,
++	  .fw_name  = "rtl_bt/rtl8761btv_vat_fw",
++	  .cfg_name = "rtl_bt/rtl8761btv_vat_config",
++	  .hw_info  = "rtl8761btv-vat" },
+ 
+ 	/* 8761B */
+ 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_UART),
+@@ -1073,8 +1083,6 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 	u16 hci_rev, lmp_subver;
+ 	u8 hci_ver, lmp_ver, chip_type = 0;
+ 	int ret;
+-	int rc;
+-	u8 key_id;
+ 	u8 reg_val[2];
+ 
+ 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
+@@ -1185,13 +1193,15 @@ next:
+ 		goto err_free;
+ 	}
+ 
+-	rc = btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
+-	if (rc < 0)
+-		goto err_free;
++	/* Legacy VAT firmware has no security-project selector. */
++	if (!btrtl_dev->ic_info->skip_sec_project) {
++		ret = btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
++		if (ret < 0)
++			goto err_free;
+ 
+-	key_id = reg_val[0];
+-	btrtl_dev->key_id = key_id;
+-	rtl_dev_info(hdev, "%s: key id %u", __func__, key_id);
++		btrtl_dev->key_id = reg_val[0];
++		rtl_dev_info(hdev, "%s: key id %u", __func__, btrtl_dev->key_id);
++	}
+ 
+ 	btrtl_dev->fw_len = -EIO;
+ 	if (lmp_subver == RTL_ROM_LMP_8852A && hci_rev == 0x000c) {
+@@ -1532,6 +1542,8 @@ MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761btv_vat_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761btv_vat_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761b_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761b_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761bu_fw.bin");

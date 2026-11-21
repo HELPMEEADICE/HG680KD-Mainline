@@ -1,0 +1,346 @@
+debugfs 1.47.4 (6-Mar-2025)
+    566   40755 (2)      0   2000    4096  1-Jan-2009 00:00 .
+    530   40755 (2)      0   2000    4096  1-Jan-2009 00:00 ..
+    567  100644 (1)      0      0     859  1-Jan-2009 00:00 rtkbt.conf
+
+debugfs 1.47.4 (6-Mar-2025)
+/system/etc/bluetooth: File not found by ext2_lookup 
+debugfs 1.47.4 (6-Mar-2025)
+   1983   40755 (2)      0      0    4096  1-Jan-2009 00:00 .
+   1720   40755 (2)      0      0    4096  1-Jan-2009 00:00 ..
+   1984  100644 (1)      0      0    1952  1-Jan-2009 00:00 bt_stack.conf
+   1985  100644 (1)      0      0    2618  1-Jan-2009 00:00 bt_did.conf
+
+debugfs 1.47.4 (6-Mar-2025)
+   1983   40755 (2)      0      0    4096  1-Jan-2009 00:00 .
+   1720   40755 (2)      0      0    4096  1-Jan-2009 00:00 ..
+   1984  100644 (1)      0      0    1952  1-Jan-2009 00:00 bt_stack.conf
+   1985  100644 (1)      0      0    2618  1-Jan-2009 00:00 bt_did.conf
+
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+dump_file: Operation not permitted while changing ownership of ./bluetooth/rtkbt.conf
+rdump: Operation not permitted while changing ownership of ./bluetooth
+.:
+total 528
+-rw-r--r-- 1 hedc hedc  55340 Nov 21 23:03 android.hardware.bluetooth@1.0-impl.so
+-rw-r--r-- 1 hedc hedc  16012 Nov 21 23:03 android.hardware.bluetooth@1.0-service
+-rw-r--r-- 1 hedc hedc    622 Nov 21 23:03 android.hardware.bluetooth@1.0-service.rc
+drwxr-xr-x 1 hedc hedc     20 Jan  1  2009 bluetooth
+-rw-r--r-- 1 hedc hedc 176556 Nov 21 23:03 libbt-vendor-rtk.so
+-rw-r--r-- 1 hedc hedc  28872 Nov 21 23:03 libbt-vendor.so
+-rw-r--r-- 1 hedc hedc  68456 Nov 21 23:03 rtk_btusb.ko
+-rw-r--r-- 1 hedc hedc     58 Nov 21 23:03 rtl8761b_config
+-rw-r--r-- 1 hedc hedc  46880 Nov 21 23:03 rtl8761b_fw
+-rw-r--r-- 1 hedc hedc     77 Nov 21 23:03 rtl8761bt_config
+-rw-r--r-- 1 hedc hedc  48004 Nov 21 23:03 rtl8761bt_fw
+-rw-r--r-- 1 hedc hedc    110 Nov 21 23:03 rtl8761btv_vat_config
+-rw-r--r-- 1 hedc hedc  65988 Nov 21 23:03 rtl8761btv_vat_fw
+
+./bluetooth:
+total 4
+-rw-r--r-- 1 hedc hedc 859 Jan  1  2009 rtkbt.conf
+service vendor.bluetooth-1-0 /vendor/bin/hw/android.hardware.bluetooth@1.0-service
+    class hal
+    capabilities BLOCK_SUSPEND NET_ADMIN SYS_NICE
+    user bluetooth
+    group bluetooth
+    writepid /dev/stune/foreground/tasks
+
+on property:vts.native_server.on=1 && property:ro.build.type=userdebug
+    stop vendor.bluetooth-1-0
+on property:vts.native_server.on=1 && property:ro.build.type=eng
+    stop vendor.bluetooth-1-0
+on property:vts.native_server.on=0 && property:ro.build.type=userdebug
+    start vendor.bluetooth-1-0
+on property:vts.native_server.on=0 && property:ro.build.type=eng
+    start vendor.bluetooth-1-0
+# RELEASE NAME: 20200422_BT_ANDROID_9.0
+# Bluetooth Device Name; NULL or comment means "ro.product.model"
+#Name=Realtek Bluetooth
+
+# Device Class
+DevClassServiceClass=0x1A
+DevClassMajorClass=0x01
+DevClassMinorClass=0x1C
+
+#Indicate USB or UART driver bluetooth
+BtDeviceNode=?/dev/ttyAMA1:H5
+
+# Enable BtSnoop logging function
+# valid value : true, false
+RtkBtsnoopDump=false
+
+# BtSnoop log output file
+BtSnoopFileName=/data/misc/bluedroid/btsnoop_hci.cfa
+
+# Preserve existing BtSnoop log before overwriting
+BtSnoopSaveLog=true
+
+#bit0 = 1,don't show heartbeat packet in btsnoop
+RtkbtLogFilter=1
+
+# configuration for uart card to save HCI log for slave
+H5LogOutput=0
+
+# Enable Coex log
+BtCoexLogOutput=0
+
+# Enable net btsnoop Dump
+RtkBtsnoopNetDump=false
+
+
+# Enable auto restart bt
+RtkBtAutoRestart=true
+
+# Enable caputure fw log Via HCI
+RtkBtCaptureFwLog=false
+libbt-vendor-rtk.so: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, for Android 28, BuildID[md5/uuid]=e2b1bf40e1b0231f2d2eebb8605920db, stripped
+bt_vendor_cbacks
+bt_wake_up_host_mode_set
+hci_close_firmware_log_file
+hci_firmware_log_fd
+rtk_get_bt_firmware
+hci_log_firmware_debug_packet_rtk
+hci_open_firmware_log_file_rtk
+userial_to_tcio_baud
+userial_vendor_set_baud
+h5_alloc_wait_controller_baudrate_ready_timer
+h5_free_wait_controller_baudrate_ready_timer
+h5_start_wait_controller_baudrate_ready_timer
+h5_stop_wait_controller_baudrate_ready_timer
+baudrates
+libbt_vendor
+20220826_BT_ANDROID_9.0_8761BTV_VAT
+bt_wake_up_host_mode_set(1)
+persist.vendor.rtkbt.bdaddr_path
+%s,persist.vendor.rtkbt.bdaddr_path = none
+/vendor/firmware/%s
+Can't access firmware, errno:%d
+Can't open firmware, errno:%d
+userial vendor open: unsupported baud idx %i
+userial_vendor_set_baud
+In %s, error writing to the uart serial port: %s
+userial_uart_close
+userial_recv_uart_thread
+bt_wake_up_host_mode_set
+bt_wake_up_host_mode_set path:%s
+bt_wake_up_host_mode_set fd:%d = open(path, O_RDWR): open(%s) failed: %s (%d)
+bt_wake_up_host_mode_set fd:%d = open(path, O_RDWR): open(%s) success
+bt_wake_up_host_mode_set buffer:%d
+bt_wake_up_host_mode_set : write(%s) failed: %s (%d)
+ro.rfkilldisabled
+/sys/class/rfkill/rfkill%d/type
+init_rfkill : open(%s) failed: %s (%d)
+/sys/class/rfkill/rfkill%d/state
+UART H5 RX: length = %d
+CommandCompleteEvent for command h5_start_wait_controller_baudrate_ready_timer (0x%04X)
+h5_wait_controller_baudrate_ready_timeout_handler H5 is cleanuping, EXIT here!
+No Controller retransfer, baudrate of controller ready
+/dev/rtk_btcoex
+%s bt_vendor_cbacks is NULL!
+bt_hwcfg_uart
+Get BT firmware fail
+no baudrate to set and no need to set hw flow control
+no baudrate to set but set hw flow control is needed
+bt vendor lib: set CONTROLLER UART baud 0x%x
+bt vendor lib: set HOST UART baud start
+bt vendor lib: set HOST UART baud %i
+Realtek libbt-vendor_uart Version %s 
+dump_uart_chip_name
+8761AT or 8761ATV or 8761ATL or 8761ATF
+8761BT
+rtl8761btv_vat_fw
+rtl8761btv_vat_config
+rtl8761bt_fw
+rtl8761bt_config
+Get config baud rate from config file:0x%x
+config baud rate to :0x%08x, hwflowcontrol:0x%x, 0x%x
+userial vendor: unsupported baud speed %d
+mp_rtl8761a_fw
+rtl8761au_fw
+rtl8761a_config
+rtl8761aw8192eu_fw
+rtl8761aw8192eu_config
+rtl8761au8192ee_fw
+rtl8761au8812ae_fw
+mp_rtl8761b_fw
+rtl8761b_fw
+rtl8761b_config
+8761AU or 8761AUV
+8761BUV
+hci_open_firmware_log_file_rtk
+/data/misc/bluedroid/firmware_log_rtk
+/dev/rtkbt_dev
+libbt-vendor.so: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, for Android 28, BuildID[md5/uuid]=cb7396bcaafb59807b82a44d34ef06dd, stripped
+bt_vendor_cbacks
+hw_lpm_set_wake_state
+line_speed_to_userial_baud
+userial_vendor_set_baud
+userial_to_tcio_baud
+bt_vendor
+/vendor/etc/bluetooth/bt_vendor.conf
+userial vendor: unsupported baud speed %d
+bt vendor lib: set UART baud %i
+vendor lib preload failed to locate firmware patch file
+firmware patch file might be altered!
+bt vendor lib: set UART baud 115200
+Controller OTP bdaddr %02X:%02X:%02X:%02X:%02X:%02X
+userial vendor open: unsupported baud idx %i
+/dev/ttyO1
+ro.rfkilldisabled
+/sys/class/rfkill/rfkill%d/type
+init_rfkill : open(%s) failed: %s (%d)
+/sys/class/rfkill/rfkill%d/state
+UartPort
+/vendor/firmware/
+android.hardware.bluetooth@1.0-impl.so: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, for Android 28, BuildID[md5/uuid]=6dc3b5329462da4f5475ff16af5dd21f, stripped
+_ZN7android8hardware9bluetooth4V1_014implementation15VendorInterface20OnFirmwareConfiguredEh
+_ZN7android8hardware9bluetooth3hci13HciPacketizer11OnDataReadyEi13HciPacketType
+OnFirmwareConfigured
+Firmware configured in %.3fs
+%s error writing to UART (%s)
+ro.bt.bdaddr_path
+persist.service.bdroid.bdaddr
+894b438075638e9f88f795563af95b008bb7495cd105dbc95a50a86c22f73fbd  rtl8761b_config
+d2095e3ad6e5ada5cbf112cd97be978eaa8272d9eef2b4cd97b676b84f5c8136  rtl8761b_fw
+31e07f0418c2cfa82931912ec1a372d1c4a2bdd9e9ba9eb46ddb2087c667c362  rtl8761bt_config
+41ddd2b97ffca0e06f07ed72c672e3990baa29d67e2ab159fb494036aa583aaf  rtl8761bt_fw
+7309d5f317fb80f630c6dca08c09559cf2db834801b86ded9ff0b22416a5e07c  rtl8761btv_vat_config
+846ee9c3b2b4e45f9317d7307753374bd1aa401de9586460684b6b6b543047fe  rtl8761btv_vat_fw
+000000 55 ab 23 87 34 00 be 01 02 1a 19 bb 01 01 3d c0  >U.#.4.........=.<
+000010 01 04 10 00 60 01 00 10 0b ff ff 04 5d 00 03 00  >....`.......]...<
+000020 ff ff ff ff 40 10 0b 28 08 30 30 00 ff ff ff ff  >....@..(.00.....<
+000030 ff ff c4 01 01 03 7a 00 01 37                    >......z..7<
+00003a
+000000 55 ab 23 87 47 00 0c 00 10 02 80 92 04 50 c5 ea  >U.#.G........P..<
+000010 19 e1 1b fd af 5f 01 a4 0b be 01 02 1a 19 bb 01  >....._..........<
+000020 01 3d c0 01 04 20 00 b0 00 00 10 0b ff ff 04 5d  >.=... .........]<
+000030 00 03 00 ff ff ff ff 40 10 0b 28 08 30 30 00 ff  >.......@..(.00..<
+000040 ff ff ff ff ff c4 01 01 03 7a 00 01 37           >.........z..7<
+00004d
+000000 55 ab 23 87 68 00 0c 00 10 02 80 92 04 50 c5 ea  >U.#.h........P..<
+000010 19 e1 1b fd af 5f 01 a4 0b 27 00 01 63 fe 00 01  >....._...'..c...<
+000020 01 e3 01 01 00 5b 01 04 0b 0b 0b 0b 7a 01 02 1a  >.....[......z...<
+000030 19 df 00 01 02 77 01 01 3d b6 01 04 10 00 60 01  >.....w..=.....`.<
+000040 dc 00 01 08 00 10 0d ff ff 05 5d 00 03 00 01 ff  >..........].....<
+000050 ff ff ff ff 40 10 0b 28 08 30 30 00 ff ff ff ff  >....@..(.00.....<
+000060 ff ff 85 00 01 fa 87 00 01 bf e2 00 01 06        >..............<
+00006e
+448:		uart0 = "/soc/amba/uart@f8b00000";
+449:		uart2 = "/soc/amba/uart@f8b02000";
+450:		uart3 = "/soc/amba/uart@f8b03000";
+827:			uart@f8b00000 {
+838:			uart@f8b02000 {
+849:			uart@f8b03000 {
+894:			iocfg_regmap = <0x13>;
+918:			iocfg_regmap = <0x13>;
+954:		hivendor_iocfg {
+955:			compatible = "hivendor,iocfg_regmap", "syscon";
+1204:		uart0 = "/soc/amba/uart@f8b00000";
+1205:		uart2 = "/soc/amba/uart@f8b02000";
+1206:		uart3 = "/soc/amba/uart@f8b03000";
+1214:		hivendor_iocfg = "/soc/hivendor_iocfg";
+bc-1.07.1
+busybox-1.37.0
+fastfetch-2.71.0
+gcc-14.2.0-nolibc
+linux-6.18.64
+linux-7.2.5
+musl-1.2.5
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:16:#include <linux/serdev.h>
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:64:	/* Must be the first member, hci_serdev.c expects this. */
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:65:	struct hci_uart		serdev_hu;
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:220:	if (hu->serdev) {
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:221:		h5 = serdev_device_get_drvdata(hu->serdev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:269:	if (!hu->serdev)
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:593:	if (hu->serdev) {
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:594:		pm_runtime_get(&hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:595:		pm_runtime_mark_last_busy(&hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:596:		pm_runtime_put_autosuspend(&hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:635:	if (hu->serdev) {
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:636:		pm_runtime_get_sync(&hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:637:		pm_runtime_mark_last_busy(&hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:638:		pm_runtime_put_autosuspend(&hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:819:static int h5_serdev_probe(struct serdev_device *serdev)
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:821:	struct device *dev = &serdev->dev;
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:829:	h5->hu = &h5->serdev_hu;
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:830:	h5->serdev_hu.serdev = serdev;
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:831:	serdev_device_set_drvdata(serdev, h5);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:867:	return hci_uart_register_device_priv(&h5->serdev_hu, &h5p,
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:871:static void h5_serdev_remove(struct serdev_device *serdev)
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:873:	struct h5 *h5 = serdev_device_get_drvdata(serdev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:875:	hci_uart_unregister_device(&h5->serdev_hu);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:878:static int __maybe_unused h5_serdev_suspend(struct device *dev)
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:889:static int __maybe_unused h5_serdev_resume(struct device *dev)
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:934:	serdev_device_set_baudrate(h5->hu->serdev, controller_baudrate);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:935:	serdev_device_set_flow_control(h5->hu->serdev, flow_control);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:965:	serdev_device_set_flow_control(h5->hu->serdev, false);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:966:	serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:967:	serdev_device_set_baudrate(h5->hu->serdev, 115200);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:970:		pm_runtime_set_active(&h5->hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:971:		pm_runtime_use_autosuspend(&h5->hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:972:		pm_runtime_set_autosuspend_delay(&h5->hu->serdev->dev,
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:974:		pm_runtime_enable(&h5->hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:991:		pm_runtime_dont_use_autosuspend(&h5->hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:992:		pm_runtime_disable(&h5->hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1007:	serdev_device_set_flow_control(h5->hu->serdev, false);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1048:		reprobe->dev = get_device(&h5->hu->serdev->dev);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1054:			serdev_device_set_flow_control(h5->hu->serdev, true);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1101:static const struct dev_pm_ops h5_serdev_pm_ops = {
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1102:	SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1103:	SET_RUNTIME_PM_OPS(h5_serdev_suspend, h5_serdev_resume, NULL)
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1121:static struct serdev_device_driver h5_serdev_driver = {
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1122:	.probe = h5_serdev_probe,
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1123:	.remove = h5_serdev_remove,
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1127:		.pm = &h5_serdev_pm_ops,
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1134:	serdev_device_driver_register(&h5_serdev_driver);
+source/linux-6.18.64/drivers/bluetooth/hci_h5.c:1140:	serdev_device_driver_unregister(&h5_serdev_driver);
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:29:#define RTL_ROM_LMP_8761A	0x8761
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:63:	CHIP_ID_8761A,
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:68:	CHIP_ID_8761B,
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:75:	CHIP_ID_8761C = 51,
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:209:	/* 8761A */
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:210:	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:213:	  .fw_name  = "rtl_bt/rtl8761a_fw",
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:214:	  .cfg_name = "rtl_bt/rtl8761a_config",
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:215:	  .hw_info  = "rtl8761au" },
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:217:	/* 8761B */
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:218:	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_UART),
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:222:	  .fw_name  = "rtl_bt/rtl8761b_fw",
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:223:	  .cfg_name = "rtl_bt/rtl8761b_config",
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:224:	  .hw_info  = "rtl8761btv" },
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:226:	/* 8761BU */
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:227:	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_USB),
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:230:	  .fw_name  = "rtl_bt/rtl8761bu_fw",
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:231:	  .cfg_name = "rtl_bt/rtl8761bu_config",
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:232:	  .hw_info  = "rtl8761bu" },
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:234:	/* 8761CU */
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:235:	{ IC_INFO(RTL_ROM_LMP_8761A, 0x0e, 0, HCI_USB),
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:238:	  .fw_name  = "rtl_bt/rtl8761cu_fw",
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:239:	  .cfg_name = "rtl_bt/rtl8761cu_config",
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:240:	  .hw_info  = "rtl8761cu" },
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:661:		{ RTL_ROM_LMP_8761A, 3 },
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:667:		{ RTL_ROM_LMP_8761A, 14 },	/* 8761B */
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:674:		{ RTL_ROM_LMP_8761A, 51 },	/* 8761C */
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1280:	case RTL_ROM_LMP_8761A:
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1319:	case CHIP_ID_8761C:
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1533:MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1534:MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1535:MODULE_FIRMWARE("rtl_bt/rtl8761b_fw.bin");
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1536:MODULE_FIRMWARE("rtl_bt/rtl8761b_config.bin");
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1537:MODULE_FIRMWARE("rtl_bt/rtl8761bu_fw.bin");
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1538:MODULE_FIRMWARE("rtl_bt/rtl8761bu_config.bin");
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1539:MODULE_FIRMWARE("rtl_bt/rtl8761cu_fw.bin");
+source/linux-6.18.64/drivers/bluetooth/btrtl.c:1540:MODULE_FIRMWARE("rtl_bt/rtl8761cu_config.bin");

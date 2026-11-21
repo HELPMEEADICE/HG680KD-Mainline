@@ -1,0 +1,151 @@
+
+# dmesg | grep -Ei "device baudrate|controller baudrate|flow control|RTL:|Too short H5"; cat /proc/interrupts; ls -l /sys/class/bluetooth
+<6>[    1.197838] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
+<6>[    1.203065] Bluetooth: hci0: RTL: rom_version status=0 version=3
+<6>[    1.204855] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_fw.bin
+<6>[    1.206902] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_config.bin
+<6>[    1.230621] Bluetooth: hci0: RTL: cfg_sz 110, total sz 21738
+<6>[    1.896784] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+<6>[   17.855991] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+<6>[  126.125815] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
+<6>[  126.129736] Bluetooth: hci0: RTL: rom_version status=0 version=3
+<6>[  126.129748] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_fw.bin
+<6>[  126.129931] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_config.bin
+<7>[  126.130003] hci0: RTL: skipping config entry 0x27 (len 1)
+<7>[  126.130012] hci0: RTL: skipping config entry 0xfe (len 1)
+<7>[  126.130018] hci0: RTL: skipping config entry 0x1e3 (len 1)
+<7>[  126.130024] hci0: RTL: skipping config entry 0x15b (len 4)
+<7>[  126.130030] hci0: RTL: skipping config entry 0x17a (len 2)
+<7>[  126.130036] hci0: RTL: skipping config entry 0xdf (len 1)
+<7>[  126.130041] hci0: RTL: skipping config entry 0x177 (len 1)
+<7>[  126.130046] hci0: RTL: skipping config entry 0x1b6 (len 4)
+<7>[  126.130052] hci0: RTL: skipping config entry 0xdc (len 1)
+<7>[  126.130057] hci0: RTL: skipping config entry 0x1000 (len 13)
+<7>[  126.130063] hci0: RTL: skipping config entry 0x1040 (len 11)
+<7>[  126.130068] hci0: RTL: skipping config entry 0x85 (len 1)
+<7>[  126.130074] hci0: RTL: skipping config entry 0x87 (len 1)
+<7>[  126.130079] hci0: RTL: skipping config entry 0xe2 (len 1)
+<7>[  126.130084] hci0: RTL: device baudrate = 0x04928002
+<7>[  126.130090] hci0: RTL: controller baudrate = 1500000
+<7>[  126.130096] hci0: RTL: flow control 1
+<6>[  126.150613] Bluetooth: hci0: RTL: cfg_sz 110, total sz 21738
+<7>[  126.150623] hci0: RTL: download fw (0/87). index = 0
+<7>[  126.153372] hci0: RTL: download fw (1/87). index = 1
+<7>[  126.156167] hci0: RTL: download fw (2/87). index = 2
+<7>[  126.158840] hci0: RTL: download fw (3/87). index = 3
+<7>[  126.161531] hci0: RTL: download fw (4/87). index = 4
+<7>[  126.164201] hci0: RTL: download fw (5/87). index = 5
+<7>[  126.166837] hci0: RTL: download fw (6/87). index = 6
+<7>[  126.169489] hci0: RTL: download fw (7/87). index = 7
+<7>[  126.172127] hci0: RTL: download fw (8/87). index = 8
+<7>[  126.174793] hci0: RTL: download fw (9/87). index = 9
+<7>[  126.177331] hci0: RTL: download fw (10/87). index = 10
+<7>[  126.179818] hci0: RTL: download fw (11/87). index = 11
+<7>[  126.182312] hci0: RTL: download fw (12/87). index = 12
+<7>[  126.184889] hci0: RTL: download fw (13/87). index = 13
+<7>[  126.187354] hci0: RTL: download fw (14/87). index = 14
+<7>[  126.189816] hci0: RTL: download fw (15/87). index = 15
+<7>[  126.192301] hci0: RTL: download fw (16/87). index = 16
+<7>[  126.194885] hci0: RTL: download fw (17/87). index = 17
+<7>[  126.197366] hci0: RTL: download fw (18/87). index = 18
+<7>[  126.199858] hci0: RTL: download fw (19/87). index = 19
+<7>[  126.202434] hci0: RTL: download fw (20/87). index = 20
+<7>[  126.204896] hci0: RTL: download fw (21/87). index = 21
+<7>[  126.207369] hci0: RTL: download fw (22/87). index = 22
+<7>[  126.209899] hci0: RTL: download fw (23/87). index = 23
+<7>[  126.212360] hci0: RTL: download fw (24/87). index = 24
+<7>[  126.214869] hci0: RTL: download fw (25/87). index = 25
+<7>[  126.217438] hci0: RTL: download fw (26/87). index = 26
+<7>[  126.219905] hci0: RTL: download fw (27/87). index = 27
+<7>[  126.222363] hci0: RTL: download fw (28/87). index = 28
+<7>[  126.224824] hci0: RTL: download fw (29/87). index = 29
+<7>[  126.227398] hci0: RTL: download fw (30/87). index = 30
+<7>[  126.229869] hci0: RTL: download fw (31/87). index = 31
+<7>[  126.232327] hci0: RTL: download fw (32/87). index = 32
+<7>[  126.234902] hci0: RTL: download fw (33/87). index = 33
+<7>[  126.237393] hci0: RTL: download fw (34/87). index = 34
+<7>[  126.239865] hci0: RTL: download fw (35/87). index = 35
+<7>[  126.242427] hci0: RTL: download fw (36/87). index = 36
+<7>[  126.244896] hci0: RTL: download fw (37/87). index = 37
+<7>[  126.247374] hci0: RTL: download fw (38/87). index = 38
+<7>[  126.249858] hci0: RTL: download fw (39/87). index = 39
+<7>[  126.252428] hci0: RTL: download fw (40/87). index = 40
+<7>[  126.254892] hci0: RTL: download fw (41/87). index = 41
+<7>[  126.257346] hci0: RTL: download fw (42/87). index = 42
+<7>[  126.259929] hci0: RTL: download fw (43/87). index = 43
+<7>[  126.262415] hci0: RTL: download fw (44/87). index = 44
+<7>[  126.264902] hci0: RTL: download fw (45/87). index = 45
+<7>[  126.267376] hci0: RTL: download fw (46/87). index = 46
+<7>[  126.269932] hci0: RTL: download fw (47/87). index = 47
+<7>[  126.272391] hci0: RTL: download fw (48/87). index = 48
+<7>[  126.274849] hci0: RTL: download fw (49/87). index = 49
+<7>[  126.277403] hci0: RTL: download fw (50/87). index = 50
+<7>[  126.279895] hci0: RTL: download fw (51/87). index = 51
+<7>[  126.282357] hci0: RTL: download fw (52/87). index = 52
+<7>[  126.284935] hci0: RTL: download fw (53/87). index = 53
+<7>[  126.287393] hci0: RTL: download fw (54/87). index = 54
+<7>[  126.289864] hci0: RTL: download fw (55/87). index = 55
+<7>[  126.292323] hci0: RTL: download fw (56/87). index = 56
+<7>[  126.294872] hci0: RTL: download fw (57/87). index = 57
+<7>[  126.297320] hci0: RTL: download fw (58/87). index = 58
+<7>[  126.299791] hci0: RTL: download fw (59/87). index = 59
+<7>[  126.302364] hci0: RTL: download fw (60/87). index = 60
+<7>[  126.304834] hci0: RTL: download fw (61/87). index = 61
+<7>[  126.307383] hci0: RTL: download fw (62/87). index = 62
+<7>[  126.309950] hci0: RTL: download fw (63/87). index = 63
+<7>[  126.312438] hci0: RTL: download fw (64/87). index = 64
+<7>[  126.314900] hci0: RTL: download fw (65/87). index = 65
+<7>[  126.317356] hci0: RTL: download fw (66/87). index = 66
+<7>[  126.319935] hci0: RTL: download fw (67/87). index = 67
+<7>[  126.322400] hci0: RTL: download fw (68/87). index = 68
+<7>[  126.324915] hci0: RTL: download fw (69/87). index = 69
+<7>[  126.327453] hci0: RTL: download fw (70/87). index = 70
+<7>[  126.329918] hci0: RTL: download fw (71/87). index = 71
+<7>[  126.332377] hci0: RTL: download fw (72/87). index = 72
+<7>[  126.334864] hci0: RTL: download fw (73/87). index = 73
+<7>[  126.337430] hci0: RTL: download fw (74/87). index = 74
+<7>[  126.339871] hci0: RTL: download fw (75/87). index = 75
+<7>[  126.342353] hci0: RTL: download fw (76/87). index = 76
+<7>[  126.344911] hci0: RTL: download fw (77/87). index = 77
+<7>[  126.347399] hci0: RTL: download fw (78/87). index = 78
+<7>[  126.349869] hci0: RTL: download fw (79/87). index = 79
+<7>[  126.352417] hci0: RTL: download fw (80/87). index = 80
+<7>[  126.354932] hci0: RTL: download fw (81/87). index = 81
+<7>[  126.357407] hci0: RTL: download fw (82/87). index = 82
+<7>[  126.359847] hci0: RTL: download fw (83/87). index = 83
+<7>[  126.362499] hci0: RTL: download fw (84/87). index = 84
+<7>[  126.365020] hci0: RTL: download fw (85/87). index = 85
+<7>[  126.367510] hci0: RTL: download fw (86/87). index = 214
+<6>[  126.808232] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+<7>[  126.826543] hci0: RTL: Central-peripheral role not enabled.
+<7>[  126.826552] hci0: RTL: WBS supported not enabled.
+           CPU0       CPU1       CPU2       CPU3       
+ 11:      43551      44124      43456      43442    GICv3  27 Level     arch_timer
+ 13:       1375          0          0          0    GICv3  81 Level     uart-pl011
+ 14:       6364          0          0          0    GICv3  83 Level     uart-pl011
+ 16:          4          0          0          0    GICv3 126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+ 17:       1154          0          0          0    GICv3 112 Level     f9840000.ethernet
+ 18:        592          0          0          0    GICv3  96 Level     xhci-hcd:usb1
+ 19:        235          0          0          0    GICv3  67 Level     mmc0
+IPI0:        17         34         21         71       Rescheduling interrupts
+IPI1:       450       1454        289       1209       Function call interrupts
+IPI2:         0          0          0          0       CPU stop interrupts
+IPI3:         0          0          0          0       CPU stop NMIs
+IPI4:         0          0          0          0       Timer broadcast interrupts
+IPI5:         0          0          0          0       IRQ work interrupts
+IPI6:         0          0          0          0       CPU backtrace interrupts
+IPI7:         0          0          0          0       KGDB roundup interrupts
+Err:          0
+lrwxrwxrwx    1         0 hci0 -> ../../devices/platform/soc/f8b02000.serial/f8b02000.serial:0/f8b02000.serial:0.0/serial0/serial0-0/bluetooth/hci0
+# 
+[host] shell command elapsed: 0.81 s
+ls /sys/bus/serial/drivers/hci_uart_h5; cat /sys/class/net/eth0/speed /sys/class/net/eth0/duplex; bt-test; echo BT_INFO_EXIT=$?; cat /sys/block/mmcblk0/ro
+unbind     bind       serial0-0  uevent
+100
+full
+hci0: HCI 0x09 rev 0x1ed6, LMP 0x09 subver 0xb420, manufacturer 0x005d
+hci0: controller BD_ADDR 00:E0:4C:23:99:87
+BT_INFO_EXIT=0
+1
+# 
+[host] shell command elapsed: 0.05 s
