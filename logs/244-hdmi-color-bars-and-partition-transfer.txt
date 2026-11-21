@@ -1,0 +1,20 @@
+
+[  227.963494] ttyAMA ttyAMA0: 1 input overrun(s)
+PING 192.1 (192.0.0.1): 56 data bytes
+ping: sendto: Network unreachable
+# wget -q -O /tmp/sendbin http://192.168.6.160:18081/sendbin
+# 
+[host] shell command elapsed: 0.03 s
+wget -q -O /tmp/fb-test http://192.168.6.160:18081/fb-test
+# 
+[host] shell command elapsed: 0.01 s
+chmod 700 /tmp/sendbin /tmp/fb-test
+# 
+[host] shell command elapsed: 0.02 s
+/tmp/fb-test
+fbdev color bars: 1920x1080, pitch 7680, 1080 rows read back
+# 
+[host] shell command elapsed: 0.05 s
+case $(cat /sys/block/mmcblk0/ro) in 1) ( /tmp/sendbin 192.168.6.160 18082 /dev/mmcblk0 0x8a400000 419430400 && /tmp/sendbin 192.168.6.160 18082 /dev/mmcblk0 0x0d400000 1258291200 ) & ;; esac
+# 
+[host] shell command elapsed: 0.03 s

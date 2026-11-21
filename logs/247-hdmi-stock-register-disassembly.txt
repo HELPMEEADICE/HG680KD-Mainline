@@ -1,0 +1,587 @@
+
+ vdp_fdr_gfx_set_ifmt 0xc05fbbd0 0xc05fbc3c
+c05fbbd0: push    {r4, r5, r6, r7, r8, lr}
+c05fbbd4: sub     sp, sp, #8
+c05fbbd8: ldr     r4, [pc, #0x58] ; = 0xc1715548 __stack_chk_guard
+c05fbbdc: mov     r8, r1
+c05fbbe0: mov     r5, r0
+c05fbbe4: movw    r7, #0x8a40
+c05fbbe8: ldr     r3, [r4]
+c05fbbec: str     r3, [sp, #4]
+c05fbbf0: bl      #0xc05f0170 ; get_vdp_reg
+c05fbbf4: add     r0, r0, r7
+c05fbbf8: add     r0, r0, r5
+c05fbbfc: bl      #0xc05f021c ; vdp_reg_read
+c05fbc00: mov     r6, r0
+c05fbc04: bl      #0xc05f0170 ; get_vdp_reg
+c05fbc08: bfi     r6, r8, #0, #8
+c05fbc0c: ldr     r2, [sp, #4]
+c05fbc10: ldr     r3, [r4]
+c05fbc14: cmp     r2, r3
+c05fbc18: bne     #0xc05fbc34 ; 
+c05fbc1c: add     r0, r0, r7
+c05fbc20: mov     r1, r6
+c05fbc24: add     r0, r0, r5
+c05fbc28: add     sp, sp, #8
+c05fbc2c: pop     {r4, r5, r6, r7, r8, lr}
+c05fbc30: b       #0xc05f027c ; vdp_reg_write
+c05fbc34: bl      #0xc01226b8 ; __stack_chk_fail
+c05fbc38: cmngt   r1, r8, asr #10
+
+ DRV_GFBG_HAL_GFX_GetWorkLayerAddr 0xc066c15c 0xc066c1c0
+c066c15c: cmp     r0, #1
+c066c160: push    {r4, r5, lr}
+c066c164: mov     r4, r0
+c066c168: sub     sp, sp, #0xc
+c066c16c: mov     r5, r1
+c066c170: bhi     #0xc066c1a0 ; 
+c066c174: ldr     r3, [pc, #0x40] ; = 0xc1a3f5c0 g_optm_vdp_reg
+c066c178: movw    r2, #0x8b38
+c066c17c: cmp     r5, #0
+c066c180: ldr     r3, [r3]
+c066c184: add     r4, r3, r4, lsl #9
+c066c188: ldr     r3, [r4, r2]
+c066c18c: str     r3, [sp, #4]
+c066c190: ldrne   r3, [sp, #4]
+c066c194: strne   r3, [r5]
+c066c198: add     sp, sp, #0xc
+c066c19c: pop     {r4, r5, pc}
+c066c1a0: mov     r1, r0
+c066c1a4: mov     r0, #0xc3
+c066c1a8: bl      #0xc066bdf0 ; GFBG_HAL_CheckLayerId.part.0
+c066c1ac: cmp     r0, #0
+c066c1b0: beq     #0xc066c174 ; 
+c066c1b4: add     sp, sp, #0xc
+c066c1b8: pop     {r4, r5, pc}
+
+ DRV_GFBG_HAL_GFX_GetLayerStride 0xc066cb1c 0xc066cb88
+c066cb1c: cmp     r0, #1
+c066cb20: push    {r4, r5, lr}
+c066cb24: mov     r4, r0
+c066cb28: sub     sp, sp, #0xc
+c066cb2c: mov     r5, r1
+c066cb30: bhi     #0xc066cb68 ; 
+c066cb34: ldr     r3, [pc, #0x48] ; = 0xc1a3f5c0 g_optm_vdp_reg
+c066cb38: movw    r2, #0x8a60
+c066cb3c: cmp     r5, #0
+c066cb40: ldr     r3, [r3]
+c066cb44: add     r4, r3, r4, lsl #9
+c066cb48: ldr     r3, [r4, r2]
+c066cb4c: str     r3, [sp, #4]
+c066cb50: ldrne   r3, [sp, #4]
+c066cb54: uxthne  r3, r3
+c066cb58: lslne   r3, r3, #4
+c066cb5c: strne   r3, [r5]
+c066cb60: add     sp, sp, #0xc
+c066cb64: pop     {r4, r5, pc}
+c066cb68: mov     r1, r0
+c066cb6c: movw    r0, #0x2e9
+c066cb70: bl      #0xc066bdf0 ; GFBG_HAL_CheckLayerId.part.0
+c066cb74: cmp     r0, #0
+c066cb78: beq     #0xc066cb34 ; 
+c066cb7c: add     sp, sp, #0xc
+c066cb80: pop     {r4, r5, pc}
+
+ hdmi_tx_aon_regs_init 0xc0842640 0xc08426e0
+c0842640: push    {r4, r5, lr}
+c0842644: sub     sp, sp, #0x14
+c0842648: ldr     r5, [pc, #0x7c] ; = 0xc1ab9878 g_tx_aon_all_reg
+c084264c: ldr     r4, [pc, #0x7c] ; = 0xc1715548 __stack_chk_guard
+c0842650: ldr     r2, [r5]
+c0842654: ldr     r3, [r4]
+c0842658: cmp     r2, #0
+c084265c: str     r3, [sp, #0xc]
+c0842660: beq     #0xc0842680 ; 
+c0842664: mov     r0, #0
+c0842668: ldr     r2, [sp, #0xc]
+c084266c: ldr     r3, [r4]
+c0842670: cmp     r2, r3
+c0842674: bne     #0xc08426c8 ; 
+c0842678: add     sp, sp, #0x14
+c084267c: pop     {r4, r5, pc}
+c0842680: mov     r0, #0x4000
+c0842684: mov     r1, #0x64
+c0842688: movt    r0, #0xf8ce
+c084268c: bl      #0xc01190fc ; ioremap
+c0842690: cmp     r0, #0
+c0842694: str     r0, [r5]
+c0842698: bne     #0xc0842664 ; 
+c084269c: ldr     r0, [pc, #0x30] ; = 0xc13dcd94 
+c08426a0: mov     r3, #0x17
+c08426a4: ldr     ip, [pc, #0x2c] ; = 0xc13dcda8 
+c08426a8: mov     r1, #0x23
+c08426ac: ldr     r2, [pc, #0x28] ; = 0xc10b8290 __FUNCTION__.51752
+c08426b0: str     r0, [sp, #4]
+c08426b4: mov     r0, #2
+c08426b8: str     ip, [sp]
+c08426bc: bl      #0xc055bb40 ; HI_LogOut
+c08426c0: mvn     r0, #0
+c08426c4: b       #0xc0842668 ; 
+c08426c8: bl      #0xc01226b8 ; __stack_chk_fail
+
+ hdmi_tx_ctrl_regs_init 0xc08460a0 0xc0846140
+c08460a0: push    {r4, r5, lr}
+c08460a4: sub     sp, sp, #0x14
+c08460a8: ldr     r5, [pc, #0x7c] ; = 0xc1ab9880 g_tx_ctrl_all_reg
+c08460ac: ldr     r4, [pc, #0x7c] ; = 0xc1715548 __stack_chk_guard
+c08460b0: ldr     r2, [r5]
+c08460b4: ldr     r3, [r4]
+c08460b8: cmp     r2, #0
+c08460bc: str     r3, [sp, #0xc]
+c08460c0: beq     #0xc08460e0 ; 
+c08460c4: mov     r0, #0
+c08460c8: ldr     r2, [sp, #0xc]
+c08460cc: ldr     r3, [r4]
+c08460d0: cmp     r2, r3
+c08460d4: bne     #0xc0846128 ; 
+c08460d8: add     sp, sp, #0x14
+c08460dc: pop     {r4, r5, pc}
+c08460e0: mov     r0, #0
+c08460e4: mov     r1, #0x134
+c08460e8: movt    r0, #0xf8ce
+c08460ec: bl      #0xc01190fc ; ioremap
+c08460f0: cmp     r0, #0
+c08460f4: str     r0, [r5]
+c08460f8: bne     #0xc08460c4 ; 
+c08460fc: ldr     r0, [pc, #0x30] ; = 0xc13dcdd8 
+c0846100: mov     r3, #0x18
+c0846104: ldr     ip, [pc, #0x2c] ; = 0xc13dcda8 
+c0846108: mov     r1, #0x23
+c084610c: ldr     r2, [pc, #0x28] ; = 0xc10b82c4 __FUNCTION__.52048
+c0846110: str     r0, [sp, #4]
+c0846114: mov     r0, #2
+c0846118: str     ip, [sp]
+c084611c: bl      #0xc055bb40 ; HI_LogOut
+c0846120: mvn     r0, #0
+c0846124: b       #0xc08460c8 ; 
+c0846128: bl      #0xc01226b8 ; __stack_chk_fail
+
+ hdmi_phy_regs_init 0xc086bd9c 0xc086be3c
+c086bd9c: push    {r4, r5, lr}
+c086bda0: sub     sp, sp, #0x14
+c086bda4: ldr     r5, [pc, #0x7c] ; = 0xc1ac39bc g_hdmi2tx_dphy_all_reg
+c086bda8: ldr     r4, [pc, #0x7c] ; = 0xc1715548 __stack_chk_guard
+c086bdac: ldr     r2, [r5]
+c086bdb0: ldr     r3, [r4]
+c086bdb4: cmp     r2, #0
+c086bdb8: str     r3, [sp, #0xc]
+c086bdbc: beq     #0xc086bddc ; 
+c086bdc0: mov     r0, #0
+c086bdc4: ldr     r2, [sp, #0xc]
+c086bdc8: ldr     r3, [r4]
+c086bdcc: cmp     r2, r3
+c086bdd0: bne     #0xc086be24 ; 
+c086bdd4: add     sp, sp, #0x14
+c086bdd8: pop     {r4, r5, pc}
+c086bddc: mov     r0, #0
+c086bde0: mov     r1, #0xc0
+c086bde4: movt    r0, #0xf8d3
+c086bde8: bl      #0xc01190fc ; ioremap
+c086bdec: cmp     r0, #0
+c086bdf0: str     r0, [r5]
+c086bdf4: bne     #0xc086bdc0 ; 
+c086bdf8: ldr     r0, [pc, #0x30] ; = 0xc13df3c8 
+c086bdfc: mov     r3, #0x18
+c086be00: ldr     ip, [pc, #0x2c] ; = 0xc13dcda8 
+c086be04: mov     r1, #0x23
+c086be08: ldr     r2, [pc, #0x28] ; = 0xc10ba284 __FUNCTION__.52333
+c086be0c: str     r0, [sp, #4]
+c086be10: mov     r0, #2
+c086be14: str     ip, [sp]
+c086be18: bl      #0xc055bb40 ; HI_LogOut
+c086be1c: mvn     r0, #0
+c086be20: b       #0xc086bdc4 ; 
+c086be24: bl      #0xc01226b8 ; __stack_chk_fail
+c086be28: strhgt  r3, [ip, ip]!
+c086be2c: cmngt   r1, r8, asr #10
+c086be30: teqgt   sp, r8, asr #7
+c086be34: teqgt   sp, r8, lsr #27
+c086be38: smlabbgt fp, r4, r2, sl
+
+ hdmi_reg_hotplug_state_get 0xc08429d0 0xc0842a1c
+c08429d0: push    {r4, lr}
+c08429d4: sub     sp, sp, #8
+c08429d8: ldr     r2, [pc, #0x34] ; = 0xc1ab9878 g_tx_aon_all_reg
+c08429dc: ldr     r4, [pc, #0x34] ; = 0xc1715548 __stack_chk_guard
+c08429e0: ldr     r0, [r2]
+c08429e4: ldr     r3, [r4]
+c08429e8: add     r0, r0, #0x28
+c08429ec: str     r3, [sp, #4]
+c08429f0: bl      #0xc086f7b8 ; hdmi_reg_read
+c08429f4: ldr     r2, [sp, #4]
+c08429f8: ldr     r3, [r4]
+c08429fc: cmp     r2, r3
+c0842a00: bne     #0xc0842a10 ; 
+c0842a04: and     r0, r0, #1
+c0842a08: add     sp, sp, #8
+c0842a0c: pop     {r4, pc}
+c0842a10: bl      #0xc01226b8 ; __stack_chk_fail
+
+ hdmi_reg_l_avi_pkt0_pb_get 0xc084b018 0xc084b080
+c084b018: push    {r4, r5, lr}
+c084b01c: mov     r4, r0
+c084b020: ldr     r2, [pc, #0x50] ; = 0xc1ab9884 g_tx_hdmi_all_reg
+c084b024: sub     sp, sp, #0xc
+c084b028: ldr     r5, [pc, #0x4c] ; = 0xc1715548 __stack_chk_guard
+c084b02c: ldr     r0, [r2]
+c084b030: ldr     r3, [r5]
+c084b034: add     r0, r0, #0x1c
+c084b038: str     r3, [sp, #4]
+c084b03c: bl      #0xc086f7b8 ; hdmi_reg_read
+c084b040: ubfx    r3, r0, #0x10, #8
+c084b044: ldr     r2, [sp, #4]
+c084b048: ubfx    r1, r0, #0x18, #8
+c084b04c: strb    r0, [r4]
+c084b050: strb    r1, [r4, #3]
+c084b054: ubfx    r0, r0, #8, #8
+c084b058: strb    r3, [r4, #2]
+c084b05c: strb    r0, [r4, #1]
+c084b060: ldr     r3, [r5]
+c084b064: cmp     r2, r3
+c084b068: bne     #0xc084b074 ; 
+c084b06c: add     sp, sp, #0xc
+c084b070: pop     {r4, r5, pc}
+c084b074: bl      #0xc01226b8 ; __stack_chk_fail
+
+ hdmi_reg_h_avi_pkt0_pb_get 0xc084b080 0xc084b0e0
+c084b080: push    {r4, r5, lr}
+c084b084: mov     r4, r0
+c084b088: ldr     r2, [pc, #0x48] ; = 0xc1ab9884 g_tx_hdmi_all_reg
+c084b08c: sub     sp, sp, #0xc
+c084b090: ldr     r5, [pc, #0x44] ; = 0xc1715548 __stack_chk_guard
+c084b094: ldr     r0, [r2]
+c084b098: ldr     r3, [r5]
+c084b09c: add     r0, r0, #0x20
+c084b0a0: str     r3, [sp, #4]
+c084b0a4: bl      #0xc086f7b8 ; hdmi_reg_read
+c084b0a8: ubfx    r3, r0, #0x10, #8
+c084b0ac: ldr     r2, [sp, #4]
+c084b0b0: strb    r0, [r4]
+c084b0b4: ubfx    r0, r0, #8, #8
+c084b0b8: strb    r3, [r4, #2]
+c084b0bc: strb    r0, [r4, #1]
+c084b0c0: ldr     r3, [r5]
+c084b0c4: cmp     r2, r3
+c084b0c8: bne     #0xc084b0d4 ; 
+c084b0cc: add     sp, sp, #0xc
+c084b0d0: pop     {r4, r5, pc}
+c084b0d4: bl      #0xc01226b8 ; __stack_chk_fail
+
+ drv_hdmi_prod_crg_init 0xc0870128 0xc0870210
+c0870128: push    {r4, lr}
+c087012c: sub     sp, sp, #0x10
+c0870130: ldr     r4, [pc, #0xc8] ; = 0xc1715548 __stack_chk_guard
+c0870134: ldr     r3, [r4]
+c0870138: str     r3, [sp, #0xc]
+c087013c: bl      #0xc086e820 ; hdmi_reg_phy_tmds_cken_get
+c0870140: cmp     r0, #0
+c0870144: beq     #0xc0870154 ; 
+c0870148: bl      #0xc086e0bc ; hdmi_reg_ssc_in_cken_get
+c087014c: cmp     r0, #0
+c0870150: bne     #0xc08701e4 ; 
+c0870154: bl      #0xc086fe18 ; drv_hdmi_prod_io_cfg_set
+c0870158: mov     r0, #1
+c087015c: bl      #0xc086ff88 ; drv_hdmi_prod_crg_gate_set
+c0870160: mov     r0, #1
+c0870164: bl      #0xc0870040 ; drv_hdmi_prod_crg_all_reset_set
+c0870168: movw    r0, #0x4808
+c087016c: movt    r0, #0xf8ce
+c0870170: bl      #0xc086f884 ; hdmi_reg_read_map
+c0870174: orr     r1, r0, #0x40000
+c0870178: movw    r0, #0x4808
+c087017c: orr     r1, r1, #0x200
+c0870180: movt    r0, #0xf8ce
+c0870184: bl      #0xc086f7f0 ; hdmi_reg_write_map
+c0870188: mov     r1, #0
+c087018c: mov     r0, #0x850
+c0870190: movt    r0, #0xf8ce
+c0870194: bl      #0xc086f7f0 ; hdmi_reg_write_map
+c0870198: bl      #0xc0853a9c ; hdmi_reg_tpg_enable_get
+c087019c: cmp     r0, #0
+c08701a0: beq     #0xc08701d8 ; 
+c08701a4: ldr     ip, [pc, #0x58] ; = 0xc13df498 
+c08701a8: movw    r3, #0x1b1
+c08701ac: ldr     r2, [pc, #0x54] ; = 0xc10ba38c __FUNCTION__.53197
+c08701b0: mov     r1, #0x23
+c08701b4: mov     r0, #3
+c08701b8: str     ip, [sp]
+c08701bc: bl      #0xc055bb40 ; HI_LogOut
+c08701c0: ldr     r2, [sp, #0xc]
+c08701c4: ldr     r3, [r4]
+c08701c8: cmp     r2, r3
+c08701cc: bne     #0xc08701fc ; 
+c08701d0: add     sp, sp, #0x10
+c08701d4: pop     {r4, pc}
+c08701d8: mov     r0, #1
+c08701dc: bl      #0xc0853a3c ; hdmi_reg_tpg_enable_set
+c08701e0: b       #0xc08701a4 ; 
+c08701e4: bl      #0xc086e418 ; hdmi_reg_hdmitx_ctrl_bus_srst_req_get
+c08701e8: cmp     r0, #0
+c08701ec: ldreq   ip, [pc, #0x18] ; = 0xc13df480 
+c08701f0: moveq   r3, #0x1a0
+c08701f4: bne     #0xc0870154 ; 
+c08701f8: b       #0xc08701ac ; 
+c08701fc: bl      #0xc01226b8 ; __stack_chk_fail
+c0870200: cmngt   r1, r8, asr #10
+			interrupts = <0x00 0x1d 0x04 0x00 0x24 0x04 0x00 0x25 0x04 0x00 0x2f 0x04 0x00 0x2f 0x04 0x00 0x30 0x04 0x00 0x30 0x04 0x00 0x47 0x04 0x00 0x4b 0x04 0x00 0x52 0x04 0x00 0x54 0x04 0x00 0x58 0x04 0x00 0x5a 0x04 0x00 0x5b 0x04 0x00 0x5b 0x04 0x00 0x5d 0x04 0x00 0x5e 0x04 0x00 0x5f 0x04 0x00 0x5f 0x04 0x00 0x60 0x04 0x00 0x61 0x04 0x00 0x65 0x04 0x00 0x66 0x04 0x00 0x68 0x04 0x00 0x69 0x04 0x00 0x6a 0x04 0x00 0x7e 0x04 0x00 0x88 0x04 0x00 0x89 0x04 0x00 0x8a 0x04 0x00 0x8b 0x04 0x00 0x92 0x04 0x00 0x93 0x04 0x00 0x94 0x04 0x00 0x94 0x04 0x00 0x95 0x04 0x00 0x96 0x04 0x00 0x9d 0x04>;
+			interrupt-names = "wdg0", "sci0", "sci1", "ir_std", "ir_s2", "keyled_ct1642", "keyled_std", "gsf0", "spacc_int_ree", "dmx", "aiao", "hdmi", "vdp", "tde", "gfx2d", "vpss0", "gpu", "vdec_vdh", "mdma_irq", "png", "jpeg", "venc", "jpge", "vdec_scd", "vdec_vdh_safe", "vdec_scd_safe", "spacc_int_tee", "vdh_pxp_safe", "vdh_pxp", "vdh_bd_safe", "vdh_bd", "SecInvokeirq", "hdmi_cec", "mmu_vdh_safe", "mmu_vdh_s", "mmu_vdh", "pastc", "sm2";
+52083ae85db4a9dadfb8f0350322f8ee2fe5f5d1729569a27cf91fbede966f20  out/hg680kd-arm64-all-2g-hdmi.img
+total 1.6G
+-rw-r--r-- 1 hedc hedc 4.0K Nov 21 22:24 system.head
+-rw-r--r-- 1 hedc hedc 1.2G Nov 21 22:33 system.img
+-rw-r--r-- 1 hedc hedc 4.0K Nov 21 22:24 vendor.head
+-rw-r--r-- 1 hedc hedc 400M Nov 21 22:31 vendor.img
+
+ vdp_disp_set_int_mask 0xc05ef1f4 0xc05ef24c
+c05ef1f4: push    {r4, r5, lr}
+c05ef1f8: sub     sp, sp, #0xc
+c05ef1fc: ldr     r5, [pc, #0x44] ; = 0xc1715548 __stack_chk_guard
+c05ef200: mov     r4, r0
+c05ef204: ldr     r3, [r5]
+c05ef208: str     r3, [sp, #4]
+c05ef20c: bl      #0xc05f0170 ; get_vdp_reg
+c05ef210: add     r0, r0, #0xc
+c05ef214: bl      #0xc05f021c ; vdp_reg_read
+c05ef218: orr     r4, r0, r4
+c05ef21c: bl      #0xc05f0170 ; get_vdp_reg
+c05ef220: ldr     r2, [sp, #4]
+c05ef224: ldr     r3, [r5]
+c05ef228: cmp     r2, r3
+c05ef22c: bne     #0xc05ef244 ; 
+c05ef230: mov     r1, r4
+c05ef234: add     r0, r0, #0xc
+c05ef238: add     sp, sp, #0xc
+c05ef23c: pop     {r4, r5, lr}
+c05ef240: b       #0xc05f027c ; vdp_reg_write
+c05ef244: bl      #0xc01226b8 ; __stack_chk_fail
+c05ef248: cmngt   r1, r8, asr #10
+
+ vdp_disp_get_int_sta 0xc05ef82c 0xc05ef874
+c05ef82c: push    {r4, r5, lr}
+c05ef830: sub     sp, sp, #0xc
+c05ef834: ldr     r4, [pc, #0x34] ; = 0xc1715548 __stack_chk_guard
+c05ef838: mov     r5, r0
+c05ef83c: ldr     r3, [r4]
+c05ef840: str     r3, [sp, #4]
+c05ef844: bl      #0xc05f0170 ; get_vdp_reg
+c05ef848: add     r0, r0, #4
+c05ef84c: bl      #0xc05f021c ; vdp_reg_read
+c05ef850: ldr     r2, [sp, #4]
+c05ef854: and     r0, r0, r5
+c05ef858: ldr     r3, [r4]
+c05ef85c: cmp     r2, r3
+c05ef860: bne     #0xc05ef86c ; 
+c05ef864: add     sp, sp, #0xc
+c05ef868: pop     {r4, r5, pc}
+c05ef86c: bl      #0xc01226b8 ; __stack_chk_fail
+c05ef870: cmngt   r1, r8, asr #10
+
+ vdp_disp_clear_int_sta 0xc05ef874 0xc05ef8bc
+c05ef874: push    {r4, r5, lr}
+c05ef878: sub     sp, sp, #0xc
+c05ef87c: ldr     r4, [pc, #0x34] ; = 0xc1715548 __stack_chk_guard
+c05ef880: mov     r5, r0
+c05ef884: ldr     r3, [r4]
+c05ef888: str     r3, [sp, #4]
+c05ef88c: bl      #0xc05f0170 ; get_vdp_reg
+c05ef890: ldr     r2, [sp, #4]
+c05ef894: ldr     r3, [r4]
+c05ef898: cmp     r2, r3
+c05ef89c: bne     #0xc05ef8b4 ; 
+c05ef8a0: mov     r1, r5
+c05ef8a4: add     r0, r0, #8
+c05ef8a8: add     sp, sp, #0xc
+c05ef8ac: pop     {r4, r5, lr}
+c05ef8b0: b       #0xc05f027c ; vdp_reg_write
+c05ef8b4: bl      #0xc01226b8 ; __stack_chk_fail
+c05ef8b8: cmngt   r1, r8, asr #10
+
+ vdp_gfx_set_layer_enable 0xc05f0d08 0xc05f0d80
+c05f0d08: push    {r4, r5, r6, r7, r8, lr}
+c05f0d0c: sub     sp, sp, #8
+c05f0d10: ldr     r6, [pc, #0x64] ; = 0xc1715548 __stack_chk_guard
+c05f0d14: mov     r5, r1
+c05f0d18: mov     r4, r0
+c05f0d1c: lsl     r7, r0, #0xb
+c05f0d20: sub     r4, r4, #3
+c05f0d24: ldr     r3, [r6]
+c05f0d28: str     r3, [sp, #4]
+c05f0d2c: bl      #0xc05f0170 ; get_vdp_reg
+c05f0d30: add     r0, r0, #0x5000
+c05f0d34: add     r0, r0, r7
+c05f0d38: bl      #0xc05f021c ; vdp_reg_read
+c05f0d3c: cmp     r4, #1
+c05f0d40: movls   r5, #0
+c05f0d44: mov     r8, r0
+c05f0d48: bl      #0xc05f0170 ; get_vdp_reg
+c05f0d4c: bfi     r8, r5, #0x1f, #1
+c05f0d50: ldr     r2, [sp, #4]
+c05f0d54: ldr     r3, [r6]
+c05f0d58: cmp     r2, r3
+c05f0d5c: bne     #0xc05f0d78 ; 
+c05f0d60: add     r0, r0, #0x5000
+c05f0d64: mov     r1, r8
+c05f0d68: add     r0, r0, r7
+c05f0d6c: add     sp, sp, #8
+c05f0d70: pop     {r4, r5, r6, r7, r8, lr}
+c05f0d74: b       #0xc05f027c ; vdp_reg_write
+c05f0d78: bl      #0xc01226b8 ; __stack_chk_fail
+c05f0d7c: cmngt   r1, r8, asr #10
+
+ vdp_gfx_set_layer_enable 0xc05f0d08 0xc05f0d80
+c05f0d08: push    {r4, r5, r6, r7, r8, lr}
+c05f0d0c: sub     sp, sp, #8
+c05f0d10: ldr     r6, [pc, #0x64] ; = 0xc1715548 __stack_chk_guard
+c05f0d14: mov     r5, r1
+c05f0d18: mov     r4, r0
+c05f0d1c: lsl     r7, r0, #0xb
+c05f0d20: sub     r4, r4, #3
+c05f0d24: ldr     r3, [r6]
+c05f0d28: str     r3, [sp, #4]
+c05f0d2c: bl      #0xc05f0170 ; get_vdp_reg
+c05f0d30: add     r0, r0, #0x5000
+c05f0d34: add     r0, r0, r7
+c05f0d38: bl      #0xc05f021c ; vdp_reg_read
+c05f0d3c: cmp     r4, #1
+c05f0d40: movls   r5, #0
+c05f0d44: mov     r8, r0
+c05f0d48: bl      #0xc05f0170 ; get_vdp_reg
+c05f0d4c: bfi     r8, r5, #0x1f, #1
+c05f0d50: ldr     r2, [sp, #4]
+c05f0d54: ldr     r3, [r6]
+c05f0d58: cmp     r2, r3
+c05f0d5c: bne     #0xc05f0d78 ; 
+c05f0d60: add     r0, r0, #0x5000
+c05f0d64: mov     r1, r8
+c05f0d68: add     r0, r0, r7
+c05f0d6c: add     sp, sp, #8
+c05f0d70: pop     {r4, r5, r6, r7, r8, lr}
+c05f0d74: b       #0xc05f027c ; vdp_reg_write
+c05f0d78: bl      #0xc01226b8 ; __stack_chk_fail
+c05f0d7c: cmngt   r1, r8, asr #10
+
+ vdp_gfx_set_reg_up 0xc05f1300 0xc05f1354
+c05f1300: push    {r4, r5, r6, lr}
+c05f1304: sub     sp, sp, #8
+c05f1308: ldr     r4, [pc, #0x40] ; = 0xc1715548 __stack_chk_guard
+c05f130c: mov     r5, r0
+c05f1310: ldr     r3, [r4]
+c05f1314: str     r3, [sp, #4]
+c05f1318: bl      #0xc05f0170 ; get_vdp_reg
+c05f131c: ldr     r2, [sp, #4]
+c05f1320: ldr     r3, [r4]
+c05f1324: cmp     r2, r3
+c05f1328: bne     #0xc05f134c ; 
+c05f132c: add     r0, r0, #0x5000
+c05f1330: mov     r6, #1
+c05f1334: add     r0, r0, #4
+c05f1338: mov     r1, r6
+c05f133c: add     r0, r0, r5, lsl #11
+c05f1340: add     sp, sp, #8
+c05f1344: pop     {r4, r5, r6, lr}
+c05f1348: b       #0xc05f027c ; vdp_reg_write
+c05f134c: bl      #0xc01226b8 ; __stack_chk_fail
+c05f1350: cmngt   r1, r8, asr #10
+
+ vdp_gfx_set_upd_mode 0xc05f1298 0xc05f1300
+c05f1298: push    {r4, r5, r6, r7, lr}
+c05f129c: sub     sp, sp, #0xc
+c05f12a0: ldr     r5, [pc, #0x54] ; = 0xc1715548 __stack_chk_guard
+c05f12a4: mov     r7, r1
+c05f12a8: lsl     r4, r0, #0xb
+c05f12ac: ldr     r3, [r5]
+c05f12b0: str     r3, [sp, #4]
+c05f12b4: bl      #0xc05f0170 ; get_vdp_reg
+c05f12b8: add     r0, r0, #0x5000
+c05f12bc: add     r0, r0, r4
+c05f12c0: bl      #0xc05f021c ; vdp_reg_read
+c05f12c4: mov     r6, r0
+c05f12c8: bl      #0xc05f0170 ; get_vdp_reg
+c05f12cc: bfi     r6, r7, #0x1d, #1
+c05f12d0: ldr     r2, [sp, #4]
+c05f12d4: ldr     r3, [r5]
+c05f12d8: cmp     r2, r3
+c05f12dc: bne     #0xc05f12f8 ; 
+c05f12e0: add     r0, r0, #0x5000
+c05f12e4: mov     r1, r6
+c05f12e8: add     r0, r0, r4
+c05f12ec: add     sp, sp, #0xc
+c05f12f0: pop     {r4, r5, r6, r7, lr}
+c05f12f4: b       #0xc05f027c ; vdp_reg_write
+c05f12f8: bl      #0xc01226b8 ; __stack_chk_fail
+c05f12fc: cmngt   r1, r8, asr #10
+
+ vdp_fdr_gfx_set_smmu_bypass2d 0xc05fb880 0xc05fb8ec
+c05fb880: push    {r4, r5, r6, r7, r8, lr}
+c05fb884: sub     sp, sp, #8
+c05fb888: ldr     r4, [pc, #0x58] ; = 0xc1715548 __stack_chk_guard
+c05fb88c: mov     r8, r1
+c05fb890: mov     r5, r0
+c05fb894: movw    r7, #0x8a20
+c05fb898: ldr     r3, [r4]
+c05fb89c: str     r3, [sp, #4]
+c05fb8a0: bl      #0xc05f0170 ; get_vdp_reg
+c05fb8a4: add     r0, r0, r7
+c05fb8a8: add     r0, r0, r5
+c05fb8ac: bl      #0xc05f021c ; vdp_reg_read
+c05fb8b0: mov     r6, r0
+c05fb8b4: bl      #0xc05f0170 ; get_vdp_reg
+c05fb8b8: bfi     r6, r8, #0, #1
+c05fb8bc: ldr     r2, [sp, #4]
+c05fb8c0: ldr     r3, [r4]
+c05fb8c4: cmp     r2, r3
+c05fb8c8: bne     #0xc05fb8e4 ; 
+c05fb8cc: add     r0, r0, r7
+c05fb8d0: mov     r1, r6
+c05fb8d4: add     r0, r0, r5
+c05fb8d8: add     sp, sp, #8
+c05fb8dc: pop     {r4, r5, r6, r7, r8, lr}
+c05fb8e0: b       #0xc05f027c ; vdp_reg_write
+c05fb8e4: bl      #0xc01226b8 ; __stack_chk_fail
+c05fb8e8: cmngt   r1, r8, asr #10
+
+ vdp_fdr_gfx_set_smmu_bypass_h2d 0xc05fb7a8 0xc05fb814
+c05fb7a8: push    {r4, r5, r6, r7, r8, lr}
+c05fb7ac: sub     sp, sp, #8
+c05fb7b0: ldr     r4, [pc, #0x58] ; = 0xc1715548 __stack_chk_guard
+c05fb7b4: mov     r8, r1
+c05fb7b8: mov     r5, r0
+c05fb7bc: movw    r7, #0x8a20
+c05fb7c0: ldr     r3, [r4]
+c05fb7c4: str     r3, [sp, #4]
+c05fb7c8: bl      #0xc05f0170 ; get_vdp_reg
+c05fb7cc: add     r0, r0, r7
+c05fb7d0: add     r0, r0, r5
+c05fb7d4: bl      #0xc05f021c ; vdp_reg_read
+c05fb7d8: mov     r6, r0
+c05fb7dc: bl      #0xc05f0170 ; get_vdp_reg
+c05fb7e0: bfi     r6, r8, #2, #1
+c05fb7e4: ldr     r2, [sp, #4]
+c05fb7e8: ldr     r3, [r4]
+c05fb7ec: cmp     r2, r3
+c05fb7f0: bne     #0xc05fb80c ; 
+c05fb7f4: add     r0, r0, r7
+c05fb7f8: mov     r1, r6
+c05fb7fc: add     r0, r0, r5
+c05fb800: add     sp, sp, #8
+c05fb804: pop     {r4, r5, r6, r7, r8, lr}
+c05fb808: b       #0xc05f027c ; vdp_reg_write
+c05fb80c: bl      #0xc01226b8 ; __stack_chk_fail
+c05fb810: cmngt   r1, r8, asr #10
+
+ vdp_gfx_set_smmu2d_bypass 0xc0610a58 0xc0610a94
+c0610a58: ldr     r3, [pc, #0x30] ; = 0xc1715548 __stack_chk_guard
+c0610a5c: str     lr, [sp, #-4]!
+c0610a60: sub     sp, sp, #0xc
+c0610a64: ldr     r2, [r3]
+c0610a68: str     r2, [sp, #4]
+c0610a6c: ldr     r2, [sp, #4]
+c0610a70: ldr     r3, [r3]
+c0610a74: cmp     r2, r3
+c0610a78: bne     #0xc0610a8c ; 
+c0610a7c: lsl     r0, r0, #9
+c0610a80: add     sp, sp, #0xc
+c0610a84: pop     {lr}
+c0610a88: b       #0xc05fb880 ; vdp_fdr_gfx_set_smmu_bypass2d
+c0610a8c: bl      #0xc01226b8 ; __stack_chk_fail
+c0610a90: cmngt   r1, r8, asr #10

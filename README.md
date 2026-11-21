@@ -1,8 +1,45 @@
-# 烽火 HG680KD 主线 Linux ARM32 适配
+# 烽火 HG680KD 主线 Linux 适配
 
 本项目以 Linux 6.18.64 为基线，从原厂 U-Boot 2022.07 和 BL31 启动 RAM 镜像。设备为海思 Hi3798MV320，四核 Cortex-A55，实装 2 GiB LPDDR4。核心与外设镜像均经 COM4 实机验证，带 BusyBox 1.37.0 和静态链接的 musl 1.2.5 用户态。
 
-建议使用 [全功能合并镜像](artifacts/arm32-all/boot.img)（`arm32-all`，128 MiB 基线）或 [2 GiB 内存扩容全功能镜像](artifacts/arm32-all-2g/boot.img)（`arm32-all-2g`，含 `fastfetch`）。同一次 RAM 启动验证了四核在线、24 MHz 架构定时器、USB 480 Mb/s FAT 只读挂载、eMMC 8-bit 52 MHz 高速 ADMA2 只读、有线网卡双向 ICMP/HTTP TCP 传输，以及 Mali-450 主线 Lima 驱动绑定与 GP+PP 离屏渲染写回。`arm32-all-2g` 进一步在启用 `CONFIG_HIGHMEM=y` 与 `CONFIG_BOUNCE=y` 后开放完整 2 GiB 物理窗口（实测可用 `MemTotal = 2,051,208 KiB` ≈ `2003.1 MiB`，含 `LowTotal = 750,220 KiB` 与 `HighTotal = 1,300,988 KiB`），并集成 `fastfetch 2.71.0`、BusyBox `free` 与 `memtest-2g`，通过 1,872 MiB 跨高低端物理内存读写校验（覆盖 `0x00000000–0x7f5ff000`）与全部外设回归，目前盒子停在该镜像的 BusyBox shell。见 [175-mainline-all.txt](logs/175-mainline-all.txt)、[176-server-ping-all.txt](logs/176-server-ping-all.txt)、[195-mainline-all-2g-r2-peripherals.txt](logs/195-mainline-all-2g-r2-peripherals.txt) 和 [202-mainline-all-2g-fastfetch.txt](logs/202-mainline-all-2g-fastfetch.txt)。
+## ARM64 2 GiB HDMI
+
+`arm64-all-2g-hdmi` 从原厂 U-Boot 接管 HDMI 图形层。实测显存 `0x7f6c1000–0x7fea9fff`，1920×1080，pitch 7680 字节，`a8r8g8b8`。原厂 1280×720 日志对应 Logo JPEG 解码，接入本次显示设备时，HDMI AVI InfoFrame 声明 3840×2160p60。Linux 6.18.64 RAM 启动后注册 simpledrm `/dev/dri/card0`、`/dev/fb0` 和帧缓冲控制台，Mali-450 Lima `/dev/dri/renderD128` 两次离屏渲染均为 4096/4096 像素匹配。采集卡确认控制台和八色彩条上屏。同次验证还通过四核 SMP、1840 MiB 内存测试、USB FAT 只读挂载、eMMC `ro=1` 与原厂 boot 容器全量 SHA256、有线 ICMP 和 `fastfetch`。[寄存器与原生 DRM 评估](HDMI-REVERSE.md) · [现场寄存器](logs/226-hdmi-uboot-registers.txt) · [最终串口](logs/249-mainline-arm64-all-2g-hdmi-final.txt) · [HDMI 采集帧](artifacts/arm64-all-2g-hdmi/hdmi-color-bars.png)
+
+| 用途 | RAM 镜像 | SHA256 |
+| --- | --- | --- |
+| HDMI | [arm64-all-2g-hdmi/boot.img](artifacts/arm64-all-2g-hdmi/boot.img) | `52083ae85db4a9dadfb8f0350322f8ee2fe5f5d1729569a27cf91fbede966f20` |
+| 6.18.64 回退 | [arm64-all-2g/uImage](artifacts/arm64-all-2g/uImage) | `4196860c3e7f499f286661f929c237d5549cb800313b84ec5306c9209228e85d` |
+
+同步 `src/`、`patches/` 与构建脚本后，在服务器构建并取回 `out/release-arm64-all-2g-hdmi.tar.gz`。
+
+```bash
+root="$HOME/hg680kd-mainline"
+bash scripts/build.sh full "$root" "$root/inputs" arm64-all-2g-hdmi
+```
+
+把归档解包到 `artifacts/arm64-all-2g-hdmi`，使用相同的 ARM64 封装器。该目标的 `boot.img` 是 Legacy ARM64 uImage，使用 `bootm 0x1fdffc0` 引导。[镜像 SHA256 清单](artifacts/arm64-all-2g-hdmi/BOOT-SHA256SUMS)
+
+```powershell
+$out = 'artifacts/arm64-all-2g-hdmi'
+python scripts/pack_arm64.py --image "$out/Image" `
+  --dtb "$out/hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi.dtb" `
+  --out $out --name boot.img
+```
+
+HDMI 设备应在盒子上电前接好，使 U-Boot 建立有效的显示链路。复用下文 ARM64 的 TFTP 或 XMODEM RAM 引导方法，把 `--image` 改为本节的镜像路径。TFTP 文件名应与服务端一致。以下命令在 BusyBox 中绘制彩条，并避免屏幕日志和光标覆盖画面。simpledrm 沿用 U-Boot 模式，原生改分辨率和热插拔仍属后续驱动工作。
+
+```sh
+echo N >/sys/module/printk/parameters/ignore_loglevel
+dmesg -n 4
+echo 0 >/sys/class/graphics/fbcon/cursor_blink
+printf '\033[?25l' >/dev/tty1
+fb-test
+```
+
+## 其他已验证镜像
+
+建议使用 [全功能合并镜像](artifacts/arm32-all/boot.img)（`arm32-all`，128 MiB 基线）或 [2 GiB 内存扩容全功能镜像](artifacts/arm32-all-2g/boot.img)（`arm32-all-2g`，含 `fastfetch`）。同一次 RAM 启动验证了四核在线、24 MHz 架构定时器、USB 480 Mb/s FAT 只读挂载、eMMC 8-bit 52 MHz 高速 ADMA2 只读、有线网卡双向 ICMP/HTTP TCP 传输，以及 Mali-450 主线 Lima 驱动绑定与 GP+PP 离屏渲染写回。`arm32-all-2g` 进一步在启用 `CONFIG_HIGHMEM=y` 与 `CONFIG_BOUNCE=y` 后开放完整 2 GiB 物理窗口（实测可用 `MemTotal = 2,051,208 KiB` ≈ `2003.1 MiB`，含 `LowTotal = 750,220 KiB` 与 `HighTotal = 1,300,988 KiB`），并集成 `fastfetch 2.71.0`、BusyBox `free` 与 `memtest-2g`，通过 1,872 MiB 跨高低端物理内存读写校验（覆盖 `0x00000000–0x7f5ff000`）与全部外设回归。见 [175-mainline-all.txt](logs/175-mainline-all.txt)、[176-server-ping-all.txt](logs/176-server-ping-all.txt)、[195-mainline-all-2g-r2-peripherals.txt](logs/195-mainline-all-2g-r2-peripherals.txt) 和 [202-mainline-all-2g-fastfetch.txt](logs/202-mainline-all-2g-fastfetch.txt)。
 
 已验证的低速存储合并回退镜像保留在 [artifacts/arm32-storage/boot.img](artifacts/arm32-storage/boot.img)（400 kHz、1-bit、PIO 只读 eMMC + USB），低速独立 eMMC 镜像保留在 [artifacts/arm32-emmc-final/boot.img](artifacts/arm32-emmc-final/boot.img)，均未覆盖。
 
@@ -35,7 +72,7 @@
 - ARM64 全功能 + 2 GiB 扩容镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-all-2g/uImage](artifacts/arm64-all-2g/uImage)（`SHA256: 4196860c3e7f499f286661f929c237d5549cb800313b84ec5306c9209228e85d`）
 - ARM64 Linux 7.2.5 全功能 + 2 GiB 扩容镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-7.2.5-all-2g/uImage](artifacts/arm64-7.2.5-all-2g/uImage)（`SHA256: ba478a9a9fc9a6602a1224fbb759f955d68d7e92c43678b2abbdeb331d1aca09`）
 
-每个产物目录同时保存 zImage、DTB、initramfs、配置、System.map、vmlinux 和 SHA256 清单。
+每个产物目录同时保存内核映像（ARM32 的 `zImage` 或 ARM64 的 `Image`）、DTB、initramfs、配置、System.map、vmlinux 和 SHA256 清单。
 
 ## 内存和装载地址
 

@@ -1,0 +1,152 @@
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+/262/040755/0/2000/.//
+/94/040755/0/2000/..//
+/263/100644/0/0/btmtk_uart_unify.ko/185848/
+/264/100644/0/0/uwe5621_bt_sdio.ko/44172/
+/265/100644/0/0/wlan_mt7961_pcie.ko/2844580/
+/266/100644/0/0/rtk_btusb.ko/68456/
+/267/100644/0/0/rtl8822cs.ko/3106404/
+/268/100644/0/0/hi_sdio_detect.ko/4876/
+/269/100644/0/0/uwe5621_bsp_sdio.ko/247804/
+/270/100644/0/0/uwe5621_wifi_sdio.ko/397820/
+
+37a5f660ab85967c0af4e226955d993e374450b46205bc0fd15bb26d1989e852  extracted/hidisp
+b23a1a1f6f7bdd86d80052bbf0107a6b8cf7101faf9ccf0c6fa305c5185d7529  extracted/libdisplayclient_vendor.so
+b3beff7cb2cefd46e79fff19631240004689ddabe1517140b58d45bdcd095672  extracted/libhi_msp.so
+9074eb02d1d7eec9f633ef654cb3d29d0c4c2fc3da3de977aecd1fa74e531299  extracted/vendor.hwdisplay.hardware.hwdisplay@1.0-service
+
+extracted/hidisp
+  Class:                             ELF32
+  Machine:                           ARM
+ 0x00000001 (NEEDED)                     Shared library: [libhidlbase.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhidltransport.so]
+ 0x00000001 (NEEDED)                     Shared library: [vendor.hwdisplay.hardware.hwdisplay@1.0.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so]
+
+extracted/libdisplayclient_vendor.so
+  Class:                             ELF32
+  Machine:                           ARM
+ 0x00000001 (NEEDED)                     Shared library: [libhidlbase.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhidltransport.so]
+ 0x00000001 (NEEDED)                     Shared library: [vendor.hwdisplay.hardware.hwdisplay@1.0.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so]
+
+extracted/libhi_msp.so
+  Class:                             ELF32
+  Machine:                           ARM
+ 0x00000001 (NEEDED)                     Shared library: [libhi_common.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhi_jpeg.so]
+ 0x00000001 (NEEDED)                     Shared library: [libsecurec.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so]
+00000000      DF *UND*	00000000 (LIBC)       ioctl
+00000000      DF *UND*	00000000 (LIBC)       mmap
+0002bb8d g    DF .text	000001d4  Base        mpi_hdmi_open
+0003adb9 g    DF .text	00000054  Base        HI_UNF_DISP_Init
+0003af81 g    DF .text	00000068  Base        HI_UNF_DISP_Open
+0002f945 g    DF .text	00000350  Base        HI_UNF_HDMI_SetAttr
+00031a6d g    DF .text	000000b0  Base        mpi_disp_init
+00031d99 g    DF .text	000000c8  Base        mpi_disp_open
+0002f01d g    DF .text	00000034  Base        HI_UNF_HDMI_GetStatus
+0002f051 g    DF .text	000008f4  Base        HI_UNF_HDMI_GetSinkCapability
+00030949 g    DF .text	00000034  Base        HI_UNF_HDMI_Start
+0002ef4d g    DF .text	00000034  Base        HI_UNF_HDMI_Init
+0002efb5 g    DF .text	00000034  Base        HI_UNF_HDMI_Open
+0003b051 g    DF .text	000000c4  Base        HI_UNF_DISP_SetFormat
+0002bfb5 g    DF .text	0000011c  Base        mpi_hdmi_start
+0002b8e5 g    DF .text	000001c8  Base        mpi_hdmi_init
+/dev/hi_disp
+/dev/hi_hdmi
+
+extracted/vendor.hwdisplay.hardware.hwdisplay@1.0-service
+  Class:                             ELF32
+  Machine:                           ARM
+ 0x00000001 (NEEDED)                     Shared library: [libhidlbase.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhidltransport.so]
+ 0x00000001 (NEEDED)                     Shared library: [vendor.hwdisplay.hardware.hwdisplay@1.0.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so]
+0002ef4c <HI_UNF_HDMI_Init@@Base>:
+0002efb4 <HI_UNF_HDMI_Open@@Base>:
+00030948 <HI_UNF_HDMI_Start@@Base>:
+0003adb8 <HI_UNF_DISP_Init@@Base>:
+   3adc6:	f7eb ec82 	blx	266cc <mpi_disp_init@plt>
+   3adde:	f7eb eaae 	blx	2633c <__stack_chk_fail@plt>
+   3adfa:	f7eb eaa0 	blx	2633c <__stack_chk_fail@plt>
+0002b8e4 <mpi_hdmi_init@@Base>:
+   2b912:	f7fa ed1a 	blx	26348 <memset_s@plt>
+   2b932:	f7fa ecfe 	blx	26330 <HI_LogOut@plt>
+   2b940:	f7fa ed08 	blx	26354 <pthread_mutex_init@plt>
+   2b958:	f7fa ecea 	blx	26330 <HI_LogOut@plt>
+   2b974:	f7fa ece2 	blx	2633c <__stack_chk_fail@plt>
+   2b982:	f7fa ece2 	blx	26348 <memset_s@plt>
+   2b990:	f7fa ece6 	blx	26360 <pthread_mutex_destroy@plt>
+   2b9ae:	f7fa eccc 	blx	26348 <memset_s@plt>
+   2b9bc:	f7fa ecd0 	blx	26360 <pthread_mutex_destroy@plt>
+   2b9dc:	f7fa ecba 	blx	26354 <pthread_mutex_init@plt>
+   2b9e8:	f7fa ecba 	blx	26360 <pthread_mutex_destroy@plt>
+   2ba04:	f7fa ecb2 	blx	2636c <__open_2@plt>
+   2ba18:	f7fa eca2 	blx	26360 <pthread_mutex_destroy@plt>
+   2ba22:	f7fa ec9e 	blx	26360 <pthread_mutex_destroy@plt>
+0002bb8c <mpi_hdmi_open@@Base>:
+   2bbb4:	f7fa ebbc 	blx	26330 <HI_LogOut@plt>
+   2bbd4:	f7fa ebb2 	blx	2633c <__stack_chk_fail@plt>
+   2bc14:	f7fa eb8c 	blx	26330 <HI_LogOut@plt>
+   2bc4c:	f7fa eb9a 	blx	26384 <pthread_create@plt>
+   2bc66:	f7fa eb64 	blx	26330 <HI_LogOut@plt>
+   2bc82:	f7fa eb56 	blx	26330 <HI_LogOut@plt>
+   2bc9a:	f7fa eb7a 	blx	26390 <pthread_mutex_lock@plt>
+   2bcb6:	f7fa eb72 	blx	2639c <ioctl@plt>
+   2bcd2:	f7fa eb2e 	blx	26330 <HI_LogOut@plt>
+   2bcda:	f7fa eb66 	blx	263a8 <pthread_mutex_unlock@plt>
+   2bcea:	f7fa eb5e 	blx	263a8 <pthread_mutex_unlock@plt>
+0002bfb4 <mpi_hdmi_start@@Base>:
+   2bfdc:	f7fa e9a8 	blx	26330 <HI_LogOut@plt>
+   2c00e:	f7fa e990 	blx	26330 <HI_LogOut@plt>
+   2c016:	f7fa e9bc 	blx	26390 <pthread_mutex_lock@plt>
+   2c02a:	f7fa e9b8 	blx	2639c <ioctl@plt>
+   2c036:	f7fa e9b8 	blx	263a8 <pthread_mutex_unlock@plt>
+   2c052:	f7fa e96e 	blx	26330 <HI_LogOut@plt>
+   2c074:	f7fa e998 	blx	263a8 <pthread_mutex_unlock@plt>
+   2c08e:	f7fa e956 	blx	2633c <__stack_chk_fail@plt>
+00031a6c <mpi_disp_init@@Base>:
+   31a7e:	f7f4 ec88 	blx	26390 <pthread_mutex_lock@plt>
+   31a9c:	f7f4 ed9e 	blx	265dc <open@plt>
+   31ab0:	f7f4 ec7a 	blx	263a8 <pthread_mutex_unlock@plt>
+   31ac8:	f7f4 ec38 	blx	2633c <__stack_chk_fail@plt>
+   31adc:	f7f4 ec28 	blx	26330 <HI_LogOut@plt>
+   31ae4:	f7f4 ec60 	blx	263a8 <pthread_mutex_unlock@plt>
+00031d98 <mpi_disp_open@@Base>:
+   31dbc:	f7f4 eab8 	blx	26330 <HI_LogOut@plt>
+   31dce:	f7f4 eae0 	blx	26390 <pthread_mutex_lock@plt>
+   31de2:	f7f4 eae2 	blx	263a8 <pthread_mutex_unlock@plt>
+   31df6:	f7f4 ead2 	blx	2639c <ioctl@plt>
+   31e0c:	f7f4 ea90 	blx	26330 <HI_LogOut@plt>
+   31e14:	f7f4 eac8 	blx	263a8 <pthread_mutex_unlock@plt>
+   31e30:	f7f4 ea84 	blx	2633c <__stack_chk_fail@plt>
+0003b050 <HI_UNF_DISP_SetFormat@@Base>:
+   3b094:	f7eb e94c 	blx	26330 <HI_LogOut@plt>
+   3b0b2:	f7eb e944 	blx	2633c <__stack_chk_fail@plt>
+   3b0bc:	f7eb eb1e 	blx	266fc <transfer_dispid@plt>
+   3b0c6:	f7eb eb38 	blx	26738 <transfer_enc_fmt@plt>
+   3b0de:	f7eb e928 	blx	26330 <HI_LogOut@plt>
+   3b0ea:	f7eb ea96 	blx	26618 <mpi_disp_set_format@plt>
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+36b06103316aed4fa96cb3ecfa4d941dc5f9f4277b56ee82e03d15b74f3ea36e  extracted/hdmi_debug.sh
+1028341ef523d61629804e5e8aa1daee7a64a5dfda4773b2ef2453a4826f4351  extracted/libdisplayclient.so
+/proc/msp/adec00
+/proc/msp/ao
+/proc/msp/disp1
+/proc/msp/hdmi0
+/proc/msp/log
+/proc/msp/sound0
+/proc/msp/sys
+/proc/sys/kernel/printk
+  Class:                             ELF32
+  Machine:                           ARM
+ 0x00000001 (NEEDED)                     Shared library: [libhidlbase.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhidltransport.so]
+ 0x00000001 (NEEDED)                     Shared library: [vendor.hwdisplay.hardware.hwdisplay@1.0.so]

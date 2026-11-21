@@ -1,0 +1,108 @@
+Waiting for the read-only factory vendor and system filesystems
+Serving HTTP on 192.168.6.160 port 18081 (http://192.168.6.160:18081/) ...
+192.168.6.249 - - [21/Nov/2026 22:31:20] "GET /sendbin HTTP/1.1" 200 -
+192.168.6.249 - - [21/Nov/2026 22:31:20] "GET /fb-test HTTP/1.1" 200 -
+vendor 419430400 bytes 726274205f81c1d79ab85da9c7c5f4cf10e8462cbc77b01a5a2a3edf440740b0
+system 1258291200 bytes 06cf51fffea3214b38945c5c322334ccb4456f87b7c381db86442811e0ef1206
+blocks/vendor.img: Linux rev 1.0 ext2 filesystem data, UUID=44ece2da-c47b-50d6-8cde-be2d0b6157db, volume name "vendor" (extents) (large files) (huge files)
+vendor /lib/modules
+debugfs 1.47.4 (6-Mar-2025)
+/262/040755/0/2000/.//
+/94/040755/0/2000/..//
+/263/100644/0/0/btmtk_uart_unify.ko/185848/
+/264/100644/0/0/uwe5621_bt_sdio.ko/44172/
+/265/100644/0/0/wlan_mt7961_pcie.ko/2844580/
+/266/100644/0/0/rtk_btusb.ko/68456/
+/267/100644/0/0/rtl8822cs.ko/3106404/
+/268/100644/0/0/hi_sdio_detect.ko/4876/
+/269/100644/0/0/uwe5621_bsp_sdio.ko/247804/
+/270/100644/0/0/uwe5621_wifi_sdio.ko/397820/
+
+vendor /lib64/modules
+debugfs 1.47.4 (6-Mar-2025)
+/lib64/modules: File not found by ext2_lookup 
+vendor /modules
+debugfs 1.47.4 (6-Mar-2025)
+/modules: File not found by ext2_lookup 
+vendor /vendor/lib/modules
+debugfs 1.47.4 (6-Mar-2025)
+/vendor/lib/modules: File not found by ext2_lookup 
+vendor /system/lib/modules
+debugfs 1.47.4 (6-Mar-2025)
+/system/lib/modules: File not found by ext2_lookup 
+blocks/system.img: Linux rev 1.0 ext2 filesystem data, UUID=767dd423-3509-5aca-95d1-93bc8119e0a4 (extents) (large files) (huge files)
+system /lib/modules
+debugfs 1.47.4 (6-Mar-2025)
+/lib/modules: File not found by ext2_lookup 
+system /lib64/modules
+debugfs 1.47.4 (6-Mar-2025)
+/lib64/modules: File not found by ext2_lookup 
+system /modules
+debugfs 1.47.4 (6-Mar-2025)
+/modules: File not found by ext2_lookup 
+system /vendor/lib/modules
+debugfs 1.47.4 (6-Mar-2025)
+/vendor/lib/modules: File not found by ext2_lookup 
+system /system/lib/modules
+debugfs 1.47.4 (6-Mar-2025)
+/system/lib/modules: File not found by ext2_lookup 
+system /
+/2/040755/0/0/.//
+/2/040755/0/0/..//
+/11/040700/0/0/lost+found//
+/13/040751/0/1028/storage//
+/14/040555/0/0/config//
+/16/040755/0/1000/mnt//
+/19/040771/1000/1000/data//
+/28/040770/1000/2001/cache//
+/34/040755/0/0/odm//
+/44/040755/0/0/oem//
+/45/040755/0/0/acct//
+/46/040755/0/0/dev//
+/48/040755/0/0/ctc//
+/49/040755/0/0/tmp//
+/52/040755/0/0/sys//
+/54/040755/0/0/backup//
+/56/040750/0/2000/sbin//
+/66/040755/0/2000/vendor//
+/67/040755/0/0/system//
+/2606/040755/0/0/proc//
+/2607/040755/0/0/private//
+system /system
+/67/040755/0/0/.//
+/2/040755/0/0/..//
+/69/040755/0/0/usr//
+/222/040755/0/0/framework//
+/400/040755/0/0/product//
+/402/040755/0/0/fake-libs//
+/404/040755/0/0/lib//
+/940/040755/0/0/priv-app//
+/1025/040755/0/2000/bin//
+/1459/040755/0/0/app//
+/1720/040755/0/0/etc//
+/2069/040755/0/0/fonts//
+/2309/040755/0/0/opt//
+/2351/040755/0/0/media//
+/2576/040755/0/2000/xbin//
+system /lib
+system /lib64
+system /system/lib
+/404/040755/0/0/.//
+/67/040755/0/0/..//
+/440/040755/0/0/extractors//
+/477/040755/0/0/drm//
+/615/040755/0/0/hw//
+/553/100644/0/0/libdisplayclient.so/45272/
+/604/100644/0/0/android.frameworks.displayservice@1.0.so/152388/
+/843/100644/0/0/vendor.hwdisplay.hardware.hwdisplay@1.0.so/289056/
+/869/100644/0/0/libdisplayservicehidl.so/37064/
+system /system/lib64
+system /bin
+system /system/bin
+/1025/040755/0/2000/.//
+/67/040755/0/0/..//
+/1181/040755/0/2000/hw//
+/1249/040755/0/2000/apache//
+/1317/040755/0/2000/opt//
+/1441/100755/0/2000/hdmi_debug.sh/360/
+system /system/vendor/lib/modules

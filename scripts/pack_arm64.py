@@ -70,17 +70,18 @@ def main():
     parser.add_argument("--image", required=True, type=Path)
     parser.add_argument("--dtb", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument("--name", choices=("uImage", "boot.img"), default="uImage")
     args = parser.parse_args()
 
     image = args.image.read_bytes()
     dtb = args.dtb.read_bytes()
     uimage = pack_uimage(image, dtb)
     args.out.mkdir(parents=True, exist_ok=True)
-    out_file = args.out / "uImage"
+    out_file = args.out / args.name
     out_file.write_bytes(uimage)
     digest = sha256(uimage).hexdigest()
-    (args.out / "BOOT-SHA256SUMS").write_text(f"{digest}  uImage\n", encoding="ascii")
-    print(f"{digest}  uImage  ({len(uimage)} bytes, CRC32={crc32(uimage):08x}, load_at=0x{UIMAGE_ADDR:08x})")
+    (args.out / "BOOT-SHA256SUMS").write_text(f"{digest}  {out_file.name}\n", encoding="ascii")
+    print(f"{digest}  {out_file.name}  ({len(uimage)} bytes, CRC32={crc32(uimage):08x}, load_at=0x{UIMAGE_ADDR:08x})")
 
 
 if __name__ == "__main__":

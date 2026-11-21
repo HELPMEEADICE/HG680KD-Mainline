@@ -21,12 +21,18 @@ cross="$root/source/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux-"
 board=hi3798mv320-fiberhome-hg680kd-arm64
 release="$root/out/release-arm64-$variant"
 variant_key=
+hdmi=
 case "$base_variant" in
     core) ;;
-    all-2g)
+    all-2g|all-2g-hdmi)
         variant_key="ARCH_HISI USB_XHCI_HI3798MV320 MMC_SDHCI_HI3798MV320 HIX5HD2_GMAC DRM_LIMA COMMON_CLK_HI3798MV320_RESET"
         bbout="$root/out/busybox-arm64-all-2g"
         board=hi3798mv320-fiberhome-hg680kd-arm64-all-2g
+        if [[ $base_variant == all-2g-hdmi ]]; then
+            hdmi=y
+            bbout="$root/out/busybox-arm64-all-2g-hdmi"
+            variant_key+=" DRM_SIMPLEDRM DRM_FBDEV_EMULATION DRM_CLIENT_DEFAULT_FBDEV FB_DEVICE VT VT_CONSOLE FRAMEBUFFER_CONSOLE"
+        fi
         ;;
     *) echo "Unknown arm64 variant: $variant" >&2; exit 2 ;;
 esac
@@ -73,7 +79,11 @@ fi
 
 # Keep arm32 source tree untouched: install only the arm64 DTS into arch/arm64/boot/dts/hisilicon
 install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/$board.dts"
-if ! grep -q "$board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
+if [[ $hdmi ]]; then
+    board+=-hdmi
+    install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/$board.dts"
+fi
+if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
     printf 'dtb-y += %s.dtb\n' "$board" >> "$linux/arch/arm64/boot/dts/hisilicon/Makefile"
 fi
 
@@ -100,8 +110,11 @@ fi
 bb=(make -C "$busybox" O="$bbout" ARCH=arm64 CROSS_COMPILE="$cross" CC="$sysroot/bin/musl-gcc")
 busybox_config="$bbout/fragment"
 cat "$inputs/busybox.config" "$inputs/busybox-fastfetch.config" "$inputs/busybox-2g.config" >"$busybox_config"
-if [[ $base_variant == all-2g ]]; then
+if [[ $base_variant != core ]]; then
     cat "$inputs/busybox-net.config" >>"$busybox_config"
+fi
+if [[ $hdmi ]]; then
+    printf 'CONFIG_CHMOD=y\n' >>"$busybox_config"
 fi
 "${bb[@]}" allnoconfig >"$root/out/busybox-arm64-config.log"
 while IFS='=' read -r key value; do
@@ -183,7 +196,7 @@ file /etc/fastfetch/config.jsonc $inputs/fastfetch-config.jsonc 0644 0 0
 EOF
 applets=(cat cttyhack cut dd dmesg echo find free grep hexdump hostname ls mount printf
          readlink reboot setsid sha256sum sh sleep stat umount uname)
-if [[ $base_variant == all-2g ]]; then
+if [[ $base_variant != core ]]; then
     applets+=(ifconfig ping wget)
     "$sysroot/bin/musl-gcc" -O2 -static -Wall -Wextra \
         -o "$out/lima-test" "$inputs/lima-test.c"
@@ -192,6 +205,12 @@ if [[ $base_variant == all-2g ]]; then
     printf 'file /bin/lima-test %s/lima-test 0755 0 0\n' "$out" >>"$list"
     printf 'file /bin/memtest-2g %s/memtest-2g 0755 0 0\n' "$out" >>"$list"
 fi
+if [[ $hdmi ]]; then
+    applets+=(chmod)
+    "$sysroot/bin/musl-gcc" -O2 -static -Wall -Wextra \
+        -o "$out/fb-test" "$inputs/fb-test.c"
+    printf 'file /bin/fb-test %s/fb-test 0755 0 0\n' "$out" >>"$list"
+fi
 for applet in "${applets[@]}"; do
     printf 'slink /bin/%s busybox 0777 0 0\n' "$applet" >>"$list"
 done
@@ -199,12 +218,18 @@ done
 
 # Build AArch64 Linux
 config="$inputs/arm64.config"
-if [[ $base_variant == all-2g ]]; then
+if [[ $base_variant != core ]]; then
     config="$out/arm64.config"
-    {
-        sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64.config"
-        cat "$inputs/arm64-all-2g.config"
-    } >"$config"
+    if [[ $hdmi ]]; then
+        sed '/^CONFIG_LOCALVERSION=/d; /^CONFIG_CMDLINE=/d' "$inputs/arm64.config" >"$config"
+        sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g.config" >>"$config"
+        cat "$inputs/arm64-all-2g-hdmi.config" >>"$config"
+    else
+        {
+            sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64.config"
+            cat "$inputs/arm64-all-2g.config"
+        } >"$config"
+    fi
 fi
 kernel=(make -C "$linux" O="$out" ARCH=arm64 CROSS_COMPILE="$cross")
 "${kernel[@]}" KCONFIG_ALLCONFIG="$config" allnoconfig

@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-all-2g.dts"
+
+/ {
+	chosen {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		framebuffer@7f6c1000 {
+			compatible = "simple-framebuffer";
+			reg = <0x0 0x7f6c1000 0x0 0x007e9000>;
+			width = <1920>;
+			height = <1080>;
+			stride = <7680>;
+			format = "a8r8g8b8";
+		};
+	};
+
+	reserved-memory {
+		/* Keep the full firmware reservation without overlapping it. */
+		uboot-resmem-high@7f67f000 {
+			reg = <0x0 0x7f67f000 0x0 0x00042000>;
+		};
+
+		framebuffer@7f6c1000 {
+			reg = <0x0 0x7f6c1000 0x0 0x007e9000>;
+			no-map;
+		};
+
+		uboot-resmem-tail@7feaa000 {
+			reg = <0x0 0x7feaa000 0x0 0x00156000>;
+			no-map;
+		};
+	};
+};
