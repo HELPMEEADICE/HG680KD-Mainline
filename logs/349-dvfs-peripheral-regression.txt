@@ -1,0 +1,54 @@
+
+# dmesg -n 3; grep MemTotal /proc/meminfo; cat /sys/devices/system/cpu/online; memtest-2g 1840; echo MEMTEST_EXIT=$?
+MemTotal:        2023508 kB
+0-3
+memtest-2g: MemFree=1947 MiB, testing 1840 MiB (115 x 16 MiB chunks)
+memtest-2g: verified 1840 MiB, pages=471040, paddr=[0x01c00000..0x7ccff000]
+memtest-2g: >128M=452708 pages, >760M=293092 pages, >1536M=94436 pages
+MEMTEST-2G: PASS
+MEMTEST_EXIT=0
+# 
+[host] shell command elapsed: 4.03 s
+bt-test; echo BT_INFO_EXIT=$?; bt-test 10; echo BT_SCAN_EXIT=$?; dmesg | grep "fw version 0x1ed6b420"
+hci0: HCI 0x09 rev 0x1ed6, LMP 0x09 subver 0xb420, manufacturer 0x005d
+hci0: controller BD_ADDR 00:E0:4C:23:99:87
+BT_INFO_EXIT=0
+hci0: HCI 0x09 rev 0x1ed6, LMP 0x09 subver 0xb420, manufacturer 0x005d
+hci0: controller BD_ADDR 00:E0:4C:23:99:87
+BLE passive scan for 10 s
+LE advertisement FC:42:65:AF:36:71 type=3 address_type=0 rssi=-66 data=142b00a80151000000007136af6542fc0583000000
+LE advertisement 30:F3:19:5D:F8:97 type=3 address_type=1 rssi=-58 data=1e16f3fe4a172330394b4e1132c2ffcddcd4fad993caeed329f92a0c00cd18
+LE advertisement 1E:F1:76:0B:55:E6 type=3 address_type=1 rssi=-46 data=1eff060001092002ac8fd393ef79fea67db6751eb289ad3a9c9e097c445bf2
+BLE passive scan: 3 advertising reports
+BT_SCAN_EXIT=0
+<6>[    1.871008] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+# 
+[host] shell command elapsed: 10.08 s
+cat /sys/bus/usb/devices/1-2/idVendor /sys/bus/usb/devices/1-2/idProduct /sys/bus/usb/devices/1-2/speed; mount -t vfat -o ro /dev/sda1 /tmp && ls /tmp && grep " /tmp " /proc/mounts && umount /tmp
+0781
+5591
+480
+Android                    HG680KD
+LOST.DIR                   System Volume Information
+/dev/sda1 /tmp vfat ro,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+# 
+[host] shell command elapsed: 0.12 s
+cat /sys/block/mmcblk0/ro /sys/block/mmcblk0/mmcblk0p1/ro /sys/block/mmcblk0/mmcblk0p2/ro; cat /sys/kernel/debug/mmc0/ios; dd if=/dev/mmcblk0 bs=512 skip=229376 count=24032 | sha256sum; cat /sys/kernel/debug/mmc0/err_stats
+1
+1
+1
+clock:		192000000 Hz
+actual clock:	192000000 Hz
+vdd:		21 (3.3 ~ 3.4 V)
+bus mode:	2 (push-pull)
+chip select:	0 (don't care)
+power mode:	2 (on)
+bus width:	3 (8 bits)
+timing spec:	10 (mmc HS400 enhanced strobe)
+signal voltage:	1 (1.80 V)
+driver type:	0 (driver type B)
+24032+0 records in
+24032+0 records out
+97f4e2b5d88ee6d6fae8ced4809420d7f875c4ff8b0acfe817c6409b6f02a6b8  -
+# 
+[host] shell command elapsed: 0.50 s

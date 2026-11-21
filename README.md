@@ -43,7 +43,8 @@ fb-test
 
 | 用途 | RAM 镜像 | SHA256 |
 | --- | --- | --- |
-| Linux 7.2.5 HDMI + 板载蓝牙 + eMMC HS400ES | [arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img) | `97a768556f66d01d745ee556785be0bb33c7c4de0ef292079c7a642a2e2502f2` |
+| Linux 7.2.5 HDMI + 蓝牙 + eMMC HS400ES + 温控/DVFS | [arm64-7.2.5-all-2g-hdmi-bt-dvfs/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-dvfs/boot.img) | `3b6b8c6f457142920be4aea815d49295e67796771cdcb5a7a29c142606c7db46` |
+| Linux 7.2.5 HDMI + 板载蓝牙 + eMMC HS400ES（回退） | [arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img) | `97a768556f66d01d745ee556785be0bb33c7c4de0ef292079c7a642a2e2502f2` |
 | Linux 7.2.5 HDMI + 板载蓝牙（回退） | [arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img) | `8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695` |
 | 6.18.64 HDMI + 板载蓝牙（回退） | [arm64-all-2g-hdmi-bt/boot.img](artifacts/arm64-all-2g-hdmi-bt/boot.img) | `73d68394f7c1b20c7d031db27773224c87b3a406b09c10220d188f3ab5c3ccc8` |
 | 7.2.5 无显示/蓝牙基线（回退） | [arm64-7.2.5-all-2g/uImage](artifacts/arm64-7.2.5-all-2g/uImage) | `ba478a9a9fc9a6602a1224fbb759f955d68d7e92c43678b2abbdeb331d1aca09` |
@@ -102,7 +103,19 @@ bash scripts/build.sh full "$root" "$root/inputs" arm64-all-2g-hdmi-wifi-probe
 - ARM64 全功能 + 2 GiB 扩容镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-all-2g/uImage](artifacts/arm64-all-2g/uImage)（`SHA256: 4196860c3e7f499f286661f929c237d5549cb800313b84ec5306c9209228e85d`）
 - ARM64 Linux 7.2.5 全功能 + 2 GiB 扩容镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-7.2.5-all-2g/uImage](artifacts/arm64-7.2.5-all-2g/uImage)（`SHA256: ba478a9a9fc9a6602a1224fbb759f955d68d7e92c43678b2abbdeb331d1aca09`）
 - ARM64 Linux 7.2.5 全功能 + HDMI + 板载蓝牙镜像（纯 RAM Legacy `boot.img`，回退）：[artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img)（`SHA256: 8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695`）
-- ARM64 Linux 7.2.5 全功能 + HDMI + 板载蓝牙 + eMMC HS400ES 镜像（纯 RAM Legacy `boot.img`）：[artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img)（`SHA256: 97a768556f66d01d745ee556785be0bb33c7c4de0ef292079c7a642a2e2502f2`）
+- ARM64 Linux 7.2.5 全功能 + HDMI + 板载蓝牙 + eMMC HS400ES 镜像（纯 RAM Legacy `boot.img`，回退）：[artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400/boot.img)（`SHA256: 97a768556f66d01d745ee556785be0bb33c7c4de0ef292079c7a642a2e2502f2`）
+- ARM64 Linux 7.2.5 全功能 + HDMI + 板载蓝牙 + eMMC HS400ES + 片上温控/DVFS 镜像（纯 RAM Legacy `boot.img`）：[artifacts/arm64-7.2.5-all-2g-hdmi-bt-dvfs/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-dvfs/boot.img)（`SHA256: 3b6b8c6f457142920be4aea815d49295e67796771cdcb5a7a29c142606c7db46`）
+
+### ARM64 Linux 7.2.5 片上温控与 CPU/GPU DVFS
+
+`arm64-7.2.5-all-2g-hdmi-bt-dvfs` 在 `arm64-7.2.5-all-2g-hdmi-bt-emmc-hs400` 基础上新增片上 TSENSOR 温控（[hi3798mv320-thermal.c](src/hi3798mv320-thermal.c)）、CPU PWM 调压与 `dvdd` 只读回读（[hi3798mv320-cpu-regulator.c](src/hi3798mv320-cpu-regulator.c)）及 CRG 无毛刺 APLL 切频与 GPU 时钟调频（[crg-hi3798mv320-reset.c](src/crg-hi3798mv320-reset.c)）。详见 [温控与 DVFS 逆向文档](DVFS-THERMAL-REVERSE.md)。
+
+- **构建复现**：在 `hedc@ArchLinux-E5-Server` 上执行 `bash scripts/build_arm64.sh full "$root" "$root/inputs" arm64-7.2.5-all-2g-hdmi-bt-dvfs`，取回 `out/release-arm64-7.2.5-all-2g-hdmi-bt-dvfs.tar.gz` 解包至 `artifacts/arm64-7.2.5-all-2g-hdmi-bt-dvfs/` 并用 [pack_arm64.py](scripts/pack_arm64.py) 封装 `boot.img`。
+- **实机验证**（纯 RAM TFTP 引导，`eMMC ro=1`）：
+  - **温控**：`soc-thermal` 待机 56.0 °C，四核短时满载平滑升至 67.0 °C，停载 10 s 内回落至 59.0 °C；保守温控阈值 68/83/86/88 °C。[启动日志](logs/360-dvfs-supplies-boot.txt) · [温控压测日志](logs/364-dvfs-thermal-stress.txt)
+  - **CPUFreq**：`cpufreq-dt` 支持 `200/400/600/800/1000 MHz`（`cpu` 供电轨实读 `1051358 µV` / `1100227 µV`）；32 MiB `sha256sum` 实测耗时 5.81 s（200 MHz）、1.92 s（600 MHz）、1.15 s（1000 MHz），呈 1:3:5 线性缩放；`schedutil` 随负载自动升降频。[调频测试日志](logs/362-dvfs-cpufreq-steps.txt) · [算力耗时日志](logs/363-dvfs-cpufreq-bench.txt)
+  - **GPU Devfreq**：`f9200000.gpu` 支持 `200/300 MHz`（共享 `dvdd` 实读 `896607 µV`），两档位均通过 `lima-test` 4096/4096 像素匹配。[GPU Devfreq 日志](logs/365-dvfs-gpu-devfreq.txt)
+  - **全项回归**：四核 SMP（`0-3`）、`MemTotal = 2,023,512 kB`、HDMI 1080p `simpledrm`、RTL8761BTV 蓝牙 `hci0`、GMAC 100 Mb/s（0% 丢包）、USB U 盘与 eMMC HS400ES（`ro=1`）均无退化。[全项回归日志](logs/366-dvfs-full-regression.txt)
 
 每个产物目录同时保存内核映像（ARM32 的 `zImage` 或 ARM64 的 `Image`）、DTB、initramfs、配置、System.map、vmlinux 和 SHA256 清单。
 

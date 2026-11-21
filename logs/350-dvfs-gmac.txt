@@ -1,0 +1,31 @@
+
+# dmesg -n 1; ifconfig eth0 hw ether 54:0A:77:88:B7:2C; ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 2; cat /sys/class/net/eth0/carrier /sys/class/net/eth0/speed /sys/class/net/eth0/duplex; ping -c 3 -W 2 192.168.6.160; echo PING_EXIT=$?; ifconfig eth0
+1
+100
+full
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+64 bytes from 192.168.6.160: seq=0 ttl=64 time=0.617 ms
+64 bytes from 192.168.6.160: seq=1 ttl=64 time=0.390 ms
+64 bytes from 192.168.6.160: seq=2 ttl=64 time=0.357 ms
+
+--- 192.168.6.160 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.357/0.454/0.617 ms
+PING_EXIT=0
+eth0      Link encap:Ethernet  HWaddr 54:0A:77:88:B7:2C  
+          inet addr:192.168.6.249  Bcast:192.168.6.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:82 errors:0 dropped:15 overruns:0 frame:0
+          TX packets:4 errors:0 dropped:2 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:7661 (7.4 KiB)  TX bytes:336 (336.0 B)
+          Interrupt:17 
+
+# 
+[host] shell command elapsed: 4.11 s
+dmesg | grep -iE "APLL did not lock|voltage.*fail|lima.*(error|hang|timeout)|inconsistent rx_skb|kernel panic" | tail -12; cat /proc/uptime; cat /sys/block/mmcblk0/ro
+sh: tail: not found
+230.47 836.88
+1
+# 
+[host] shell command elapsed: 0.03 s

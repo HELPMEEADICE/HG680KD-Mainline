@@ -1,0 +1,13 @@
+
+# ls -la /sys/bus/platform/devices/ | grep regulator; ls -la /sys/bus/platform/drivers/hi3798mv320-cpu-regulator/; cat /sys/class/regulator/regulator.1/name /sys/class/regulator/regulator.1/microvolts
+lrwxrwxrwx    1         0 f8a23018.regulator -> ../../../devices/platform/soc/f8a23018.regulator
+--w-------    1      4096 unbind
+--w-------    1      4096 bind
+lrwxrwxrwx    1         0 f8a23018.regulator -> ../../../../devices/platform/soc/f8a23018.regulator
+--w-------    1      4096 uevent
+drwxr-xr-x   22         0 ..
+drwxr-xr-x    2         0 .
+cpu
+1051358
+# 
+[host] shell command elapsed: 0.06 s

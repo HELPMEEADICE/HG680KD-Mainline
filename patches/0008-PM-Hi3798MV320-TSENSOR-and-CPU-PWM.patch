@@ -1,0 +1,46 @@
+--- a/drivers/thermal/Kconfig
++++ b/drivers/thermal/Kconfig
+@@ -92,6 +92,12 @@
+ 	  Say 'Y' here if you need to build thermal infrastructure
+ 	  based on device tree.
+ 
++config HI3798MV320_THERMAL
++	tristate "Hi3798MV320 temperature sensor"
++	depends on ARCH_HISI && THERMAL_OF
++	help
++	  Enable the Hi3798MV320 SoC temperature sensor.
++
+ choice
+ 	prompt "Default Thermal governor"
+ 	default THERMAL_DEFAULT_GOV_STEP_WISE
+--- a/drivers/thermal/Makefile
++++ b/drivers/thermal/Makefile
+@@ -4,5 +4,6 @@
+ #
+ CFLAGS_thermal_core.o		:= -I$(src)
+ obj-$(CONFIG_THERMAL)		+= thermal_sys.o
++obj-$(CONFIG_HI3798MV320_THERMAL)	+= hi3798mv320-thermal.o
+ thermal_sys-y			+= thermal_core.o thermal_sysfs.o
+ thermal_sys-y			+= thermal_trip.o thermal_helpers.o
+--- a/drivers/regulator/Kconfig
++++ b/drivers/regulator/Kconfig
+@@ -23,5 +23,11 @@
+ 	  If unsure, say no.
+ 
++config REGULATOR_HI3798MV320_CPU
++	tristate "Hi3798MV320 CPU PWM regulator"
++	depends on REGULATOR && ARCH_HISI && OF && COMMON_CLK
++	help
++	  Control the dedicated CPU voltage rail on Hi3798MV320.
++
+ 
+ if REGULATOR
+ 
+--- a/drivers/regulator/Makefile
++++ b/drivers/regulator/Makefile
+@@ -7,4 +7,5 @@
+ obj-$(CONFIG_REGULATOR) += core.o dummy.o fixed-helper.o helpers.o devres.o irq_helpers.o
+ obj-$(CONFIG_REGULATOR_NETLINK_EVENTS) += event.o
++obj-$(CONFIG_REGULATOR_HI3798MV320_CPU) += hi3798mv320-cpu-regulator.o
+ obj-$(CONFIG_OF) += of_regulator.o
+ obj-$(CONFIG_REGULATOR_FIXED_VOLTAGE) += fixed.o

@@ -1,0 +1,42 @@
+
+# grep ^ /sys/class/regulator/regulator.*/name /sys/class/regulator/regulator.*/microvolts
+/sys/class/regulator/regulator.0/name:regulator-dummy
+/sys/class/regulator/regulator.1/name:cpu
+/sys/class/regulator/regulator.2/name:dvdd
+/sys/class/regulator/regulator.1/microvolts:1100227
+/sys/class/regulator/regulator.2/microvolts:896607
+# 
+[host] shell command elapsed: 0.03 s
+grep ^ /sys/class/thermal/thermal_zone0/type /sys/class/thermal/thermal_zone0/temp /sys/class/thermal/thermal_zone0/trip_point_*
+/sys/class/thermal/thermal_zone0/type:soc-thermal
+/sys/class/thermal/thermal_zone0/temp:55000
+/sys/class/thermal/thermal_zone0/trip_point_0_hyst:1000
+/sys/class/thermal/thermal_zone0/trip_point_0_temp:68000
+/sys/class/thermal/thermal_zone0/trip_point_0_type:passive
+/sys/class/thermal/thermal_zone0/trip_point_1_hyst:1000
+/sys/class/thermal/thermal_zone0/trip_point_1_temp:83000
+/sys/class/thermal/thermal_zone0/trip_point_1_type:passive
+/sys/class/thermal/thermal_zone0/trip_point_2_hyst:1000
+/sys/class/thermal/thermal_zone0/trip_point_2_temp:86000
+/sys/class/thermal/thermal_zone0/trip_point_2_type:hot
+/sys/class/thermal/thermal_zone0/trip_point_3_hyst:1000
+/sys/class/thermal/thermal_zone0/trip_point_3_temp:88000
+/sys/class/thermal/thermal_zone0/trip_point_3_type:critical
+# 
+[host] shell command elapsed: 0.08 s
+grep ^ /sys/devices/system/cpu/cpufreq/policy0/scaling_* /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_*
+/sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies:200000 400000 600000 800000 1000000 
+/sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors:userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpufreq/policy0/scaling_boost_frequencies:
+/sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq:800000
+/sys/devices/system/cpu/cpufreq/policy0/scaling_driver:cpufreq-dt
+/sys/devices/system/cpu/cpufreq/policy0/scaling_governor:schedutil
+/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq:1000000
+/sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq:200000
+/sys/devices/system/cpu/cpufreq/policy0/scaling_setspeed:<unsupported>
+/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq:800000
+/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_max_freq:1000000
+/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq:200000
+/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_transition_latency:600000
+# 
+[host] shell command elapsed: 0.11 s

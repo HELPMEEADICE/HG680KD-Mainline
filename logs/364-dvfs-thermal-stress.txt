@@ -1,0 +1,23 @@
+
+# T=/sys/class/thermal/thermal_zone0/temp; F=/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq; echo "idle: T=$(cat $T) F=$(cat $F)"; for i in 1 2 3 4; do dd if=/dev/zero bs=1M count=256 2>/dev/null | sha256sum >/dev/null & done; for s in 1 2 3 4 5; do sleep 2; echo "load_${s}: T=$(cat $T) F=$(cat $F)"; done; wait; echo "post_load: T=$(cat $T) F=$(cat $F)"
+idle: T=56000 F=800000
+load_1: T=63000 F=1000000
+load_2: T=64000 F=1000000
+load_3: T=66000 F=1000000
+load_4: T=67000 F=1000000
+load_5: T=67000 F=800000
+post_load: T=65000 F=800000
+[4]+  Done                       dd if=/dev/zero bs=1M count=256 2>/dev/null | sha256sum 1>/dev/null
+[3]+  Done                       dd if=/dev/zero bs=1M count=256 2>/dev/null | sha256sum 1>/dev/null
+[2]+  Done                       dd if=/dev/zero bs=1M count=256 2>/dev/null | sha256sum 1>/dev/null
+[1]+  Done                       dd if=/dev/zero bs=1M count=256 2>/dev/null | sha256sum 1>/dev/null
+# 
+[host] shell command elapsed: 10.50 s
+T=/sys/class/thermal/thermal_zone0/temp; F=/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq; for s in 1 2 3 4 5; do sleep 2; echo "cool_${s}: T=$(cat $T) F=$(cat $F)"; done
+cool_1: T=61000 F=800000
+cool_2: T=60000 F=800000
+cool_3: T=60000 F=800000
+cool_4: T=59000 F=800000
+cool_5: T=59000 F=800000
+# 
+[host] shell command elapsed: 10.05 s

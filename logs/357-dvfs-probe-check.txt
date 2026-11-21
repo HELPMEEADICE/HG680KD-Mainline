@@ -1,0 +1,55 @@
+
+# dmesg | grep -iE 'regulator|thermal|cpufreq|lima|devfreq|opp|tsensor'
+<6>[    0.250909] thermal_sys: Registered thermal governor 'step_wise'
+<6>[    0.409092] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+<6>[    0.409182] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+<6>[    0.409245] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+<6>[    0.409304] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+<6>[    0.409351] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+<6>[    0.409795] lima f9200000.gpu: bus rate = 200000000
+<6>[    0.409847] lima f9200000.gpu: mod rate = 200000000
+<3>[    0.409957] lima f9200000.gpu: error -19: _opp_set_regulators: no regulator (mali) found
+<6>[    0.420570] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 1
+<6>[    0.447885] cpufreq: cpufreq_policy_online: CPU0: Running at unlisted initial frequency: 1250000 kHz, changing to: 1000000 kHz
+# 
+[host] shell command elapsed: 0.09 s
+ls -la /sys/class/regulator/ /sys/class/thermal/ /sys/class/devfreq/ /sys/devices/system/cpu/cpufreq/policy0/
+/sys/devices/system/cpu/cpufreq/policy0/:
+-r--r--r--    1      4096 cpuinfo_min_freq
+-r--r--r--    1      4096 scaling_driver
+-r--r--r--    1      4096 cpuinfo_transition_latency
+-rw-r--r--    1      4096 scaling_max_freq
+-r--r--r--    1      4096 affected_cpus
+-rw-r--r--    1      4096 scaling_setspeed
+-r--r--r--    1      4096 scaling_cur_freq
+-r--r--r--    1      4096 related_cpus
+-rw-r--r--    1      4096 boost
+-r--r--r--    1      4096 scaling_available_frequencies
+-r--r--r--    1      4096 cpuinfo_max_freq
+-rw-r--r--    1      4096 scaling_governor
+-r--------    1      4096 cpuinfo_cur_freq
+-r--r--r--    1      4096 scaling_boost_frequencies
+-r--r--r--    1      4096 scaling_available_governors
+-rw-r--r--    1      4096 scaling_min_freq
+drwxr-xr-x    4         0 ..
+drwxr-xr-x    2         0 .
+
+/sys/class/devfreq/:
+lrwxrwxrwx    1         0 f9200000.gpu -> ../../devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu
+drwxr-xr-x   25         0 ..
+drwxr-xr-x    2         0 .
+
+/sys/class/thermal/:
+lrwxrwxrwx    1         0 cooling_device0 -> ../../devices/virtual/thermal/cooling_device0
+lrwxrwxrwx    1         0 thermal_zone0 -> ../../devices/virtual/thermal/thermal_zone0
+lrwxrwxrwx    1         0 cooling_device1 -> ../../devices/virtual/thermal/cooling_device1
+drwxr-xr-x   25         0 ..
+drwxr-xr-x    2         0 .
+
+/sys/class/regulator/:
+lrwxrwxrwx    1         0 regulator.1 -> ../../devices/platform/soc/f8a23018.regulator/regulator/regulator.1
+lrwxrwxrwx    1         0 regulator.0 -> ../../devices/faux/reg-dummy/regulator/regulator.0
+drwxr-xr-x   25         0 ..
+drwxr-xr-x    2         0 .
+# 
+[host] shell command elapsed: 0.16 s

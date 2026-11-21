@@ -1,0 +1,12 @@
+
+# ls /bin /usr/bin
+ls: /usr/bin: No such file or directory
+/bin:
+busybox     cat         find        mount       sh          ping
+fastfetch   cttyhack    free        printf      sleep       wget
+lima-test   cut         grep        readlink    stat        chmod
+memtest-2g  dd          hexdump     reboot      umount
+fb-test     dmesg       hostname    setsid      uname
+bt-test     echo        ls          sha256sum   ifconfig
+# 
+[host] shell command elapsed: 0.03 s

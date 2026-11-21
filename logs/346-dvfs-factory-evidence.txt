@@ -1,0 +1,366 @@
+e289000306072f9fd2e140dc5a837fb646b9c803dae15c2b4d0b99c32cf63517  inputs/factory.dtb
+	tsensor@0xa15a00 {
+		compatible = "hi,tsensor";
+		hi,tsensor_reg = <0xf8a23028 0x1c>;
+		hi,sensors = <0x01>;
+		hi,tsensor_name = "cpu";
+		hi,tsensor_id = <0x00>;
+		hi,tsensor_reg_offset = <0x00>;
+		hi,tsensor_ctrl_config = <0x72>;
+		hi,pmc_tsensorout_offset = <0x08>;
+		hi,tsensor_scale_capacitance = <0x84 0xa5 0x328 0x28>;
+		hi,tsensor_trimming_otp_enable = <0x01>;
+		hi,tsensor_trimming_otp_base = <0xf8ab0000>;
+		hi,tsensor_trimming_otp_offset = <0x1db>;
+		phandle = <0x18>;
+	};
+
+	cpufreq_cdev_info {
+		hi,cluster_num = <0x01>;
+		hi,ipa_cpufreq_table_index = <0x00>;
+		hi,cluster_dyn_capacitance = <0x22f>;
+		hi,cluster_static_capacitance = <0x8c>;
+		hi,temperature_scale_capacitance = "-13169", "3960", "-68", "1", "605";
+		hi,static_power_core_cap = "45", "-11969", "1000";
+		hi,hpm_param = <0xf80000b4 0x10 0xffff 0xe6 0x14a>;
+	};
+
+	ipa-sensor@0 {
+		type = "soc_max";
+		compatible = "arm,ipa-thermal0";
+		#thermal-sensor-cells = <0x01>;
+		status = "ok";
+		phandle = <0x02>;
+	};
+
+	thermal-zones {
+
+		soc_thermal {
+			governor_name = "power_allocator";
+			polling-delay = <0xc8>;
+			polling-delay-passive = <0x32>;
+			sustainable-power = <0x708>;
+			k_po = <0x7a>;
+			k_pu = <0xf5>;
+			k_i = <0x0a>;
+			integral_cutoff = <0x00>;
+			thermal-sensors = <0x02 0xff>;
+
+			trips {
+
+				trip-point@0 {
+					temperature = <0x186a0>;
+					hysteresis = <0x3e8>;
+					type = "passive";
+					phandle = <0x19>;
+				};
+
+				trip-point@1 {
+					temperature = <0x1c138>;
+					hysteresis = <0x3e8>;
+					type = "passive";
+					phandle = <0x03>;
+				};
+
+				trip-point@2 {
+					temperature = <0x1ccf0>;
+					hysteresis = <0x3e8>;
+					type = "hot";
+					phandle = <0x1a>;
+				};
+
+				trip-point@3 {
+					temperature = <0x1d4c0>;
+					hysteresis = <0x3e8>;
+					type = "critical";
+					phandle = <0x1b>;
+				};
+			};
+
+			cooling-maps {
+
+				map0 {
+					trip = <0x03>;
+					cooling-device = <0x04 0xffffffff 0xffffffff>;
+					contribution = <0x400>;
+				};
+
+				map1 {
+					trip = <0x03>;
+					cooling-device = <0x05 0xffffffff 0xffffffff>;
+					contribution = <0x400>;
+				};
+			};
+		};
+	};
+
+	opp_table@0 {
+		compatible = "operating-points-v2";
+		opp-shared;
+		phandle = <0x0d>;
+
+		opp@200000000 {
+			opp-hz = <0x00 0xbebc200>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0x2710>;
+		};
+
+		opp@400000000 {
+			opp-hz = <0x00 0x17d78400>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0x2710>;
+		};
+
+		opp@600000000 {
+			opp-hz = <0x00 0x23c34600>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0x2ee0>;
+		};
+
+		opp@800000000 {
+			opp-hz = <0x00 0x2faf0800>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0x2ee0>;
+		};
+
+		opp@1000000000 {
+			opp-hz = <0x00 0x3b9aca00>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0x2ee0>;
+		};
+
+		opp@1250000000 {
+			opp-hz = <0x00 0x4a817c80>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0xafc8>;
+			status = "disabled";
+		};
+
+		opp@1300000000 {
+			opp-hz = <0x00 0x4d7c6d00>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0xafc8>;
+			status = "disabled";
+		};
+
+		opp@1500000000 {
+			opp-hz = <0x00 0x59682f00>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0xafc8>;
+		};
+
+		opp@1650000000 {
+			opp-hz = <0x00 0x62590080>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0xafc8>;
+		};
+
+		opp@2000000000 {
+			opp-hz = <0x00 0x77359400>;
+			clock-latency-ns = <0x493e0>;
+			opp-microvolt = <0xf4240>;
+			opp-microamp = <0xafc8>;
+		};
+	};
+
+	regulator_1 {
+		compatible = "hi,regulator";
+		regulator-name = "dvdd";
+		pwm_addr = <0xf8a2301c>;
+		max_v_duty = <0x00>;
+		duty_step_value = <0x01>;
+		step_num = <0xdd>;
+		volt_reg_type = <0x01>;
+		volt_reg_step = <0x1388>;
+		volt_reg_sleep_time = <0x3e8>;
+		regulator-min-microvolt = <0xb90f0>;
+		regulator-max-microvolt = <0x124f80>;
+		regulator-always-on;
+		status = "okay";
+		phandle = <0x15>;
+	};
+
+	regulator_2 {
+		compatible = "hi,regulator";
+		regulator-name = "cpu";
+		pwm_addr = <0xf8a23018>;
+		max_v_duty = <0x00>;
+		duty_step_value = <0x01>;
+		step_num = <0xdd>;
+		volt_reg_type = <0x00>;
+		volt_reg_step = <0x00>;
+		volt_reg_sleep_time = <0x00>;
+		regulator-min-microvolt = <0xb90f0>;
+		regulator-max-microvolt = <0x124f80>;
+		regulator-always-on;
+		status = "okay";
+		phandle = <0x0e>;
+	};
+
+	dvfs@0 {
+		compatible = "hi,dvfs";
+		dvfs_enter_low_temp_comp_threshold = <0xff>;
+		dvfs_quit_low_temp_comp_threshold = <0xff>;
+		dvfs_enter_high_temp_comp_threshold = <0xff>;
+		dvfs_quit_high_temp_comp_threshold = <0xff>;
+		dvfs_enter_limiting_freq_threshold = <0xff>;
+		dvfs_quit_limiting_freq_threshold = <0xff>;
+		dvfs_enter_standby_threshold = <0x78>;
+		dvfs_enter_anti_aging_threshold = <0x69>;
+		dvfs_quit_anti_aging_threshold = <0x5f>;
+		dvfs_anti_aging_limit_freq = <0xf4240>;
+		dvfs_limit_max_freq = <0x16e360>;
+		cpu_freq_200000 = <0x505 0x432 0x37 0x32a 0x44c 0x4b0>;
+		cpu_freq_400000 = <0x505 0x432 0x37 0x32a 0x44c 0x4b0>;
+		cpu_freq_600000 = <0x566 0x497 0x28 0x32a 0x44c 0x4b0>;
+		cpu_freq_800000 = <0x59a 0x4ea 0x28 0x32a 0x44c 0x4b0>;
+		cpu_freq_1000000 = <0x61c 0x563 0x28 0x32a 0x44c 0x4b0>;
+		cpu_freq_1250000 = <0x6d3 0x5eb 0x28 0x32a 0x44c 0x4b0>;
+		cpu_freq_1300000 = <0x710 0x60e 0x28 0x32a 0x44c 0x4b0>;
+		cpu_freq_1500000 = <0x6d3 0x5eb 0x28 0x32a 0x44c 0x4b0>;
+		cpu_freq_1650000 = <0x00 0x47e 0x00 0x32a 0x47e 0x4b0>;
+		cpu_freq_2000000 = <0x00 0x47e 0x00 0x32a 0x47e 0x4b0>;
+		otp_compensation_enable = <0x44f 0x01>;
+		otp_freq_200000 = <0x44c 0x00 0x0f>;
+		otp_freq_400000 = <0x44c 0x00 0x0f>;
+		otp_freq_600000 = <0x44c 0x04 0x0f>;
+		otp_freq_800000 = <0x44d 0x00 0x0f>;
+		otp_freq_1000000 = <0x44d 0x04 0x0f>;
+		otp_freq_1250000 = <0x44e 0x00 0x0f>;
+		otp_freq_1500000 = <0x44e 0x00 0x0f>;
+		hpm_param = <0xf80000b4 0x10 0xffff 0xb4 0x1ae>;
+		core_regulator_name = "dvdd";
+		phandle = <0x1c>;
+	};
+		regulator@f8a23020 {
+			compatible = "hivendor,hi3798mv310-volt";
+			reg = <0xf8a2301c 0x04>;
+			reg-names = "Hivendor GPU Regulator";
+			regulator-name = "vdd-gpu";
+			regulator-min-microvolt = <0xafc80>;
+			regulator-max-microvolt = <0x1214e8>;
+			regulator-always-on;
+			status = "okay";
+			phandle = <0x3e>;
+		};
+
+		edid {
+		gpu_vmodel {
+			compatible = "gpu,vmodel";
+			phandle = <0x16>;
+
+			vmodel@200000 {
+				vmodel-constant = <0x479>;
+				vmodel-ratio = <0x480>;
+				vmodel-minimum = <0x32a>;
+				vmodel-lgain = <0x28>;
+				vmodel-hgain = <0x00>;
+				vmodel-otp-volt = <0x28>;
+			};
+
+			vmodel@300000 {
+				vmodel-constant = <0x479>;
+				vmodel-ratio = <0x480>;
+				vmodel-minimum = <0x32a>;
+				vmodel-lgain = <0x28>;
+				vmodel-hgain = <0x00>;
+				vmodel-otp-volt = <0x28>;
+			};
+
+			vmodel@400000 {
+				vmodel-constant = <0x494>;
+				vmodel-ratio = <0x4c9>;
+				vmodel-minimum = <0x32a>;
+				vmodel-lgain = <0x32>;
+				vmodel-hgain = <0x00>;
+				vmodel-otp-volt = <0x28>;
+			};
+
+			vmodel@540000 {
+				vmodel-constant = <0x494>;
+				vmodel-ratio = <0x4c9>;
+				vmodel-minimum = <0x32a>;
+				vmodel-lgain = <0x32>;
+				vmodel-hgain = <0x00>;
+				vmodel-otp-volt = <0x28>;
+			};
+
+			vmodel@712000 {
+				vmodel-constant = <0x553>;
+				vmodel-ratio = <0x677>;
+				vmodel-minimum = <0x32a>;
+				vmodel-lgain = <0x1e>;
+				vmodel-hgain = <0x00>;
+				vmodel-otp-volt = <0x28>;
+			};
+		};
+
+		gpu_temperature {
+			compatible = "gpu,temperature";
+			l_temperature_l = <0x23>;
+			l_temperature_h = <0x28>;
+			h_temperature_l = <0x28>;
+			h_temperature_h = <0x2d>;
+			phandle = <0x17>;
+		};
+
+		gpu@f9200000 {
+			compatible = "arm,mali-450", "arm,mali-utgard";
+			interrupt-parent = <0x01>;
+			reg = <0xf9200000 0x10000>;
+			interrupts = <0x00 0x5e 0x04 0x00 0x5e 0x04 0x00 0x5e 0x04 0x00 0x5e 0x04 0x00 0x5e 0x04 0x00 0x5e 0x04 0x00 0x5e 0x04 0x00 0x5e 0x04>;
+			interrupt-names = "IRQGP", "IRQGPMMU", "IRQPP0", "IRQPPMMU0", "IRQPP1", "IRQPPMMU1", "IRQPMU", "IRQPP";
+			pmu_domain_config = <0x01 0x02 0x02 0x00 0x00 0x00 0x00 0x00 0x00 0x01 0x02 0x00>;
+			pmu_switch_delay = <0x1ff>;
+			#cooling-cells = <0x02>;
+			clocks = <0x0c 0x124>;
+			clock-names = "clk_mali";
+			irq_affinity = <0x03>;
+			mali-supply = <0x15>;
+			gpu_vmodel = <0x16>;
+			gpu_temperature = <0x17>;
+			default-frequency = <0x202fbf00>;
+			max-utilization = <0x3c>;
+			min-utilization = <0x1e>;
+			max-frequency = "*pB";
+			min-frequency = <0xbebc200>;
+			operating-points-tt = <0xbebc200 0x30d40 0x11e1a300 0x493e0 0x17d78400 0x61a80 0x202fbf00 0x83d60 0x2a704200 0xadd40>;
+			cooling-min-state = <0x00>;
+			cooling-max-state = <0x06>;
+			status = "okay";
+			ipa-model = "mali-simple-power-model";
+			phandle = <0x05>;
+
+			power_model0 {
+				compatible = "arm,mali-simple-power-model";
+				static-coefficient = <0x9d05>;
+				dynamic-coefficient = <0x299>;
+				ts = <0xffffac8e 0xf01 0xffffffa6 0x01>;
+				thermal-zone = [00];
+				phandle = <0x40>;
+			};
+system image /system/lib/modules
+debugfs 1.47.4 (6-Mar-2025)
+/system/lib/modules: File not found by ext2_lookup 
+vendor image /lib/modules
+debugfs 1.47.4 (6-Mar-2025)
+/262/040755/0/2000/.//
+/94/040755/0/2000/..//
+/263/100644/0/0/btmtk_uart_unify.ko/185848/
+/264/100644/0/0/uwe5621_bt_sdio.ko/44172/
+/265/100644/0/0/wlan_mt7961_pcie.ko/2844580/
+/266/100644/0/0/rtk_btusb.ko/68456/
+/267/100644/0/0/rtl8822cs.ko/3106404/
+/268/100644/0/0/hi_sdio_detect.ko/4876/
+/269/100644/0/0/uwe5621_bsp_sdio.ko/247804/
+/270/100644/0/0/uwe5621_wifi_sdio.ko/397820/
+

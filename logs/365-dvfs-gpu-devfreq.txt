@@ -1,0 +1,33 @@
+
+# D=/sys/class/devfreq/f9200000.gpu; grep ^ $D/governor $D/available_governors $D/available_frequencies $D/cur_freq /sys/class/regulator/regulator.2/microvolts
+/sys/class/devfreq/f9200000.gpu/governor:simple_ondemand
+/sys/class/devfreq/f9200000.gpu/available_governors:userspace powersave performance simple_ondemand
+/sys/class/devfreq/f9200000.gpu/available_frequencies:200000000 300000000
+/sys/class/devfreq/f9200000.gpu/cur_freq:200000000
+/sys/class/regulator/regulator.2/microvolts:896607
+# 
+[host] shell command elapsed: 0.06 s
+D=/sys/class/devfreq/f9200000.gpu; echo userspace > $D/governor; for f in 200000000 300000000; do echo $f > $D/userspace/set_freq; echo "=== GPU $f (cur=$(cat $D/cur_freq), dvdd=$(cat /sys/class/regulator/regulator.2/microvolts)) ==="; lima-test; done; echo simple_ondemand > $D/governor; cat $D/governor
+=== GPU 200000000 (cur=200000000, dvdd=896607) ===
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+=== GPU 300000000 (cur=300000000, dvdd=896607) ===
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+simple_ondemand
+# 
+[host] shell command elapsed: 0.16 s

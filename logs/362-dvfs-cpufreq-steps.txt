@@ -1,0 +1,25 @@
+
+# P=/sys/devices/system/cpu/cpufreq/policy0; echo userspace > $P/scaling_governor; for f in 200000 400000 600000 800000 1000000; do echo $f > $P/scaling_setspeed; echo "=== $f ==="; cat $P/cpuinfo_cur_freq /sys/class/regulator/regulator.1/microvolts; time -p dd if=/dev/zero bs=1M count=32 2>/dev/null | md5sum; done; echo schedutil > $P/scaling_governor; cat $P/scaling_governor
+=== 200000 ===
+200000
+1051358
+sh: md5sum: not found
+=== 400000 ===
+400000
+1051358
+sh: md5sum: not found
+=== 600000 ===
+600000
+1051358
+sh: md5sum: not found
+=== 800000 ===
+800000
+1100227
+sh: md5sum: not found
+=== 1000000 ===
+1000000
+1100227
+sh: md5sum: not found
+schedutil
+# 
+[host] shell command elapsed: 0.08 s

@@ -1,0 +1,277 @@
+<INTERRUPT>
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.160
+fastboot#setenv tftpdstp 1069
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+171130880 Bytes/s
+fastboot#tftpboot 1fdffc0 hg680kd-arm64-7.2.5-all-2g-hdmi-bt-dvfs.img
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.160; our IP address is 192.168.6.249
+Filename 'hg680kd-arm64-7.2.5-all-2g-hdmi-bt-dvfs.img'.
+Load address: 0x1fdffc0
+Loading: *#	[ Connected ]
+################################	[ 2.888 MB]
+################################	[ 5.752 MB]
+################################	[ 8.616 MB]
+################################	[11.480 MB]
+#####################
+	 1.4 MiB/s
+done
+Bytes transferred = 14008392 (d5c048 hex)
+fastboot#crc32 1fdffc0 d5c048
+CRC32 for 01fdffc0 ... 02d3c007 ==> 1d1124ee
+fastboot#
+[host] CRC32 matches local image: 1d1124ee
+bootm 0x1fdffc0
+## Booting kernel from Legacy Image at 01fdffc0 ...
+   Image Name:   Linux HG680KD ARM64
+   Image Type:   AArch64 Linux Kernel Image (uncompressed)
+   Data Size:    14008328 Bytes = 13.4 MiB
+   Load Address: 01fe0000
+   Entry Point:  01fe0000
+   XIP Kernel Image
+
+Starting kernel ...
+
+Start ATF with aarch64 kernel...
+bl33_ep->spsr = 0x3C5
+Start Warm Reseting
+[   39.314219][cpu0]NOTICE:  BL31: lts-v2.8.6(release):98d5f24
+[   39.318311][cpu0]NOTICE:  BL31: Built : 21:47:11, Jul 22 2024
+[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+[    0.000000] Linux version 7.2.5-hg680kd-arm64-all-2g-hdmi-bt-dvfs (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+[    0.000000] Machine model: FiberHome HG680KD (ARM64)
+[    0.000000] earlycon: pl11 at MMIO32 0x00000000f8b00000 (options '')
+[    0.000000] printk: legacy bootconsole [pl11] enabled
+[    0.000000] printk: debug: ignoring loglevel setting.
+[    0.000000] OF: reserved mem: 0x00000000053e0000..0x0000000005bdffff (8192 KiB) nomap non-reusable firmware-log@53e0000
+[    0.000000] OF: reserved mem: 0x00000000063dc000..0x00000000063dffff (16 KiB) nomap non-reusable crash-log@63dc000
+[    0.000000] OF: reserved mem: 0x0000000008000000..0x00000000083fffff (4096 KiB) nomap non-reusable atf@8000000
+[    0.000000] OF: reserved mem: 0x0000000017ff8000..0x0000000017ffffff (32 KiB) nomap non-reusable uboot-resmem-low@17ff8000
+[    0.000000] OF: reserved mem: 0x000000007f67f000..0x000000007f6c0fff (264 KiB) nomap non-reusable uboot-resmem-high@7f67f000
+[    0.000000] OF: reserved mem: 0x000000007f6c1000..0x000000007fea9fff (8100 KiB) nomap non-reusable framebuffer@7f6c1000
+[    0.000000] OF: reserved mem: 0x000000007feaa000..0x000000007fffffff (1368 KiB) nomap non-reusable uboot-resmem-tail@7feaa000
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.2
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000000000000-0x000000007fffffff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000053dffff]
+[    0.000000]   node   0: [mem 0x00000000053e0000-0x0000000005bdffff]
+[    0.000000]   node   0: [mem 0x0000000005be0000-0x00000000063dbfff]
+[    0.000000]   node   0: [mem 0x00000000063dc000-0x00000000063dffff]
+[    0.000000]   node   0: [mem 0x00000000063e0000-0x0000000007ffffff]
+[    0.000000]   node   0: [mem 0x0000000008000000-0x00000000083fffff]
+[    0.000000]   node   0: [mem 0x0000000008400000-0x0000000017ff7fff]
+[    0.000000]   node   0: [mem 0x0000000017ff8000-0x0000000017ffffff]
+[    0.000000]   node   0: [mem 0x0000000018000000-0x000000007f67efff]
+[    0.000000]   node   0: [mem 0x000000007f67f000-0x000000007fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000007fffffff]
+[    0.000000] percpu: Embedded 15 pages/cpu s29656 r0 d31784 u61440
+[    0.000000] pcpu-alloc: s29656 r0 d31784 u61440 alloc=15*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+[    0.000000] Detected VIPT I-cache on CPU0
+[    0.000000] CPU features: detected: GICv3 CPU interface
+[    0.000000] alternatives: applying boot alternatives
+[    0.000000] Kernel command line: console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro
+[    0.000000] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+[    0.000000] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.000000] software IO TLB: SWIOTLB bounce buffer size adjusted to 2MB
+[    0.000000] software IO TLB: area num 4.
+[    0.000000] software IO TLB: mapped [mem 0x000000007cd00000-0x000000007cf00000] (2MB)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 524288
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] GICv3: 224 SPIs implemented
+[    0.000000] GICv3: 0 Extended SPIs implemented
+[    0.000000] Root IRQ handler: gic_handle_irq
+[    0.000000] GICv3: GICv3 features: 16 PPIs
+[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0x00000000f1040000
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.000000] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.008231] Console: colour dummy device 80x25
+[    0.012741] printk: legacy console [tty0] enabled
+[    0.017934] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+[    0.028338] pid_max: default: 32768 minimum: 301
+[    0.033201] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.040709] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.048930] VFS: Finished mounting rootfs on nullfs
+[    0.054261] cacheinfo: Unable to detect cache hierarchy for CPU 0
+[    0.061193] rcu: Hierarchical SRCU implementation.
+[    0.066069] rcu: 	Max phase no-delay instances is 1000.
+[    0.071905] smp: Bringing up secondary CPUs ...
+[    0.076917] Detected VIPT I-cache on CPU1
+[    0.076985] GICv3: CPU1: found redistributor 100 region 0:0x00000000f1060000
+[    0.077020] CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
+[    0.077461] Detected VIPT I-cache on CPU2
+[    0.077507] GICv3: CPU2: found redistributor 200 region 0:0x00000000f1080000
+[    0.077530] CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
+[    0.077926] Detected VIPT I-cache on CPU3
+[    0.077970] GICv3: CPU3: found redistributor 300 region 0:0x00000000f10a0000
+[    0.077993] CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
+[    0.078064] smp: Brought up 1 node, 4 CPUs
+[    0.135621] SMP: Total of 4 processors activated.
+[    0.140386] CPU: All CPU(s) started at EL1
+[    0.144535] CPU features: detected: 32-bit EL0 Support
+[    0.149741] CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+[    0.158465] CPU features: detected: CRC32 instructions
+[    0.163673] CPU features: detected: RCpc load-acquire (LDAPR)
+[    0.169493] CPU features: detected: LSE atomic instructions
+[    0.175138] CPU features: detected: Privileged Access Never
+[    0.180784] CPU features: detected: XNX
+[    0.184663] CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+[    0.191740] alternatives: applying system-wide alternatives
+[    0.199702] Memory: 2015552K/2097152K available (6336K kernel code, 816K rwdata, 1600K rodata, 4672K init, 239K bss, 78316K reserved, 0K cma-reserved)
+[    0.214043] devtmpfs: initialized
+[    0.219184] posixtimers hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    0.226766] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.236387] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.242793] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.250902] thermal_sys: Registered thermal governor 'step_wise'
+[    0.250964] ASID allocator initialised with 65536 entries
+[    0.262575] Serial: AMBA PL011 UART driver
+[    0.268094] f8b00000.serial: ttyAMA0 at MMIO 0xf8b00000 (irq = 13, base_baud = 0) is a PL011 rev2
+[    0.277152] printk: console [ttyAMA0] enabled
+[    0.277152] printk: console [ttyAMA0] enabled
+[    0.285936] printk: legacy bootconsole [pl11] disabled
+[    0.285936] printk: legacy bootconsole [pl11] disabled
+[    0.297934] f8b02000.serial: ttyAMA1 at MMIO 0xf8b02000 (irq = 14, base_baud = 0) is a PL011 rev2
+[    0.298117] serial serial0: tty port ttyAMA1 registered
+[    0.312596] SCSI subsystem initialized
+[    0.312762] usbcore: registered new interface driver usbfs
+[    0.312802] usbcore: registered new interface driver hub
+[    0.312841] usbcore: registered new device driver usb
+[    0.313394] Bluetooth: Core ver 2.22
+[    0.313444] NET: Registered PF_BLUETOOTH protocol family
+[    0.313459] Bluetooth: HCI device and connection manager initialized
+[    0.313477] Bluetooth: HCI socket layer initialized
+[    0.313492] Bluetooth: L2CAP socket layer initialized
+[    0.313511] Bluetooth: SCO socket layer initialized
+[    0.316385] clocksource: Switched to clocksource arch_sys_counter
+[    0.322626] NET: Registered PF_INET protocol family
+[    0.322794] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    0.324176] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.324215] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.324254] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    0.324363] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+[    0.324800] TCP: Hash tables configured (established 16384 bind 16384)
+[    0.324906] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.341819] workingset: timestamp_bits=62 (anon: 57) max_order=19 bucket_order=0 (anon: 0)
+[    0.348275] pl061_gpio f8b24000.gpio: PL061 GPIO chip registered
+[    0.352445] [drm] Initialized simpledrm 1.0.0 for 7f6c1000.framebuffer on minor 0
+[    0.395997] Console: switching to colour frame buffer device 240x67
+[    0.425469] simple-framebuffer 7f6c1000.framebuffer: [drm] fb0: simpledrmdrmfb frame buffer device
+[    0.426275] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+[    0.426364] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+[    0.426421] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+[    0.426479] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+[    0.426526] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+[    0.426900] lima f9200000.gpu: bus rate = 200000000
+[    0.426946] lima f9200000.gpu: mod rate = 200000000
+[    0.427059] lima f9200000.gpu: error -19: _opp_set_regulators: no regulator (mali) found
+[    0.427735] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 1
+[    0.441186] (unnamed net_device) (uninitialized): using random MAC address 2a:f1:f3:46:27:43
+[    0.444060] xhci-hi3798mv320 f98a0000.usb: xHCI Host Controller
+[    0.444149] xhci-hi3798mv320 f98a0000.usb: new USB bus registered, assigned bus number 1
+[    0.444310] xhci-hi3798mv320 f98a0000.usb: hcc params 0x0228fe6d hci version 0x110 quirks 0x0000000020000010
+[    0.444914] xhci-hi3798mv320 f98a0000.usb: irq 18, io mem 0xf98a0000
+[    0.445112] xhci-hi3798mv320 f98a0000.usb: xHCI Host Controller
+[    0.445158] xhci-hi3798mv320 f98a0000.usb: new USB bus registered, assigned bus number 2
+[    0.445212] xhci-hi3798mv320 f98a0000.usb: Host supports USB 3.0 SuperSpeed
+[    0.446467] hub 1-0:1.0: USB hub found
+[    0.446693] hub 1-0:1.0: 2 ports detected
+[    0.447327] usb usb2: We don't know the algorithms for LPM for this host, disabling LPM.
+[    0.448160] hub 2-0:1.0: USB hub found
+[    0.448368] hub 2-0:1.0: 1 port detected
+[    0.448962] usbcore: registered new interface driver usb-storage
+[    0.449379] Bluetooth: HCI UART driver ver 2.3
+[    0.449452] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[    0.454610] cpufreq: cpufreq_policy_online: CPU0: Running at unlisted initial frequency: 1250000 kHz, changing to: 1000000 kHz
+[    0.484404] mmc0: SDHCI controller on f9830000.mmc [f9830000.mmc] using ADMA
+[    0.484842] NET: Registered PF_PACKET protocol family
+[    0.498333] clk: Not disabling unused clocks
+[    0.641231] mmc0: new HS400 Enhanced strobe MMC card at address 0001
+[    0.642173] mmcblk0: mmc0:0001 B10030 7.28 GiB (ro)
+[    0.643025]  mmcblk0: p1(system) p2(vendor)
+[    0.643740] mmcblk0rpmb: mmc0:0001 B10030 4.00 MiB, chardev (253:0)
+[    0.696411] usb 1-2: new high-speed USB device number 2 using xhci-hi3798mv320
+[    0.840640] usb-storage 1-2:1.0: USB Mass Storage device detected
+[    0.841692] scsi host0: usb-storage 1-2:1.0
+[    1.073133] Freeing unused kernel memory: 4672K
+[    1.073418] Run /init as init process
+[    1.073455]   with arguments:
+[    1.073483]     /init
+[    1.073507]   with environment:
+[    1.075474]     HOME=/
+[    1.080446]     TERM=linux
+
+[    1.095219] Bluetooth: (null): Too short H5 packet
+HG680KD AArch64 RAM bring-up
+Linux hg680kd 7.2.5-hg680kd-arm64-all-2g-hdmi-bt-dvfs #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+Online CPUs: 0-3
+Clocksource: arch_sys_counter
+Timer int[    1.115277] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
+errupt counts before and after one second:
+            [    1.129094] Bluetooth: hci0: RTL: rom_version status=0 version=3
+CPU0       CPU1 [    1.131186] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_fw.bin
+      CPU2      [    1.133594] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_config.bin
+ CPU3       
+  11:        274        237        203        254  GICv3      27 Level     arch_timer
+1.00 3.01
+[    1.176484] Bluetooth: hci0: RTL: cfg_sz 110, total sz 21738
+[    1.871008] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+[    1.878935] scsi 0:0:0:0: Direct-Access      USB      SanDisk 3.2Gen1 1.00 PQ: 0 ANSI: 6
+[    1.893735] sd 0:0:0:0: [sda] 60125184 512-byte logical blocks: (30.8 GB/28.7 GiB)
+[    1.902400] sd 0:0:0:0: [sda] Write Protect is off
+[    1.907005] sd 0:0:0:0: [sda] Mode Sense: 43 00 00 00
+[    1.913073] sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+[    1.950293]  sda: sda1
+[    1.953144] sd 0:0:0:0: [sda] Attached SCSI removable disk
+            CPU0       CPU1       CPU2       CPU3       
+  11:        568        489        449        505  GICv3      27 Level     arch_timer
+2.00 6.63
+
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+# echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 4; mount -t debugfs debugfs /sys/kernel/debug; uname -a; cat /sys/block/mmcblk0/ro /sys/block/mmcblk0/mmcblk0p1/ro /sys/block/mmcblk0/mmcblk0p2/ro; ls -l /dev/dri /sys/class/devfreq /sys/class/thermal; cat /sys/class/thermal/thermal_zone0/temp; cat /sys/kernel/debug/devices_deferred; cat /sys/class/devfreq/f9200000.gpu/available_frequencies
+Linux hg680kd 7.2.5-hg680kd-arm64-all-2g-hdmi-bt-dvfs #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+1
+1
+1
+/sys/class/thermal:
+lrwxrwxrwx    1         0 cooling_device0 -> ../../devices/virtual/thermal/cooling_device0
+lrwxrwxrwx    1         0 thermal_zone0 -> ../../devices/virtual/thermal/thermal_zone0
+lrwxrwxrwx    1         0 cooling_device1 -> ../../devices/virtual/thermal/cooling_device1
+
+/sys/class/devfreq:
+lrwxrwxrwx    1         0 f9200000.gpu -> ../../devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu
+
+/dev/dri:
+crw-------    1  226,   0 card0
+crw-------    1  226, 128 renderD128
+crw-------    1  226,   1 card1
+58000
+200000000 300000000
+# 
+[host] shell command elapsed: 0.09 s

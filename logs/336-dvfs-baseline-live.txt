@@ -1,0 +1,28 @@
+ __recovery__into no IR KEY
+lsadc value 109
+already set hardwareid and boardid, skip!
+env not set emergency_log, skip!
+Reserve Memory
+    Start Addr:          0x7FFFE000
+    Bound Addr:          0x20000000
+    Free  Addr:          0x7F684000
+    Alloc Block:  Addr         Size
+                  0x17FFD000   0x2000
+                  0x17FFB000   0x1000
+                  0x17FF8000   0x2000
+                  0x7FEAB000   0x152000
+                  0x7F6C1000   0x7E9000
+                  0x7F6BF000   0x1000
+                  0x7F6B5000   0x9000
+                  0x7F684000   0x30000
+
+BBOX:
+[INFO][create_reboot_reason_cmdline][reboot_reason=AP_S_AWDT][exception_subtype=SUB_APWDT_AP]
+[INFO][record_exce_type]:set reboot_reason is 0xff
+Autobooting in 3 seconds, Press Ctrl+C to stop autoboot
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#

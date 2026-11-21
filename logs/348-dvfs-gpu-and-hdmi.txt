@@ -1,0 +1,66 @@
+
+# g=/sys/class/devfreq/f9200000.gpu; cat $g/available_governors $g/available_frequencies $g/governor; cat /sys/class/thermal/thermal_zone0/cdev0_trip_point /sys/class/thermal/thermal_zone0/cdev1_trip_point; echo userspace > $g/governor; for f in 200000000 300000000 200000000; do echo "$f" > $g/userspace/set_freq || break; echo "GPU REQUEST $f"; lima-test; echo "LIMA_EXIT=$?"; cat $g/cur_freq; grep "gpu_core " /sys/kernel/debug/clk/clk_summary; done; cat $g/trans_stat; echo simple_ondemand > $g/governor
+userspace powersave performance simple_ondemand
+200000000 300000000
+simple_ondemand
+0
+0
+GPU REQUEST 200000000
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+LIMA_EXIT=0
+200000000
+ gpu_core                            1       1        0        200000000   0          0     50000      N   f9200000.gpu                    core                     
+GPU REQUEST 300000000
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+LIMA_EXIT=0
+300000000
+ gpu_core                            1       1        0        300000000   0          0     50000      N   f9200000.gpu                    core                     
+GPU REQUEST 200000000
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+LIMA_EXIT=0
+200000000
+ gpu_core                            1       1        0        200000000   0          0     50000      N   f9200000.gpu                    core                     
+     From  :   To
+           : 200000000 300000000   time(ms)
+* 200000000:         0         1    168196
+  300000000:         1         0         8
+Total transition : 2
+# 
+[host] shell command elapsed: 0.30 s
+ls -l /dev/fb0 /dev/dri; cat /sys/kernel/debug/dri/0/name /sys/class/graphics/fb0/virtual_size; echo 0 >/sys/class/graphics/fbcon/cursor_blink; printf "\033[?25l" >/dev/tty1; fb-test; echo FB_EXIT=$?
+crw-------    1   29,   0 /dev/fb0
+
+/dev/dri:
+crw-------    1  226,   0 card0
+crw-------    1  226, 128 renderD128
+crw-------    1  226,   1 card1
+simpledrm dev=7f6c1000.framebuffer unique=7f6c1000.framebuffer
+1920,1080
+fbdev color bars: 1920x1080, pitch 7680, 1080 rows read back
+FB_EXIT=0
+# 
+[host] shell command elapsed: 0.11 s

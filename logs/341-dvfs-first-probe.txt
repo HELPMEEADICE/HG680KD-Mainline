@@ -1,0 +1,72 @@
+
+# mount -t debugfs debugfs /sys/kernel/debug; dmesg | grep -iE "lima|f9200000|devfreq|opp|regulator|APLL|thermal|cpufreq"; cat /sys/kernel/debug/devices_deferred; ls -l /dev/dri
+<6>[    0.250942] thermal_sys: Registered thermal governor 'step_wise'
+<6>[    0.497443] cpufreq: cpufreq_policy_online: CPU0: Running at unlisted initial frequency: 1250000 kHz, changing to: 1000000 kHz
+f9200000.gpu	
+crw-------    1  226,   0 card0
+# 
+[host] shell command elapsed: 0.06 s
+p=/sys/devices/system/cpu/cpufreq/policy0; cat $p/scaling_available_governors $p/scaling_available_frequencies $p/related_cpus $p/scaling_governor; cat /sys/kernel/debug/regulator/regulator_summary; cat /sys/class/thermal/thermal_zone0/trip_point_*_temp
+userspace powersave performance schedutil 
+200000 400000 600000 800000 1000000 
+0 1 2 3
+schedutil
+ regulator                      use open bypass  opmode voltage current     min     max
+---------------------------------------------------------------------------------------
+ regulator-dummy                  1    0      0 unknown     0mV     0mA     0mV     0mV 
+ cpu                              2    1      0 unknown  1100mV     0mA   750mV  1200mV 
+    cpu0-cpu                      1                                 0mA  1100mV  1102mV
+68000
+83000
+86000
+88000
+# 
+[host] shell command elapsed: 0.08 s
+p=/sys/devices/system/cpu/cpufreq/policy0; echo userspace > $p/scaling_governor; for f in 200000 400000 600000 800000 1000000; do echo "$f" > $p/scaling_setspeed; echo "REQUEST $f"; cat $p/cpuinfo_cur_freq /sys/class/thermal/thermal_zone0/temp; grep " cpu " /sys/kernel/debug/regulator/regulator_summary; cat /proc/uptime; dd if=/dev/zero bs=1M count=32 | sha256sum; cat /proc/uptime; done; echo schedutil > $p/scaling_governor
+REQUEST 200000
+200000
+57000
+ cpu                              2    1      0 unknown  1051mV     0mA   750mV  1200mV 
+18.33 72.08
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+24.15 89.33
+REQUEST 400000
+400000
+57000
+ cpu                              2    1      0 unknown  1051mV     0mA   750mV  1200mV 
+24.16 89.37
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+27.05 97.95
+REQUEST 600000
+600000
+58000
+ cpu                              2    1      0 unknown  1051mV     0mA   750mV  1200mV 
+27.06 97.97
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+28.98 103.65
+REQUEST 800000
+800000
+58000
+ cpu                              2    1      0 unknown  1100mV     0mA   750mV  1200mV 
+28.99 103.67
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+30.43 107.94
+REQUEST 1000000
+1000000
+59000
+ cpu                              2    1      0 unknown  1100mV     0mA   750mV  1200mV 
+30.44 107.96
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+31.59 111.36
+# 
+[host] shell command elapsed: 13.33 s

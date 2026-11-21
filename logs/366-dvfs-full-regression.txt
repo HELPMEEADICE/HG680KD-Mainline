@@ -1,0 +1,34 @@
+
+# grep ^ /sys/devices/system/cpu/online /sys/block/mmcblk0/ro /sys/block/mmcblk0/mmcblk0p*/ro /sys/class/graphics/fb0/virtual_size /sys/class/drm/card0-*/modes /sys/block/sda/size; grep -c ^processor /proc/cpuinfo; grep MemTotal /proc/meminfo; free -m
+/sys/devices/system/cpu/online:0-3
+/sys/block/mmcblk0/ro:1
+/sys/block/mmcblk0/mmcblk0p1/ro:1
+/sys/block/mmcblk0/mmcblk0p2/ro:1
+/sys/class/graphics/fb0/virtual_size:1920,1080
+/sys/class/drm/card0-Unknown-1/modes:1920x1080
+/sys/block/sda/size:60125184
+4
+MemTotal:        2023512 kB
+              total        used        free      shared  buff/cache   available
+Mem:        2023512       17372     1993964       11292       12176     1984696
+Swap:             0           0           0
+# 
+[host] shell command elapsed: 0.06 s
+bt-test; fb-test
+hci0: HCI 0x09 rev 0x1ed6, LMP 0x09 subver 0xb420, manufacturer 0x005d
+hci0: controller BD_ADDR 00:E0:4C:23:99:87
+Framebuffer readback failed at row 1056
+# 
+[host] shell command elapsed: 0.11 s
+ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 2; ping -c 3 192.168.6.160
+[  143.242885] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+64 bytes from 192.168.6.160: seq=0 ttl=64 time=4.192 ms
+64 bytes from 192.168.6.160: seq=1 ttl=64 time=0.390 ms
+64 bytes from 192.168.6.160: seq=2 ttl=64 time=0.361 ms
+
+--- 192.168.6.160 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.361/1.647/4.192 ms
+# 
+[host] shell command elapsed: 4.05 s

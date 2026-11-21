@@ -1,0 +1,208 @@
+
+# p=/sys/devices/system/cpu/cpufreq/policy0; z=/sys/class/thermal/thermal_zone0; cat $p/scaling_available_governors $p/scaling_available_frequencies $p/related_cpus; ls -l $z/cdev*; for d in /sys/class/thermal/cooling_device*; do cat $d/type $d/cur_state $d/max_state; done
+userspace powersave performance schedutil 
+200000 400000 600000 800000 1000000 
+0 1 2 3
+-rw-r--r--    1      4096 /sys/class/thermal/thermal_zone0/cdev1_weight
+-r--r--r--    1      4096 /sys/class/thermal/thermal_zone0/cdev1_trip_point
+lrwxrwxrwx    1         0 /sys/class/thermal/thermal_zone0/cdev1 -> ../cooling_device1
+-rw-r--r--    1      4096 /sys/class/thermal/thermal_zone0/cdev0_weight
+-r--r--r--    1      4096 /sys/class/thermal/thermal_zone0/cdev0_trip_point
+lrwxrwxrwx    1         0 /sys/class/thermal/thermal_zone0/cdev0 -> ../cooling_device0
+devfreq-f9200000.gpu
+0
+1
+cpufreq-cpu0
+0
+4
+# 
+[host] shell command elapsed: 0.08 s
+p=/sys/devices/system/cpu/cpufreq/policy0; echo userspace > $p/scaling_governor; for f in 200000 400000 600000 800000 1000000; do echo "$f" > $p/scaling_setspeed || break; echo "REQUEST $f kHz"; cat $p/cpuinfo_cur_freq /sys/class/thermal/thermal_zone0/temp; grep " cpu " /sys/kernel/debug/regulator/regulator_summary; cat /proc/uptime; dd if=/dev/zero bs=1M count=32 | sha256sum; cat /proc/uptime; done; echo schedutil > $p/scaling_governor
+REQUEST 200000 kHz
+200000
+56000
+ cpu                              2    1      0 unknown  1051mV     0mA   750mV  1200mV 
+113.72 453.46
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+119.53 470.66
+REQUEST 400000 kHz
+400000
+57000
+ cpu                              2    1      0 unknown  1051mV     0mA   750mV  1200mV 
+119.54 470.70
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+122.42 479.26
+REQUEST 600000 kHz
+600000
+57000
+ cpu                              2    1      0 unknown  1051mV     0mA   750mV  1200mV 
+122.43 479.28
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+124.35 484.96
+REQUEST 800000 kHz
+800000
+57000
+ cpu                              2    1      0 unknown  1100mV     0mA   750mV  1200mV 
+124.36 484.98
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+125.80 489.24
+REQUEST 1000000 kHz
+1000000
+58000
+ cpu                              2    1      0 unknown  1100mV     0mA   750mV  1200mV 
+125.81 489.25
+32+0 records in
+32+0 records out
+83ee47245398adee79bd9c0a8bc57b821e92aba10f5f9ade8a5d1fae4d8c4302  -
+126.96 492.66
+# 
+[host] shell command elapsed: 13.30 s
+p=/sys/devices/system/cpu/cpufreq/policy0; z=/sys/class/thermal/thermal_zone0; for i in 1 2 3 4 5; do echo IDLE; cat /proc/uptime $z/temp $p/cpuinfo_cur_freq; sleep 1; done; grep "^cpu[0-3] " /proc/stat
+IDLE
+126.99 492.76
+59000
+800000
+IDLE
+127.99 496.78
+57000
+800000
+IDLE
+128.99 500.79
+57000
+800000
+IDLE
+130.00 504.80
+57000
+800000
+IDLE
+131.00 508.81
+57000
+800000
+cpu0 568 0 52 12578 0 0 0 0 0 0
+cpu1 0 0 57 13138 0 0 0 0 0 0
+cpu2 0 0 45 13134 0 0 0 0 0 0
+cpu3 718 0 38 12432 4 0 0 0 0 0
+# 
+[host] shell command elapsed: 5.06 s
+p=/sys/devices/system/cpu/cpufreq/policy0; z=/sys/class/thermal/thermal_zone0; (pids=""; trap "kill \$pids 2>/dev/null; wait" EXIT; for i in 1 2 3 4; do sha256sum /dev/zero >/dev/null & pids="$pids $!"; done; for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16; do echo FOUR_CORE_LOAD; cat /proc/uptime $z/temp $p/cpuinfo_cur_freq; sleep 1; done; grep "^cpu[0-3] " /proc/stat; kill $pids; wait; trap - EXIT)
+FOUR_CORE_LOAD
+132.06 513.02
+57000
+1000000
+FOUR_CORE_LOAD
+133.08 513.02
+62000
+1000000
+FOUR_CORE_LOAD
+134.09 513.02
+64000
+1000000
+FOUR_CORE_LOAD
+135.10 513.02
+65000
+1000000
+FOUR_CORE_LOAD
+136.12 513.02
+65000
+1000000
+FOUR_CORE_LOAD
+137.13 513.02
+66000
+1000000
+FOUR_CORE_LOAD
+138.14 513.02
+67000
+1000000
+FOUR_CORE_LOAD
+139.16 513.02
+67000
+1000000
+FOUR_CORE_LOAD
+140.17 513.02
+67000
+800000
+FOUR_CORE_LOAD
+141.18 513.02
+67000
+800000
+FOUR_CORE_LOAD
+142.20 513.02
+67000
+800000
+FOUR_CORE_LOAD
+143.21 513.02
+67000
+800000
+FOUR_CORE_LOAD
+144.22 513.02
+67000
+800000
+FOUR_CORE_LOAD
+145.24 513.02
+67000
+600000
+FOUR_CORE_LOAD
+146.25 513.02
+68000
+600000
+FOUR_CORE_LOAD
+147.26 513.02
+67000
+800000
+cpu0 2166 0 76 12582 0 0 0 0 0 0
+cpu1 1596 0 83 13143 0 0 0 0 0 0
+cpu2 1601 0 66 13139 0 0 0 0 0 0
+cpu3 2317 0 61 12437 4 0 0 0 0 0
+# 
+[host] shell command elapsed: 16.27 s
+p=/sys/devices/system/cpu/cpufreq/policy0; z=/sys/class/thermal/thermal_zone0; for i in 1 2 3 4 5 6 7 8 9 10; do echo RECOVERY; cat /proc/uptime $z/temp $p/cpuinfo_cur_freq; sleep 1; done; dmesg | grep -iE "apll did not lock|hardware error|panic"
+RECOVERY
+148.31 513.17
+67000
+600000
+RECOVERY
+149.32 517.19
+64000
+800000
+RECOVERY
+150.32 521.20
+63000
+800000
+RECOVERY
+151.32 525.20
+62000
+800000
+RECOVERY
+152.33 529.22
+62000
+800000
+RECOVERY
+153.33 533.23
+61000
+800000
+RECOVERY
+154.34 537.25
+61000
+800000
+RECOVERY
+155.34 541.26
+61000
+800000
+RECOVERY
+156.34 545.28
+61000
+800000
+RECOVERY
+157.35 549.28
+60000
+800000
+# 
+[host] shell command elapsed: 10.06 s

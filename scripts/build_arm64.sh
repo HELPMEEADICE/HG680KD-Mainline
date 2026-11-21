@@ -25,9 +25,10 @@ hdmi=
 wifi_probe=
 bt=
 emmc_hs400=
+dvfs=
 case "$base_variant" in
     core) ;;
-    all-2g|all-2g-hdmi|all-2g-hdmi-wifi-probe|all-2g-hdmi-bt|all-2g-hdmi-bt-emmc-hs400)
+    all-2g|all-2g-hdmi|all-2g-hdmi-wifi-probe|all-2g-hdmi-bt|all-2g-hdmi-bt-emmc-hs400|all-2g-hdmi-bt-dvfs)
         variant_key="ARCH_HISI USB_XHCI_HI3798MV320 MMC_SDHCI_HI3798MV320 HIX5HD2_GMAC DRM_LIMA COMMON_CLK_HI3798MV320_RESET"
         bbout="$root/out/busybox-arm64-all-2g"
         board=hi3798mv320-fiberhome-hg680kd-arm64-all-2g
@@ -45,8 +46,13 @@ case "$base_variant" in
             variant_key+=" GPIOLIB GPIO_PL061 CMDLINE_PARTITION EXT4_FS FW_LOADER BT BT_BREDR BT_LE"
             variant_key+=" SERIAL_DEV_BUS SERIAL_DEV_CTRL_TTYPORT BT_HCIUART BT_HCIUART_SERDEV BT_HCIUART_3WIRE BT_HCIUART_RTL"
         fi
-        if [[ $base_variant == all-2g-hdmi-bt-emmc-hs400 ]]; then
+        if [[ $base_variant == all-2g-hdmi-bt-emmc-hs400 || $base_variant == all-2g-hdmi-bt-dvfs ]]; then
             emmc_hs400=y
+        fi
+        if [[ $base_variant == all-2g-hdmi-bt-dvfs ]]; then
+            dvfs=y
+            variant_key+=" HI3798MV320_THERMAL REGULATOR_HI3798MV320_CPU CPUFREQ_DT CPU_FREQ_THERMAL DEVFREQ_THERMAL"
+            variant_key+=" CPU_FREQ_GOV_SCHEDUTIL CPU_FREQ_GOV_PERFORMANCE CPU_FREQ_GOV_POWERSAVE DEVFREQ_GOV_USERSPACE"
         fi
         ;;
     *) echo "Unknown arm64 variant: $variant" >&2; exit 2 ;;
@@ -111,6 +117,14 @@ fi
 if [[ $emmc_hs400 ]]; then
     board+=-emmc-hs400
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/$board.dts"
+fi
+if [[ $dvfs ]]; then
+    apply_board_patch "$inputs/0008-PM-Hi3798MV320-TSENSOR-and-CPU-PWM.patch"
+    apply_board_patch "$inputs/0009-CLK-hisi-initialize-reset-controller.patch"
+    install -m644 "$inputs/hi3798mv320-thermal.c" "$linux/drivers/thermal/"
+    install -m644 "$inputs/hi3798mv320-cpu-regulator.c" "$linux/drivers/regulator/"
+    board=hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs
+    install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
 if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
     printf 'dtb-y += %s.dtb\n' "$board" >> "$linux/arch/arm64/boot/dts/hisilicon/Makefile"
@@ -267,6 +281,9 @@ if [[ $base_variant != core ]]; then
         sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g.config" >>"$config"
         if [[ $wifi_probe || $bt ]]; then
             sed '/^CONFIG_LOCALVERSION=/d; /^CONFIG_CMDLINE=/d' "$inputs/arm64-all-2g-hdmi.config" >>"$config"
+            if [[ $dvfs ]]; then
+                sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g-hdmi-bt-emmc-hs400.config" >>"$config"
+            fi
             cat "$inputs/arm64-${base_variant}.config" >>"$config"
         else
             cat "$inputs/arm64-all-2g-hdmi.config" >>"$config"

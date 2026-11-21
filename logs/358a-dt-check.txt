@@ -1,0 +1,13 @@
+
+# ls /sys/firmware/devicetree/base/soc/
+syscon@f8a21000                syscon@f8a22000
+name                           #size-cells
+gpio@f8b24000                  thermal-sensor@f8a23028
+interrupt-controller@f1000000  usb@f98a0000
+ethernet@f9840000              syscon@f8a20000
+serial@f8b00000                regulator@f8a23018
+mmc@f9830000                   gpu@f9200000
+ranges                         #address-cells
+compatible                     serial@f8b02000
+# 
+[host] shell command elapsed: 0.05 s

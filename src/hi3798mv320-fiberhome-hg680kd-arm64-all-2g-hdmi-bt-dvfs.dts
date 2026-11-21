@@ -1,0 +1,150 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-emmc-hs400.dts"
+#include <dt-bindings/thermal/thermal.h>
+
+&{/} {
+	cpu_opp: opp-table-cpu {
+		compatible = "operating-points-v2";
+		opp-shared;
+
+		opp-200000000 {
+			opp-hz = /bits/ 64 <200000000>;
+			opp-microvolt = <1050000 1050000 1052100>;
+			clock-latency-ns = <600000>;
+		};
+		opp-400000000 {
+			opp-hz = /bits/ 64 <400000000>;
+			opp-microvolt = <1050000 1050000 1052100>;
+			clock-latency-ns = <600000>;
+		};
+		opp-600000000 {
+			opp-hz = /bits/ 64 <600000000>;
+			opp-microvolt = <1050000 1050000 1052100>;
+			clock-latency-ns = <600000>;
+		};
+		opp-800000000 {
+			opp-hz = /bits/ 64 <800000000>;
+			opp-microvolt = <1100000 1100000 1102100>;
+			clock-latency-ns = <600000>;
+		};
+		opp-1000000000 {
+			opp-hz = /bits/ 64 <1000000000>;
+			opp-microvolt = <1100000 1100000 1102100>;
+			clock-latency-ns = <600000>;
+		};
+	};
+
+	gpu_opp: opp-table-gpu {
+		compatible = "operating-points-v2";
+
+		opp-200000000 {
+			opp-hz = /bits/ 64 <200000000>;
+			opp-microvolt = <897000 896000 1200000>;
+		};
+		opp-300000000 {
+			opp-hz = /bits/ 64 <300000000>;
+			opp-microvolt = <897000 896000 1200000>;
+		};
+	};
+
+	thermal-zones {
+		soc-thermal {
+			polling-delay = <200>;
+			polling-delay-passive = <50>;
+			thermal-sensors = <&tsensor>;
+
+			/* Derate the factory trips by the maximum unknown positive trim. */
+			trips {
+				passive0: trip-passive0 {
+					temperature = <68000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+				trip-passive1 {
+					temperature = <83000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+				trip-hot {
+					temperature = <86000>;
+					hysteresis = <1000>;
+					type = "hot";
+				};
+				trip-critical {
+					temperature = <88000>;
+					hysteresis = <1000>;
+					type = "critical";
+				};
+			};
+
+			cooling-maps {
+				map0 {
+					trip = <&passive0>;
+					cooling-device = <&{/cpus/cpu@0} THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
+							 <&gpu THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+				};
+			};
+		};
+	};
+};
+
+&{/cpus/cpu@0} {
+	clocks = <&crg 2>;
+	cpu-supply = <&cpu_supply>;
+	operating-points-v2 = <&cpu_opp>;
+	#cooling-cells = <2>;
+};
+
+&{/cpus/cpu@100} {
+	clocks = <&crg 2>;
+	operating-points-v2 = <&cpu_opp>;
+};
+
+&{/cpus/cpu@200} {
+	clocks = <&crg 2>;
+	operating-points-v2 = <&cpu_opp>;
+};
+
+&{/cpus/cpu@300} {
+	clocks = <&crg 2>;
+	operating-points-v2 = <&cpu_opp>;
+};
+
+&{/soc} {
+	cpu_supply: regulator@f8a23018 {
+		compatible = "hisilicon,hi3798mv320-cpu-regulator";
+		reg = <0x0 0xf8a23018 0x0 0x4>, <0x0 0xf80000b4 0x0 0x4>;
+		clocks = <&crg 2>;
+		regulator-name = "cpu";
+		regulator-min-microvolt = <750000>;
+		regulator-max-microvolt = <1200000>;
+		regulator-always-on;
+	};
+
+	dvdd_supply: regulator@f8a2301c {
+		compatible = "hisilicon,hi3798mv320-dvdd";
+		reg = <0x0 0xf8a2301c 0x0 0x4>;
+		regulator-name = "dvdd";
+		regulator-min-microvolt = <750000>;
+		regulator-max-microvolt = <1200000>;
+		regulator-always-on;
+	};
+
+	tsensor: thermal-sensor@f8a23028 {
+		compatible = "hisilicon,hi3798mv320-tsensor";
+		reg = <0x0 0xf8a23028 0x0 0x1c>;
+		#thermal-sensor-cells = <0>;
+	};
+};
+
+&crg {
+	compatible = "hisilicon,hi3798mv320-crg-dvfs", "hisilicon,hi3798mv320-crg", "syscon";
+};
+
+&gpu {
+	/* The factory GPU regulator shares the core DVDD rail. Keep its boot duty. */
+	mali-supply = <&dvdd_supply>;
+	operating-points-v2 = <&gpu_opp>;
+	#cooling-cells = <2>;
+};

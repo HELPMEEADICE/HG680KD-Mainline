@@ -1,0 +1,24 @@
+
+# dmesg | grep -iE "supplier|defer|hisi|lima|f9200000"; ls -l /sys/devices/platform/soc/f9200000.gpu; ls -l /sys/bus/platform/drivers/lima; cat /sys/devices/platform/soc/f9200000.gpu/waiting_for_supplier; ls -l /sys/bus/platform/devices/f8a22000.syscon; grep -E "gpu|cpu_cluster" /sys/kernel/debug/clk/clk_summary
+-r--r--r--    1      4096 modalias
+-r--r--r--    1      4096 waiting_for_supplier
+lrwxrwxrwx    1         0 supplier:platform:f8a22000.syscon -> ../../../virtual/devlink/platform:f8a22000.syscon--platform:f9200000.gpu
+lrwxrwxrwx    1         0 subsystem -> ../../../../bus/platform
+-rw-r--r--    1      4096 driver_override
+drwxr-xr-x    2         0 power
+lrwxrwxrwx    1         0 of_node -> ../../../../firmware/devicetree/base/soc/gpu@f9200000
+-rw-r--r--    1      4096 uevent
+--w-------    1      4096 unbind
+--w-------    1      4096 bind
+--w-------    1      4096 uevent
+0
+lrwxrwxrwx    1         0 /sys/bus/platform/devices/f8a22000.syscon -> ../../../devices/platform/soc/f8a22000.syscon
+ cpu_cluster                         0       0        0        800000000   0          0     50000      Y   cpu0                            no_connection_id         
+ gpu_core                            0       0        0        200000000   0          0     50000      N   deviceless                      no_connection_id         
+ gpu_bus                             0       0        0        200000000   0          0     50000      Y   deviceless                      no_connection_id         
+# 
+[host] shell command elapsed: 0.14 s
+echo f9200000.gpu > /sys/bus/platform/drivers/lima/bind; dmesg | grep -iE "lima|f9200000|defer|regulator"; ls /sys/class/devfreq
+echo: write error: Resource temporarily unavailable
+# 
+[host] shell command elapsed: 0.05 s
