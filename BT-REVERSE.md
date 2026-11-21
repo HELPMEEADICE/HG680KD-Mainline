@@ -67,4 +67,6 @@ python scripts/pack_arm64.py --image "$out/Image" `
 | GMAC 和 USB | 100 Mb/s 全双工，编译服务器 ICMP 3/3，SanDisk `0781:5591` 以 480 Mb/s 枚举，USB FAT 按只读方式挂载。 |
 | eMMC | 8-bit high-speed ADMA2，52 MHz 请求、48 MHz 实际，`ro=1` 及原厂 boot 容器 SHA256 均通过。 |
 
+Linux 7.2.5 前向移植目标 `arm64-7.2.5-all-2g-hdmi-bt` 已通过同口径全项实机回归（[artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img)，SHA256 `8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695`）：`hci0` 加载 `0x1ed6b420` 固件并读出 `00:E0:4C:23:99:87`、`bt-test 10` 收到 4 条真实 BLE 广播，HDMI 采集 24/24 样本通过，Lima 两次 4096/4096 像素匹配，4 核 SMP、1840 MiB 内存校验、GMAC ICMP 3/3、USB 480 Mb/s 只读挂载与 eMMC `ro=1` 全部通过。详见 [构建日志](logs/309-arm64-7.2.5-hdmi-bt-build.txt) · [最终串口](logs/312-mainline-arm64-7.2.5-hdmi-bt-final.txt) · [HDMI 采集校验](logs/313-arm64-7.2.5-hdmi-capture.txt)。
+
 回退镜像 [arm64-all-2g-hdmi-wifi-probe/boot.img](artifacts/arm64-all-2g-hdmi-wifi-probe/boot.img) 的 SHA256 仍为 `f57038eb565ef04366282a7b0a6ed2ac53fd3258df5361684a1a4cf5b4d8276d`。

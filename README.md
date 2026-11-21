@@ -43,10 +43,12 @@ fb-test
 
 | 用途 | RAM 镜像 | SHA256 |
 | --- | --- | --- |
-| HDMI + 板载蓝牙 | [arm64-all-2g-hdmi-bt/boot.img](artifacts/arm64-all-2g-hdmi-bt/boot.img) | `73d68394f7c1b20c7d031db27773224c87b3a406b09c10220d188f3ab5c3ccc8` |
+| Linux 7.2.5 HDMI + 板载蓝牙 | [arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img) | `8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695` |
+| 6.18.64 HDMI + 板载蓝牙（回退） | [arm64-all-2g-hdmi-bt/boot.img](artifacts/arm64-all-2g-hdmi-bt/boot.img) | `73d68394f7c1b20c7d031db27773224c87b3a406b09c10220d188f3ab5c3ccc8` |
+| 7.2.5 无显示/蓝牙基线（回退） | [arm64-7.2.5-all-2g/uImage](artifacts/arm64-7.2.5-all-2g/uImage) | `ba478a9a9fc9a6602a1224fbb759f955d68d7e92c43678b2abbdeb331d1aca09` |
 | 无线探测回退 | [arm64-all-2g-hdmi-wifi-probe/boot.img](artifacts/arm64-all-2g-hdmi-wifi-probe/boot.img) | `f57038eb565ef04366282a7b0a6ed2ac53fd3258df5361684a1a4cf5b4d8276d` |
 
-新目标为 `arm64-all-2g-hdmi-bt`，使用经哈希校验的原厂 VAT 固件和配置。镜像按 ARM64 Legacy uImage 方式传到 RAM 并执行 `bootm 0x1fdffc0`。进入 BusyBox 后，`bt-test` 读取版本和控制器地址，`bt-test 10` 执行 10 秒被动 BLE 扫描。
+6.18.64 目标为 `arm64-all-2g-hdmi-bt`，7.2.5 全功能目标为 `arm64-7.2.5-all-2g-hdmi-bt`，均使用经哈希校验的原厂 VAT 固件和配置。Linux 7.2.5 下 `0006` / `0007` 补丁、DTS 与 defconfig 无冲突合入并在 `aarch64-linux-gcc 14.2.0` 零错误零警告通过编译（`7.2.5` 的 `hci_h5` 新增 CRC 请求与 1-jiffy 延迟握手、`btrtl` 使用 `kzalloc_obj`/`kmalloc_obj` 均与补丁兼容）。单次 TFTP 纯 RAM 引导完整通过四核 SMP、`MemTotal = 2,023,720 KiB`、`memtest-2g 1840`、`fastfetch`、HDMI `simpledrm` 1080p 八色彩条回读与采集卡 24/24 采样校验、`hci0` 自动注册并加载固件 `0x1ed6b420`（BD_ADDR `00:E0:4C:23:99:87`，`bt-test 10` 收到 4 条真实 BLE 广播）、Mali-450 Lima 两次 4096/4096 像素匹配、GMAC 100 Mb/s ICMP 3/3、USB 480 Mb/s 只读挂载与 eMMC `ro=1` 原厂 boot 容器 SHA256 校验。详见 [7.2.5 构建日志](logs/309-arm64-7.2.5-hdmi-bt-build.txt) · [7.2.5 最终串口](logs/312-mainline-arm64-7.2.5-hdmi-bt-final.txt) · [7.2.5 HDMI 采集验证](logs/313-arm64-7.2.5-hdmi-capture.txt) · [7.2.5 HDMI 采集帧](artifacts/arm64-7.2.5-all-2g-hdmi-bt/hdmi-color-bars.png)。镜像按 ARM64 Legacy uImage 方式传到 RAM 并执行 `bootm 0x1fdffc0`。进入 BusyBox 后，`bt-test` 读取版本和控制器地址，`bt-test 10` 执行 10 秒被动 BLE 扫描。
 
 ## ARM64 HDMI 无线探测
 
@@ -98,6 +100,7 @@ bash scripts/build.sh full "$root" "$root/inputs" arm64-all-2g-hdmi-wifi-probe
 - ARM64 最小化核心验证镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-core/uImage](artifacts/arm64-core/uImage)（见 [ARM64-HANDOFF.md](ARM64-HANDOFF.md)）
 - ARM64 全功能 + 2 GiB 扩容镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-all-2g/uImage](artifacts/arm64-all-2g/uImage)（`SHA256: 4196860c3e7f499f286661f929c237d5549cb800313b84ec5306c9209228e85d`）
 - ARM64 Linux 7.2.5 全功能 + 2 GiB 扩容镜像（纯 RAM Legacy `uImage`）：[artifacts/arm64-7.2.5-all-2g/uImage](artifacts/arm64-7.2.5-all-2g/uImage)（`SHA256: ba478a9a9fc9a6602a1224fbb759f955d68d7e92c43678b2abbdeb331d1aca09`）
+- ARM64 Linux 7.2.5 全功能 + HDMI + 板载蓝牙镜像（纯 RAM Legacy `boot.img`）：[artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt/boot.img)（`SHA256: 8d77c2a170fb75bdd38db2991f380bdf5755185e15fc30538221711b603eb695`）
 
 每个产物目录同时保存内核映像（ARM32 的 `zImage` 或 ARM64 的 `Image`）、DTB、initramfs、配置、System.map、vmlinux 和 SHA256 清单。
 
