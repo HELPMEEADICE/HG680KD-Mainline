@@ -88,10 +88,10 @@ static void h264_poc_messages(struct h264_poc *poc)
 	memset(poc->arena + POC_UP_MSG, POC_POISON, POC_UP_MSG_SIZE);
 	memset(poc->arena + POC_OUTPUT, POC_POISON, POC_Y_BYTES + POC_UV_BYTES);
 
-	pub[0] = cpu_to_le32(h264_addr(POC_UP_MSG));
 	pub[2] = cpu_to_le32(0x41000003);
 	pub[3] = cpu_to_le32(0x00030000);
 	pub[4] = cpu_to_le32(h264_addr(POC_PICTURE));
+	pub[5] = cpu_to_le32(h264_addr(POC_UP_MSG));
 	pub[6] = cpu_to_le32(h264_addr(POC_STREAM));
 	pub[8] = cpu_to_le32(1);
 	pub[9] = cpu_to_le32(h264_addr(POC_OUTPUT));
@@ -104,10 +104,14 @@ static void h264_poc_messages(struct h264_poc *poc)
 	pub[25] = cpu_to_le32(h264_addr(POC_CABAC));
 	pub[30] = cpu_to_le32(h264_addr(POC_EXT_WORK + 0x1e000));
 	pub[31] = cpu_to_le32(0x00010001);
-	pub[48] = cpu_to_le32(POC_UP_MSG_SIZE);
+
+	/* POC_CORE (+0x100) follows pub[] implicitly; core[28/32/36] come from dec_hal_write_core_msg. */
+	core[28] = cpu_to_le32(h264_addr(POC_SLICE));
+	core[32] = cpu_to_le32(h264_addr(POC_UP_MSG + 0x80));
+	core[36] = cpu_to_le32(1);
 
 	/* Progressive 4:2:0 I picture, no reference history, flat scaling. */
-	pic[0] = cpu_to_le32(0x00014001);
+	pic[0] = cpu_to_le32(0x02010001);
 	for (i = 64; i < 120; i++)
 		pic[i] = cpu_to_le32(0x10101010);
 
@@ -127,7 +131,7 @@ static void h264_poc_messages(struct h264_poc *poc)
 		core[0x580 / 4 + i] = cpu_to_le32(h264_addr(POC_OUTPUT));
 	}
 	for (i = 0; i < 3; i++) {
-		core[0x5cc / 4 + i] = cpu_to_le32(0x00020020);
+		core[0x5cc / 4 + i] = cpu_to_le32(0x00200020);
 		core[0x5d8 / 4 + i] = cpu_to_le32(POC_Y_BYTES);
 		core[0x5e4 / 4 + i] = 0;
 		core[0x5fc / 4 + i] = cpu_to_le32(POC_STRIDE);
