@@ -1,0 +1,11 @@
+
+# memtest-2g
+memtest-2g: MemFree=1989 MiB, testing 1888 MiB (118 x 16 MiB chunks)
+[   13.533531] memtest-2g: CONFIG_KUSER_HELPERS disabled at 0xffff0fa0
+Segmentation fault
+# 
+[host] shell command elapsed: 3.45 s
+cat /proc/uptime
+13.78 50.72
+# 
+[host] shell command elapsed: 0.00 s

@@ -1,0 +1,88 @@
+From: HG680KD bring-up
+Subject: [PATCH] mmc: add read-only Hi3798MV320 diagnostic host
+
+Mark exposed disks read-only and block raw userspace MMC commands
+on the diagnostic host. Leave standard card initialization enabled.
+
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -159,6 +159,14 @@ config MMC_SDHCI_PLTFM
+ 
+ 	  If unsure, say N.
+ 
++config MMC_SDHCI_HI3798MV320
++	tristate "Experimental read-only Hi3798MV320 eMMC"
++	depends on MMC_SDHCI_PLTFM && (ARCH_HI3798MV320 || (ARM64 && ARCH_HISI)) && COMMON_CLK
++	select MFD_SYSCON
++	help
++	  Enable PIO eMMC diagnostics on the HG680KD. The integrated flash
++	  driver exposes the user area read-only.
++
+ config MMC_SDHCI_OF_ARASAN
+ 	tristate "SDHCI OF support for the Arasan SDHCI controllers"
+ 	depends on MMC_SDHCI_PLTFM
+diff --git a/drivers/mmc/host/Makefile b/drivers/mmc/host/Makefile
+--- a/drivers/mmc/host/Makefile
++++ b/drivers/mmc/host/Makefile
+@@ -79,5 +79,6 @@
+ 
+ obj-$(CONFIG_MMC_SDHCI_PLTFM)		+= sdhci-pltfm.o
++obj-$(CONFIG_MMC_SDHCI_HI3798MV320)	+= sdhci-hi3798mv320.o
+ obj-$(CONFIG_MMC_SDHCI_CADENCE)		+= sdhci-cadence.o
+ obj-$(CONFIG_MMC_SDHCI_ESDHC_MCF)       += sdhci-esdhc-mcf.o
+ obj-$(CONFIG_MMC_SDHCI_ESDHC_IMX)	+= sdhci-esdhc-imx.o
+diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+--- a/include/linux/mmc/host.h
++++ b/include/linux/mmc/host.h
+@@ -463,5 +463,6 @@ struct mmc_host {
+ #define MMC_CAP2_CRYPTO		0
+ #endif
+ #define MMC_CAP2_ALT_GPT_TEGRA	(1 << 28)	/* Host with eMMC that has GPT entry at a non-standard location */
++#define MMC_CAP2_FORCE_READ_ONLY	(1 << 29)	/* Diagnostic host: block media writes and raw ioctls */
+ 
+ 	bool			uhs2_sd_tran;	/* UHS-II flag for SD_TRAN state */
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1120,6 +1120,10 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+ 
+ 	switch (mq_rq->drv_op) {
+ 	case MMC_DRV_OP_IOCTL:
++		if (card->host->caps2 & MMC_CAP2_FORCE_READ_ONLY) {
++			ret = -EROFS;
++			break;
++		}
+ 		if (card->ext_csd.cmdq_en) {
+ 			ret = mmc_cmdq_disable(card);
+ 			if (ret)
+@@ -1130,6 +1134,10 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+ 
+ 		fallthrough;
+ 	case MMC_DRV_OP_IOCTL_RPMB:
++		if (card->host->caps2 & MMC_CAP2_FORCE_READ_ONLY) {
++			ret = -EROFS;
++			break;
++		}
+ 		idata = mq_rq->drv_op_data;
+ 		for (i = 0, ret = 0; i < mq_rq->ioc_count; i++) {
+ 			ret = __mmc_blk_ioctl_cmd(card, md, idata, i);
+@@ -1142,6 +1150,10 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+ 			mmc_cmdq_enable(card);
+ 		break;
+ 	case MMC_DRV_OP_BOOT_WP:
++		if (card->host->caps2 & MMC_CAP2_FORCE_READ_ONLY) {
++			ret = -EROFS;
++			break;
++		}
+ 		ret = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_BOOT_WP,
+ 				 card->ext_csd.boot_ro_lock |
+ 				 EXT_CSD_BOOT_WP_B_PWR_WP_EN,
+@@ -2490,6 +2502,7 @@ static inline int mmc_blk_readonly(struct mmc_card *card)
+ static inline int mmc_blk_readonly(struct mmc_card *card)
+ {
+ 	return mmc_card_readonly(card) ||
++	       (card->host->caps2 & MMC_CAP2_FORCE_READ_ONLY) ||
+ 	       !(card->csd.cmdclass & CCC_BLOCK_WRITE);
+ }
+ 

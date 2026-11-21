@@ -1,0 +1,31 @@
+
+# ping -c 2 -s 8 -W 1 192.168.6.1; ping -c 2 -s 8 -W 1 192.168.6.160; cat /proc/net/arp; cat /proc/net/dev; cat /proc/net/snmp
+PING 192.168.6.1 (192.168.6.1): 8 data bytes
+
+--- 192.168.6.1 ping statistics ---
+2 packets transmitted, 0 packets received, 100% packet loss
+PING 192.168.6.160 (192.168.6.160): 8 data bytes
+
+--- 192.168.6.160 ping statistics ---
+2 packets transmitted, 0 packets received, 100% packet loss
+IP address       HW type     Flags       HW address            Mask     Device
+192.168.6.1      0x1         0x2         30:07:5c:df:c7:13     *        eth0
+192.168.6.160    0x1         0x2         1c:86:0b:02:fd:40     *        eth0
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0:   45214     306    0   55    0     0          0         0     1236      22    0    0    0     0       0          0
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails FragOKs FragFails FragCreates OutTransmits
+Ip: 2 64 95 0 0 0 0 0 4 9 0 0 0 0 0 0 0 0 0 9
+Icmp: InMsgs InErrors InCsumErrors InDestUnreachs InTimeExcds InParmProbs InSrcQuenchs InRedirects InEchos InEchoReps InTimestamps InTimestampReps InAddrMasks InAddrMaskReps OutMsgs OutErrors OutRateLimitGlobal OutRateLimitHost OutDestUnreachs OutTimeExcds OutParmProbs OutSrcQuenchs OutRedirects OutEchos OutEchoReps OutTimestamps OutTimestampReps OutAddrMasks OutAddrMaskReps
+Icmp: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 0 0 0 0 0 0 0 0 9 0 0 0 0 0
+IcmpMsg: OutType8
+IcmpMsg: 9
+Tcp: RtoAlgorithm RtoMin RtoMax MaxConn ActiveOpens PassiveOpens AttemptFails EstabResets CurrEstab InSegs OutSegs RetransSegs InErrs OutRsts InCsumErrors
+Tcp: 1 200 120000 -1 0 0 0 0 0 0 0 0 0 0 0
+Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors InCsumErrors IgnoredMulti MemErrors
+Udp: 0 0 0 0 0 0 0 4 0
+UdpLite: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors InCsumErrors IgnoredMulti MemErrors
+UdpLite: 0 0 0 0 0 0 0 0 0
+# 
+[host] shell command elapsed: 4.19 s

@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd.dts"
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	sdio_clock: clock-400000 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <400000>;
+	};
+
+	wifi_pwrseq: wifi-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&gpio4 3 GPIO_ACTIVE_LOW>;
+		post-power-on-delay-ms = <100>;
+	};
+};
+
+&{/soc} {
+	gpio4: gpio@f8b24000 {
+		compatible = "arm,pl061", "arm,primecell";
+		reg = <0xf8b24000 0x1000>;
+		interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&uart_clock>;
+		clock-names = "apb_pclk";
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		#address-cells = <0>;
+	};
+
+	crg: syscon@f8a22000 {
+		compatible = "hisilicon,hi3798mv320-crg", "syscon";
+		reg = <0xf8a22000 0x400>;
+	};
+
+	mmc@f9c40000 {
+		compatible = "hisilicon,hi3798mv320-sdio";
+		reg = <0xf9c40000 0x1000>;
+		interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&sdio_clock>;
+		hisilicon,crg = <&crg>;
+		mmc-pwrseq = <&wifi_pwrseq>;
+		non-removable;
+		no-sd;
+		no-mmc;
+		bus-width = <1>;
+		max-frequency = <400000>;
+		sdhci-caps-mask = <0 0x00200000>;
+	};
+};

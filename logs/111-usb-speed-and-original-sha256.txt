@@ -1,0 +1,7 @@
+
+# cat /sys/bus/usb/devices/1-2/speed; if mount -t vfat -o ro /dev/sda1 /tmp; then sha256sum /tmp/HG680KD/boot.img /tmp/HG680KD/factory.dtb; umount /tmp; fi
+480
+97f4e2b5d88ee6d6fae8ced4809420d7f875c4ff8b0acfe817c6409b6f02a6b8  /tmp/HG680KD/boot.img
+e289000306072f9fd2e140dc5a837fb646b9c803dae15c2b4d0b99c32cf63517  /tmp/HG680KD/factory.dtb
+# 
+[host] shell command elapsed: 0.61 s

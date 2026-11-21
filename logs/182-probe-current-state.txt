@@ -1,0 +1,24 @@
+
+# uname -a; free -m; cat /proc/iomem
+Linux hg680kd 6.18.64-hg680kd-all-fastfetch #1 SMP 2025-12-01 00:00:00 UTC armv7l
+sh: free: not found
+00000000-053dffff : System RAM
+  00008000-005a5fff : Kernel code
+  00820000-008d56c7 : Kernel data
+05be0000-063dbfff : System RAM
+063e0000-07ffffff : System RAM
+f1000000-f100ffff : GICD
+f1040000-f10bffff : GICR
+f8a22000-f8a223ff : f8a22000.syscon syscon@f8a22000
+f8ab0118-f8ab011b : f98a0000.usb trim
+f8b00000-f8b00fff : serial@f8b00000
+  f8b00000-f8b00fff : f8b00000.serial serial@f8b00000
+f9200000-f923ffff : f9200000.gpu gpu@f9200000
+f9830000-f9830fff : f9830000.mmc mmc@f9830000
+f9840000-f9840fff : f9840000.ethernet ethernet@f9840000
+f984300c-f984300f : f9840000.ethernet ethernet@f9840000
+f9866000-f9866fff : f98a0000.usb phy0
+f98a0000-f98affff : f98a0000.usb xhci
+f9960000-f9960fff : f98a0000.usb phy1
+# 
+[host] shell command elapsed: 0.08 s

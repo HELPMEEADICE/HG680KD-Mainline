@@ -1,0 +1,79 @@
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           ARM
+  Version:                           0x1
+  Entry point address:               0x12b5c
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          254656 (bytes into file)
+  Flags:                             0x5000200, Version5 EABI, soft-float ABI
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         5
+  Size of section headers:           40 (bytes)
+  Number of section headers:         14
+  Section header string table index: 13
+make: Entering directory '/home/hedc/hg680kd-mainline/source/linux-6.18.64'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/arm32-emmc'
+  GEN     Makefile
+#
+# configuration written to .config
+#
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/arm32-emmc'
+make: Leaving directory '/home/hedc/hg680kd-mainline/source/linux-6.18.64'
+make: Entering directory '/home/hedc/hg680kd-mainline/source/linux-6.18.64'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/arm32-emmc'
+  GEN     Makefile
+#
+# configuration written to .config
+#
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/arm32-emmc'
+make: Leaving directory '/home/hedc/hg680kd-mainline/source/linux-6.18.64'
+make: Entering directory '/home/hedc/hg680kd-mainline/source/linux-6.18.64'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/arm32-emmc'
+  SYNC    include/config/auto.conf
+  GEN     Makefile
+  GEN     Makefile
+  DTC     arch/arm/boot/dts/hisilicon/hi3798mv320-fiberhome-hg680kd-emmc.dtb
+  CALL    /home/hedc/hg680kd-mainline/source/linux-6.18.64/scripts/checksyscalls.sh
+  COPY    usr/initramfs_inc_data
+  AS      usr/initramfs_data.o
+  AR      usr/built-in.a
+  CC      drivers/mmc/host/sdhci-hi3798mv320.o
+  AR      drivers/mmc/host/built-in.a
+  AR      drivers/mmc/built-in.a
+  AR      drivers/built-in.a
+  AR      built-in.a
+  AR      vmlinux.a
+  LD      vmlinux.o
+  MODPOST vmlinux.symvers
+  KSYMS   .tmp_vmlinux0.kallsyms.S
+  AS      .tmp_vmlinux0.kallsyms.o
+  LD      .tmp_vmlinux1
+  NM      .tmp_vmlinux1.syms
+  KSYMS   .tmp_vmlinux1.kallsyms.S
+  AS      .tmp_vmlinux1.kallsyms.o
+  LD      .tmp_vmlinux2
+  NM      .tmp_vmlinux2.syms
+  KSYMS   .tmp_vmlinux2.kallsyms.S
+  AS      .tmp_vmlinux2.kallsyms.o
+  LD      vmlinux.unstripped
+  NM      System.map
+  SORTTAB vmlinux.unstripped
+  OBJCOPY vmlinux
+  GEN     modules.builtin.modinfo
+  GEN     modules.builtin
+  OBJCOPY arch/arm/boot/Image
+  Kernel: arch/arm/boot/Image is ready
+  GZIP    arch/arm/boot/compressed/piggy_data
+  AS      arch/arm/boot/compressed/piggy.o
+  LD      arch/arm/boot/compressed/vmlinux
+  OBJCOPY arch/arm/boot/zImage
+  Kernel: arch/arm/boot/zImage is ready
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/arm32-emmc'
+make: Leaving directory '/home/hedc/hg680kd-mainline/source/linux-6.18.64'

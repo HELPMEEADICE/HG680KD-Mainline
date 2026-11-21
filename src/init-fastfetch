@@ -1,0 +1,29 @@
+#!/bin/sh
+export PATH=/bin
+export USER=root
+export HOME=/
+export XDG_CONFIG_HOME=/etc
+mount -t devtmpfs devtmpfs /dev
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+hostname -F /etc/hostname
+
+echo
+echo "HG680KD AArch32 RAM bring-up"
+uname -a
+printf 'Online CPUs: '
+cat /sys/devices/system/cpu/online
+printf 'Clocksource: '
+cat /sys/devices/system/clocksource/clocksource0/current_clocksource
+echo 'Timer interrupt counts before and after one second:'
+grep -E 'arch_timer|CPU[0-9]' /proc/interrupts
+cat /proc/uptime
+sleep 1
+grep -E 'arch_timer|CPU[0-9]' /proc/interrupts
+cat /proc/uptime
+echo
+
+while :; do
+    setsid cttyhack sh -i </dev/console >/dev/console 2>&1
+    sleep 1
+done

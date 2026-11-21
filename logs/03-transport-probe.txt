@@ -1,0 +1,161 @@
+help
+?         - alias for 'help'
+OTP_getmsid- Get msid
+OTP_getstbsn- Get stb sn
+OTP_getvendorid- Get vendor id
+OTP_setmsid- Set MSID
+OTP_setstbsn- Set stb sn
+base      - print or set address offset
+bdinfo    - print Board Info structure
+bootm     - boot application image from memory
+bootp     - boot image via network using BOOTP/TFTP protocol
+cmp       - memory compare
+coninfo   - print console devices and information
+crc32     - checksum calculation
+ddr       - ddr training function
+echo      - echo args to console
+editenv   - edit environment variable
+env       - environment handling commands
+erase     - erase FLASH memory
+fastboot  - run as a fastboot usb or udp device
+fatinfo   - print information about filesystem
+fatload   - load binary file from a dos filesystem
+fatls     - list files in a directory (default /)
+fatmkdir  - create a directory
+fatrm     - delete a file
+fatsize   - determine a file's size
+fatwrite  - write file into a dos filesystem
+flinfo    - print FLASH memory information
+getinfo   - print hardware information
+gzwrite   - unzip and write memory to block device
+help      - print command description/usage
+iminfo    - print header information for application image
+imxtract  - extract a part of a multi-image
+ir        - IR command:
+itest     - return true/false on integer compare
+loadb     - load binary file over serial line (kermit mode)
+loadx     - load binary file over serial line (xmodem mode)
+loady     - load binary file over serial line (ymodem mode)
+loop      - infinite loop on address range
+md        - memory display
+mii       - MII utility commands
+mmc       - MMC sub system
+mmcinfo   - display MMC info
+mmcut     - mmc user tools
+mw        - memory write (fill)
+otp_burntonormalchipset- Burn to normal chipset, please be careful !!!
+otp_burntosecurechipset- Burn to secure chipset, please be careful !!!
+otp_getbootkeyslotlock- Get root key slot lock flag
+otp_getbootmode- Get Boot mode
+otp_getcas0keyslotlock- Get root key slot lock flag
+otp_getcas1keyslotlock- Get root key slot lock flag
+otp_getcas2keyslotlock- Get root key slot lock flag
+otp_getcas3keyslotlock- Get root key slot lock flag
+otp_getcas4keyslotlock- Get root key slot lock flag
+otp_getcas5keyslotlock- Get root key slot lock flag
+otp_getcas6keyslotlock- Get root key slot lock flag
+otp_getcas7keyslotlock- Get root key slot lock flag
+otp_getcustomerkey- otp_getcustomerkey 
+otp_getddrwakeupstatus- Get DDR wakeup status
+otp_getrsashalock- Get RSA HASH lock flag
+otp_getsecurewordlock- Get ID word lock flag
+otp_getsmshalock- Get sm HASH lock flag
+otp_getstbmkeyslotlock- Get root key slot lock flag
+otp_getstbprivdata- otp_getstbprivdata 
+otp_gettrustzonestat- Get TEE status
+otp_setbootkeyslot- Set boot root key slot
+otp_setbootmode- Set Boot mode
+otp_setcas0keyslot- Set cas0 root key slot
+otp_setcas1keyslot- Set cas1 root key slot
+otp_setcas2keyslot- Set cas2 root key slot
+otp_setcas3keyslot- Set cas3 root key slot
+otp_setcas4keyslot- Set cas4 root key slot
+otp_setcas5keyslot- Set cas5 root key slot
+otp_setcas6keyslot- Set cas6 root key slot
+otp_setcas7keyslot- Set cas7 root key slot
+otp_setrsasha- Set RSA HASH
+otp_setsmsha- Set SM HASH
+otp_setstbmkeyslot- Set stbm root key slot
+otp_setstbprivdata- StbPrivData 
+otp_settrustzone- Set TEE enable
+otpreadall- read otp ,for example otpreadall 
+otpwrite  - write otp ,for example otpwrite adddress value 
+panic     - Panic with optional message
+ping      - send ICMP ECHO_REQUEST to network host
+printenv  - print environment variables
+protect   - enable or disable FLASH write protection
+reset     - Perform RESET of the CPU
+run       - run commands in an environment variable
+saveenv   - save environment variables to persistent storage
+setenv    - set environment variables
+setexpr   - set environment variable as the result of eval expression
+sleep     - delay execution for some time
+source    - run script from memory
+switchns  - switchns
+tftp      - tftp	- download or upload image via network using TFTP protocol
+tftpboot  - boot image via network using TFTP protocol
+tftpput   - TFTP put command, for uploading files to a server
+unzip     - unzip a memory region
+usb       - USB sub-system
+usbboot   - boot from USB device
+version   - print monitor, compiler and linker version
+fastboot#help mii
+mii - MII utility commands
+
+Usage:
+mii device                            - list available devices
+mii device <devname>                  - set current device
+mii info   <addr>                     - display MII PHY info
+mii read   <addr> <reg>               - read  MII PHY <addr> register <reg>
+mii write  <addr> <reg> <data>        - write MII PHY <addr> register <reg>
+mii modify <addr> <reg> <data> <mask> - modify MII PHY <addr> register <reg>
+                                        updating bits identified in <mask>
+mii dump   <addr> <reg>               - pretty-print <addr> <reg> (0-5 only)
+Addr and/or reg may be ranges, e.g. 2-7.
+fastboot#help fdt
+Unknown command 'fdt' - try 'help' without arguments for list of all known commands
+
+fastboot#md.l 1ffbfc0 4
+01ffbfc0: 4d4e4f40 494a4b4c 1e1d1c13 1a19181f  @ONMLKJI........
+fastboot#md.l 8020000 8
+08020000: 9794958a 93909196 9291908f 96959a9d  ................
+08020010: 6764659a 63606166 626143bc 66656463  .edgfa`c.Cabcdef
+fastboot#mii info
+PHY 0x00: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x01: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x02: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x03: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x04: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x05: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x06: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x07: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x08: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x09: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x0A: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x0B: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x0C: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x0D: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x0E: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x0F: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x10: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x11: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x12: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x13: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x14: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x15: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x16: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x17: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x18: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x19: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x1A: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x1B: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x1C: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x1D: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x1E: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+PHY 0x1F: OUI = 0x0000, Model = 0x00, Rev = 0x00,  10baseT, HDX
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.160
+fastboot#ping 192.168.6.160
+ETH0: PHY(mdio0, phyaddr=1, mii) not link!
+ping failed; host 192.168.6.160 is not alive
+fastboot#

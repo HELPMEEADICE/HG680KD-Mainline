@@ -1,0 +1,176 @@
+memreserve: 0x53e0000 0x800000
+/
+  model 'Hivendor\x00'
+  compatible 'hi3798mv310-series\x00'
+  #address-cells 00 00 00 01
+  #size-cells 00 00 00 01
+  interrupt-parent 00 00 00 01
+/cpufreq_cdev_info
+  hi,cluster_num 00 00 00 01
+  hi,ipa_cpufreq_table_index 00 00 00 00
+  hi,cluster_dyn_capacitance 00 00 02 2f
+  hi,cluster_static_capacitance 00 00 00 8c
+  hi,temperature_scale_capacitance '-13169\x003960\x00-68\x001\x00605\x00'
+  hi,static_power_core_cap '45\x00-11969\x001000\x00'
+  hi,hpm_param f8 00 00 b4 00 00 00 10 00 00 ff ff 00 00 00 e6 00 00 01 4a
+/reserved-memory
+  #address-cells 00 00 00 01
+  #size-cells 00 00 00 01
+  ranges 
+  phandle 00 00 00 1f
+/reserved-memory/ramoops
+  reg 05 3e 00 00 00 10 00 00
+  phandle 00 00 00 20
+/reserved-memory/dmsg_log
+  reg 05 4e 00 00 00 08 00 00
+  no-map 
+/reserved-memory/extend_log
+  reg 05 56 00 00 00 10 00 00
+  no-map 
+/reserved-memory/bl31_log
+  reg 05 66 00 00 00 08 00 00
+  no-map 
+/reserved-memory/fastboot_log
+  reg 05 6e 00 00 00 02 00 00
+  no-map 
+/reserved-memory/mntndump
+  reg 05 70 00 00 00 00 10 00
+  no-map 
+  phandle 00 00 00 07
+/reserved-memory/pmumem
+  reg 05 70 10 00 00 00 10 00
+  no-map 
+/reserved-memory/bbox-mem
+  compatible 'bbox-mem\x00'
+  reg 05 70 20 00 00 4d e0 00
+  no-map 
+  phandle 00 00 00 06
+/reserved-memory/kdump
+  reg 06 3d c0 00 00 00 40 00
+/chosen
+  bootargs 'rw\x00'
+/psci
+  compatible 'arm,psci-0.2\x00'
+  method 'smc\x00'
+/cpus
+  #address-cells 00 00 00 01
+  #size-cells 00 00 00 00
+/cpus/cpu-map
+/cpus/cpu-map/cluster0
+  #cooling-cells 00 00 00 02
+  phandle 00 00 00 04
+/cpus/cpu-map/cluster0/core0
+  cpu 00 00 00 08
+/cpus/cpu-map/cluster0/core1
+  cpu 00 00 00 09
+/cpus/cpu-map/cluster0/core2
+  cpu 00 00 00 0a
+/cpus/cpu-map/cluster0/core3
+  cpu 00 00 00 0b
+/cpus/cpu@0
+  compatible 'arm,cortex-a55\x00'
+  device_type 'cpu\x00'
+  reg 00 00 00 00
+  enable-method 'psci\x00'
+  clocks 00 00 00 0c 00 00 01 58
+  clock-names 'cpu_clk\x00'
+  operating-points-v2 00 00 00 0d
+  cpu-supply 00 00 00 0e
+  phandle 00 00 00 08
+/cpus/cpu@1
+  compatible 'arm,cortex-a55\x00'
+  device_type 'cpu\x00'
+  reg 00 00 01 00
+  enable-method 'psci\x00'
+  clocks 00 00 00 0c 00 00 01 58
+  clock-names 'cpu_clk\x00'
+  operating-points-v2 00 00 00 0d
+  cpu-supply 00 00 00 0e
+  phandle 00 00 00 09
+/cpus/cpu@2
+  compatible 'arm,cortex-a55\x00'
+  device_type 'cpu\x00'
+  reg 00 00 02 00
+  enable-method 'psci\x00'
+  clocks 00 00 00 0c 00 00 01 58
+  clock-names 'cpu_clk\x00'
+  operating-points-v2 00 00 00 0d
+  cpu-supply 00 00 00 0e
+  phandle 00 00 00 0a
+/cpus/cpu@3
+  compatible 'arm,cortex-a55\x00'
+  device_type 'cpu\x00'
+  reg 00 00 03 00
+  enable-method 'psci\x00'
+  clocks 00 00 00 0c 00 00 01 58
+  clock-names 'cpu_clk\x00'
+  operating-points-v2 00 00 00 0d
+  cpu-supply 00 00 00 0e
+  phandle 00 00 00 0b
+/soc/amba/watchdog@f8a2c000
+  compatible 'arm,sp805-wdt\x00arm,primecell\x00'
+  arm,primecell-periphid 00 14 18 05
+  reg f8 a2 c0 00 00 00 10 00
+  interrupts 00 00 00 00 00 00 00 1d 00 00 00 04
+  clocks 00 00 00 0f
+  clock-names 'apb_pclk\x00'
+  timeout-sec 00 00 00 0a
+  start_ping_in_kernel 00 00 00 01
+  phandle 00 00 00 2c
+/soc/amba/arm-timer
+  compatible 'arm,armv7-timer\x00'
+  interrupts 00 00 00 01 00 00 00 0d 00 00 0f 04 00 00 00 01 00 00 00 0e 00 00 0f 04
+  clock-frequency 01 6e 36 00
+/soc/amba/timer@hisp804
+  compatible 'hivendor,hisp804\x00'
+  reg f8 a2 90 00 00 00 00 20 f8 a2 a0 00 00 00 00 20 f8 a2 a0 20 00 00 00 20 f8 a2 b0 00 00 00 00 20 f8 a2 b0 20 00 00 00 20
+  interrupts 00 00 00 00 00 00 00 1a 00 00 00 04 00 00 00 00 00 00 00 3b 00 00 00 04 00 00 00 00 00 00 00 1b 00 00 00 04 00 00 00 00 00 00 00 3c 00 00 00 04
+  clocks 00 00 00 0f
+  clock-names 'apb_pclk\x00'
+/soc/amba/uart@f8b00000
+  compatible 'arm,pl011\x00arm,primecell\x00'
+  arm,primecell-periphid 00 24 10 11
+  reg f8 b0 00 00 00 00 10 00
+  interrupts 00 00 00 00 00 00 00 31 00 00 00 04
+  clocks 00 00 00 10
+  clock-names 'apb_pclk\x00'
+  status 'okay\x00'
+  phandle 00 00 00 32
+/soc/amba/uart@f8b02000
+  compatible 'arm,pl011\x00arm,primecell\x00'
+  arm,primecell-periphid 00 24 10 11
+  reg f8 b0 20 00 00 00 10 00
+  interrupts 00 00 00 00 00 00 00 33 00 00 00 04
+  clocks 00 00 00 10
+  clock-names 'apb_pclk\x00'
+  status 'okay\x00'
+  phandle 00 00 00 33
+/soc/amba/uart@f8b03000
+  compatible 'arm,pl011\x00arm,primecell\x00'
+  arm,primecell-periphid 00 24 10 11
+  reg f8 b0 30 00 00 00 10 00
+  interrupts 00 00 00 00 00 00 00 34 00 00 00 04
+  clocks 00 00 00 10
+  clock-names 'apb_pclk\x00'
+  status 'okay\x00'
+  phandle 00 00 00 34
+/soc/ethernet@f9840000
+  compatible 'hivendor,higmac-v5\x00'
+  reg f9 84 00 00 00 00 10 00 f9 84 30 0c 00 00 00 04
+  interrupts 00 00 00 00 00 00 00 50 00 00 00 04 00 00 00 00 00 00 00 51 00 00 00 04 00 00 00 00 00 00 00 53 00 00 00 04 00 00 00 00 00 00 00 55 00 00 00 04
+  clocks 00 00 00 0c 00 00 03 bc 00 00 00 0c 00 00 00 d0
+  clock-names 'higmac_clk\x00macif_clk\x00'
+  status 'okay\x00'
+  resets 00 00 00 11 00 00 03 bc 00 00 00 00 00 00 00 11 00 00 00 d0 00 00 00 00 00 00 00 11 00 00 00 cc 00 00 00 05
+  reset-names 'port_reset\x00macif_reset\x00phy_reset\x00'
+  #address-cells 00 00 00 01
+  #size-cells 00 00 00 00
+  mac-address 00 00 00 00 00 00
+  phy-handle 00 00 00 12
+  phy-mode 'mii\x00'
+  phy-gpio-base 00 00 00 00
+  phy-gpio-bit 00 00 00 00
+  phandle 00 00 00 35
+/soc/ethernet@f9840000/ethernet_phy@0
+  reg 00 00 00 03
+  phandle 00 00 00 12

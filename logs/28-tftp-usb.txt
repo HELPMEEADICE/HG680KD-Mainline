@@ -1,0 +1,12 @@
+Listening on UDP 192.168.6.160:1069 for 192.168.6.249
+Traceback (most recent call last):
+  File "/home/hedc/hg680kd-mainline/inputs/tftp_send.py", line 68, in <module>
+    main()
+    ~~~~^^
+  File "/home/hedc/hg680kd-mainline/inputs/tftp_send.py", line 64, in main
+    serve(listener, args.image.name, args.image.read_bytes(), args.peer)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hedc/hg680kd-mainline/inputs/tftp_send.py", line 24, in serve
+    request, peer = listener.recvfrom(4096)
+                    ~~~~~~~~~~~~~~~~~^^^^^^
+TimeoutError: timed out

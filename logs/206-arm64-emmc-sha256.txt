@@ -1,0 +1,6 @@
+
+# wget --help 2>&1 || true; dd if=/dev/mmcblk0 bs=512 count=4096 2>/dev/null | sha256sum; dd if=/dev/mmcblk0 bs=512 skip=65536 count=4096 2>/dev/null | sha256sum
+c0889ada28f6b8ccab76b983394a0470028efd8324412eb8ce102c64480a8265  -
+72b2f15f68537c899222d691f8fa6ad8fa18055a8b77792fdc224bed1b9d56bf  -
+# 
+[host] shell command elapsed: 0.20 s

@@ -1,0 +1,10 @@
+ar: `u' modifier ignored since `D' is the default (see `U')
+warranty.c: In function 'warranty':
+warranty.c:56:1: warning: old-style function definition [-Wold-style-definition]
+   56 | warranty(prefix)
+      | ^~~~~~~~
+./fix-libmath_h: line 1: ed: command not found
+make[2]: *** [Makefile:632: libmath.h] Error 127
+make[1]: *** [Makefile:357: all-recursive] Error 1
+make: *** [Makefile:297: all] Error 2
+Terminated                 curl --fail --location --silent --show-error --retry 3 --connect-timeout 15 --output "$file.part" "$url"

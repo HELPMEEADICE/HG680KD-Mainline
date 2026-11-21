@@ -1,0 +1,18 @@
+PING 192.168.6.249 (192.168.6.249) 56(84) bytes of data.
+From 192.168.6.160 icmp_seq=1 Destination Host Unreachable
+From 192.168.6.160 icmp_seq=2 Destination Host Unreachable
+From 192.168.6.160 icmp_seq=3 Destination Host Unreachable
+
+--- 192.168.6.249 ping statistics ---
+3 packets transmitted, 0 received, +3 errors, 100% packet loss, time 2032ms
+pipe 3
+PING 192.168.6.249 (192.168.6.249) 1472(1500) bytes of data.
+From 192.168.6.160 icmp_seq=1 Destination Host Unreachable
+From 192.168.6.160 icmp_seq=2 Destination Host Unreachable
+ping: sendmsg: No route to host
+
+--- 192.168.6.249 ping statistics ---
+3 packets transmitted, 0 received, +2 errors, 100% packet loss, time 2045ms
+pipe 2
+192.168.6.249 dev enp6s0 FAILED 
+a33ae7e96dd789dcccaa542dd222a1b599a9caeb5b59f505871f44a580b538dd  /home/hedc/hg680kd-mainline/out/hg680kd-arm64-all-2g.uImage

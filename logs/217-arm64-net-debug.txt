@@ -1,0 +1,22 @@
+
+# ping -c 3 -W 1 192.168.6.160; cat /proc/net/dev; grep f984 /proc/interrupts; dmesg | grep -i -E "gmac|eth0|phy|dma|swiotlb"
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+
+--- 192.168.6.160 ping statistics ---
+3 packets transmitted, 0 packets received, 100% packet loss
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0:   30596     302    0  302    0     0          0         0      126       3    0    0    0     0       0          0
+ 15:        260          0          0          0    GICv3 112 Level     f9840000.ethernet
+<6>[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+<6>[    0.000000]   DMA      [mem 0x0000000000000000-0x000000007fffffff]
+<6>[    0.000000]   DMA32    empty
+<6>[    0.000000] software IO TLB: SWIOTLB bounce buffer size adjusted to 2MB
+<6>[    0.212817] DMA: preallocated 256 KiB GFP_KERNEL pool for atomic allocations
+<6>[    0.219995] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+<6>[    0.227861] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+<6>[    0.341455] mmc0: SDHCI controller on f9830000.mmc [f9830000.mmc] using ADMA
+<6>[    5.397344] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+# 
+[host] shell command elapsed: 3.14 s

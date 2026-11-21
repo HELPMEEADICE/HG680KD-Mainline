@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd.dts"
+
+&{/soc} {
+	peri: syscon@f8a20000 {
+		compatible = "hisilicon,hi3798mv320-peri", "syscon";
+		reg = <0xf8a20000 0x874>;
+	};
+
+	crg: syscon@f8a22000 {
+		compatible = "hisilicon,hi3798mv320-crg", "syscon";
+		reg = <0xf8a22000 0x400>;
+	};
+
+	usb@f98a0000 {
+		compatible = "hisilicon,hi3798mv320-xhci";
+		reg = <0xf98a0000 0x10000>, <0xf9866000 0x1000>,
+		      <0xf9960000 0x1000>, <0xf8ab0118 0x4>;
+		reg-names = "xhci", "phy0", "phy1", "trim";
+		interrupts = <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+		hisilicon,crg = <&crg>;
+		hisilicon,peri = <&peri>;
+		usb2-lpm-disable;
+	};
+};

@@ -1,0 +1,22 @@
+
+# ifconfig eth0; route -n; cat /proc/net/arp; ping -c 2 -W 1 192.168.6.160; cat /proc/net/arp
+eth0      Link encap:Ethernet  HWaddr 54:0A:77:88:B7:2C  
+          inet addr:192.168.6.249  Bcast:192.168.6.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:539 errors:0 dropped:539 overruns:0 frame:0
+          TX packets:3 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:63160 (61.6 KiB)  TX bytes:126 (126.0 B)
+          Interrupt:15 
+
+sh: route: not found
+IP address       HW type     Flags       HW address            Mask     Device
+192.168.6.160    0x1         0x0         00:00:00:00:00:00     *        eth0
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+
+--- 192.168.6.160 ping statistics ---
+2 packets transmitted, 0 packets received, 100% packet loss
+IP address       HW type     Flags       HW address            Mask     Device
+192.168.6.160    0x1         0x0         00:00:00:00:00:00     *        eth0
+# 
+[host] shell command elapsed: 2.05 s

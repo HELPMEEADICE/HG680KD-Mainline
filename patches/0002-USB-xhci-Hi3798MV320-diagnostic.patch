@@ -1,0 +1,31 @@
+From: HG680KD bring-up
+Subject: [PATCH] usb: xhci: wire up a Hi3798MV320 diagnostic host
+
+diff --git a/drivers/usb/host/Kconfig b/drivers/usb/host/Kconfig
+--- a/drivers/usb/host/Kconfig
++++ b/drivers/usb/host/Kconfig
+@@ -68,6 +68,14 @@ config USB_XHCI_HISTB
+ 	  Say 'Y' to enable the support for the xHCI host controller
+ 	  found in HiSilicon STB SoCs.
+ 
++config USB_XHCI_HI3798MV320
++	tristate "Experimental xHCI host on Hi3798MV320"
++	depends on USB_XHCI_PLATFORM && (ARCH_HI3798MV320 || (ARM64 && ARCH_HISI))
++	select MFD_SYSCON
++	help
++	  Enable the HG680KD USB storage diagnostic after the stock firmware
++	  has prepared the board.
++
+ config USB_XHCI_MTK
+ 	tristate "xHCI support for MediaTek SoCs"
+ 	select MFD_SYSCON
+diff --git a/drivers/usb/host/Makefile b/drivers/usb/host/Makefile
+--- a/drivers/usb/host/Makefile
++++ b/drivers/usb/host/Makefile
+@@ -75,5 +75,6 @@
+ obj-$(CONFIG_USB_XHCI_PCI_RENESAS)	+= xhci-pci-renesas.o
+ obj-$(CONFIG_USB_XHCI_PLATFORM) += xhci-plat-hcd.o
+ obj-$(CONFIG_USB_XHCI_HISTB)	+= xhci-histb.o
++obj-$(CONFIG_USB_XHCI_HI3798MV320) += xhci-hi3798mv320.o
+ obj-$(CONFIG_USB_XHCI_RCAR)	+= xhci-rcar-hcd.o
+ obj-$(CONFIG_USB_XHCI_MTK)	+= xhci-mtk-hcd.o

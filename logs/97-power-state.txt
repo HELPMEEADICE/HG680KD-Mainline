@@ -1,0 +1,28 @@
+[pid:674,cpu0,bbox_bootcheck][blackbox]:<bbox fail>is_addr_len_invalid() fail: addr 0x00000000 len 3452882888 log_addr 0x00000000 log_len 4505088.
+[pid:674,cpu1,bbox_bootcheck][blackbox]:<bbox fail>rdr_ap_cleartext_print_hk_irq_on_cpu() fail.
+[pid:674,cpu2,bbox_bootcheck][blackbox]:<bbox fail>rdr_ap_cleartext_print_hk[0] ret error.
+[pid:674,cpu2,bbox_bootcheck][blackbox]:<bbox fail>[bbox_save_cleartext], call pfn_cleartext_ops 0x00000000 failed err [-1]!
+[pid:1,cpu1,init]selinux: avc:  denied  { set } for property=ro.boot.btmacaddr pid=2329 uid=0 gid=0 scontext=u:r:fh_common:s0 tcontext=u:object_r:bluetooth_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu1,init]selinux: avc:  denied  { set } for property=ro.fh.flash.life pid=2337 uid=0 gid=0 scontext=u:r:fh_common:s0 tcontext=u:object_r:default_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu1,init]selinux: avc:  denied  { set } for property=ctl.wifi_bt pid=2343 uid=0 gid=0 scontext=u:r:fh_common:s0 tcontext=u:object_r:ctl_default_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu1,init]selinux: avc:  denied  { set } for property=ro.total.memsize pid=2350 uid=0 gid=0 scontext=u:r:fh_common:s0 tcontext=u:object_r:default_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu0,init]selinux: avc:  denied  { set } for property=ro.memory.size pid=2355 uid=0 gid=0 scontext=u:r:fh_common:s0 tcontext=u:object_r:default_prop:s0 tclass=property_service permissive=1
+
+[pid:555,cpu0,kworker/0:1]binder: unexpected work type, 4, not freed
+[pid:1,cpu3,init]selinux: avc:  denied  { set } for property=service.media.playstatus pid=1980 uid=0 gid=0 scontext=u:r:hal_hwsysmanager:s0 tcontext=u:object_r:system_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu0,init]selinux: avc:  denied  { set } for property=vendor.realtek.bluetooth.chip_name pid=1950 uid=1002 gid=1002 scontext=u:r:hal_bluetooth_default:s0 tcontext=u:object_r:vendor_default_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu0,init]selinux: avc:  denied  { set } for property=persist.iptv.auth.count pid=2682 uid=1000 gid=1000 scontext=u:r:system_app:s0 tcontext=u:object_r:default_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu2,init]init: Could not find service hosting interface android.hardware.camera.provider@2.4::ICameraProvider/external/0
+[2009:01:01 00:00:05][pid:1,cpu0,init]selinux: avc:  denied  { set } for property=service.bootanim.exit pid=1986 uid=0 gid=1003 scontext=u:r:bootanim:s0 tcontext=u:object_r:exported_system_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu0,init]selinux: avc:  denied  { set } for property=persist.vendor.media.np.local.switch.black pid=1986 uid=0 gid=1003 scontext=u:r:bootanim:s0 tcontext=u:object_r:hi_prop:s0 tclass=property_service permissive=1
+
+[pid:1,cpu2,init]selinux: avc:  denied  { set } for property=pppoe.eth0.pid pid=3550 uid=0 gid=0 scontext=u:r:upgradeserver:s0 tcontext=u:object_r:hi_prop:s0 tclass=property_service permissive=1
+

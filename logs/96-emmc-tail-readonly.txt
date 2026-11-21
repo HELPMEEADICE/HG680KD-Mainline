@@ -1,0 +1,9 @@
+
+# cat /sys/block/mmcblk0/ro; cat /sys/block/mmcblk0/device/name; dd if=/dev/mmcblk0 bs=512 skip=253280 count=128 | sha256sum
+1
+B10030
+128+0 records in
+128+0 records out
+2edae46864612ccbe27419b4f33b0d147bf0aceefc2001d27c1180d3f5641c3b  -
+# 
+[host] shell command elapsed: 4.00 s

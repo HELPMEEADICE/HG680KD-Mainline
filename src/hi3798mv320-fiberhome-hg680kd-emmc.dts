@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd.dts"
+
+/ {
+	emmc_clock: clock-52000000 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <52000000>;
+	};
+};
+
+&{/soc} {
+	crg: syscon@f8a22000 {
+		compatible = "hisilicon,hi3798mv320-crg", "syscon";
+		reg = <0xf8a22000 0x400>;
+	};
+
+	mmc@f9830000 {
+		compatible = "hisilicon,hi3798mv320-emmc";
+		reg = <0xf9830000 0x1000>;
+		interrupts = <GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&emmc_clock>;
+		hisilicon,crg = <&crg>;
+		non-removable;
+		cap-mmc-highspeed;
+		cap-mmc-hw-reset;
+		no-sd;
+		no-sdio;
+		bus-width = <8>;
+		max-frequency = <52000000>;
+	};
+};

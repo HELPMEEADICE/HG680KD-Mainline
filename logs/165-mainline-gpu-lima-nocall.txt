@@ -1,0 +1,30 @@
+
+# lima-test --no-call; grep -i -E 'gp|pp|mmu|126' /proc/interrupts; dmesg | grep -i lima
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima[   18.731671] lima f9200000.gpu: pp0 error irq state=201 status=40
+ params: gpu_id=[   18.731689] lima f9200000.gpu: pp1 error irq state=201 status=40
+2 num_pp=2 gp_ver[   18.731729] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+=0x0d070000 pp_v[   18.731741] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+er=0xcf070000
+Created Lima context id=0
+GEM BOs: fb_va=0x00000000 pp_buf_va=0x00004000 plb_va=0x00005000 stream_va=0x00006000
+PP clear 0xff336699: 0/4096 pixels matched (first=0xff996633 mid=0xdeadbeef last=0xdeadbeef)
+ 29:          2          0          0          0    GICv3 126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+<6>[    0.205281] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+<6>[    0.205311] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+<6>[    0.205337] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+<6>[    0.205363] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+<6>[    0.205373] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+<6>[    0.205585] lima f9200000.gpu: bus rate = 200000000
+<6>[    0.205593] lima f9200000.gpu: mod rate = 200000000
+<6>[    0.205832] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 0
+<3>[    1.354879] lima f9200000.gpu: pp0 error irq state=201 status=40
+<3>[    1.354897] lima f9200000.gpu: pp1 error irq state=201 status=40
+<3>[    1.354940] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+<3>[    1.354952] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+<3>[   18.731671] lima f9200000.gpu: pp0 error irq state=201 status=40
+<3>[   18.731689] lima f9200000.gpu: pp1 error irq state=201 status=40
+<3>[   18.731729] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+<3>[   18.731741] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+# 
+[host] shell command elapsed: 0.19 s

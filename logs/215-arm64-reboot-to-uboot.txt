@@ -1,0 +1,124 @@
+
+# reboot -f
+[  868.085021] reboot: Restarting system
+Systÿ
+Bootrom start
+Boot Media: EMMC
+Decrypt auxiliary code ...OK
+
+lsadc voltage min: 0000006B, max: 00000070, aver: 0000006C, index: 0000000B
+
+Enter boot auxiliary code
+
+Auxiliary code - v1.00
+DDR code - V2.2.4 20241026
+Build: Oct 26 2024 - 15:52:06
+
+Reg Version:  v2.2.3d
+Reg Time:     2024/11/27 15:19:10
+Reg Name:     hi3798mv320dma_Hi3798MV320_LPDDR4-2666-2rank_2GB_32bitx1_2layers.reg
+
+cpu_hpm_otp:
+00000125
+cpu_hpm:
+00000125
+cpu_otp_comp:
+0000002D
+cpu svb done!
+
+gpu_hpm_otp:
+0000011D
+gpu_hpm:
+00000113
+core_hpm_otp:
+0000017B
+core_hpm:
+0000016D
+gpu_otp_comp:
+0000002D
+gpu_otp_comp:
+0000002D
+core_otp_comp:
+0000002D
+training volt:
+0000036A
+DDR traning...done!
+
+core_otp_comp:
+0000002D
+core svb done:
+
+Boot auxiliary code success
+Bootrom success
+
+
+
+
+
+U-Boot 2022.07-g80522c56-dirty (Jun 05 2025 - 21:16:17 +0800), Build: jenkins-STB-git_FVOS_HISI_9_CTCGUANGDONG_p-hisi-iptv_fh_product_20240318-60
+
+
+CPU:		   HI3798MV320 ()
+Boot Media:	eMMC
+DDR Size:	  2 GiB (Boot:  2 GiB)
+
+
+WARNING: Caches not enabled
+[INFO][record_exce_type]:set reboot_reason is 0x43
+[INFO]last bootup_keypoint is [30]
+MMC:   MMC/SD Card:
+    MID:         0xf4
+    Read Block:  512 Bytes
+    Write Block: 512 Bytes
+    Chip Size:   7818182656 Bytes (High Capacity)
+    Name:        "B1003"
+    Chip Type:   MMC
+    Version:     5.1
+    Speed:       192000000Hz
+    Bus Width:   8bit
+    Mode:        HS400ES
+    Boot Mode:   normal(), 61 ms
+Loading Environment from MMC... OK
+LOGO Flag:00000001
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+Net:   gmac0
+
+SDK Version: HiHuanglong_V100R009C01SPC023_v2024111912
+
+jpgd_dfx_print_timestamp 69 cnt: 1, hard in 1280 720 out 1280 720  sample 1 fmt 17 17 total 8 alloc yuv 0 dec 4 csc 0
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+cvbs select_channel:DISP_CLOCK_SOURCE_SD0
+cvbs select_channel:DISP_CLOCK_SOURCE_SD0
+cvbs select_channel:DISP_CLOCK_SOURCE_SD0
+get_devinfo_item_ptr: date_type 2 is null !!
+check remote recovery button begin
+ __recovery__into no IR KEY
+lsadc value 109
+already set hardwareid and boardid, skip!
+env not set emergency_log, skip!
+Reserve Memory
+    Start Addr:          0x7FFFE000
+    Bound Addr:          0x20000000
+    Free  Addr:          0x7F67F000
+    Alloc Block:  Addr         Size
+                  0x17FFD000   0x2000
+                  0x17FFB000   0x1000
+                  0x17FF8000   0x2000
+                  0x7FEAB000   0x152000
+                  0x7F6C1000   0x7E9000
+                  0x7F6BF000   0x1000
+                  0x7F6B5000   0x9000
+                  0x7F6B3000   0x1000
+                  0x7F6B0000   0x2000
+                  0x7F67F000   0x30000
+
+BBOX:
+[INFO][create_reboot_reason_cmdline][reboot_reason=AP_S_AWDT][exception_subtype=SUB_APWDT_AP]
+[INFO][record_exce_type]:set reboot_reason is 0xff
+Autobooting in 3 seconds, Press Ctrl+C to stop autoboot
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#

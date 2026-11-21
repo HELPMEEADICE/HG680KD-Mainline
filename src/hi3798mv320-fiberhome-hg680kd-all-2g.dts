@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-all.dts"
+
+/ {
+	memory@0 {
+		reg = <0x00000000 0x80000000>;
+	};
+
+	reserved-memory {
+		atf@8000000 {
+			reg = <0x08000000 0x00400000>;
+			no-map;
+		};
+
+		uboot-resmem-low@17ff8000 {
+			reg = <0x17ff8000 0x00008000>;
+			no-map;
+		};
+
+		uboot-resmem-high@7f67f000 {
+			reg = <0x7f67f000 0x00981000>;
+			no-map;
+		};
+	};
+};

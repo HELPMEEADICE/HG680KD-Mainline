@@ -1,0 +1,36 @@
+
+sh: HG680KD: not found
+# uname -a; ls -l /dev/mmcblk0 /dev/sda1 2>&1; ifconfig eth0; mount -t vfat -o ro /dev/sda1 /tmp 2>/dev/null && ls -la /tmp /tmp/HG680KD 2>&1 && umount /tmp || true
+Linux hg680kd 6.18.64-hg680kd-all-2g #1 SMP 2025-12-01 00:00:00 UTC armv7l
+brw-------    1    8,   1 /dev/sda1
+brw-------    1  179,   0 /dev/mmcblk0
+eth0      Link encap:Ethernet  HWaddr 54:0A:77:88:B7:2C  
+          inet addr:192.168.6.249  Bcast:192.168.6.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:6199 errors:0 dropped:611 overruns:0 frame:0
+          TX packets:312 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:765131 (747.1 KiB)  TX bytes:28072 (27.4 KiB)
+          Interrupt:30 
+
+/tmp/HG680KD:
+-rwxr-xr-x    1    118927 kernel.config
+-rwxr-xr-x    1 419430400 vendor.img
+drwxr-xr-x    4     16384 firmware
+-rwxr-xr-x    1     27413 dtbo.img
+-rwxr-xr-x    1     27349 factory.dtb
+-rwxr-xr-x    1  12253696 zImage
+-rwxr-xr-x    1  12281109 uImage
+-rwxr-xr-x    1  12304384 boot.img
+drwxr-xr-x    6     16384 ..
+drwxr-xr-x    3     16384 .
+
+/tmp:
+drwxr-xr-x    3     16384 Android
+drwxr-xr-x    2     16384 LOST.DIR
+drwxr-xr-x    3     16384 HG680KD
+drwxr-xr-x    2     16384 System Volume Information
+drwxrwxrwt    8       180 ..
+drwxr-xr-x    6     16384 .
+# 
+[host] shell command elapsed: 0.12 s

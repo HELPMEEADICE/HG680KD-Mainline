@@ -1,0 +1,334 @@
+From: HG680KD bring-up
+Subject: [PATCH] net: hix5hd2: support the Hi3798MV320 diagnostic GMAC
+
+Use 16-byte ring entries and the corresponding pointer stride, along
+with the GEMAC_V2 (TSO/SG) descriptor command format reported by
+MAC_SET[29:28] == 3 on Hi3798MV320 (higmac-v5). The Hi3798MV320 test
+assumes the stock firmware has enabled the clocks. Validate the
+reported RX frame length before appending it to an skb. Mirror the
+stock MAC interface reset ordering and MAC_SET field.
+
+diff --git a/drivers/net/ethernet/hisilicon/hix5hd2_gmac.c b/drivers/net/ethernet/hisilicon/hix5hd2_gmac.c
+index 02282dc..c9619a9 100644
+--- a/drivers/net/ethernet/hisilicon/hix5hd2_gmac.c
++++ b/drivers/net/ethernet/hisilicon/hix5hd2_gmac.c
+@@ -39,6 +39,9 @@
+ #define RECV_CONTROL			0x01e0
+ #define BIT_STRIP_PAD_EN		BIT(3)
+ #define BIT_RUNT_PKT_EN			BIT(4)
++#define MAC_SET				0x0210
++#define MV320_MAC_SET_MASK		GENMASK(13, 8)
++#define MV320_MAC_SET_DEFAULT		(0xe << 8)
+ #define CONTROL_WORD			0x0214
+ #define MDIO_SINGLE_CMD			0x03c0
+ #define MDIO_SINGLE_DATA		0x03c4
+@@ -169,7 +172,6 @@
+ #define TX_RQ_IN_TIMEOUT		0x50000
+ 
+ #define MAC_MAX_FRAME_SIZE		1600
+-#define DESC_SIZE			32
+ #define RX_DESC_NUM			1024
+ #define TX_DESC_NUM			1024
+ 
+@@ -187,10 +189,10 @@
+ 
+ /* DMA descriptor ring helpers */
+ #define dma_ring_incr(n, s)		(((n) + 1) & ((s) - 1))
+-#define dma_cnt(n)			((n) >> 5)
+-#define dma_byte(n)			((n) << 5)
+ 
+ #define HW_CAP_TSO			BIT(0)
++#define HW_CAP_BOOT_CLOCKS		BIT(1)
++#define HW_CAP_DESC_16			BIT(2)
+ #define GEMAC_V1			0
+ #define GEMAC_V2			(GEMAC_V1 | HW_CAP_TSO)
+ #define HAS_CAP_TSO(hw_cap)		((hw_cap) & HW_CAP_TSO)
+@@ -207,7 +209,7 @@ enum phy_reset_delays {
+ struct hix5hd2_desc {
+ 	__le32 buff_addr;
+ 	__le32 cmd;
+-} __aligned(32);
++};
+ 
+ struct hix5hd2_desc_sw {
+ 	struct hix5hd2_desc *desc;
+@@ -259,6 +261,7 @@ struct hix5hd2_priv {
+ 	phy_interface_t	phy_mode;
+ 
+ 	unsigned long hw_cap;
++	unsigned int desc_shift;
+ 	unsigned int speed;
+ 	unsigned int duplex;
+ 
+@@ -273,13 +276,11 @@ struct hix5hd2_priv {
+ 	struct work_struct tx_timeout_task;
+ };
+ 
+-static inline void hix5hd2_mac_interface_reset(struct hix5hd2_priv *priv)
++static inline struct hix5hd2_desc *hix5hd2_get_desc(struct hix5hd2_priv *priv,
++						   struct hix5hd2_desc_sw *ring,
++						   unsigned int index)
+ {
+-	if (!priv->mac_ifc_rst)
+-		return;
+-
+-	reset_control_assert(priv->mac_ifc_rst);
+-	reset_control_deassert(priv->mac_ifc_rst);
++	return (void *)ring->desc + (index << priv->desc_shift);
+ }
+ 
+ static void hix5hd2_config_port(struct net_device *dev, u32 speed, u32 duplex)
+@@ -313,8 +314,13 @@ static void hix5hd2_config_port(struct net_device *dev, u32 speed, u32 duplex)
+ 
+ 	if (duplex)
+ 		val |= GMAC_FULL_DUPLEX;
+-	writel_relaxed(val, priv->ctrl_base);
+-	hix5hd2_mac_interface_reset(priv);
++	/* On MV320, latch the interface mode before releasing reset. */
++	if (priv->hw_cap & HW_CAP_DESC_16)
++		reset_control_assert(priv->mac_ifc_rst);
++	writel(val, priv->ctrl_base);
++	if (!(priv->hw_cap & HW_CAP_DESC_16))
++		reset_control_assert(priv->mac_ifc_rst);
++	reset_control_deassert(priv->mac_ifc_rst);
+ 
+ 	writel_relaxed(BIT_MODE_CHANGE_EN, priv->base + MODE_CHANGE_EN);
+ 	if (speed == SPEED_1000)
+@@ -331,19 +337,19 @@ static void hix5hd2_config_port(struct net_device *dev, u32 speed, u32 duplex)
+ static void hix5hd2_set_desc_depth(struct hix5hd2_priv *priv, int rx, int tx)
+ {
+ 	writel_relaxed(BITS_RX_FQ_DEPTH_EN, priv->base + RX_FQ_REG_EN);
+-	writel_relaxed(rx << 3, priv->base + RX_FQ_DEPTH);
++	writel_relaxed(rx << (priv->desc_shift - 2), priv->base + RX_FQ_DEPTH);
+ 	writel_relaxed(0, priv->base + RX_FQ_REG_EN);
+ 
+ 	writel_relaxed(BITS_RX_BQ_DEPTH_EN, priv->base + RX_BQ_REG_EN);
+-	writel_relaxed(rx << 3, priv->base + RX_BQ_DEPTH);
++	writel_relaxed(rx << (priv->desc_shift - 2), priv->base + RX_BQ_DEPTH);
+ 	writel_relaxed(0, priv->base + RX_BQ_REG_EN);
+ 
+ 	writel_relaxed(BITS_TX_BQ_DEPTH_EN, priv->base + TX_BQ_REG_EN);
+-	writel_relaxed(tx << 3, priv->base + TX_BQ_DEPTH);
++	writel_relaxed(tx << (priv->desc_shift - 2), priv->base + TX_BQ_DEPTH);
+ 	writel_relaxed(0, priv->base + TX_BQ_REG_EN);
+ 
+ 	writel_relaxed(BITS_TX_RQ_DEPTH_EN, priv->base + TX_RQ_REG_EN);
+-	writel_relaxed(tx << 3, priv->base + TX_RQ_DEPTH);
++	writel_relaxed(tx << (priv->desc_shift - 2), priv->base + TX_RQ_DEPTH);
+ 	writel_relaxed(0, priv->base + TX_RQ_REG_EN);
+ }
+ 
+@@ -392,6 +398,11 @@ static void hix5hd2_hw_init(struct hix5hd2_priv *priv)
+ 	writel_relaxed(~0, priv->base + RAW_PMU_INT);
+ 
+ 	writel_relaxed(BIT_CRC_ERR_PASS, priv->base + REC_FILT_CONTROL);
++	if (priv->hw_cap & HW_CAP_DESC_16) {
++		val = readl_relaxed(priv->base + MAC_SET);
++		val = (val & ~MV320_MAC_SET_MASK) | MV320_MAC_SET_DEFAULT;
++		writel_relaxed(val, priv->base + MAC_SET);
++	}
+ 	writel_relaxed(MAC_MAX_FRAME_SIZE, priv->base + CONTROL_WORD);
+ 	writel_relaxed(0, priv->base + COL_SLOT_TIME);
+ 
+@@ -471,9 +482,9 @@ static void hix5hd2_rx_refill(struct hix5hd2_priv *priv)
+ 	dma_addr_t addr;
+ 
+ 	/* software write pointer */
+-	start = dma_cnt(readl_relaxed(priv->base + RX_FQ_WR_ADDR));
++	start = readl_relaxed(priv->base + RX_FQ_WR_ADDR) >> priv->desc_shift;
+ 	/* logic read pointer */
+-	end = dma_cnt(readl_relaxed(priv->base + RX_FQ_RD_ADDR));
++	end = readl_relaxed(priv->base + RX_FQ_RD_ADDR) >> priv->desc_shift;
+ 	num = CIRC_SPACE(start, end, RX_DESC_NUM);
+ 
+ 	for (i = 0, pos = start; i < num; i++) {
+@@ -481,7 +492,9 @@ static void hix5hd2_rx_refill(struct hix5hd2_priv *priv)
+ 		if (priv->rx_skb[pos]) {
+ 			break;
+ 		} else {
+-			skb = netdev_alloc_skb_ip_align(priv->netdev, len);
++			skb = netdev_alloc_skb(priv->netdev, len + 2);
+ 			if (unlikely(skb == NULL))
+ 				break;
++			/* Hardware aligns RX DMA to 4 bytes + 2-byte header offset. */
++			skb_reserve(skb, 2);
+ 		}
+@@ -491,7 +504,7 @@ static void hix5hd2_rx_refill(struct hix5hd2_priv *priv)
+ 			break;
+ 		}
+ 
+-		desc = priv->rx_fq.desc + pos;
++		desc = hix5hd2_get_desc(priv, &priv->rx_fq, pos);
+ 		desc->buff_addr = cpu_to_le32(addr);
+ 		priv->rx_skb[pos] = skb;
+ 		desc->cmd = cpu_to_le32(DESC_VLD_FREE |
+@@ -503,7 +514,7 @@ static void hix5hd2_rx_refill(struct hix5hd2_priv *priv)
+ 	wmb();
+ 
+ 	if (pos != start)
+-		writel_relaxed(dma_byte(pos), priv->base + RX_FQ_WR_ADDR);
++		writel_relaxed(pos << priv->desc_shift, priv->base + RX_FQ_WR_ADDR);
+ }
+ 
+ static int hix5hd2_rx(struct net_device *dev, int limit)
+@@ -515,9 +526,9 @@ static int hix5hd2_rx(struct net_device *dev, int limit)
+ 	u32 start, end, num, pos, i, len;
+ 
+ 	/* software read pointer */
+-	start = dma_cnt(readl_relaxed(priv->base + RX_BQ_RD_ADDR));
++	start = readl_relaxed(priv->base + RX_BQ_RD_ADDR) >> priv->desc_shift;
+ 	/* logic write pointer */
+-	end = dma_cnt(readl_relaxed(priv->base + RX_BQ_WR_ADDR));
++	end = readl_relaxed(priv->base + RX_BQ_WR_ADDR) >> priv->desc_shift;
+ 	num = CIRC_CNT(end, start, RX_DESC_NUM);
+ 	if (num > limit)
+ 		num = limit;
+@@ -532,22 +543,22 @@ static int hix5hd2_rx(struct net_device *dev, int limit)
+ 		}
+ 		priv->rx_skb[pos] = NULL;
+ 
+-		desc = priv->rx_bq.desc + pos;
++		desc = hix5hd2_get_desc(priv, &priv->rx_bq, pos);
+ 		len = (le32_to_cpu(desc->cmd) >> DESC_DATA_LEN_OFF) &
+ 		       DESC_DATA_MASK;
+ 		addr = le32_to_cpu(desc->buff_addr);
+ 		dma_unmap_single(priv->dev, addr, MAC_MAX_FRAME_SIZE,
+ 				 DMA_FROM_DEVICE);
+ 
+-		skb_put(skb, len);
+-		if (skb->len > MAC_MAX_FRAME_SIZE) {
+-			netdev_err(dev, "rcv len err, len = %d\n", skb->len);
++		if (len < ETH_HLEN || len > MAC_MAX_FRAME_SIZE) {
++			netdev_err(dev, "rcv len err, len = %u\n", len);
+ 			dev->stats.rx_errors++;
+ 			dev->stats.rx_length_errors++;
+ 			dev_kfree_skb_any(skb);
+ 			goto next;
+ 		}
+ 
++		skb_put(skb, len);
+ 		skb->protocol = eth_type_trans(skb, dev);
+ 		napi_gro_receive(&priv->napi, skb);
+ 		dev->stats.rx_packets++;
+@@ -557,7 +568,7 @@ next:
+ 	}
+ 
+ 	if (pos != start)
+-		writel_relaxed(dma_byte(pos), priv->base + RX_BQ_RD_ADDR);
++		writel_relaxed(pos << priv->desc_shift, priv->base + RX_BQ_RD_ADDR);
+ 
+ 	hix5hd2_rx_refill(priv);
+ 
+@@ -597,9 +608,9 @@ static void hix5hd2_xmit_reclaim(struct net_device *dev)
+ 	netif_tx_lock(dev);
+ 
+ 	/* software read */
+-	start = dma_cnt(readl_relaxed(priv->base + TX_RQ_RD_ADDR));
++	start = readl_relaxed(priv->base + TX_RQ_RD_ADDR) >> priv->desc_shift;
+ 	/* logic write */
+-	end = dma_cnt(readl_relaxed(priv->base + TX_RQ_WR_ADDR));
++	end = readl_relaxed(priv->base + TX_RQ_WR_ADDR) >> priv->desc_shift;
+ 	num = CIRC_CNT(end, start, TX_DESC_NUM);
+ 
+ 	for (i = 0, pos = start; i < num; i++) {
+@@ -611,7 +622,7 @@ static void hix5hd2_xmit_reclaim(struct net_device *dev)
+ 
+ 		pkts_compl++;
+ 		bytes_compl += skb->len;
+-		desc = priv->tx_rq.desc + pos;
++		desc = hix5hd2_get_desc(priv, &priv->tx_rq, pos);
+ 
+ 		if (skb_shinfo(skb)->nr_frags) {
+ 			hix5hd2_clean_sg_desc(priv, skb, pos);
+@@ -627,7 +638,7 @@ static void hix5hd2_xmit_reclaim(struct net_device *dev)
+ 	}
+ 
+ 	if (pos != start)
+-		writel_relaxed(dma_byte(pos), priv->base + TX_RQ_RD_ADDR);
++		writel_relaxed(pos << priv->desc_shift, priv->base + TX_RQ_RD_ADDR);
+ 
+ 	netif_tx_unlock(dev);
+ 
+@@ -743,7 +754,7 @@ static netdev_tx_t hix5hd2_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	int ret;
+ 
+ 	/* software write pointer */
+-	pos = dma_cnt(readl_relaxed(priv->base + TX_BQ_WR_ADDR));
++	pos = readl_relaxed(priv->base + TX_BQ_WR_ADDR) >> priv->desc_shift;
+ 	if (unlikely(priv->tx_skb[pos])) {
+ 		dev->stats.tx_dropped++;
+ 		dev->stats.tx_fifo_errors++;
+@@ -751,7 +762,7 @@ static netdev_tx_t hix5hd2_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		return NETDEV_TX_BUSY;
+ 	}
+ 
+-	desc = priv->tx_bq.desc + pos;
++	desc = hix5hd2_get_desc(priv, &priv->tx_bq, pos);
+ 
+ 	cmd = hix5hd2_get_desc_cmd(skb, priv->hw_cap);
+ 	desc->cmd = cpu_to_le32(cmd);
+@@ -781,7 +792,7 @@ static netdev_tx_t hix5hd2_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	wmb();
+ 
+ 	pos = dma_ring_incr(pos, TX_DESC_NUM);
+-	writel_relaxed(dma_byte(pos), priv->base + TX_BQ_WR_ADDR);
++	writel_relaxed(pos << priv->desc_shift, priv->base + TX_BQ_WR_ADDR);
+ 
+ 	netif_trans_update(dev);
+ 	dev->stats.tx_packets++;
+@@ -802,7 +813,7 @@ static void hix5hd2_free_dma_desc_rings(struct hix5hd2_priv *priv)
+ 		if (skb == NULL)
+ 			continue;
+ 
+-		desc = priv->rx_fq.desc + i;
++		desc = hix5hd2_get_desc(priv, &priv->rx_fq, i);
+ 		addr = le32_to_cpu(desc->buff_addr);
+ 		dma_unmap_single(priv->dev, addr,
+ 				 MAC_MAX_FRAME_SIZE, DMA_FROM_DEVICE);
+@@ -815,7 +826,7 @@ static void hix5hd2_free_dma_desc_rings(struct hix5hd2_priv *priv)
+ 		if (skb == NULL)
+ 			continue;
+ 
+-		desc = priv->tx_rq.desc + i;
++		desc = hix5hd2_get_desc(priv, &priv->tx_rq, i);
+ 		addr = le32_to_cpu(desc->buff_addr);
+ 		dma_unmap_single(priv->dev, addr, skb->len, DMA_TO_DEVICE);
+ 		dev_kfree_skb_any(skb);
+@@ -1002,7 +1013,7 @@ static int hix5hd2_init_hw_desc_queue(struct hix5hd2_priv *priv)
+ 	priv->tx_rq.count = TX_DESC_NUM;
+ 
+ 	for (i = 0; i < QUEUE_NUMS; i++) {
+-		size = priv->pool[i].count * sizeof(struct hix5hd2_desc);
++		size = priv->pool[i].count << priv->desc_shift;
+ 		virt_addr = dma_alloc_coherent(dev, size, &phys_addr,
+ 					       GFP_KERNEL);
+ 		if (virt_addr == NULL)
+@@ -1111,6 +1122,7 @@ static int hix5hd2_dev_probe(struct platform_device *pdev)
+ 	priv->netdev = ndev;
+ 
+ 	priv->hw_cap = (unsigned long)device_get_match_data(dev);
++	priv->desc_shift = priv->hw_cap & HW_CAP_DESC_16 ? 4 : 5;
+ 
+ 	priv->base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(priv->base)) {
+@@ -1124,7 +1136,10 @@ static int hix5hd2_dev_probe(struct platform_device *pdev)
+ 		goto out_free_netdev;
+ 	}
+ 
+-	priv->mac_core_clk = devm_clk_get(&pdev->dev, "mac_core");
++	if (priv->hw_cap & HW_CAP_BOOT_CLOCKS)
++		priv->mac_core_clk = devm_clk_get_optional(dev, "mac_core");
++	else
++		priv->mac_core_clk = devm_clk_get(dev, "mac_core");
+ 	if (IS_ERR(priv->mac_core_clk)) {
+ 		netdev_err(ndev, "failed to get mac core clk\n");
+ 		ret = -ENODEV;
+@@ -1300,6 +1315,8 @@ static const struct of_device_id hix5hd2_of_match[] = {
+ 	{ .compatible = "hisilicon,hix5hd2-gmac", .data = (void *)GEMAC_V1 },
+ 	{ .compatible = "hisilicon,hi3798cv200-gmac", .data = (void *)GEMAC_V2 },
+ 	{ .compatible = "hisilicon,hi3516a-gmac", .data = (void *)GEMAC_V2 },
++	{ .compatible = "hisilicon,hi3798mv320-gmac",
++	  .data = (void *)(GEMAC_V2 | HW_CAP_BOOT_CLOCKS | HW_CAP_DESC_16) },
+ 	{},
+ };
+ 

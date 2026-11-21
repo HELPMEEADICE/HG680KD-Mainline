@@ -1,0 +1,18 @@
+<INTERRUPT>
+fastboot#setenv tftpdstp 1069
+fastboot#tftpboot 1ffbfc0 hg680kd-serial-sample.bin
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.160; our IP address is 192.168.6.249
+Filename 'hg680kd-serial-sample.bin'.
+Load address: 0x1ffbfc0
+Loading: *#	[ Connected ]
+
+	 2.6 MiB/s
+done
+Bytes transferred = 32768 (8000 hex)
+fastboot#crc32 1ffbfc0 8000
+CRC32 for 01ffbfc0 ... 02003fbf ==> 217726b2
+fastboot#
+[host] CRC32 matches local image: 217726b2

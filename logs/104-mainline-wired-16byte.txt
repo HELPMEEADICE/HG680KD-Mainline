@@ -1,0 +1,176 @@
+<INTERRUPT>
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.160
+fastboot#setenv tftpdstp 1069
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+171186688 Bytes/s
+fastboot#tftpboot 1ffbfc0 hg680kd-net-r3.img
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.160; our IP address is 192.168.6.249
+Filename 'hg680kd-net-r3.img'.
+Load address: 0x1ffbfc0
+Loading: *#	[ Connected ]
+###########################
+	 3.1 MiB/s
+done
+Bytes transferred = 2605056 (27c000 hex)
+fastboot#crc32 1ffbfc0 27c000
+CRC32 for 01ffbfc0 ... 02277fbf ==> 5383b283
+fastboot#
+[host] CRC32 matches local image: 5383b283
+bootm 0x1ffbfc0
+## Booting kernel from Legacy Image at 01ffffc0 ...
+   Image Name:   Linux HG680KD ARM32
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    2586518 Bytes = 2.5 MiB
+   Load Address: 02000000
+   Entry Point:  02000000
+   XIP Kernel Image
+
+Starting kernel ...
+
+Start ATF with aarch32 kernel...
+bl33_ep->spsr = 0x1D3
+Start Warm Reseting
+[   27.224592][cpu0]NOTICE:  BL31: lts-v2.8.6(release):98d5f24
+[   27.228683][cpu0]NOTICE:  BL31: Built : 21:47:11, Jul 22 2024
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Linux version 6.18.64-hg680kd-net (hg680kd@build) (arm-linux-gnueabi-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP 2025-12-01 00:00:00 UTC
+[    0.000000] CPU: ARMv7 Processor [412fd050] revision 0 (ARMv7), cr=10c5383d
+[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+[    0.000000] OF: fdt: Machine model: FiberHome HG680KD
+[    0.000000] earlycon: pl11 at MMIO32 0xf8b00000 (options '')
+[    0.000000] printk: legacy bootconsole [pl11] enabled
+[    0.000000] printk: debug: ignoring loglevel setting.
+[    0.000000] Memory policy: Data cache writealloc
+[    0.000000] Zone ranges:
+[    0.000000]   Normal   [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000053dffff]
+[    0.000000]   node   0: [mem 0x00000000053e0000-0x0000000005bdffff]
+[    0.000000]   node   0: [mem 0x0000000005be0000-0x00000000063dbfff]
+[    0.000000]   node   0: [mem 0x00000000063dc000-0x00000000063dffff]
+[    0.000000]   node   0: [mem 0x00000000063e0000-0x0000000007ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] OF: reserved mem: 0x053e0000..0x05bdffff (8192 KiB) nomap non-reusable firmware-log@53e0000
+[    0.000000] OF: reserved mem: 0x063dc000..0x063dffff (16 KiB) nomap non-reusable crash-log@63dc000
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.2
+[    0.000000] percpu: Embedded 9 pages/cpu s12876 r0 d23988 u36864
+[    0.000000] pcpu-alloc: s12876 r0 d23988 u36864 alloc=9*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+[    0.000000] Kernel command line: console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel
+[    0.000000] printk: log buffer data + meta data: 131072 + 409600 = 540672 bytes
+[    0.000000] Dentry cache hash table entries: 16384 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 32768
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+[    0.000000] NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+[    0.000000] GICv3: 224 SPIs implemented
+[    0.000000] GICv3: 0 Extended SPIs implemented
+[    0.000000] GICv3: GICv3 features: 16 PPIs
+[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0xf1040000
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.000001] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.008098] Switching to timer-based delay loop, resolution 41ns
+[    0.014280] Console: colour dummy device 80x30
+[    0.018791] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=240000)
+[    0.029272] CPU: Testing write buffer coherency: ok
+[    0.034226] pid_max: default: 32768 minimum: 301
+[    0.038996] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.046401] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.055193] Setting up static identity map for 0x8240 - 0x82a0
+[    0.061183] rcu: Hierarchical SRCU implementation.
+[    0.066026] rcu: 	Max phase no-delay instances is 1000.
+[    0.071626] smp: Bringing up secondary CPUs ...
+[    0.076588] GICv3: CPU1: found redistributor 100 region 0:0xf1060000
+[    0.077047] GICv3: CPU2: found redistributor 200 region 0:0xf1080000
+[    0.077481] GICv3: CPU3: found redistributor 300 region 0:0xf10a0000
+[    0.077556] smp: Brought up 1 node, 4 CPUs
+[    0.100978] SMP: Total of 4 processors activated (192.00 BogoMIPS).
+[    0.107321] CPU: All CPU(s) started in SVC mode.
+[    0.112366] Memory: 115124K/131072K available (3592K kernel code, 506K rwdata, 636K rodata, 456K init, 181K bss, 15024K reserved, 0K cma-reserved)
+[    0.125959] devtmpfs: initialized
+[    0.130154] VFP support v0.3: implementor 41 architecture 3 part 40 variant 5 rev 3
+[    0.137992] posixtimers hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.145511] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.154636] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.160767] DMA: preallocated 256 KiB pool for atomic coherent allocations
+[    0.168204] Serial: AMBA PL011 UART driver
+[    0.173086] f8b00000.serial: ttyAMA0 at MMIO 0xf8b00000 (irq = 28, base_baud = 0) is a PL011 rev2
+[    0.182102] printk: console [ttyAMA0] enabled
+[    0.182102] printk: console [ttyAMA0] enabled
+[    0.190857] printk: legacy bootconsole [pl11] disabled
+[    0.190857] printk: legacy bootconsole [pl11] disabled
+[    0.202698] clocksource: Switched to clocksource arch_sys_counter
+[    0.207534] NET: Registered PF_INET protocol family
+[    0.207648] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.207981] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.207997] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.208012] TCP established hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.208026] TCP bind hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.208045] TCP: Hash tables configured (established 1024 bind 1024)
+[    0.208099] UDP hash table entries: 256 (order: 2, 14336 bytes, linear)
+[    0.208120] UDP-Lite hash table entries: 256 (order: 2, 14336 bytes, linear)
+[    0.208703] workingset: timestamp_bits=30 max_order=15 bucket_order=0
+[    0.225178] (unnamed net_device) (uninitialized): using random MAC address be:5b:52:a0:95:19
+[    0.225756] NET: Registered PF_PACKET protocol family
+[    0.225788] Registering SWP/SWPB emulation handler
+
+[    0.231041] clk: Disabling unused clocks
+[    0.275557] Freeing unused kernel image (initmem) memory: 456K
+[    0.275564] Kernel memory protection not selected by kernel config.
+HG680KD AArch32 R[    0.275573] Run /init as init process
+AM bring-up[    0.275576]   with arguments:
+
+[    0.275579]     /init
+[    0.275581]   with environment:
+[    0.275583]     HOME=/
+Linux (none) 6.18[    0.275585]     TERM=linux
+.64-hg680kd-net #1 SMP 2025-12-01 00:00:00 UTC armv7l
+Online CPUs: 0-3
+Clocksource: arch_sys_counter
+Timer interrupt counts before and after one second:
+           CPU0       CPU1       CPU2       CPU3       
+ 26:         31         23         23         24    GICv3  27 Level     arch_timer
+0.28 0.64
+           CPU0       CPU1       CPU2       CPU3       
+ 26:        132        125        124        125    GICv3  27 Level     arch_timer
+1.28 4.64
+
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+# uname -a; cat /sys/bus/mdio_bus/devices/*/phy_id; ifconfig eth0 hw ether 54:0A:77:88:B7:2C; ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 5; cat /sys/class/net/eth0/carrier; ping -c 5 -W 2 192.168.6.160; cat /proc/net/arp; cat /sys/class/net/eth0/statistics/rx_packets /sys/class/net/eth0/statistics/tx_packets
+Linux (none) 6.18.64-hg680kd-net #1 SMP 2025-12-01 00:00:00 UTC armv7l
+0x20669908
+[    1.399820] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+1
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+
+--- 192.168.6.160 ping statistics ---
+5 packets transmitted, 0 packets received, 100% packet loss
+IP address       HW type     Flags       HW address            Mask     Device
+192.168.6.1      0x1         0x2         30:07:5c:df:c7:13     *        eth0
+192.168.6.160    0x1         0x2         1c:86:0b:02:fd:40     *        eth0
+74
+10
+# 
+[host] shell command elapsed: 11.08 s

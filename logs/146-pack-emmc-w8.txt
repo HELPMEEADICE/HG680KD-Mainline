@@ -1,0 +1,3 @@
+382dc2577af3a88dde6a58eecf0499ec87d007eddd254db5b99ed359482c2f21  zImage-dtb  (2038865 bytes, CRC32=c1d1d7c4)
+99f9223ca073a3e31bfa1f05ce7eebcf69eab857be195bcb524b0f53f3dff2c8  uImage  (2038929 bytes, CRC32=b0385a94)
+ec4cb48d6dec2e71ca0e67ca356e198f0bbcbe3540eeecd63275a61d6b22e6e2  boot.img  (2064384 bytes, CRC32=b68bf971)

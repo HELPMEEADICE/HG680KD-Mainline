@@ -1,0 +1,72 @@
+
+# uname -a; cat /sys/devices/system/cpu/online; cat /proc/cpuinfo
+Linux (none) 6.18.64 #1 SMP 2025-12-01 00:00:00 UTC armv7l
+0-3
+processor	: 0
+model name	: ARMv7 Processor rev 0 (v7l)
+BogoMIPS	: 48.00
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae fphp asimdhp asimddp aes pmull sha1 sha2 crc32 ssbs 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 1
+model name	: ARMv7 Processor rev 0 (v7l)
+BogoMIPS	: 48.00
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae fphp asimdhp asimddp aes pmull sha1 sha2 crc32 ssbs 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 2
+model name	: ARMv7 Processor rev 0 (v7l)
+BogoMIPS	: 48.00
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae fphp asimdhp asimddp aes pmull sha1 sha2 crc32 ssbs 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 3
+model name	: ARMv7 Processor rev 0 (v7l)
+BogoMIPS	: 48.00
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae fphp asimdhp asimddp aes pmull sha1 sha2 crc32 ssbs 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+Hardware	: Generic DT based system
+Revision	: 0000
+Serial		: 0000000000000000
+# 
+[host] shell command elapsed: 0.12 s
+cat /proc/uptime; grep arch_timer /proc/interrupts; sleep 2; cat /proc/uptime; grep arch_timer /proc/interrupts
+63.00 251.58
+ 26:       6361       6300       6299       6302    GICv3  27 Level     arch_timer
+63.00 251.58
+ 26:       6361       6300       6299       6302    GICv3  27 Level     arch_timer
+# 
+[host] shell command elapsed: 0.03 s
+cat /sys/devices/system/clocksource/clocksource0/current_clocksource; cat /proc/uptime; cat /proc/interrupts
+arch_sys_counter
+63.03 251.70
+           CPU0       CPU1       CPU2       CPU3       
+ 26:       6364       6303       6302       6305    GICv3  27 Level     arch_timer
+ 28:        292          0          0          0    GICv3  81 Level     uart-pl011
+IPI0:         0          0          0          0  CPU wakeup interrupts
+IPI1:         0          0          0          0  Timer broadcast interrupts
+IPI2:         3         14          9         26  Rescheduling interrupts
+IPI3:       130         10         91         34  Function call interrupts
+IPI4:         0          0          0          0  CPU stop interrupts
+IPI5:         0          0          0          0  IRQ work interrupts
+IPI6:         0          0          0          0  completion interrupts
+Err:          0
+# 
+[host] shell command elapsed: 0.08 s

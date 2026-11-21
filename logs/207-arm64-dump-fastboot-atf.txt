@@ -1,0 +1,5 @@
+
+# wget -q -O /bin/memtest-2g http://192.168.6.160:18081/sendbin && /bin/memtest-2g 192.168.6.160 18082 /dev/mmcblk0 0 2097152 && /bin/memtest-2g 192.168.6.160 18083 /dev/mmcblk0 33554432 2097152 && echo DUMP_OK
+connect: Connection refused
+# 
+[host] shell command elapsed: 0.22 s

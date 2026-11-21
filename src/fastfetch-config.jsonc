@@ -1,0 +1,22 @@
+{
+  "modules": [
+    "title",
+    "separator",
+    "os",
+    "host",
+    "kernel",
+    "uptime",
+    "shell",
+    "terminal",
+    "cpu",
+    "gpu",
+    "memory",
+    "swap",
+    "disk",
+    {
+      "type": "localip",
+      "defaultRouteOnly": false
+    },
+    "locale"
+  ]
+}

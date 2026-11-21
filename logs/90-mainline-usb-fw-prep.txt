@@ -1,0 +1,31 @@
+<INTERRUPT>
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.160
+fastboot#setenv tftpdstp 1069
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+172519424 Bytes/s
+fastboot#tftpboot 1ffbfc0 hg680kd-usb-r5.img
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.160; our IP address is 192.168.6.249
+Filename 'hg680kd-usb-r5.img'.
+Load address: 0x1ffbfc0
+Loading: *#	[ Connected ]
+#######################
+	 3.2 MiB/s
+done
+Bytes transferred = 2195456 (218000 hex)
+fastboot#crc32 1ffbfc0 218000
+CRC32 for 01ffbfc0 ... 02213fbf ==> 17216271
+fastboot#
+[host] CRC32 matches local image: 17216271
+md.l f8a20150 1
+f8a20150: 20002000                             . . 
+fastboot#mw.l f8a20150 2000
+fastboot#md.l f8a20150 1
+f8a20150: 20002000                             . . 
+fastboot#

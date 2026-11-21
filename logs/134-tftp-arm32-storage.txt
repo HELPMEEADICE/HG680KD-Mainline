@@ -1,0 +1,2 @@
+Listening on UDP 192.168.6.160:1069 for 192.168.6.249
+Sent 2359296 bytes of hg680kd-storage.img to 192.168.6.249

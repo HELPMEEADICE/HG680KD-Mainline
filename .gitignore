@@ -1,0 +1,7 @@
+# Prebuilt kernel, initramfs, and image artifacts
+artifacts/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class

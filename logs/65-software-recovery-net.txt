@@ -1,0 +1,176 @@
+
+# umask 5; umask >/proc/sys/kernel/panic; umask 1; umask >/proc/sys/kernel/panic_on_oops; umask 022
+# 
+[host] shell command elapsed: 0.02 s
+reboot -f
+[  308.804278] BUG: Bad rss-counter state mm:(ptrval) type:MM_ANONPAGES val:1 Comm:sh Pid:84
+[  308.804545] 8<--- cut here ---
+[  308.804550] Unhandled prefetch abort: unknown 1 (0x001) at 0x01000406
+[  308.804557] Internal error: : 1 [#5] SMP ARM
+[  308.826535] CPU: 3 UID: 0 PID: 84 Comm: sh Tainted: G      D             6.18.64-hg680kd-net #1 NONE 
+[  308.835752] Tainted: [D]=DIE
+[  308.838624] Hardware name: Generic DT based system
+[  308.843407] PC is at 0x1000406
+[  308.846455] LR is at bprm_execve+0x1c8/0x44c
+[  308.850726] pc : [<01000406>]    lr : [<c01201d0>]    psr: 60000013
+[  308.856986] sp : c0af9f30  ip : 60000013  fp : c05572a0
+[  308.862203] r10: c0a20a58  r9 : 00000006  r8 : c05224f8
+[  308.867420] r7 : c0a20a00  r6 : 00000000  r5 : c0522a08  r4 : c08bf080
+[  308.873940] r3 : 01000406  r2 : 00000000  r1 : 00000000  r0 : c0a20a00
+[  308.880460] Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+[  308.887589] Control: 10c5383d  Table: 012b006a  DAC: 00000055
+[  308.893327] Register r0 information: slab kmalloc-512 start c0a20a00 pointer offset 0 size 512
+[  308.901946] Register r1 information: NULL pointer
+[  308.906646] Register r2 information: NULL pointer
+[  308.911343] Register r3 information: non-paged memory
+[  308.916388] Register r4 information: slab task_struct start c08bf080 pointer offset 0 size 1920
+[  308.925091] Register r5 information: non-slab/vmalloc memory
+[  308.930744] Register r6 information: NULL pointer
+[  308.935442] Register r7 information: slab kmalloc-512 start c0a20a00 pointer offset 0 size 512
+[  308.944056] Register r8 information: non-slab/vmalloc memory
+[  308.949709] Register r9 information: non-paged memory
+[  308.954754] Register r10 information: slab kmalloc-512 start c0a20a00 pointer offset 88 size 512
+[  308.963542] Register r11 information: non-slab/vmalloc memory
+[  308.969282] Register r12 information: non-paged memory
+[  308.974414] Process sh (pid: 84, stack limit = 0x(ptrval))
+[  308.979892] Stack: (0xc0af9f30 to 0xc0afa000)
+[  308.984244] 9f20:                                     c08bf080 c05572a0 00000000 00000054
+[  308.992416] 9f40: 00000100 00000000 c08bf080 00000000 c08d9000 c0a20a00 c08bf080 b6fa78a0
+[  309.000588] 9f60: b6fa78ac 0000000b 00052824 c01205bc b6fa78a0 b6fa78ac b6fa78ac 0000000b
+[  309.008759] 9f80: c00084f8 c08bf080 0000000b c01211e0 00000000 00015a7c 60000010 b6fa78c4
+[  309.016931] 9fa0: b6fa78a0 c00082a0 b6fa78c4 b6fa78a0 b6fa78c4 b6fa78a0 b6fa78ac b6fa7820
+[  309.025103] 9fc0: b6fa78c4 b6fa78a0 b6fa78ac 0000000b 0004f045 00052824 00052928 00052824
+[  309.033274] 9fe0: 082d872b bed7fa2c 00019064 0003201c 60000010 b6fa78c4 00000000 00000000
+[  309.041443] Call trace: 
+[  309.041450]  bprm_execve from do_execveat_common+0x168/0x194
+[  309.049636]  do_execveat_common from sys_execve+0x34/0x3c
+[  309.055037]  sys_execve from ret_fast_syscall+0x0/0x4c
+[  309.060176] Exception stack(0xc0af9fa8 to 0xc0af9ff0)
+[  309.065222] 9fa0:                   b6fa78c4 b6fa78a0 b6fa78c4 b6fa78a0 b6fa78ac b6fa7820
+[  309.073394] 9fc0: b6fa78c4 b6fa78a0 b6fa78ac 0000000b 0004f045 00052824 00052928 00052824
+[  309.081564] 9fe0: 082d872b bed7fa2c 00019064 0003201c
+[  309.086608] Code: bad PC value
+[  309.089655] ---[ end trace 0000000000000000 ]---
+[  309.094265] Kernel panic - not syncing: Fatal exception
+[  309.099568] Rebooting in 5 seconds..
+Systÿ
+Bootrom start
+Boot Media: EMMC
+Decrypt auxiliary code ...OK
+
+lsadc voltage min: 0000006B, max: 00000071, aver: 0000006D, index: 0000000B
+
+Enter boot auxiliary code
+
+Auxiliary code - v1.00
+DDR code - V2.2.4 20241026
+Build: Oct 26 2024 - 15:52:06
+
+Reg Version:  v2.2.3d
+Reg Time:     2024/11/27 15:19:10
+Reg Name:     hi3798mv320dma_Hi3798MV320_LPDDR4-2666-2rank_2GB_32bitx1_2layers.reg
+
+cpu_hpm_otp:
+00000125
+cpu_hpm:
+00000125
+cpu_otp_comp:
+0000002D
+cpu svb done!
+
+gpu_hpm_otp:
+0000011D
+gpu_hpm:
+00000113
+core_hpm_otp:
+0000017B
+core_hpm:
+0000016D
+gpu_otp_comp:
+0000002D
+gpu_otp_comp:
+0000002D
+core_otp_comp:
+0000002D
+training volt:
+0000036A
+DDR traning...done!
+
+core_otp_comp:
+0000002D
+core svb done:
+
+Boot auxiliary code success
+Bootrom success
+
+
+
+
+
+U-Boot 2022.07-g80522c56-dirty (Jun 05 2025 - 21:16:17 +0800), Build: jenkins-STB-git_FVOS_HISI_9_CTCGUANGDONG_p-hisi-iptv_fh_product_20240318-60
+
+
+CPU:		   HI3798MV320 ()
+Boot Media:	eMMC
+DDR Size:	  2 GiB (Boot:  2 GiB)
+
+
+WARNING: Caches not enabled
+[INFO][record_exce_type]:set reboot_reason is 0x43
+[INFO]last bootup_keypoint is [30]
+MMC:   MMC/SD Card:
+    MID:         0xf4
+    Read Block:  512 Bytes
+    Write Block: 512 Bytes
+    Chip Size:   7818182656 Bytes (High Capacity)
+    Name:        "B1003"
+    Chip Type:   MMC
+    Version:     5.1
+    Speed:       192000000Hz
+    Bus Width:   8bit
+    Mode:        HS400ES
+    Boot Mode:   normal(), 61 ms
+Loading Environment from MMC... OK
+LOGO Flag:9291908f
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+Net:   gmac0
+
+SDK Version: HiHuanglong_V100R009C01SPC023_v2024111912
+
+jpgd_dfx_print_timestamp 69 cnt: 1, hard in 1280 720 out 1280 720  sample 1 fmt 17 17 total 8 alloc yuv 0 dec 4 csc 0
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+cvbs select_channel:DISP_CLOCK_SOURCE_SD0
+cvbs select_channel:DISP_CLOCK_SOURCE_SD0
+cvbs select_channel:DISP_CLOCK_SOURCE_SD0
+get_devinfo_item_ptr: date_type 2 is null !!
+check remote recovery button begin
+ __recovery__into no IR KEY
+lsadc value 108
+already set hardwareid and boardid, skip!
+env not set emergency_log, skip!
+Reserve Memory
+    Start Addr:          0x7FFFE000
+    Bound Addr:          0x20000000
+    Free  Addr:          0x7F67F000
+    Alloc Block:  Addr         Size
+                  0x17FFD000   0x2000
+                  0x17FFB000   0x1000
+                  0x17FF8000   0x2000
+                  0x7FEAB000   0x152000
+                  0x7F6C1000   0x7E9000
+                  0x7F6BF000   0x1000
+                  0x7F6B5000   0x9000
+                  0x7F6B3000   0x1000
+                  0x7F6B0000   0x2000
+                  0x7F67F000   0x30000
+
+BBOX:
+[INFO][create_reboot_reason_cmdline][reboot_reason=AP_S_AWDT][exception_subtype=SUB_APWDT_AP]
+[INFO][record_exce_type]:set reboot_reason is 0xff
+Autobooting in 3 seconds, Press Ctrl+C to stop autoboot
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#

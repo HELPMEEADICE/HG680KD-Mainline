@@ -1,0 +1,60 @@
+<INTERRUPT>
+fastboot#usb start
+starting USB...
+USB0:   Register 1000140 NbrPorts 1
+Starting the controller
+USB XHCI 1.10
+scanning bus 0 for devices... 1 USB Device(s) found
+USB1:   Register 3000140 NbrPorts 3
+Starting the controller
+USB XHCI 1.10
+scanning bus 1 for devices... 2 USB Device(s) found
+       scanning usb for storage devices... 1 Storage Device(s) found
+       scanning usb for ethernet devices... 0 Ethernet Device(s) found
+fastboot#usb tree
+USB device tree:
+  1  Hub (5 Gb/s, 0mA)
+     U-Boot XHCI Host Controller 
+   
+  2  Hub (5 Gb/s, 0mA)
+  |  U-Boot XHCI Host Controller 
+  |
+  |+-3  Mass Storage (480 Mb/s, 224mA)
+        USB  SanDisk 3.2Gen1 0101cfcee42b331f192d48b3e59fbda
+     
+fastboot#usb storage
+  Device 0: Vendor:  USB Rev: 1.00 Prod:  SanDisk 3.2Gen1
+            Type: Removable Hard Disk
+            Capacity: 29358.0 MB = 28.6 GB (60125184 x 512)
+fastboot#usb part
+
+Partition Map for USB device 0  --   Partition Type: DOS
+
+Part	Start Sector	Num Sectors	UUID		Type
+  1	2048      	60123136  	ecb6e308-01	0c Boot
+fastboot#fatls usb 0:1 /HG680KD
+            ./
+            ../
+ 12304384   boot.img
+ 12281109   uImage
+ 12253696   zImage
+    27349   factory.dtb
+    27413   dtbo.img
+            firmware/
+ 419430400   vendor.img
+   118927   kernel.config
+
+7 file(s), 3 dir(s)
+
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.160
+fastboot#ping 192.168.6.160
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+host 192.168.6.160 is alive
+fastboot#mii read 1 1
+786D
+fastboot#mii read 3 1
+0000
+fastboot#

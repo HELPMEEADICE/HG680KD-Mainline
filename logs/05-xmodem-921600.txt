@@ -1,0 +1,12 @@
+<INTERRUPT>
+fastboot#loadx 10000000 921600
+## Switch baudrate to 921600 bps and press ENTER ...
+## Ready for binary (xmodem) download to 0x10000000 at 921600 bps...
+[host] XMODEM sent 32768 bytes in 0.5 s with 0 retries
+## Total Size      = 0x00008000 = 32768 Bytes
+## Start Addr      = 0x10000000
+## Switch baudrate to 115200 bps and press ESC ...
+fastboot#crc32 10000000 8000
+CRC32 for 10000000 ... 10007fff ==> 217726b2
+fastboot#
+[host] CRC32 matches local image: 217726b2

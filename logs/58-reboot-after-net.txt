@@ -1,0 +1,53 @@
+
+# reboot -f
+[   55.707803] BUG: Bad rss-counter state mm:(ptrval) type:MM_ANONPAGES val:1 Comm:sh Pid:83
+[   55.708022] 8<--- cut here ---
+[   55.708027] Unhandled prefetch abort: unknown 1 (0x001) at 0x01000406
+[   55.708034] Internal error: : 1 [#4] SMP ARM
+[   55.730058] CPU: 2 UID: 0 PID: 83 Comm: sh Tainted: G      D             6.18.64-hg680kd-net #1 NONE 
+[   55.739275] Tainted: [D]=DIE
+[   55.742147] Hardware name: Generic DT based system
+[   55.746929] PC is at 0x1000406
+[   55.749977] LR is at bprm_execve+0x1c8/0x44c
+[   55.754248] pc : [<01000406>]    lr : [<c01201d0>]    psr: 60000013
+[   55.760507] sp : c0bfff30  ip : 60000013  fp : c05572a0
+[   55.765725] r10: c0aaca58  r9 : 00000006  r8 : c05224f8
+[   55.770942] r7 : c0aaca00  r6 : 00000000  r5 : c0522a08  r4 : c1088000
+[   55.777461] r3 : 01000406  r2 : 00000000  r1 : 00000000  r0 : c0aaca00
+[   55.783981] Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+[   55.791111] Control: 10c5383d  Table: 012b006a  DAC: 00000055
+[   55.796848] Register r0 information: slab kmalloc-512 start c0aaca00 pointer offset 0 size 512
+[   55.805468] Register r1 information: NULL pointer
+[   55.810168] Register r2 information: NULL pointer
+[   55.814866] Register r3 information: non-paged memory
+[   55.819911] Register r4 information: slab task_struct start c1088000 pointer offset 0 size 1920
+[   55.828612] Register r5 information: non-slab/vmalloc memory
+[   55.834265] Register r6 information: NULL pointer
+[   55.838962] Register r7 information: slab kmalloc-512 start c0aaca00 pointer offset 0 size 512
+[   55.847577] Register r8 information: non-slab/vmalloc memory
+[   55.853230] Register r9 information: non-paged memory
+[   55.858275] Register r10 information: slab kmalloc-512 start c0aaca00 pointer offset 88 size 512
+[   55.867064] Register r11 information: non-slab/vmalloc memory
+[   55.872804] Register r12 information: non-paged memory
+[   55.877936] Process sh (pid: 83, stack limit = 0x(ptrval))
+[   55.883414] Stack: (0xc0bfff30 to 0xc0c00000)
+[   55.887765] ff20:                                     c1088000 c05572a0 00000000 00000053
+[   55.895937] ff40: 00000100 00000000 c1088000 00000000 c1061000 c0aaca00 c1088000 b6fa78a0
+[   55.904109] ff60: b6fa78ac 0000000b 00052824 c01205bc b6fa78a0 b6fa78ac b6fa78ac 0000000b
+[   55.912281] ff80: c00084f8 c1088000 0000000b c01211e0 00000000 00015a7c 60000010 b6fa78c4
+[   55.920453] ffa0: b6fa78a0 c00082a0 b6fa78c4 b6fa78a0 b6fa78c4 b6fa78a0 b6fa78ac b6fa7820
+[   55.928625] ffc0: b6fa78c4 b6fa78a0 b6fa78ac 0000000b 0004f045 00052824 00052928 00052824
+[   55.936796] ffe0: 082d872b bed7fa2c 00019064 0003201c 60000010 b6fa78c4 00000000 00000000
+[   55.944965] Call trace: 
+[   55.944971]  bprm_execve from do_execveat_common+0x168/0x194
+[   55.953156]  do_execveat_common from sys_execve+0x34/0x3c
+[   55.958557]  sys_execve from ret_fast_syscall+0x0/0x4c
+[   55.963695] Exception stack(0xc0bfffa8 to 0xc0bffff0)
+[   55.968742] ffa0:                   b6fa78c4 b6fa78a0 b6fa78c4 b6fa78a0 b6fa78ac b6fa7820
+[   55.976913] ffc0: b6fa78c4 b6fa78a0 b6fa78ac 0000000b 0004f045 00052824 00052928 00052824
+[   55.985084] ffe0: 082d872b bed7fa2c 00019064 0003201c
+[   55.990127] Code: bad PC value
+[   55.993174] ---[ end trace 0000000000000000 ]---
+[   55.997783] note: sh[83] exited with irqs disabled
+Segmentation fault
+# [   56.002630] BUG: Bad rss-counter state mm:(ptrval) type:MM_ANONPAGES val:1 Comm:sh Pid:69

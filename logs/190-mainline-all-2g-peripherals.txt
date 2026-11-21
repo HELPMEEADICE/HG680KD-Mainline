@@ -1,0 +1,52 @@
+
+# cat /sys/bus/usb/devices/1-2/speed; mount -t vfat -o ro /dev/sda1 /tmp && sha256sum /tmp/HG680KD/boot.img /tmp/HG680KD/factory.dtb && umount /tmp
+480
+97f4e2b5d88ee6d6fae8ced4809420d7f875c4ff8b0acfe817c6409b6f02a6b8  /tmp/HG680KD/boot.img
+e289000306072f9fd2e140dc5a837fb646b9c803dae15c2b4d0b99c32cf63517  /tmp/HG680KD/factory.dtb
+# 
+[host] shell command elapsed: 0.61 s
+cat /sys/block/mmcblk0/ro; dd if=/dev/mmcblk0 bs=512 skip=229376 count=128 | sha256sum; dd if=/dev/mmcblk0 bs=512 skip=253280 count=128 | sha256sum; dd if=/dev/mmcblk0 bs=512 skip=229376 count=24032 | sha256sum
+1
+128+0 records in
+128+0 records out
+5628bea3312b887f305f0882461483e3d4663cb412bf742bbda879becc68a08d  -
+128+0 records in
+128+0 records out
+2edae46864612ccbe27419b4f33b0d147bf0aceefc2001d27c1180d3f5641c3b  -
+24032+0 records in
+24032+0 records out
+97f4e2b5d88ee6d6fae8ced4809420d7f875c4ff8b0acfe817c6409b6f02a6b8  -
+# 
+[host] shell command elapsed: 0.53 s
+ifconfig eth0 hw ether 54:0A:77:88:B7:2C; ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 3; ping -c 3 -W 1 192.168.6.160; wget -q -O - http://192.168.6.160:18080/hg680kd-all-2g.img | sha256sum; cat /proc/net/dev
+[   28.245127] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+64 bytes from 192.168.6.160: seq=0 ttl=64 time=0.475 ms
+64 bytes from 192.168.6.160: seq=1 ttl=64 time=0.249 ms
+64 bytes from 192.168.6.160: seq=2 ttl=64 time=0.232 ms
+
+--- 192.168.6.160 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.232/0.318/0.475 ms
+372baa69d36e0cf82e42b59bb1087bc3d0e3cf6766fec741c9b34b3f1d880abb  -
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 3586856    2458    0    5    0     0          0         0    87703    1323    0    4    0     0       0          0
+# 
+[host] shell command elapsed: 5.36 s
+lima-test; grep -i -E 'arch_timer|f984|f983|f98a|gp|pp|mmu' /proc/interrupts
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+ 26:       3396       3370       3405       3358    GICv3  27 Level     arch_timer
+ 29:          4          0          0          0    GICv3 126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+ 30:       3727          0          0          0    GICv3 112 Level     f9840000.ethernet
+# 
+[host] shell command elapsed: 0.09 s

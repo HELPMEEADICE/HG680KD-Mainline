@@ -1,0 +1,17 @@
+PING 192.168.6.249 (192.168.6.249) 56(84) bytes of data.
+64 bytes from 192.168.6.249: icmp_seq=1 ttl=64 time=0.247 ms
+64 bytes from 192.168.6.249: icmp_seq=2 ttl=64 time=0.219 ms
+64 bytes from 192.168.6.249: icmp_seq=3 ttl=64 time=0.210 ms
+
+--- 192.168.6.249 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2042ms
+rtt min/avg/max/mdev = 0.210/0.225/0.247/0.015 ms
+PING 192.168.6.249 (192.168.6.249) 1472(1500) bytes of data.
+1480 bytes from 192.168.6.249: icmp_seq=1 ttl=64 time=0.494 ms
+1480 bytes from 192.168.6.249: icmp_seq=2 ttl=64 time=0.559 ms
+1480 bytes from 192.168.6.249: icmp_seq=3 ttl=64 time=0.557 ms
+
+--- 192.168.6.249 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2045ms
+rtt min/avg/max/mdev = 0.494/0.536/0.559/0.030 ms
+192.168.6.249 dev enp6s0 lladdr 54:0a:77:88:b7:2c DELAY 

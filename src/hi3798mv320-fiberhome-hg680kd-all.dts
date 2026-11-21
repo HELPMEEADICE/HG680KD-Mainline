@@ -1,0 +1,6 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-emmc.dts"
+#include "hi3798mv320-fiberhome-hg680kd-usb.dts"
+#include "hi3798mv320-fiberhome-hg680kd-net.dts"
+#include "hi3798mv320-fiberhome-hg680kd-gpu.dts"

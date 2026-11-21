@@ -1,0 +1,37 @@
+From: HG680KD bring-up
+Subject: [PATCH] ARM: hisi: add Hi3798MV320 platform configuration
+
+Enable the generic ARM GICv3, PSCI and architected timer drivers for
+the 32-bit firmware boot path on Hi3798MV320.
+
+diff --git a/arch/arm/mach-hisi/Kconfig b/arch/arm/mach-hisi/Kconfig
+--- a/arch/arm/mach-hisi/Kconfig
++++ b/arch/arm/mach-hisi/Kconfig
+@@ -44,6 +44,15 @@ config ARCH_HIP04
+ 	help
+ 	  Support for Hisilicon HiP04 SoC family
+ 
++config ARCH_HI3798MV320
++	bool "HiSilicon Hi3798MV320"
++	depends on ARCH_MULTI_V7
++	select ARM_GIC_V3
++	select ARM_PSCI
++	select HAVE_ARM_ARCH_TIMER
++	help
++	  Support for HiSilicon Hi3798MV320 with an AArch32 bootloader.
++
+ config ARCH_HIX5HD2
+ 	bool "Hisilicon X5HD2 family"
+ 	depends on ARCH_MULTI_V7
+diff --git a/arch/arm/boot/dts/hisilicon/Makefile b/arch/arm/boot/dts/hisilicon/Makefile
+--- a/arch/arm/boot/dts/hisilicon/Makefile
++++ b/arch/arm/boot/dts/hisilicon/Makefile
+@@ -7,6 +7,8 @@ dtb-$(CONFIG_ARCH_HIP04) += \
+ 	hip04-d01.dtb
+ dtb-$(CONFIG_ARCH_HISI) += \
+ 	hi3519-demb.dtb
++dtb-$(CONFIG_ARCH_HI3798MV320) += \
++	hi3798mv320-fiberhome-hg680kd.dtb
+ dtb-$(CONFIG_ARCH_HIX5HD2) += \
+ 	hisi-x5hd2-dkb.dtb
+ dtb-$(CONFIG_ARCH_SD5203) += \

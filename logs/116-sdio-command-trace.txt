@@ -1,0 +1,52 @@
+
+# mount -t debugfs debugfs /tmp; echo file drivers/mmc/core/* +p >/tmp/dynamic_debug/control; echo file sdhci.c +p >/tmp/dynamic_debug/control; echo f9c40000.mmc >/sys/bus/platform/drivers/sdhci-hi3798mv320/unbind; echo f9c40000.mmc >/sys/bus/platform/drivers/sdhci-hi3798mv320/bind; sleep 2; ls /sys/bus/sdio/devices; cat /tmp/mmc0/ios; umount /tmp
+[    0.259476] mmc0: Failed to initialize a non-removable card
+[    9.042270] sdhci-hi3798mv320 f9c40000.mmc: No vmmc regulator found
+[    9.042288] sdhci-hi3798mv320 f9c40000.mmc: No vqmmc regulator found
+[    9.042293] sdhci-hi3798mv320 f9c40000.mmc: No vqmmc2 regulator found
+[    9.042298] mmc0: sdhci: Version:   0x00000005 | Present:  0x03f700f0
+[    9.042306] mmc0: sdhci: Caps:      0x276dc881 | Caps_1:   0x08002077
+[    9.042327] mmc0: sdhci: Disabling DMA as it is marked broken
+[    9.042332] mmc0: sdhci: Disabling ADMA as it is marked broken
+[    9.042337] mmc0: sdhci: Auto-CMD23 available
+[    9.042883] mmc0: clock 0Hz busmode 2 powermode 1 cs 0 Vdd 21 width 1 timing 0
+[    9.048413] sdhci-hi3798mv320 f9c40000.mmc: Initial signal voltage of 3.3v
+[    9.060927] mmc0: clock 400000Hz busmode 2 powermode 2 cs 0 Vdd 21 width 1 timing 0
+[    9.073456] mmc0: SDHCI controller on f9c40000.mmc [f9c40000.mmc] using PIO
+[    9.073631] mmc0: mmc_rescan_try_freq: trying to init card at 400000 Hz
+[    9.073642] mmc0: starting CMD52 arg 00000c00 flags 00000195
+[    9.073985] mmc0: sdhci: IRQ status 0x00018000
+[    9.073997] mmc0: sdhci: IRQ status 0x00000001
+[    9.074037] mmc0: req done (CMD52): -110: 00000000 00000000 00000000 00000000
+[    9.074092] mmc0: starting CMD52 arg 80000c08 flags 00000195
+[    9.074439] mmc0: sdhci: IRQ status 0x00018000
+[    9.074448] mmc0: sdhci: IRQ status 0x00000001
+[    9.074483] mmc0: req done (CMD52): -110: 00000000 00000000 00000000 00000000
+[    9.074503] mmc0: clock 400000Hz busmode 2 powermode 2 cs 1 Vdd 21 width 1 timing 0
+[    9.075779] mmc0: starting CMD0 arg 00000000 flags 000000c0
+[    9.075951] mmc0: sdhci: IRQ status 0x00000001
+[    9.075959] mmc0: req done (CMD0): 0: 00000000 00000000 00000000 00000000
+[    9.077230] mmc0: clock 400000Hz busmode 2 powermode 2 cs 0 Vdd 21 width 1 timing 0
+[    9.078502] mmc0: starting CMD5 arg 00000000 flags 000002e1
+[    9.078836] mmc0: sdhci: IRQ status 0x00018000
+[    9.078850] mmc0: sdhci: IRQ status 0x00000001
+[    9.078887] mmc0: req failed (CMD5): -110, retrying...
+[    9.079220] mmc0: sdhci: IRQ status 0x00018000
+[    9.079232] mmc0: sdhci: IRQ status 0x00000001
+[    9.079267] mmc0: req failed (CMD5): -110, retrying...
+[    9.079599] mmc0: sdhci: IRQ status 0x00018000
+[    9.079638] mmc0: req failed (CMD5): -110, retrying...
+[    9.079971] mmc0: sdhci: IRQ status 0x00018000
+[    9.080004] mmc0: req done (CMD5): -110: 00000000 00000000 00000000 00000000
+[    9.080020] mmc0: clock 0Hz busmode 2 powermode 0 cs 0 Vdd 0 width 1 timing 0
+clock:		0 Hz
+vdd:		0 (invalid)
+bus mode:	2 (push-pull)
+chip select:	0 (don't care)
+power mode:	0 (off)
+bus width:	0 (1 bits)
+timing spec:	0 (legacy)
+signal voltage:	0 (3.30 V)
+driver type:	0 (driver type B)
+# 
+[host] shell command elapsed: 2.09 s

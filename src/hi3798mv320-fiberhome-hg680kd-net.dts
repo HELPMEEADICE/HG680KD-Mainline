@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd.dts"
+
+&{/soc} {
+	crg: syscon@f8a22000 {
+		compatible = "hisilicon,hi3798mv320-crg", "syscon";
+		reg = <0xf8a22000 0x400>;
+		#reset-cells = <2>;
+	};
+
+	ethernet@f9840000 {
+		compatible = "hisilicon,hi3798mv320-gmac";
+		reg = <0xf9840000 0x1000>, <0xf984300c 0x4>;
+		interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+		resets = <&crg 0x3bc 0>, <&crg 0x0d0 0>;
+		reset-names = "mac_core", "mac_ifc";
+		phy-mode = "mii";
+		phy-handle = <&phy1>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		phy1: ethernet-phy@1 {
+			reg = <1>;
+		};
+	};
+};

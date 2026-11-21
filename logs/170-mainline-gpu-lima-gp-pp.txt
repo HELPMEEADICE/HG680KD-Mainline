@@ -1,0 +1,181 @@
+<INTERRUPT>
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.160
+fastboot#setenv tftpdstp 1069
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+171084288 Bytes/s
+fastboot#tftpboot 1ffbfc0 hg680kd-gpu-r2.img
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.160; our IP address is 192.168.6.249
+Filename 'hg680kd-gpu-r2.img'.
+Load address: 0x1ffbfc0
+Loading: *#	[ Connected ]
+#######################
+	 3.1 MiB/s
+done
+Bytes transferred = 2211840 (21c000 hex)
+fastboot#crc32 1ffbfc0 21c000
+CRC32 for 01ffbfc0 ... 02217fbf ==> 34055551
+fastboot#
+[host] CRC32 matches local image: 34055551
+bootm 0x1ffbfc0
+## Booting kernel from Legacy Image at 01ffffc0 ...
+   Image Name:   Linux HG680KD ARM32
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    2192070 Bytes = 2.1 MiB
+   Load Address: 02000000
+   Entry Point:  02000000
+   XIP Kernel Image
+
+Starting kernel ...
+
+Start ATF with aarch32 kernel...
+bl33_ep->spsr = 0x1D3
+Start Warm Reseting
+[   56.170092][cpu0]NOTICE:  BL31: lts-v2.8.6(release):98d5f24
+[   56.174184][cpu0]NOTICE:  BL31: Built : 21:47:11, Jul 22 2024
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Linux version 6.18.64-hg680kd-gpu (hg680kd@build) (arm-linux-gnueabi-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP 2025-12-01 00:00:00 UTC
+[    0.000000] CPU: ARMv7 Processor [412fd050] revision 0 (ARMv7), cr=10c5383d
+[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+[    0.000000] OF: fdt: Machine model: FiberHome HG680KD
+[    0.000000] earlycon: pl11 at MMIO32 0xf8b00000 (options '')
+[    0.000000] printk: legacy bootconsole [pl11] enabled
+[    0.000000] printk: debug: ignoring loglevel setting.
+[    0.000000] Memory policy: Data cache writealloc
+[    0.000000] Zone ranges:
+[    0.000000]   Normal   [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000053dffff]
+[    0.000000]   node   0: [mem 0x00000000053e0000-0x0000000005bdffff]
+[    0.000000]   node   0: [mem 0x0000000005be0000-0x00000000063dbfff]
+[    0.000000]   node   0: [mem 0x00000000063dc000-0x00000000063dffff]
+[    0.000000]   node   0: [mem 0x00000000063e0000-0x0000000007ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] OF: reserved mem: 0x053e0000..0x05bdffff (8192 KiB) nomap non-reusable firmware-log@53e0000
+[    0.000000] OF: reserved mem: 0x063dc000..0x063dffff (16 KiB) nomap non-reusable crash-log@63dc000
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.2
+[    0.000000] percpu: Embedded 9 pages/cpu s12368 r0 d24496 u36864
+[    0.000000] pcpu-alloc: s12368 r0 d24496 u36864 alloc=9*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+[    0.000000] Kernel command line: console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel
+[    0.000000] printk: log buffer data + meta data: 131072 + 409600 = 540672 bytes
+[    0.000000] Dentry cache hash table entries: 16384 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 32768
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+[    0.000000] NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+[    0.000000] GICv3: 224 SPIs implemented
+[    0.000000] GICv3: 0 Extended SPIs implemented
+[    0.000000] GICv3: GICv3 features: 16 PPIs
+[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0xf1040000
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.000001] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.008098] Switching to timer-based delay loop, resolution 41ns
+[    0.014276] Console: colour dummy device 80x30
+[    0.018788] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=240000)
+[    0.029270] CPU: Testing write buffer coherency: ok
+[    0.034221] pid_max: default: 32768 minimum: 301
+[    0.038959] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.046364] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.055151] Setting up static identity map for 0x8240 - 0x82a0
+[    0.061142] rcu: Hierarchical SRCU implementation.
+[    0.065985] rcu: 	Max phase no-delay instances is 1000.
+[    0.071588] smp: Bringing up secondary CPUs ...
+[    0.076553] GICv3: CPU1: found redistributor 100 region 0:0xf1060000
+[    0.077014] GICv3: CPU2: found redistributor 200 region 0:0xf1080000
+[    0.077448] GICv3: CPU3: found redistributor 300 region 0:0xf10a0000
+[    0.077523] smp: Brought up 1 node, 4 CPUs
+[    0.100943] SMP: Total of 4 processors activated (192.00 BogoMIPS).
+[    0.107287] CPU: All CPU(s) started in SVC mode.
+[    0.112353] Memory: 115824K/131072K available (2929K kernel code, 481K rwdata, 616K rodata, 480K init, 177K bss, 14324K reserved, 0K cma-reserved)
+[    0.125933] devtmpfs: initialized
+[    0.130144] VFP support v0.3: implementor 41 architecture 3 part 40 variant 5 rev 3
+[    0.138007] posixtimers hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.145525] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.154553] DMA: preallocated 256 KiB pool for atomic coherent allocations
+[    0.162022] Serial: AMBA PL011 UART driver
+[    0.167024] f8b00000.serial: ttyAMA0 at MMIO 0xf8b00000 (irq = 28, base_baud = 0) is a PL011 rev2
+[    0.176023] printk: console [ttyAMA0] enabled
+[    0.176023] printk: console [ttyAMA0] enabled
+[    0.184795] printk: legacy bootconsole [pl11] disabled
+[    0.184795] printk: legacy bootconsole [pl11] disabled
+[    0.196474] clocksource: Switched to clocksource arch_sys_counter
+[    0.202408] workingset: timestamp_bits=30 max_order=15 bucket_order=0
+[    0.205215] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+[    0.205245] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+[    0.205271] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+[    0.205296] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+[    0.205308] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+[    0.205518] lima f9200000.gpu: bus rate = 200000000
+[    0.205526] lima f9200000.gpu: mod rate = 200000000
+[    0.216543] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 0
+[    0.230637] Registering SWP/SWPB emulation handler
+[    0.235606] clk: Disabling unused clocks
+[    0.274651] Freeing unused kernel image (initmem) memory: 480K
+[    0.274657] Kernel memory protection not selected by kernel config.
+[    0.274667] Run /init as init process
+[    0.274670]   with arguments:
+[    0.274672]     /init
+[    0.274675]   with environment:
+
+[    0.274676]     HOME=/
+[    0.274679]     TERM=linux
+HG680KD AArch32 RAM bring-up
+Linux (none) 6.18.64-hg680kd-gpu #1 SMP 2025-12-01 00:00:00 UTC armv7l
+Online CPUs: 0-3
+Clocksource: arch_sys_counter
+Timer interrupt counts before and after one second:
+           CPU0       CPU1       CPU2       CPU3       
+ 26:         26         21         20         20    GICv3  27 Level     arch_timer
+0.25 0.55
+           CPU0       CPU1       CPU2       CPU3       
+ 26:        126        122        120        120    GICv3  27 Level     arch_timer
+1.26 4.58
+
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+# ls -l /dev/dri; lima-test; echo exit=True; grep -i -E 'gp|pp|mmu|126' /proc/interrupts; dmesg | grep -i -E 'lima|drm'
+crw-------    1  226, 128 renderD128
+crw-------    1  226,   0 card0
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+exit=True
+ 26:        131        126        125        124    GICv3  27 Level     arch_timer
+ 29:          4          0          0          0    GICv3 126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+<6>[    0.205215] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+<6>[    0.205245] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+<6>[    0.205271] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+<6>[    0.205296] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+<6>[    0.205308] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+<6>[    0.205518] lima f9200000.gpu: bus rate = 200000000
+<6>[    0.205526] lima f9200000.gpu: mod rate = 200000000
+<6>[    0.216543] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 0
+# 
+[host] shell command elapsed: 0.14 s

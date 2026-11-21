@@ -1,0 +1,30 @@
+
+# mount -t debugfs debugfs /tmp; echo file drivers/mmc/core/* +p >/tmp/dynamic_debug/control; echo f9c40000.mmc >/sys/bus/platform/drivers/sdhci-hi3798mv320/unbind; echo f9c40000.mmc >/sys/bus/platform/drivers/sdhci-hi3798mv320/bind; sleep 2; ls /sys/bus/sdio/devices; cat /tmp/gpio; umount /tmp
+[    0.351683] mmc0: Failed to initialize a non-removable card
+[   64.157822] sdhci-hi3798mv320 f9c40000.mmc: allocated mmc-pwrseq
+[   64.157852] sdhci-hi3798mv320 f9c40000.mmc: No vmmc regulator found
+[   64.157857] sdhci-hi3798mv320 f9c40000.mmc: No vqmmc regulator found
+[   64.157862] sdhci-hi3798mv320 f9c40000.mmc: No vqmmc2 regulator found
+[   64.158399] mmc0: clock 0Hz busmode 2 powermode 1 cs 0 Vdd 21 width 1 timing 0
+[   64.163932] sdhci-hi3798mv320 f9c40000.mmc: Initial signal voltage of 3.3v
+[   64.286561] mmc0: clock 400000Hz busmode 2 powermode 2 cs 0 Vdd 21 width 1 timing 0
+[   64.299094] mmc0: SDHCI controller on f9c40000.mmc [f9c40000.mmc] using PIO
+[   64.299276] mmc0: mmc_rescan_try_freq: trying to init card at 400000 Hz
+[   64.299287] mmc0: starting CMD52 arg 00000c00 flags 00000195
+[   64.299685] mmc0: req done (CMD52): -110: 00000000 00000000 00000000 00000000
+[   64.299709] mmc0: starting CMD52 arg 80000c08 flags 00000195
+[   64.300101] mmc0: req done (CMD52): -110: 00000000 00000000 00000000 00000000
+[   64.300124] mmc0: clock 400000Hz busmode 2 powermode 2 cs 1 Vdd 21 width 1 timing 0
+[   64.301402] mmc0: starting CMD0 arg 00000000 flags 000000c0
+[   64.301576] mmc0: req done (CMD0): 0: 00000000 00000000 00000000 00000000
+[   64.302851] mmc0: clock 400000Hz busmode 2 powermode 2 cs 0 Vdd 21 width 1 timing 0
+[   64.304122] mmc0: starting CMD5 arg 00000000 flags 000002e1
+[   64.304493] mmc0: req failed (CMD5): -110, retrying...
+[   64.304860] mmc0: req failed (CMD5): -110, retrying...
+[   64.305226] mmc0: req failed (CMD5): -110, retrying...
+[   64.305584] mmc0: req done (CMD5): -110: 00000000 00000000 00000000 00000000
+[   64.305606] mmc0: clock 0Hz busmode 2 powermode 0 cs 0 Vdd 0 width 1 timing 0
+gpiochip0: 8 GPIOs, parent: amba/f8b24000.gpio, f8b24000.gpio:
+ gpio-3   (                    |reset               ) out lo ACTIVE LOW
+# 
+[host] shell command elapsed: 2.19 s

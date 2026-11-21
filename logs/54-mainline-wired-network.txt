@@ -1,0 +1,334 @@
+<INTERRUPT>
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.160
+fastboot#setenv tftpdstp 1069
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+171121152 Bytes/s
+fastboot#tftpboot 1ffbfc0 hg680kd-net.img
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.160; our IP address is 192.168.6.249
+Filename 'hg680kd-net.img'.
+Load address: 0x1ffbfc0
+Loading: *#	[ Connected ]
+###########################
+	 3.2 MiB/s
+done
+Bytes transferred = 2605056 (27c000 hex)
+fastboot#crc32 1ffbfc0 27c000
+CRC32 for 01ffbfc0 ... 02277fbf ==> a38ccb6c
+fastboot#
+[host] CRC32 matches local image: a38ccb6c
+bootm 0x1ffbfc0
+## Booting kernel from Legacy Image at 01ffffc0 ...
+   Image Name:   Linux HG680KD ARM32
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    2578622 Bytes = 2.5 MiB
+   Load Address: 02000000
+   Entry Point:  02000000
+   XIP Kernel Image
+
+Starting kernel ...
+
+Start ATF with aarch32 kernel...
+bl33_ep->spsr = 0x1D3
+Start Warm Reseting
+[  229.851521][cpu0]NOTICE:  BL31: lts-v2.8.6(release):98d5f24
+[  229.855611][cpu0]NOTICE:  BL31: Built : 21:47:11, Jul 22 2024
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Linux version 6.18.64-hg680kd-net (hg680kd@build) (arm-linux-gnueabi-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP 2025-12-01 00:00:00 UTC
+[    0.000000] CPU: ARMv7 Processor [412fd050] revision 0 (ARMv7), cr=10c5383d
+[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+[    0.000000] OF: fdt: Machine model: FiberHome HG680KD
+[    0.000000] earlycon: pl11 at MMIO32 0xf8b00000 (options '')
+[    0.000000] printk: legacy bootconsole [pl11] enabled
+[    0.000000] printk: debug: ignoring loglevel setting.
+[    0.000000] Memory policy: Data cache writealloc
+[    0.000000] Zone ranges:
+[    0.000000]   Normal   [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000053dffff]
+[    0.000000]   node   0: [mem 0x00000000053e0000-0x0000000005bdffff]
+[    0.000000]   node   0: [mem 0x0000000005be0000-0x00000000063dbfff]
+[    0.000000]   node   0: [mem 0x00000000063dc000-0x00000000063dffff]
+[    0.000000]   node   0: [mem 0x00000000063e0000-0x0000000007ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] OF: reserved mem: 0x053e0000..0x05bdffff (8192 KiB) nomap non-reusable firmware-log@53e0000
+[    0.000000] OF: reserved mem: 0x063dc000..0x063dffff (16 KiB) nomap non-reusable crash-log@63dc000
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.2
+[    0.000000] percpu: Embedded 9 pages/cpu s12876 r0 d23988 u36864
+[    0.000000] pcpu-alloc: s12876 r0 d23988 u36864 alloc=9*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+[    0.000000] Kernel command line: console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel
+[    0.000000] printk: log buffer data + meta data: 131072 + 409600 = 540672 bytes
+[    0.000000] Dentry cache hash table entries: 16384 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 32768
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+[    0.000000] NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+[    0.000000] GICv3: 224 SPIs implemented
+[    0.000000] GICv3: 0 Extended SPIs implemented
+[    0.000000] GICv3: GICv3 features: 16 PPIs
+[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0xf1040000
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.000001] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.008099] Switching to timer-based delay loop, resolution 41ns
+[    0.014281] Console: colour dummy device 80x30
+[    0.018792] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=240000)
+[    0.029274] CPU: Testing write buffer coherency: ok
+[    0.034224] pid_max: default: 32768 minimum: 301
+[    0.038996] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.046401] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.055194] Setting up static identity map for 0x8240 - 0x82a0
+[    0.061187] rcu: Hierarchical SRCU implementation.
+[    0.066030] rcu: 	Max phase no-delay instances is 1000.
+[    0.071633] smp: Bringing up secondary CPUs ...
+[    0.076599] GICv3: CPU1: found redistributor 100 region 0:0xf1060000
+[    0.077062] GICv3: CPU2: found redistributor 200 region 0:0xf1080000
+[    0.077502] GICv3: CPU3: found redistributor 300 region 0:0xf10a0000
+[    0.077579] smp: Brought up 1 node, 4 CPUs
+[    0.100998] SMP: Total of 4 processors activated (192.00 BogoMIPS).
+[    0.107341] CPU: All CPU(s) started in SVC mode.
+[    0.112398] Memory: 115140K/131072K available (3581K kernel code, 505K rwdata, 632K rodata, 456K init, 181K bss, 15008K reserved, 0K cma-reserved)
+[    0.125997] devtmpfs: initialized
+[    0.130169] VFP support v0.3: implementor 41 architecture 3 part 40 variant 5 rev 3
+[    0.138006] posixtimers hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.145524] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.154651] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.160784] DMA: preallocated 256 KiB pool for atomic coherent allocations
+[    0.168216] Serial: AMBA PL011 UART driver
+[    0.173071] f8b00000.serial: ttyAMA0 at MMIO 0xf8b00000 (irq = 28, base_baud = 0) is a PL011 rev2
+[    0.182087] printk: console [ttyAMA0] enabled
+[    0.182087] printk: console [ttyAMA0] enabled
+[    0.190841] printk: legacy bootconsole [pl11] disabled
+[    0.190841] printk: legacy bootconsole [pl11] disabled
+[    0.202547] clocksource: Switched to clocksource arch_sys_counter
+[    0.207385] NET: Registered PF_INET protocol family
+[    0.207500] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.207837] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.207853] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.207867] TCP established hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.207881] TCP bind hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.207900] TCP: Hash tables configured (established 1024 bind 1024)
+[    0.207955] UDP hash table entries: 256 (order: 2, 14336 bytes, linear)
+[    0.207977] UDP-Lite hash table entries: 256 (order: 2, 14336 bytes, linear)
+[    0.208582] workingset: timestamp_bits=30 max_order=15 bucket_order=0
+[    0.225163] (unnamed net_device) (uninitialized): using random MAC address a2:e5:a6:6b:12:7b
+[    0.225758] NET: Registered PF_PACKET protocol family
+[    0.225791] Registering SWP/SWPB emulation handler
+
+[    0.231011] clk: Disabling unused clocks
+[    0.275549] Freeing unused kernel image (initmem) memory: 456K
+[    0.275555] Kernel memory protection not selected by kernel config.
+HG680KD AArch32 R[    0.275565] Run /init as init process
+AM bring-up[    0.275568]   with arguments:
+
+[    0.275570]     /init
+[    0.275572]   with environment:
+Linux (none) 6.18[    0.275574]     HOME=/
+.64-hg680kd-net [    0.275576]     TERM=linux
+#1 SMP 2025-12-01 00:00:00 UTC armv7l
+Online CPUs: 0-3
+Clocksource: arch_sys_counter
+Timer interrupt counts before and after one second:
+           CPU0       CPU1       CPU2       CPU3       
+ 26:         32         25         24         25    GICv3  27 Level     arch_timer
+0.28 0.63
+           CPU0       CPU1       CPU2       CPU3       
+ 26:        132        125        124        126    GICv3  27 Level     arch_timer
+1.28 4.63
+
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+# uname -a; ls /sys/class/net; ls /sys/bus/mdio_bus/devices; cat /sys/bus/mdio_bus/devices/*/phy_id
+Linux (none) 6.18.64-hg680kd-net #1 SMP 2025-12-01 00:00:00 UTC armv7l
+eth0  lo
+f9840000.ethernet-mii:01
+0x20669908
+# 
+[host] shell command elapsed: 0.01 s
+ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 5; cat /sys/class/net/eth0/carrier; ping -c 3 -W 2 192.168.6.160; cat /sys/class/net/eth0/statistics/rx_packets /sys/class/net/eth0/statistics/tx_packets
+[    1.410708] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+[    2.453114] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    2.453137] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    2.453185] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    2.453310] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    2.453374] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    3.821765] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.453813] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.453835] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.453854] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.453879] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.453915] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.453966] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.454035] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.454125] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.454233] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.454364] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    4.454521] hisi-gmac f9840000.ethernet eth0: inconsistent rx_skb
+[    6.411857] 8<--- cut here ---
+[    6.411865] Unhandled prefetch abort: unknown 1 (0x001) at 0x01000406
+[    6.411876] Internal error: : 1 [#1] SMP ARM
+[    6.425620] CPU: 2 UID: 0 PID: 80 Comm: sh Not tainted 6.18.64-hg680kd-net #1 NONE 
+[    6.433273] Hardware name: Generic DT based system
+[    6.438056] PC is at 0x1000406
+[    6.441106] LR is at bprm_execve+0x1c8/0x44c
+[    6.445378] pc : [<01000406>]    lr : [<c01201d0>]    psr: 60000013
+[    6.451638] sp : c0aabf30  ip : 60000013  fp : c05572a0
+[    6.456855] r10: c0aac858  r9 : 00000006  r8 : c05224f8
+[    6.462072] r7 : c0aac800  r6 : 00000000  r5 : c0522a08  r4 : c1088f00
+[    6.468592] r3 : 01000406  r2 : 00000000  r1 : 00000000  r0 : c0aac800
+[    6.475112] Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+[    6.482242] Control: 10c5383d  Table: 0100806a  DAC: 00000055
+[    6.487979] Register r0 information: slab kmalloc-512 start c0aac800 pointer offset 0 size 512
+[    6.496600] Register r1 information: NULL pointer
+[    6.501300] Register r2 information: NULL pointer
+[    6.505998] Register r3 information: non-paged memory
+[    6.511044] Register r4 information: slab task_struct start c1088f00 pointer offset 0 size 1920
+[    6.519746] Register r5 information: non-slab/vmalloc memory
+[    6.525399] Register r6 information: NULL pointer
+[    6.530097] Register r7 information: slab kmalloc-512 start c0aac800 pointer offset 0 size 512
+[    6.538712] Register r8 information: non-slab/vmalloc memory
+[    6.544364] Register r9 information: non-paged memory
+[    6.549410] Register r10 information: slab kmalloc-512 start c0aac800 pointer offset 88 size 512
+[    6.558198] Register r11 information: non-slab/vmalloc memory
+[    6.563938] Register r12 information: non-paged memory
+[    6.569071] Process sh (pid: 80, stack limit = 0x(ptrval))
+[    6.574550] Stack: (0xc0aabf30 to 0xc0aac000)
+[    6.578902] bf20:                                     c1088f00 c05572a0 00000000 00000050
+[    6.587074] bf40: 00000100 00000000 c1088f00 00000000 c1060000 c0aac800 c1088f00 b6fa7ee8
+[    6.595246] bf60: b6fa7ef4 0000000b 00052824 c01205bc b6fa7ee8 b6fa7ef4 b6fa7ef4 0000000b
+[    6.603417] bf80: c00084f8 c1088f00 0000000b c01211e0 00000000 00015a7c 60000010 b6fa7f0c
+[    6.611589] bfa0: b6fa7ee8 c00082a0 b6fa7f0c b6fa7ee8 b6fa7f0c b6fa7ee8 b6fa7ef4 b6fa7820
+[    6.619761] bfc0: b6fa7f0c b6fa7ee8 b6fa7ef4 0000000b 0004f045 00052824 00052928 00052824
+[    6.627932] bfe0: 082d80e3 bed7f504 00019064 0003201c 60000010 b6fa7f0c 00000000 00000000
+[    6.636101] Call trace: 
+[    6.636111]  bprm_execve from do_execveat_common+0x168/0x194
+[    6.644298]  do_execveat_common from sys_execve+0x34/0x3c
+[    6.649699]  sys_execve from ret_fast_syscall+0x0/0x4c
+[    6.654838] Exception stack(0xc0aabfa8 to 0xc0aabff0)
+[    6.659884] bfa0:                   b6fa7f0c b6fa7ee8 b6fa7f0c b6fa7ee8 b6fa7ef4 b6fa7820
+[    6.668056] bfc0: b6fa7f0c b6fa7ee8 b6fa7ef4 0000000b 0004f045 00052824 00052928 00052824
+[    6.676226] bfe0: 082d80e3 bed7f504 00019064 0003201c
+[    6.681271] Code: bad PC value
+[    6.684319] ---[ end trace 0000000000000000 ]---
+[    6.688928] note: sh[80] exited with irqs disabled
+Segmentation faul[    6.694137] 8<--- cut here ---
+[    6.694144] Unhandled prefetch abort: unknown 1 (0x001) at 0x01000406
+[    6.694152] Internal error: : 1 [#2] SMP ARM
+[    6.708960] CPU: 0 UID: 0 PID: 81 Comm: sh Tainted: G      D             6.18.64-hg680kd-net #1 NONE 
+[    6.718177] Tainted: [D]=DIE
+[    6.721050] Hardware name: Generic DT based system
+[    6.725832] PC is at 0x1000406
+[    6.728881] LR is at bprm_execve+0x1c8/0x44c
+[    6.733151] pc : [<01000406>]    lr : [<c01201d0>]    psr: 60000013
+[    6.739410] sp : c0b77f30  ip : 60000013  fp : c05572a0
+[    6.744627] r10: c0aeee58  r9 : 00000006  r8 : c05224f8
+[    6.749844] r7 : c0aeee00  r6 : 00000000  r5 : c0522a08  r4 : c1088780
+[    6.756364] r3 : 01000406  r2 : 00000000  r1 : 00000000  r0 : c0aeee00
+[    6.762884] Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+[    6.770013] Control: 10c5383d  Table: 012a806a  DAC: 00000055
+[    6.775750] Register r0 information: slab kmalloc-512 start c0aeee00 pointer offset 0 size 512
+[    6.784369] Register r1 information: NULL pointer
+[    6.789068] Register r2 information: NULL pointer
+[    6.793766] Register r3 information: non-paged memory
+[    6.798811] Register r4 information: slab task_struct start c1088780 pointer offset 0 size 1920
+[    6.807513] Register r5 information: non-slab/vmalloc memory
+[    6.813167] Register r6 information: NULL pointer
+[    6.817865] Register r7 information: slab kmalloc-512 start c0aeee00 pointer offset 0 size 512
+[    6.826480] Register r8 information: non-slab/vmalloc memory
+[    6.832133] Register r9 information: non-paged memory
+[    6.837178] Register r10 information: slab kmalloc-512 start c0aeee00 pointer offset 88 size 512
+[    6.845967] Register r11 information: non-slab/vmalloc memory
+[    6.851707] Register r12 information: non-paged memory
+[    6.856838] Process sh (pid: 81, stack limit = 0x(ptrval))
+[    6.862317] Stack: (0xc0b77f30 to 0xc0b78000)
+[    6.866668] 7f20:                                     c1088780 c05572a0 00000000 00000051
+[    6.874840] 7f40: 00000100 00000000 c1088780 00000000 c0a98000 c0aeee00 c1088780 b6fa7f18
+[    6.883012] 7f60: b6fa7f34 0000000b 00052824 c01205bc b6fa7f18 b6fa7f34 b6fa7f34 0000000b
+[    6.891184] 7f80: c00084f8 c1088780 0000000b c01211e0 00000000 00015a7c 60000010 b6fa7f4c
+[    6.899355] 7fa0: b6fa7f18 c00082a0 b6fa7f4c b6fa7f18 b6fa7f4c b6fa7f18 b6fa7f34 b6fa7820
+[    6.907527] 7fc0: b6fa7f4c b6fa7f18 b6fa7f34 0000000b 0004f045 00052824 00052928 00052824
+[    6.915698] 7fe0: 082d80a3 bed7f6bc 00019064 0003201c 60000010 b6fa7f4c 00000000 00000000
+[    6.923867] Call trace: 
+[    6.923873]  bprm_execve from do_execveat_common+0x168/0x194
+[    6.932059]  do_execveat_common from sys_execve+0x34/0x3c
+[    6.937460]  sys_execve from ret_fast_syscall+0x0/0x4c
+[    6.942599] Exception stack(0xc0b77fa8 to 0xc0b77ff0)
+[    6.947646] 7fa0:                   b6fa7f4c b6fa7f18 b6fa7f4c b6fa7f18 b6fa7f34 b6fa7820
+[    6.955817] 7fc0: b6fa7f4c b6fa7f18 b6fa7f34 0000000b 0004f045 00052824 00052928 00052824
+[    6.963987] 7fe0: 082d80a3 bed7f6bc 00019064 0003201c
+[    6.969031] Code: bad PC value
+[    6.972078] ---[ end trace 0000000000000000 ]---
+[    6.976688] note: sh[81] exited with irqs disabled
+t
+Segmentation fa[    6.981956] 8<--- cut here ---
+[    6.981962] Unhandled prefetch abort: unknown 1 (0x001) at 0x01000406
+[    6.981970] Internal error: : 1 [#3] SMP ARM
+ult
+[    6.996788] CPU: 3 UID: 0 PID: 82 Comm: sh Tainted: G      D             6.18.64-hg680kd-net #1 NONE 
+[    7.006423] Tainted: [D]=DIE
+[    7.009295] Hardware name: Generic DT based system
+[    7.014078] PC is at 0x1000406
+[    7.017126] LR is at bprm_execve+0x1c8/0x44c
+[    7.021396] pc : [<01000406>]    lr : [<c01201d0>]    psr: 60000013
+[    7.027655] sp : c0bd3f30  ip : 60000013  fp : c05572a0
+[    7.032873] r10: c0a20858  r9 : 00000006  r8 : c05224f8
+[    7.038089] r7 : c0a20800  r6 : 00000000  r5 : c0522a08  r4 : c1088000
+[    7.044609] r3 : 01000406  r2 : 00000000  r1 : 00000000  r0 : c0a20800
+[    7.051129] Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+[    7.058258] Control: 10c5383d  Table: 012ac06a  DAC: 00000055
+[    7.063995] Register r0 information: slab kmalloc-512 start c0a20800 pointer offset 0 size 512
+[    7.072613] Register r1 information: NULL pointer
+[    7.077313] Register r2 information: NULL pointer
+[    7.082011] Register r3 information: non-paged memory
+[    7.087057] Register r4 information: slab task_struct start c1088000 pointer offset 0 size 1920
+[    7.095759] Register r5 information: non-slab/vmalloc memory
+[    7.101412] Register r6 information: NULL pointer
+[    7.106110] Register r7 information: slab kmalloc-512 start c0a20800 pointer offset 0 size 512
+[    7.114725] Register r8 information: non-slab/vmalloc memory
+[    7.120378] Register r9 information: non-paged memory
+[    7.125423] Register r10 information: slab kmalloc-512 start c0a20800 pointer offset 88 size 512
+[    7.134212] Register r11 information: non-slab/vmalloc memory
+[    7.139951] Register r12 information: non-paged memory
+[    7.145084] Process sh (pid: 82, stack limit = 0x(ptrval))
+[    7.150562] Stack: (0xc0bd3f30 to 0xc0bd4000)
+[    7.154913] 3f20:                                     c1088000 c05572a0 00000000 00000052
+[    7.163085] 3f40: 00000100 00000000 c1088000 00000000 c08d8000 c0a20800 c1088000 b6fa7f30
+[    7.171257] 3f60: b6fa7f44 0000000b 00052824 c01205bc b6fa7f30 b6fa7f44 b6fa7f44 0000000b
+[    7.179429] 3f80: c00084f8 c1088000 0000000b c01211e0 00000000 00015a7c 60000010 b6fa7f5c
+[    7.187600] 3fa0: b6fa7f30 c00082a0 b6fa7f5c b6fa7f30 b6fa7f5c b6fa7f30 b6fa7f44 b6fa7820
+[    7.195772] 3fc0: b6fa7f5c b6fa7f30 b6fa7f44 0000000b 0004f045 00052824 00052928 00052824
+[    7.203944] 3fe0: 082d80b3 bed7f874 00019064 0003201c 60000010 b6fa7f5c 00000000 00000000
+[    7.212112] Call trace: 
+[    7.212117]  bprm_execve from do_execveat_common+0x168/0x194
+[    7.220302]  do_execveat_common from sys_execve+0x34/0x3c
+[    7.225703]  sys_execve from ret_fast_syscall+0x0/0x4c
+[    7.230841] Exception stack(0xc0bd3fa8 to 0xc0bd3ff0)
+[    7.235888] 3fa0:                   b6fa7f5c b6fa7f30 b6fa7f5c b6fa7f30 b6fa7f44 b6fa7820
+[    7.244060] 3fc0: b6fa7f5c b6fa7f30 b6fa7f44 0000000b 0004f045 00052824 00052928 00052824
+[    7.252230] 3fe0: 082d80b3 bed7f874 00019064 0003201c
+[    7.257274] Code: bad PC value
+[    7.260321] ---[ end trace 0000000000000000 ]---
+[    7.264930] note: sh[82] exited with irqs disabled
+Segmentation fault
+# 
+[host] shell command elapsed: 5.89 s

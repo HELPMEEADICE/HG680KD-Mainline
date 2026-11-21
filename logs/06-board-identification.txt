@@ -1,0 +1,45 @@
+<INTERRUPT>
+fastboot#help getinfo
+getinfo - print hardware information
+
+Usage:
+getinfo bootmode - get start memeory type e.g. nand/spi etc
+getinfo nand - get nand flash information
+getinfo spi - get spi flash information
+getinfo version - get system version
+getinfo ddrfree - get free ddr baseaddr/size
+
+fastboot#getinfo
+getinfo - print hardware information
+
+Usage:
+getinfo bootmode - get start memeory type e.g. nand/spi etc
+getinfo nand - get nand flash information
+getinfo spi - get spi flash information
+getinfo version - get system version
+getinfo ddrfree - get free ddr baseaddr/size
+
+getinfo - print hardware information
+
+Usage:
+getinfo bootmode - get start memeory type e.g. nand/spi etc
+getinfo nand - get nand flash information
+getinfo spi - get spi flash information
+getinfo version - get system version
+getinfo ddrfree - get free ddr baseaddr/size
+
+fastboot#help switchns
+switchns - switchns
+
+Usage:
+switchns  
+
+fastboot#md.l f8b00018 b
+f8b00018: 0000011f 00000000 00000000 00000028  ............(...
+f8b00028: 0000002c 00000070 00000b01 00000012  ,...p...........
+f8b00038: 00000000 00000000 00000000           ............
+fastboot#mii read 1 2
+2066
+fastboot#mii read 3 2
+0000
+fastboot#

@@ -1,0 +1,5 @@
+
+# /bin/memtest-2g 192.168.6.160 18083 /dev/mmcblk0 33554432 2097152 && echo ATF_OK
+ATF_OK
+# 
+[host] shell command elapsed: 0.17 s

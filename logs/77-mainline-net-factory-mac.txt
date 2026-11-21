@@ -1,0 +1,16 @@
+
+# cat /sys/class/net/eth0/address; cat /proc/net/arp; ifconfig eth0 down; ifconfig eth0 hw ether 54:0A:77:88:B7:2C; ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 2; ping -c 4 -W 2 192.168.6.160; cat /proc/net/arp
+7e:15:04:52:e3:58
+IP address       HW type     Flags       HW address            Mask     Device
+192.168.6.160    0x1         0x[   50.065567] hisi-gmac f9840000.ethernet eth0: Link is Down
+0         00:00:00:00:00:00     *        eth0
+ifconfig: bad address 'hw'
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+[   57.182934] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+
+--- 192.168.6.160 ping statistics ---
+4 packets transmitted, 0 packets received, 100% packet loss
+IP address       HW type     Flags       HW address            Mask     Device
+192.168.6.160    0x1         0x0         00:00:00:00:00:00     *        eth0
+# 
+[host] shell command elapsed: 12.06 s

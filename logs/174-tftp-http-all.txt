@@ -1,0 +1,3 @@
+Listening on UDP 192.168.6.160:1069 for 192.168.6.249
+Sent 3375104 bytes of hg680kd-all.img to 192.168.6.249
+HTTP: "GET /hg680kd-all.img HTTP/1.1" 200 -
