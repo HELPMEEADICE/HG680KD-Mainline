@@ -1,0 +1,76 @@
+
+=== CMD: systemctl is-active ssh lightdm bluetooth hg680kd-zram; id hg680kd; grep -n -E 'autologin|PermitRoot|PasswordAuth' /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf.d/* /etc/ssh/sshd_config /etc/ssh/sshd_config.d/* 2>/dev/null || true ===
+systemctl is-active ssh lightdm bluetooth hg680kd-zram; id hg680kd; grep -n -E 'autologin|PermitRoot|PasswordAuth' /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf.d/* /etc/ssh/sshd_config /etc/ssh/sshd_config.d/* 2>/dev/ null || true
+[?2004lactive
+active
+active
+active
+uid=1000(hg680kd) gid=1000(hg680kd) groups=1000(hg680kd),4(adm),20(dialout),24(cdrom),27(sudo),29(audio),30(dip),44(video),46(plugdev),995(input),991(render),105(netdev),107(bluetooth)
+/etc/lightdm/lightdm.conf:49:# pam-autologin-service = PAM service to use for autologin
+/etc/lightdm/lightdm.conf:79:# autologin-guest = True to log in as guest by default
+/etc/lightdm/lightdm.conf:80:# autologin-user = User to log in with by default (overrides autologin-guest)
+/etc/lightdm/lightdm.conf:81:# autologin-user-timeout = Number of seconds to wait before loading default user
+/etc/lightdm/lightdm.conf:82:# autologin-session = Session to load for automatic login (overrides user-session)
+/etc/lightdm/lightdm.conf:83:# autologin-in-background = True if autologin session should not be immediately activated
+/etc/lightdm/lightdm.conf:89:#pam-autologin-service=lightdm-autologin
+/etc/lightdm/lightdm.conf:119:#autologin-guest=false
+/etc/lightdm/lightdm.conf:120:#autologin-user=
+/etc/lightdm/lightdm.conf:121:#autologin-user-timeout=0
+/etc/lightdm/lightdm.conf:122:#autologin-in-background=false
+/etc/lightdm/lightdm.conf:123:#autologin-session=
+/etc/lightdm/lightdm.conf.d/20-hg680kd-autologin.conf:2:autologin-user=hg680kd
+/etc/lightdm/lightdm.conf.d/20-hg680kd-autologin.conf:3:autologin-user-timeout=0
+/etc/ssh/sshd_config:33:PermitRootLogin yes
+/etc/ssh/sshd_config:57:#PasswordAuthentication yes
+/etc/ssh/sshd_config:81:# PasswordAuthentication.  Depending on your PAM configuration,
+/etc/ssh/sshd_config:83:# the setting of "PermitRootLogin yes
+/etc/ssh/sshd_config:85:# PAM authentication, then enable this but set PasswordAuthentication
+/etc/ssh/sshd_config.d/99-hg680kd.conf:1:PermitRootLogin yes
+/etc/ssh/sshd_config.d/99-hg680kd.conf:2:PasswordAuthentication yes
+[?2004hroot@hg680kd:~# 
+=== CMD: cat /etc/systemd/system/hg680kd-zram.service; sysctl vm.swappiness; cat /sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu/available_frequencies /sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu/cur_freq ===
+cat /etc/systemd/system/hg680kd-zram.service; sysctl vm.swappiness; cat /sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu/available_frequencies /sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu/cur_freq
+[?2004l[Unit]
+Description=HG680KD 1 GiB zstd ZRAM swap
+DefaultDependencies=no
+After=systemd-modules-load.service local-fs.target
+Before=swap.target sysinit.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/hg680kd-zram-init
+
+[Install]
+WantedBy=sysinit.target
+vm.swappiness = 100
+200000000 300000000
+200000000
+[?2004hroot@hg680kd:~# 
+=== CMD: dpkg-query -W xfce4 lightdm xserver-xorg mesa-utils libgl1-mesa-dri fastfetch f2fs-tools openssh-server bluez htop vim ===
+dpkg-query -W xfce4 lightdm xserver-xorg mesa-utils libgl1-mesa-dri fastfetch f2fs-tools openssh-server bluez htop vim
+[?2004lbluez	5.82-1.1+rpt2
+f2fs-tools	1.16.0-1.1+b1
+fastfetch	2.40.4+dfsg-1
+htop	3.4.1-5
+libgl1-mesa-dri:arm64	27.0.0~git202610251245.e737139f66-1+armbian1.1~trixie
+lightdm	1.32.0-6+deb13u1
+mesa-utils	9.0.0-2+b2
+openssh-server	1:10.0p1-7+deb13u4
+vim	2:9.1.1230-2+deb13u2
+xfce4	4.20.1
+xserver-xorg	1:7.7+24+deb13u1
+[?2004hroot@hg680kd:~# 
+=== CMD: XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 xfce4-terminal --geometry=100x34 --hold -e fastfetch >/dev/null 2>&1 & sleep 3; ps -ef | grep xfce4-terminal | grep -v grep ===
+XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 xfce4-terminal --geometry=100x34 --hold -e fastfetch >/dev/null 2>&1 & sleep 3; ps -ef | grep xfce4-terminal | grep -v grep
+[?2004l[1] 1403
+[  448.541609] lima f9200000.gpu: pp0 error irq state=201 status=40
+[  448.541651] lima f9200000.gpu: pp1 error irq state=201 status=40
+[  448.541708] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[  448.541729] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[  449.147254] lima f9200000.gpu: pp0 error irq state=201 status=40
+[  449.147324] lima f9200000.gpu: pp1 error irq state=201 status=40
+[  449.147462] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[  449.147543] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+root        1403     666 39 19:43 ?        00:00:01 xfce4-terminal --geometry=100x34 --hold -e fastfetch
+[?2004hroot@hg680kd:~# 

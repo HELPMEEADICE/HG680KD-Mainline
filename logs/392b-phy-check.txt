@@ -1,0 +1,18 @@
+
+=== CMD: cat /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/phy_id /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/phy_interface /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/driver/uevent 2>&1 ===
+cat /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/phy_id /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/phy_interface /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/driver/uevent 2>&1
+[?2004l0x00000000
+mii
+cat: '/sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/driver/uevent': Permission denied
+[?2004hroot@hg680kd:~# 
+=== CMD: dmesg | grep -iE 'f9840000|gmac|phy|eth0' | head -n 40 ===
+dmesg | grep -iE 'f9840000|gmac|phy|eth0' | head -n 40
+[?2004l[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+[   31.840657] hisi-gmac f9840000.ethernet eth0: Link is Down
+[?2004hroot@hg680kd:~# 
+=== CMD: grep -o 'compress_algorithm=[^,]*' /proc/mounts; ls -la /sys/block/mmcblk0/ro; cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies ===
+grep -o 'compress_algorithm=[^,]*' /proc/mounts; ls -la /sys/block/mmcblk0/ro; cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies
+[?2004lcompress_algorithm=zstd:6
+-r--r--r-- 1 root root 4096 Nov 20 19:37 /sys/block/mmcblk0/ro
+200000 400000 600000 800000 1000000 
+[?2004hroot@hg680kd:~# 

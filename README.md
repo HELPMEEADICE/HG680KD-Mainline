@@ -1,6 +1,23 @@
 # 烽火 HG680KD 主线 Linux 适配
 
-本项目以 Linux 6.18.64 为基线，从原厂 U-Boot 2022.07 和 BL31 启动 RAM 镜像。设备为海思 Hi3798MV320，四核 Cortex-A55，实装 2 GiB LPDDR4。核心与外设镜像均经 COM4 实机验证，带 BusyBox 1.37.0 和静态链接的 musl 1.2.5 用户态。
+本项目最初以 Linux 6.18.64 为基线、后经 Linux 7.2.5 验证全硬件并在最新阶段通过 GCC 14.2.0 升级至 **Linux 7.3.5**，可从原厂 U-Boot 2022.07 和 BL31 直接冷启动 U 盘 **Armbian (Trixie arm64) + Xfce 桌面**（亦保留各版本 RAM 镜像作回退）。设备为海思 Hi3798MV320，四核 Cortex-A55，实装 2 GiB LPDDR4，板载 eMMC 始终强制只读（`ro=1`）。
+
+## ARM64 Linux 7.3.5 + Armbian Xfce（U 盘冷启动，F2FS zstd + ZRAM）
+
+在保持 7.2.5 基线与 eMMC 严格只读（`MMC_CAP2_FORCE_READ_ONLY | MMC_CAP2_BOOTPART_NOACC`）的前提下，将全部补丁、DTS 与自研驱动（`0005` / `0009` 已适配 Linux 7.3 `COMMON_CLK_HISI` / `reset-hisilicon`）使用 `aarch64-linux-gcc (GCC) 14.2.0` 前向移植至官方 **Linux 7.3.5**，并针对 U 盘根文件系统部署了基于 **Armbian_community 26.11.0-trunk.137 (Debian Trixie aarch64) + Xfce 4.20.1** 的完整桌面系统。详情、原厂 `printenv` 快照、U-Boot LMB 与 FEPHY 唤醒机制见 [UBOOT-USB-BOOT.md](UBOOT-USB-BOOT.md)。
+
+| 用途 / 产物 | 路径 | SHA256 |
+| --- | --- | --- |
+| 7.3.5 USB Armbian `boot.img` | [arm64-7.3.5-armbian-usb/boot.img](artifacts/arm64-7.3.5-armbian-usb/boot.img) | `f5e3173703253ff79cd4c9e329c9b57856a42e7cbdb745656c19ed8288f67b70` |
+| 7.3.5 TFTP RAM 验证镜像 | [arm64-7.3.5-all-2g-hdmi-bt-dvfs/boot.img](artifacts/arm64-7.3.5-all-2g-hdmi-bt-dvfs/boot.img) | `3c8cb9aab2c60da79206d043067ab23bbe7b9bb1643996d3c5e6b668ca017811` |
+| Armbian Xfce USB 原始镜像（`30,784,094,208` B） | `hg680kd-armbian-xfce-f2fs.img` | `480c30072d9d2f6eedbe9d772efddfcaabc222a43d15d53a508c14baada1c585` |
+| Armbian Xfce USB 压缩镜像（`1,444,582,642` B） | `hg680kd-armbian-xfce-f2fs.img.zst` | `1274e866f449ba6ff7d865d1466d0aadb89c11338678a8b9816a37f39dfd21eb` |
+
+- **U 盘 GPT 分区与存储栈**：分区 1 `HG680KD_BOOT`（512 MiB FAT32，挂载 `/boot`，`boot.img` 连续存放于 `LBA 0x1028` / `0x7451` 扇区）；分区 2 `HG680KD_SWAP`（1024 MiB swap，`pri=10`）；分区 3 `HG680KD_ROOT`（27.17 GiB **F2FS**，启用 `extra_attr,inode_checksum,sb_checksum,compression`，以 `compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime,noatime` 挂载，无 initramfs 直接启动）。
+- **内存与压缩交换**：固定 **1 GiB `zstd` ZRAM**（`/dev/zram0`，`hg680kd-zram.service`，`pri=100`，`vm.swappiness = 100`）+ **1 GiB 物理 Swap**（`/dev/sda2`，`pri=10`）。
+- **登录凭据**：LightDM 默认自动登录用户 `hg680kd`（密码 `hg680kd`，具备 `sudo`/`video`/`render`/`bluetooth`/`netdev` 等权限）；`root` 密码同为 `hg680kd`，`openssh-server` 允许两账号密码登录。默认关闭 Xfce 窗口合成器（`use_compositing = false`）以保证 1080p 流畅度。
+- **U-Boot 条件启动与回退**：在原厂 U-Boot 设置 `fephy_init`（写 4 个 CRG 与 1 个 GMAC 寄存器以在不执行 `tftpboot`/`ping` 时唤醒内置 FEPHY `0x20669908`）、`stock_bootcmd` 与 `usb_bootcmd`，并将 `bootcmd` 设为 `run usb_bootcmd;run stock_bootcmd` 后执行 `saveenv`；拔掉 U 盘或遇到非启动盘时，`bootm 0x1fdffc0` 校验失败后自动回落执行 `stock_bootcmd` 启动原厂安卓。
+- **冷启动全项实机验证**：执行 `reset` 无人工干预冷重启后，自动进入 Armbian Xfce 1080p 桌面，验证 `Linux 7.3.5-hg680kd-arm64-armbian-usb`（GCC 14.2.0）、`fastfetch` 展示 `Arm mali-450` 与本地 IP、F2FS `compress_algorithm=zstd:6`、`/dev/zram0`（1G `zstd` `pri=100`）+ `/dev/sda2`（1024M `pri=10`）、有线网 `eth0` `100Mb/s Full` 与 OpenSSH、RTL8761BTV `hci0`（`00:E0:4C:23:99:87`，`0x1ed6b420`）、TSENSOR 温控、CPU/GPU DVFS 及 eMMC HS400ES `ro=1`。见 [构建日志](logs/378-arm64-7.3.5-build.txt) · [USB 内核重编](logs/379-arm64-7.3.5-usb-rebuild.txt) · [TFTP 7.3.5 回归](logs/380-mainline-arm64-7.3.5-tftp-ram.txt) · [USB 刷盘校验](logs/386-usb-flash-verified.txt) · [冷启动串口](logs/399-cold-boot-auto-armbian.txt) · [串口实测](logs/400-cold-boot-step5-verify.txt) · [SSH 全项验证](logs/402-cold-boot-ssh-verify.txt) · [HDMI 采集截图](artifacts/arm64-7.3.5-armbian-usb/xfce-desktop-fastfetch.png)。
 
 ## ARM64 2 GiB HDMI
 

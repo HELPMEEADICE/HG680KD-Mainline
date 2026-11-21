@@ -1,0 +1,38 @@
+<INTERRUPT>
+fastboot#usb start
+starting USB...
+USB0:   Register 1000140 NbrPorts 1
+Starting the controller
+USB XHCI 1.10
+scanning bus 0 for devices... 1 USB Device(s) found
+USB1:   Register 3000140 NbrPorts 3
+Starting the controller
+USB XHCI 1.10
+scanning bus 1 for devices... 2 USB Device(s) found
+       scanning usb for storage devices... 1 Storage Device(s) found
+       scanning usb for ethernet devices... 0 Ethernet Device(s) found
+fastboot#fatload usb 0:1 0x00800000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#fatload usb 0:1 0x01fdffc0 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#fatload usb 0:1 0x03000000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#fatload usb 0:1 0x04000000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#fatload usb 0:1 0x10000000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#fatload usb 0:1 0x20000000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#fatload usb 0:1 0x30000000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#fatload usb 0:1 0x40000000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#

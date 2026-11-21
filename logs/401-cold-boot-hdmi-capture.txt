@@ -1,0 +1,17 @@
+Input #0, dshow, from 'video=USB2 Video':
+  Duration: N/A, start: 42148.488584, bitrate: N/A
+  Stream #0:0: Video: mjpeg (Baseline) (MJPG / 0x47504A4D), yuvj422p(pc, bt470bg/bt709/unknown), 1920x1080, 30 fps, 30 tbr, 10000k tbn, start 42148.488584
+Stream mapping:
+  Stream #0:0 -> #0:0 (mjpeg (native) -> png (native))
+Press [q] to stop, [?] for help
+[swscaler @ 0000026a39c23fc0] deprecated pixel format used, make sure you did set range correctly
+Output #0, image2, to 'x:\Project\Hi3798CV200_Mainline\artifacts\arm64-7.3.5-armbian-usb\xfce-desktop-fastfetch.png':
+  Metadata:
+    encoder         : Lavf62.1.103
+  Stream #0:0: Video: png, rgb24(pc, gbr/bt709/unknown, progressive), 1920x1080, q=2-31, 200 kb/s, 30 fps, 30 tbn
+    Metadata:
+      encoder         : Lavc62.6.100 png
+[image2 @ 0000026a3abf4980] The specified filename 'x:\Project\Hi3798CV200_Mainline\artifacts\arm64-7.3.5-armbian-usb\xfce-desktop-fastfetch.png' does not contain an image sequence pattern or a pattern is invalid.
+[image2 @ 0000026a3abf4980] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
+[out#0/image2 @ 0000026a3aadd140] video:648KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=    1 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.53 bitrate=N/A speed=0.871x elapsed=0:00:00.61    

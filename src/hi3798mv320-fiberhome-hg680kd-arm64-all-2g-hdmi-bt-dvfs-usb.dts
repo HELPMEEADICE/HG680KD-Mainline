@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs.dts"
+
+/ {
+	chosen {
+		bootargs = "console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro root=PARTLABEL=HG680KD_ROOT rootfstype=f2fs rootflags=compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime rootwait";
+	};
+};

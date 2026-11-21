@@ -1,0 +1,31 @@
+From: HG680KD bring-up
+Subject: [PATCH] clk: hisilicon: register a reset controller on Hi3798MV320
+
+diff --git a/drivers/clk/hisilicon/Kconfig b/drivers/clk/hisilicon/Kconfig
+--- a/drivers/clk/hisilicon/Kconfig
++++ b/drivers/clk/hisilicon/Kconfig
+@@ -2,6 +2,14 @@
+ config COMMON_CLK_HISI
+ 	bool
+ 	default ARCH_HISI
++
++config COMMON_CLK_HI3798MV320_RESET
++	tristate "Hi3798MV320 reset controller"
++	depends on ARCH_HI3798MV320 || (ARM64 && ARCH_HISI)
++	select RESET_CONTROLLER
++	select RESET_HISI
++	help
++	  Register the reset lines in the Hi3798MV320 CRG window.
+ 
+ config COMMON_CLK_HI3516CV300
+ 	tristate "HI3516CV300 Clock Driver"
+diff --git a/drivers/clk/hisilicon/Makefile b/drivers/clk/hisilicon/Makefile
+--- a/drivers/clk/hisilicon/Makefile
++++ b/drivers/clk/hisilicon/Makefile
+@@ -14,5 +14,6 @@
+ obj-$(CONFIG_COMMON_CLK_HI3670) += clk-hi3670.o
+ obj-$(CONFIG_COMMON_CLK_HI3798CV200)	+= crg-hi3798cv200.o
++obj-$(CONFIG_COMMON_CLK_HI3798MV320_RESET) += crg-hi3798mv320-reset.o
+ obj-$(CONFIG_COMMON_CLK_HI6220)	+= clk-hi6220.o
+ obj-$(CONFIG_RESET_HISI)	+= reset.o
+ obj-$(CONFIG_STUB_CLK_HI6220)	+= clk-hi6220-stub.o

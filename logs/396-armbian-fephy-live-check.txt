@@ -1,0 +1,64 @@
+
+=== CMD: ip -br a; ethtool eth0; cat /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/phy_id; cat /sys/class/net/eth0/carrier; nmcli dev status; ping -c 2 -W 2 192.168.6.172; fastfetch --logo none ===
+ip -br a; ethtool eth0; cat /sys/bus/mdio_bus/devices/f9840000.e thernet-mii:01/phy_id; cat /sys/class/net/eth0/carrier; nmcli dev status; ping - c 2 -W 2 192.168.6.172; fastfetch --logo none
+[?2004l[36mlo               [0mUNKNOWN        [35m127.0.0.1[0m/8 [34m::1[0m/128 
+[36meth0             [0m[32mUP             [0m[35m192.168.6.125[0m/24 [34m240e:3a2:ac02:4840:894e:7df8:ac96:1ee5[0m/64 [34mfde4:7f58:b6df:0:b4b:dc24:4a64:5f31[0m/64 [34mfe80::8453:5ef4:566:180b[0m/64 
+Settings for eth0:
+	Supported ports: [ TP MII ]
+	Supported link modes:   10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	Supported pause frame use: Symmetric Receive-only
+	Supports auto-negotiation: Yes
+	Supported FEC modes: Not reported
+	Advertised link modes:  10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	Advertised pause frame use: No
+	Advertised auto-negotiation: Yes
+	Advertised FEC modes: Not reported
+	Link partner advertised link modes:  10baseT/Half 10baseT/Full 
+	                                     100baseT/Half 100baseT/Full 
+	Link partner advertised pause frame use: Symmetric Receive-only
+	Link partner advertised auto-negotiation: Yes
+	Link partner advertised FEC modes: Not reported
+	Speed: 100Mb/s
+	Duplex: Full
+	Port: MII
+	PHYAD: 1
+	Transceiver: external
+	Auto-negotiation: on
+	Link detected: yes
+0x20669908
+1
+DEVICE  TYPE      STATE                   CONNECTION         
+[32meth0[0m    [32methernet[0m  [32mconnected[0m               [32mWired connection 1[0m 
+[32;2mlo[0m      [32;2mloopback[0m  [32;2mconnected (externally)[0m  [32;2mlo[0m                 
+PING 192.168.6.172 (192.168.6.172) 56(84) bytes of data.
+64 bytes from 192.168.6.172: icmp_seq=1 ttl=128 time=0.648 ms
+64 bytes from 192.168.6.172: icmp_seq=2 ttl=128 time=0.347 ms
+
+--- 192.168.6.172 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1016ms
+rtt min/avg/max/mdev = 0.347/0.497/0.648/0.150 ms
+[m[m[1m[37mroot[m@[1m[37mhg680kd[m
+------------
+[m[1m[31mOS[m: [mArmbian_community 26.11.0-trunk.137 trixie aarch64
+[m[1m[31mHost[m: [mFiberHome HG680KD (ARM64)
+[m[1m[31mKernel[m: [mLinux 7.3.5-hg680kd-arm64-armbian-usb
+[m[1m[31mUptime[m: [m1 min
+[m[1m[31mPackages[m: [m1242 (dpkg)
+[m[1m[31mShell[m: [mbash 5.2.37
+[m[1m[31mDisplay (Unknown-1)[m: [m1920x1080 @ 60 Hz in 23"
+[m[1m[31mCursor[m: [mAdwaita
+[m[1m[31mTerminal[m: [m/dev/ttyAMA0
+[m[1m[31mTerminal Font[m: [mVGA default kernel font
+[m[1m[31mCPU[m: [mhi3798mv320 (4) @ 1.00 GHz
+[m[1m[31mGPU[m: [mArm mali-450 [Integrated]
+[m[1m[31mMemory[m: [m462.91 MiB / 1.93 GiB ([32m23%[m)
+[m[1m[31mSwap[m: [m0 B / 2.00 GiB ([32m0%[m)
+[m[1m[31mDisk (]8;;file:///\/]8;;\)[m: [m4.58 GiB / 27.17 GiB ([32m17%[m) - f2fs
+[m[1m[31mLocal IP (eth0)[m: [m192.168.6.125/24
+[m[1m[31mLocale[m: [men_US.UTF-8
+
+[m[40m   [41m   [42m   [43m   [44m   [45m   [46m   [47m   [m
+[5m[100m   [101m   [102m   [103m   [104m   [105m   [106m   [107m   [m
+[?2004hroot@hg680kd:~# 

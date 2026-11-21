@@ -1,0 +1,132 @@
+**********************
+PowerShell transcript start
+Start time: 20261122025739
+Username: HELPMEEADICE-PC\Administrator
+RunAs User: HELPMEEADICE-PC\Administrator
+Configuration Name: 
+Machine: HELPMEEADICE-PC (Microsoft Windows NT 10.0.19045.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -ExecutionPolicy Bypass -File C:\Users\Administrator\.gemini\antigravity\brain\e0478f5a-363f-4b5c-a3df-ba5252da6a7d\scratch\flash_j_usb.ps1 -ZstPath C:\Users\Administrator\.gemini\antigravity\brain\e0478f5a-363f-4b5c-a3df-ba5252da6a7d\scratch\hg680kd-armbian-xfce-f2fs.img.zst -ExpectedRawSize 30784094208 -ExpectedRawSha256 480c30072d9d2f6eedbe9d772efddfcaabc222a43d15d53a508c14baada1c585 -ExpectedBootSha256 f5e3173703253ff79cd4c9e329c9b57856a42e7cbdb745656c19ed8288f67b70 -LogPath X:\Project\Hi3798CV200_Mainline\logs\383-usb-flash-j.txt
+Process ID: 37720
+PSVersion: 7.6.3
+PSEdition: Core
+GitCommitId: 7.6.3
+OS: Microsoft Windows 10.0.19045
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+Number         : 8
+FriendlyName   : USB SanDisk 3.2Gen1
+Model          :  SanDisk 3.2Gen1
+BusType        : USB
+Size           : 30784094208
+PartitionStyle : MBR
+IsBoot         : False
+IsSystem       : False
+IsReadOnly     : False
+
+Safety checks PASSED for J: -> PhysicalDrive8 (USB SanDisk 3.2Gen1, 30784094208 bytes, BusType=USB)
+Flushing and dismounting J: / clearing disk 8...
+Cleared head and tail metadata (16 MiB each).
+Written 260 / 29358 MiB (17.3 MiB/s)
+Written 520 / 29358 MiB (17.3 MiB/s)
+Written 804 / 29358 MiB (17.8 MiB/s)
+Written 1124 / 29358 MiB (18.6 MiB/s)
+Written 1376 / 29358 MiB (18.3 MiB/s)
+Written 1652 / 29358 MiB (18.3 MiB/s)
+Written 1872 / 29358 MiB (17.7 MiB/s)
+Written 2064 / 29358 MiB (17.1 MiB/s)
+Written 2276 / 29358 MiB (16.7 MiB/s)
+Written 2520 / 29358 MiB (16.7 MiB/s)
+Written 2744 / 29358 MiB (16.5 MiB/s)
+Written 2976 / 29358 MiB (16.4 MiB/s)
+Written 3180 / 29358 MiB (16.2 MiB/s)
+Written 3344 / 29358 MiB (15.8 MiB/s)
+Written 3508 / 29358 MiB (15.5 MiB/s)
+Written 3676 / 29358 MiB (15.2 MiB/s)
+Written 3844 / 29358 MiB (15.0 MiB/s)
+Written 4008 / 29358 MiB (14.7 MiB/s)
+Written 4172 / 29358 MiB (14.5 MiB/s)
+Written 4340 / 29358 MiB (14.4 MiB/s)
+Written 4508 / 29358 MiB (14.2 MiB/s)
+Written 4672 / 29358 MiB (14.1 MiB/s)
+Written 4840 / 29358 MiB (13.9 MiB/s)
+Written 5004 / 29358 MiB (13.8 MiB/s)
+Written 5172 / 29358 MiB (13.7 MiB/s)
+Written 5340 / 29358 MiB (13.6 MiB/s)
+Written 5504 / 29358 MiB (13.5 MiB/s)
+Written 5672 / 29358 MiB (13.4 MiB/s)
+Written 5840 / 29358 MiB (13.3 MiB/s)
+Written 6004 / 29358 MiB (13.2 MiB/s)
+Written 6172 / 29358 MiB (13.2 MiB/s)
+Written 6344 / 29358 MiB (13.1 MiB/s)
+Written 6512 / 29358 MiB (13.0 MiB/s)
+Written 6680 / 29358 MiB (13.0 MiB/s)
+Written 6844 / 29358 MiB (12.9 MiB/s)
+Written 7020 / 29358 MiB (12.9 MiB/s)
+Written 7180 / 29358 MiB (12.8 MiB/s)
+Written 7348 / 29358 MiB (12.8 MiB/s)
+Written 7512 / 29358 MiB (12.7 MiB/s)
+Written 7680 / 29358 MiB (12.7 MiB/s)
+Written 7852 / 29358 MiB (12.6 MiB/s)
+Written 8016 / 29358 MiB (12.6 MiB/s)
+Written 8188 / 29358 MiB (12.6 MiB/s)
+Written 8356 / 29358 MiB (12.5 MiB/s)
+Written 8528 / 29358 MiB (12.5 MiB/s)
+Written 8692 / 29358 MiB (12.5 MiB/s)
+Written 8844 / 29358 MiB (12.4 MiB/s)
+Written 9004 / 29358 MiB (12.3 MiB/s)
+Written 9172 / 29358 MiB (12.3 MiB/s)
+Written 9336 / 29358 MiB (12.3 MiB/s)
+Written 9528 / 29358 MiB (12.3 MiB/s)
+Written 9700 / 29358 MiB (12.3 MiB/s)
+Written 9844 / 29358 MiB (12.2 MiB/s)
+Written 10016 / 29358 MiB (12.2 MiB/s)
+Written 10152 / 29358 MiB (12.1 MiB/s)
+Written 10292 / 29358 MiB (12.1 MiB/s)
+Written 10464 / 29358 MiB (12.1 MiB/s)
+Written 10664 / 29358 MiB (12.1 MiB/s)
+Written 10820 / 29358 MiB (12.1 MiB/s)
+Written 11024 / 29358 MiB (12.1 MiB/s)
+Written 11252 / 29358 MiB (12.1 MiB/s)
+Written 11420 / 29358 MiB (12.1 MiB/s)
+Written 11588 / 29358 MiB (12.1 MiB/s)
+Written 11748 / 29358 MiB (12.1 MiB/s)
+Written 11920 / 29358 MiB (12.1 MiB/s)
+Written 12084 / 29358 MiB (12.1 MiB/s)
+Written 12244 / 29358 MiB (12.0 MiB/s)
+Written 12412 / 29358 MiB (12.0 MiB/s)
+Written 12580 / 29358 MiB (12.0 MiB/s)
+Written 12744 / 29358 MiB (12.0 MiB/s)
+Written 12908 / 29358 MiB (12.0 MiB/s)
+Written 13076 / 29358 MiB (12.0 MiB/s)
+Written 13244 / 29358 MiB (12.0 MiB/s)
+Written 13408 / 29358 MiB (11.9 MiB/s)
+Written 13576 / 29358 MiB (11.9 MiB/s)
+Written 13740 / 29358 MiB (11.9 MiB/s)
+Written 13908 / 29358 MiB (11.9 MiB/s)
+Written 14076 / 29358 MiB (11.9 MiB/s)
+Written 14244 / 29358 MiB (11.9 MiB/s)
+Written 14408 / 29358 MiB (11.9 MiB/s)
+Written 14572 / 29358 MiB (11.9 MiB/s)
+Written 14740 / 29358 MiB (11.8 MiB/s)
+Written 14908 / 29358 MiB (11.8 MiB/s)
+Written 15080 / 29358 MiB (11.8 MiB/s)
+Traceback (most recent call last):
+  File "C:\Users\Administrator\.gemini\antigravity\brain\e0478f5a-363f-4b5c-a3df-ba5252da6a7d\scratch\write_usb_raw.py",
+ line 214, in <module>
+    main()
+  File "C:\Users\Administrator\.gemini\antigravity\brain\e0478f5a-363f-4b5c-a3df-ba5252da6a7d\scratch\write_usb_raw.py",
+ line 169, in main
+    write_all(h, buf)
+  File "C:\Users\Administrator\.gemini\antigravity\brain\e0478f5a-363f-4b5c-a3df-ba5252da6a7d\scratch\write_usb_raw.py",
+ line 81, in write_all
+    raise win_err("WriteFile")
+OSError: [Errno 433] WriteFile (WinError 433: 指指定定不不存存在在的的设设备备。。)
+**********************
+PowerShell transcript end
+End time: 20261122031911
+**********************

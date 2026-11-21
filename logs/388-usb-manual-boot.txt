@@ -1,0 +1,17 @@
+<INTERRUPT>
+fastboot#usb start
+fastboot#mw.l 0x1fdffc0 0 1
+fastboot#fatload usb 0:1 0x1fdffc0 boot.img
+** Reading file would overwrite reserved memory **
+Failed to load 'boot.img'
+fastboot#crc32 1fdffc0 e8a048
+CRC32 for 01fdffc0 ... 02e6a007 ==> 9d01b860
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+171028480 Bytes/s
+fastboot#bootm 0x1fdffc0
+Wrong Image Format for bootm command
+ERROR: can't get kernel image!
+fastboot#

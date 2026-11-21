@@ -1,0 +1,9 @@
+
+=== CMD: python3 -c 'import mmap,os,struct; fd=os.open(chr(47)+chr(100)+chr(101)+chr(118)+chr(47)+chr(109)+chr(101)+chr(109), os.O_RDONLY|os.O_SYNC); m1=mmap.mmap(fd,0x1000,mmap.MAP_SHARED,mmap.PROT_READ,offset=0xf8a22000); m2=mmap.mmap(fd,0x1000,mmap.MAP_SHARED,mmap.PROT_READ,offset=0xf8a20000); print(hex(struct.unpack_from(chr(60)+chr(73),m1,0xcc)[0]), hex(struct.unpack_from(chr(60)+chr(73),m1,0xd0)[0]), hex(struct.unpack_from(chr(60)+chr(73),m1,0x3bc)[0]), hex(struct.unpack_from(chr(60)+chr(73),m2,0x118)[0]))' ===
+python3 -c 'import mmap,os,struct; fd=os.open(chr(47)+chr(100)+chr(101)+chr(118)+chr(47)+chr(109)+chr(101)+chr(109), os.O_RDONLY|os.O_SYNC); m1=mmap.mmap(fd,0x1000,mmap.MAP_SHARED,mmap.PROT_READ,offset=0xf8a22000); m2=mmap.m map(fd,0x1000,mmap.MAP_SHARED,mmap.PROT_READ,offset=0xf8a20000); print(hex(struct.unpack_from(chr(60)+chr(73),m1,0xcc)[0]), hex(struct.unpack_from(chr(60)+chr(73),m1,0xd0)[0]), hex(struct.unpack_from(chr(60)+chr(73),m1,0x3bc)[0]), hex(struct.unpack_from(chr(60)+chr(73),m2,0x118)[0]))'
+[?2004lTraceback (most recent call last):
+  File [35m"<string>"[0m, line [35m1[0m, in [35m<module>[0m
+    import mmap,os,struct; fd=[31mos.open[0m[1;31m(chr(47)+chr(100)+chr(101)+chr(118)+chr(47)+chr(109)+chr(101)+chr(109), os.O_RDONLY|os.O_SYNC)[0m; m1=mmap.mmap(fd,0x1000,mmap.MAP_SHARED,mmap.PROT_READ,offset=0xf8a22000); m2=mmap.mmap(fd,0x1000,mmap.MAP_SHARED,mmap.PROT_READ,offset=0xf8a20000); print(hex(struct.unpack_from(chr(60)+chr(73),m1,0xcc)[0]), hex(struct.unpack_from(chr(60)+chr(73),m1,0xd0)[0]), hex(struct.unpack_from(chr(60)+chr(73),m1,0x3bc)[0]), hex(struct.unpack_from(chr(60)+chr(73),m2,0x118)[0]))
+                              [31m~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[1;35mFileNotFoundError[0m: [35m[Errno 2] No such file or directory: '/dev/mem'[0m
+[?2004hroot@hg680kd:~# 

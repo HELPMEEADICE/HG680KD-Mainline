@@ -10,6 +10,9 @@ base_variant=$variant
 if [[ $variant == 7.2.5-* ]]; then
     linux_ver=7.2.5
     base_variant=${variant#7.2.5-}
+elif [[ $variant == 7.3.5-* ]]; then
+    linux_ver=7.3.5
+    base_variant=${variant#7.3.5-}
 fi
 linux="$root/source/linux-$linux_ver"
 busybox="$root/source/busybox-1.37.0"
@@ -26,13 +29,14 @@ wifi_probe=
 bt=
 emmc_hs400=
 dvfs=
+usb_root=
 case "$base_variant" in
     core) ;;
-    all-2g|all-2g-hdmi|all-2g-hdmi-wifi-probe|all-2g-hdmi-bt|all-2g-hdmi-bt-emmc-hs400|all-2g-hdmi-bt-dvfs)
+    all-2g|all-2g-hdmi|all-2g-hdmi-wifi-probe|all-2g-hdmi-bt|all-2g-hdmi-bt-emmc-hs400|all-2g-hdmi-bt-dvfs|armbian-usb)
         variant_key="ARCH_HISI USB_XHCI_HI3798MV320 MMC_SDHCI_HI3798MV320 HIX5HD2_GMAC DRM_LIMA COMMON_CLK_HI3798MV320_RESET"
         bbout="$root/out/busybox-arm64-all-2g"
         board=hi3798mv320-fiberhome-hg680kd-arm64-all-2g
-        if [[ $base_variant == all-2g-hdmi* ]]; then
+        if [[ $base_variant == all-2g-hdmi* || $base_variant == armbian-usb ]]; then
             hdmi=y
             bbout="$root/out/busybox-arm64-all-2g-hdmi"
             variant_key+=" DRM_SIMPLEDRM DRM_FBDEV_EMULATION DRM_CLIENT_DEFAULT_FBDEV FB_DEVICE VT VT_CONSOLE FRAMEBUFFER_CONSOLE"
@@ -41,18 +45,29 @@ case "$base_variant" in
             wifi_probe=y
             variant_key+=" GPIOLIB GPIO_PL061 PWRSEQ_SIMPLE CMDLINE_PARTITION MSDOS_PARTITION EXT4_FS"
         fi
-        if [[ $base_variant == all-2g-hdmi-bt* ]]; then
+        if [[ $base_variant == all-2g-hdmi-bt* || $base_variant == armbian-usb ]]; then
             bt=y
             variant_key+=" GPIOLIB GPIO_PL061 CMDLINE_PARTITION EXT4_FS FW_LOADER BT BT_BREDR BT_LE"
-            variant_key+=" SERIAL_DEV_BUS SERIAL_DEV_CTRL_TTYPORT BT_HCIUART BT_HCIUART_SERDEV BT_HCIUART_3WIRE BT_HCIUART_RTL"
+            variant_key+=" SERIAL_DEV_BUS SERIAL_DEV_CTRL_TTYPORT BT_HCIUART_SERDEV BT_HCIUART_3WIRE BT_HCIUART_RTL"
+            if [[ $base_variant != armbian-usb ]]; then
+                variant_key+=" BT_HCIUART"
+            fi
         fi
-        if [[ $base_variant == all-2g-hdmi-bt-emmc-hs400 || $base_variant == all-2g-hdmi-bt-dvfs ]]; then
+        if [[ $base_variant == all-2g-hdmi-bt-emmc-hs400 || $base_variant == all-2g-hdmi-bt-dvfs || $base_variant == armbian-usb ]]; then
             emmc_hs400=y
         fi
-        if [[ $base_variant == all-2g-hdmi-bt-dvfs ]]; then
+        if [[ $base_variant == all-2g-hdmi-bt-dvfs || $base_variant == armbian-usb ]]; then
             dvfs=y
             variant_key+=" HI3798MV320_THERMAL REGULATOR_HI3798MV320_CPU CPUFREQ_DT CPU_FREQ_THERMAL DEVFREQ_THERMAL"
             variant_key+=" CPU_FREQ_GOV_SCHEDUTIL CPU_FREQ_GOV_PERFORMANCE CPU_FREQ_GOV_POWERSAVE DEVFREQ_GOV_USERSPACE"
+        fi
+        if [[ $base_variant == armbian-usb ]]; then
+            usb_root=y
+        fi
+        if [[ $linux_ver == 7.3.* ]]; then
+            variant_key+=" USB_STORAGE BLK_DEV_SD VFAT_FS DEVTMPFS DEVTMPFS_MOUNT EFI_PARTITION"
+            variant_key+=" F2FS_FS F2FS_FS_XATTR F2FS_FS_POSIX_ACL F2FS_FS_SECURITY F2FS_FS_COMPRESSION F2FS_FS_ZSTD"
+            variant_key+=" ZSTD_COMPRESS ZSTD_DECOMPRESS SWAP ZRAM ZRAM_BACKEND_ZSTD ZRAM_DEF_COMP_ZSTD CRYPTO_ZSTD"
         fi
         ;;
     *) echo "Unknown arm64 variant: $variant" >&2; exit 2 ;;
@@ -79,6 +94,13 @@ apply_board_patch() {
     fi
 }
 
+patch_0005="$inputs/0005-CLK-hisi-register-Hi3798MV320-reset-controller.patch"
+patch_0009="$inputs/0009-CLK-hisi-initialize-reset-controller.patch"
+if [[ $linux_ver == 7.3.* ]]; then
+    patch_0005="$inputs/0005-CLK-hisi-register-Hi3798MV320-reset-controller-7.3.patch"
+    patch_0009="$inputs/0009-CLK-hisi-initialize-reset-controller-7.3.patch"
+fi
+
 if [[ $base_variant == core ]]; then
     shopt -s nullglob
     for patchfile in "$inputs"/000[2-5]-*.patch; do
@@ -93,7 +115,7 @@ else
     apply_board_patch "$inputs/0003-MMC-Hi3798MV320-read-only-diagnostic.patch"
     install -m644 "$inputs/sdhci-hi3798mv320.c" "$linux/drivers/mmc/host/"
     apply_board_patch "$inputs/0004-NET-hix5hd2-try-Hi3798MV320-GMAC.patch"
-    apply_board_patch "$inputs/0005-CLK-hisi-register-Hi3798MV320-reset-controller.patch"
+    apply_board_patch "$patch_0005"
     install -m644 "$inputs/crg-hi3798mv320-reset.c" "$linux/drivers/clk/hisilicon/"
     install -m644 "$inputs/hi3798mv320-fiberhome-hg680kd-arm64.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
@@ -120,16 +142,21 @@ if [[ $emmc_hs400 ]]; then
 fi
 if [[ $dvfs ]]; then
     apply_board_patch "$inputs/0008-PM-Hi3798MV320-TSENSOR-and-CPU-PWM.patch"
-    apply_board_patch "$inputs/0009-CLK-hisi-initialize-reset-controller.patch"
+    apply_board_patch "$patch_0009"
     install -m644 "$inputs/hi3798mv320-thermal.c" "$linux/drivers/thermal/"
     install -m644 "$inputs/hi3798mv320-cpu-regulator.c" "$linux/drivers/regulator/"
     board=hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
+    if [[ $usb_root ]]; then
+        board+=-usb
+        install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
+    fi
 fi
 if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
     printf 'dtb-y += %s.dtb\n' "$board" >> "$linux/arch/arm64/boot/dts/hisilicon/Makefile"
 fi
 
+if [[ -z $usb_root ]]; then
 # Build AArch64 musl sysroot
 if [[ ! -x $sysroot/bin/musl-gcc ]]; then
     mkdir -p "$root/out/musl-arm64-build"
@@ -271,6 +298,7 @@ for applet in "${applets[@]}"; do
     printf 'slink /bin/%s busybox 0777 0 0\n' "$applet" >>"$list"
 done
 "$out/gen_init_cpio" -t "$SOURCE_DATE_EPOCH" "$list" >"$out/initramfs.cpio"
+fi
 
 # Build AArch64 Linux
 config="$inputs/arm64.config"
@@ -278,15 +306,31 @@ if [[ $base_variant != core ]]; then
     config="$out/arm64.config"
     if [[ $hdmi ]]; then
         sed '/^CONFIG_LOCALVERSION=/d; /^CONFIG_CMDLINE=/d' "$inputs/arm64.config" >"$config"
-        sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g.config" >>"$config"
+        if [[ $usb_root ]]; then
+            sed '/^CONFIG_LOCALVERSION=/d; /^CONFIG_PANIC_ON_OOPS=/d; /^CONFIG_PANIC_TIMEOUT=/d' "$inputs/arm64-all-2g.config" >>"$config"
+        else
+            sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g.config" >>"$config"
+        fi
         if [[ $wifi_probe || $bt ]]; then
             sed '/^CONFIG_LOCALVERSION=/d; /^CONFIG_CMDLINE=/d' "$inputs/arm64-all-2g-hdmi.config" >>"$config"
             if [[ $dvfs ]]; then
-                sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g-hdmi-bt-emmc-hs400.config" >>"$config"
+                if [[ $usb_root ]]; then
+                    sed '/^CONFIG_LOCALVERSION=/d; /^CONFIG_CMDLINE=/d' "$inputs/arm64-all-2g-hdmi-bt-emmc-hs400.config" >>"$config"
+                else
+                    sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g-hdmi-bt-emmc-hs400.config" >>"$config"
+                fi
             fi
-            cat "$inputs/arm64-${base_variant}.config" >>"$config"
+            if [[ $usb_root ]]; then
+                sed '/^CONFIG_LOCALVERSION=/d' "$inputs/arm64-all-2g-hdmi-bt-dvfs.config" >>"$config"
+                cat "$inputs/arm64-7.3.5-f2fs-zram.config" "$inputs/arm64-7.3.5-armbian-usb.config" >>"$config"
+            else
+                cat "$inputs/arm64-${base_variant}.config" >>"$config"
+            fi
         else
             cat "$inputs/arm64-all-2g-hdmi.config" >>"$config"
+        fi
+        if [[ $linux_ver == 7.3.* && -z $usb_root ]]; then
+            cat "$inputs/arm64-7.3.5-f2fs-zram.config" >>"$config"
         fi
     else
         {
@@ -297,19 +341,34 @@ if [[ $base_variant != core ]]; then
 fi
 kernel=(make -C "$linux" O="$out" ARCH=arm64 CROSS_COMPILE="$cross")
 "${kernel[@]}" KCONFIG_ALLCONFIG="$config" allnoconfig
-"$linux/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/initramfs.cpio"
+if [[ -z $usb_root ]]; then
+    "$linux/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/initramfs.cpio"
+else
+    "$linux/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE ""
+fi
 "${kernel[@]}" olddefconfig
+grep -qx "CONFIG_CC_IS_GCC=y" "$out/.config" || { echo "Expected GCC build (CONFIG_CC_IS_GCC=y)" >&2; exit 1; }
 for key in ARM64 ARM_GIC_V3 ARM_PSCI_FW ARM_ARCH_TIMER SMP OF \
-    SERIAL_AMBA_PL011_CONSOLE SERIAL_EARLYCON BLK_DEV_INITRD CMDLINE_FORCE $variant_key; do
+    SERIAL_AMBA_PL011_CONSOLE SERIAL_EARLYCON CMDLINE_FORCE $variant_key; do
     grep -qx "CONFIG_$key=y" "$out/.config" || { echo "Missing CONFIG_$key" >&2; exit 1; }
 done
-"${kernel[@]}" -j"$jobs" Image "hisilicon/$board.dtb"
+if [[ -z $usb_root ]]; then
+    grep -qx "CONFIG_BLK_DEV_INITRD=y" "$out/.config" || { echo "Missing CONFIG_BLK_DEV_INITRD" >&2; exit 1; }
+    "${kernel[@]}" -j"$jobs" Image "hisilicon/$board.dtb"
+    install -m644 "$bbout/.config" "$release/busybox.config"
+    install -m644 "$out/initramfs.cpio" "$release/"
+else
+    grep -qx "CONFIG_BT_HCIUART=m" "$out/.config" || { echo "Expected CONFIG_BT_HCIUART=m for usb_root" >&2; exit 1; }
+    "${kernel[@]}" -j"$jobs" Image "hisilicon/$board.dtb" modules
+    rm -rf "$release/rootfs-mods"
+    "${kernel[@]}" INSTALL_MOD_PATH="$release/rootfs-mods" modules_install
+    rm -f "$release/rootfs-mods/lib/modules/"*/build "$release/rootfs-mods/lib/modules/"*/source
+fi
 
 install -m644 "$out/arch/arm64/boot/Image" "$release/Image"
 install -m644 "$out/arch/arm64/boot/dts/hisilicon/$board.dtb" "$release/$board.dtb"
 install -m644 "$out/.config" "$release/kernel.config"
-install -m644 "$bbout/.config" "$release/busybox.config"
-install -m644 "$out/System.map" "$out/vmlinux" "$out/initramfs.cpio" "$release"
-(cd "$release" && sha256sum Image ./*.dtb ./*.config System.map vmlinux initramfs.cpio > SHA256SUMS)
+install -m644 "$out/System.map" "$out/vmlinux" "$release"
+(cd "$release" && sha256sum Image ./*.dtb ./*.config System.map vmlinux $([[ -z $usb_root ]] && echo initramfs.cpio) > SHA256SUMS)
 tar -C "$release" -czf "$release.tar.gz" .
 ls -lh "$release/Image" "$release/$board.dtb" "$release.tar.gz"

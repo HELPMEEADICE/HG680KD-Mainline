@@ -1,0 +1,95 @@
+mkfs.fat 4.2 (2021-01-31)
+total 29680
+drwxr-xr-x  2 root root     4096 Jan  1  1970 .
+drwxr-xr-x 19 root root     4096 Nov 21 03:36 ..
+-rwxr-xr-x  1 root root      277 Nov 22 02:55 BOOT-SHA256SUMS
+-rwxr-xr-x  1 root root 15114248 Nov 22 02:55 Image
+-rwxr-xr-x  1 root root 15245384 Nov 22 02:55 boot.img
+-rwxr-xr-x  1 root root     7768 Nov 22 02:55 hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs-usb.dtb
+f5e3173703253ff79cd4c9e329c9b57856a42e7cbdb745656c19ed8288f67b70  boot.img
+4236d445c9bcc41e0546f363b72d15c80207447121dcebfe64d096e0e92a11f2  Image
+9e0e8493ae63d54d5edf1f1dea30b8f9af5b69c9c641745a09c839636b163f08  hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs-usb.dtb
+=== Verify key rootfs configs ===
+PARTLABEL=HG680KD_ROOT  /      f2fs  defaults,compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime,noatime  0 1
+PARTLABEL=HG680KD_BOOT  /boot  vfat  defaults,umask=0022  0 2
+PARTLABEL=HG680KD_SWAP  none   swap  sw,pri=10  0 0
+tmpfs                   /tmp   tmpfs defaults,nosuid,nodev 0 0
+hg680kd
+/mnt/hg680kd-fix/usr/lib/firmware/rtl_bt/:
+total 1024
+drwxrwxr-x  2 root root   3452 Nov 22 02:51 .
+drwxr-xr-x 45 root root   8192 Nov 21 03:38 ..
+-rw-rw-r--  1 root root     68 Nov 18 19:47 rtl8723b_config.bin
+-rw-rw-r--  1 root root  46236 Nov 18 19:47 rtl8723b_fw.bin
+-rw-rw-r--  1 root root     68 Nov 18 19:47 rtl8723bs_config-pine64.bin
+lrwxrwxrwx  1 root root     19 Nov 18 19:47 rtl8723bs_config.bin -> rtl8723b_config.bin
+lrwxrwxrwx  1 root root     15 Nov 18 19:47 rtl8723bs_fw.bin -> rtl8723b_fw.bin
+lrwxrwxrwx  1 root root     28 Nov 18 19:47 rtl8723cs_cg_config.bin -> ../rtlbt/rtl8723cs_cg_config
+lrwxrwxrwx  1 root root     24 Nov 18 19:47 rtl8723cs_cg_fw.bin -> ../rtlbt/rtl8723cs_cg_fw
+lrwxrwxrwx  1 root root     28 Nov 18 19:47 rtl8723cs_vf_config.bin -> ../rtlbt/rtl8723cs_vf_config
+lrwxrwxrwx  1 root root     24 Nov 18 19:47 rtl8723cs_vf_fw.bin -> ../rtlbt/rtl8723cs_vf_fw
+lrwxrwxrwx  1 root root     28 Nov 18 19:47 rtl8723cs_xx_config.bin -> ../rtlbt/rtl8723cs_xx_config
+lrwxrwxrwx  1 root root     24 Nov 18 19:47 rtl8723cs_xx_fw.bin -> ../rtlbt/rtl8723cs_xx_fw
+-rw-rw-r--  1 root root     10 Nov 18 19:47 rtl8723d_config.bin
+-rw-rw-r--  1 root root  52080 Nov 18 19:47 rtl8723d_fw.bin
+-rw-rw-r--  1 root root     47 Nov 18 19:47 rtl8723ds_config.bin
+-rw-rw-r--  1 root root  48988 Nov 18 19:47 rtl8723ds_fw.bin
+-rw-r--r--  1 root root    110 Nov 22 02:51 rtl8761btv_vat_config.bin
+-rw-r--r--  1 root root  65988 Nov 22 02:51 rtl8761btv_vat_fw.bin
+-rw-rw-r--  1 root root     10 Nov 18 19:47 rtl8821c_config.bin
+-rw-rw-r--  1 root root  37356 Nov 18 19:47 rtl8821c_fw.bin
+-rw-rw-r--  1 root root     14 Nov 18 19:47 rtl8822b_config.bin
+-rw-rw-r--  1 root root  51176 Nov 18 19:47 rtl8822b_fw.bin
+-rw-rw-r--  1 root root     73 Nov 18 19:47 rtl8822cs_config.bin
+-rw-rw-r--  1 root root  66248 Nov 18 19:47 rtl8822cs_fw.bin
+-rw-rw-r--  1 root root      6 Nov 18 19:47 rtl8822cu_config.bin
+-rw-rw-r--  1 root root  60892 Nov 18 19:47 rtl8822cu_fw.bin
+-rw-rw-r--  1 root root  67188 Nov 18 19:47 rtl8852au_fw.bin
+-rw-rw-r--  1 root root     33 Nov 18 19:47 rtl8852bs_config.bin
+-rw-rw-r--  1 root root  62532 Nov 18 19:47 rtl8852bs_fw.bin
+-rw-rw-r--  1 root root      6 Nov 18 19:47 rtl8852bu_config.bin
+-rw-rw-r--  1 root root  74324 Nov 18 19:47 rtl8852bu_fw.bin
+-rw-rw-r--  1 root root 113336 Nov 18 19:47 rtl8852cu_fw.bin
+-rw-rw-r--  1 root root 112953 Nov 18 19:47 rtl8852cu_fw_v2.bin
+-rw-rw-r--  1 root root     55 Nov 18 19:47 rtlbt_config
+-rw-rw-r--  1 root root  44504 Nov 18 19:47 rtlbt_fw
+-rw-rw-r--  1 root root  51364 Nov 18 19:47 rtlbt_fw_new
+
+/mnt/hg680kd-fix/usr/lib/modules/:
+total 11
+drwxr-xr-x  3 root root 3452 Nov 22 02:51 .
+drwxr-xr-x 74 root root 3452 Nov 22 02:51 ..
+drwxr-xr-x  3 hedc hedc 3452 Nov 22 02:53 7.3.5-hg680kd-arm64-armbian-usb
+total 19
+drwxr-xr-x 2 root root 3452 Nov 22 02:53 .
+drwxr-xr-x 3 root root 3452 Nov 19 14:06 ..
+-rw-r--r-- 1 root root   39 Nov 19 14:06 10-slick-greeter.conf
+-rw-r--r-- 1 root root  102 Nov 19 14:06 11-armbian.conf
+-rw-r--r-- 1 root root   75 Nov 22 02:53 20-hg680kd-autologin.conf
+/mnt/hg680kd-fix/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml:68:    <property name="use_compositing" type="bool" value="false"/>
+/mnt/hg680kd-fix/home/hg680kd/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml:68:    <property name="use_compositing" type="bool" value="false"/>
+lrwxrwxrwx 1 root root 40 Nov 22 02:53 /mnt/hg680kd-fix/etc/systemd/system/sysinit.target.wants/hg680kd-zram.service -> /etc/systemd/system/hg680kd-zram.service
+/dev/loop0p1: LABEL_FATBOOT="HG680KDBOOT" LABEL="HG680KDBOOT" UUID="928A-76D5" BLOCK_SIZE="512" TYPE="vfat" PARTLABEL="HG680KD_BOOT" PARTUUID="caf68121-6e1d-421d-9f34-15cb4511505a"
+/dev/loop0p2: LABEL="HG680KD_SWAP" UUID="b7681eee-33bc-42ce-a8e6-4a4820e892a3" TYPE="swap" PARTLABEL="HG680KD_SWAP" PARTUUID="0c3affbe-379f-422d-95b3-0e1108544584"
+/dev/loop0p3: LABEL="HG680KD_ROOT" UUID="7729e2b3-eb7d-4a48-94be-7e5d5162be69" BLOCK_SIZE="4096" TYPE="f2fs" PARTLABEL="HG680KD_ROOT" PARTUUID="228149da-74d1-41f8-99ad-9d1e122d7964"
+fsck.fat 4.2 (2021-01-31)
+/dev/loop0p1: 5 files, 7418/130811 clusters
+Info: Use default preen mode
+Info: MKFS version
+  "Linux version 7.3.5-zen1-1-zen (linux-zen@archlinux) (gcc (GCC) 16.2.1 20260810, GNU ld (GNU Binutils) 2.47) #1 ZEN SMP PREEMPT_DYNAMIC Tue, 17 Nov 2026 22:28:55 +0000"
+Info: FSCK version
+  from "Linux version 7.3.5-zen1-1-zen (linux-zen@archlinux) (gcc (GCC) 16.2.1 20260810, GNU ld (GNU Binutils) 2.47) #1 ZEN SMP PREEMPT_DYNAMIC Tue, 17 Nov 2026 22:28:55 +0000"
+    to "Linux version 7.3.5-zen1-1-zen (linux-zen@archlinux) (gcc (GCC) 16.2.1 20260810, GNU ld (GNU Binutils) 2.47) #1 ZEN SMP PREEMPT_DYNAMIC Tue, 17 Nov 2026 22:28:55 +0000"
+Info: superblock features = 2828 :  extra_attr inode_checksum sb_checksum compression
+Info: superblock encrypt level = 0, salt = 00000000000000000000000000000000
+Info: Segments per section = 1
+Info: Sections per zone = 1
+Info: total FS sectors = 56975360 (27820 MB)
+Info: CKPT version = 3beb7884
+Info: Casefold: linear_lookup [enable]
+Info: checkpoint state = 145 :  trimmed crc compacted_summary unmount
+Info: No error was reported
+-rw-r--r-- 1 root root  29G Nov 22 02:55 /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img
+-rw-r--r-- 1 root root 1.4G Nov 22 02:55 /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img.zst
+480c30072d9d2f6eedbe9d772efddfcaabc222a43d15d53a508c14baada1c585  /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img
+1274e866f449ba6ff7d865d1466d0aadb89c11338678a8b9816a37f39dfd21eb  /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img.zst

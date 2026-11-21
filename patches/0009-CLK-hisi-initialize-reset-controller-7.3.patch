@@ -1,0 +1,12 @@
+--- a/drivers/clk/hisilicon/reset.c
++++ b/drivers/clk/hisilicon/reset.c
+@@ -95,7 +95,8 @@
+ 	rstc->rcdev.of_node = pdev->dev.of_node;
+ 	rstc->rcdev.of_reset_n_cells = 2;
+ 	rstc->rcdev.of_xlate = hisi_reset_of_xlate;
+-	reset_controller_register(&rstc->rcdev);
++	if (reset_controller_register(&rstc->rcdev))
++		return NULL;
+ 
+ 	return rstc;
+ }

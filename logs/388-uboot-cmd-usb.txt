@@ -1,0 +1,29 @@
+<INTERRUPT>
+fastboot#help usb
+usb - USB sub-system
+
+Usage:
+usb start - start (scan) USB controller
+usb reset - reset (rescan) USB controller
+usb stop [f] - stop USB [f]=force stop
+usb tree - show USB device tree
+usb info [dev] - show available USB devices
+usb test [dev] [port] [mode] - set USB 2.0 test mode
+    (specify port 0 to indicate the device's upstream port)
+    Available modes: J, K, S[E0_NAK], P[acket], F[orce_Enable]
+usb storage - show details of USB storage devices
+usb dev [dev] - show or set current USB storage device
+usb part [dev] - print partition table of one or all USB storage    devices
+usb read addr blk# cnt - read `cnt' blocks starting at block `blk#'
+    to memory address `addr'
+usb write addr blk# cnt - write `cnt' blocks starting at block `blk#'
+    from memory address `addr'
+fastboot#fatload usb 0:1 0x00200000 BOOT-SHA256SUMS
+277 bytes read in 4 ms (67.4 KiB/s)
+fastboot#usb read 0x04000000 0x800 1
+
+usb read: device 0 block # 2048, count 1 ... 1 blocks read: OK
+fastboot#md.b 0x04000000 20
+04000000: eb 58 90 6d 6b 66 73 2e 66 61 74 00 02 08 20 00  .X.mkfs.fat... .
+04000010: 02 00 00 00 00 f8 00 00 3f 00 ff 00 00 08 00 00  ........?.......
+fastboot#

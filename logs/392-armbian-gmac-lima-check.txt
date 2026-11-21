@@ -1,0 +1,148 @@
+
+=== CMD: stty cols 240; findmnt -no FSTYPE,OPTIONS /; grep -E 'sda|zram' /proc/mounts ===
+stty cols 240; findmnt -no FSTYPE,OPTIONS /; grep -E 'sda|zram'  /proc/mounts
+[?2004lf rw,noatime,lazytime,background_gc=on,gc_merge,nodiscard,user_xattr,inline_xattr,acl,inline_data,inline_dentry,noflush_merge,barrier,extent_cache,mode=adaptive,active_logs=6,alloc_mode=default,checkpoint_merge,fsync_mode=posix,compress_alg
+/dev/sda1 /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+[?2004hroot@hg680kd:~# 
+=== CMD: dmesg | grep -iE 'gmac|mdio|phy|eth0|tsensor|bluetooth|rtl|usb|clk' | tail -n 50 ===
+dmesg | grep -iE 'gmac|mdio|phy|eth0|tsensor|bluetooth|rtl|usb|clk' | tail -n 50
+[?2004l[    0.474196] xhci-hi3798mv320 f98a0000.usb: Host supports USB 3.0 SuperSpeed
+[    0.475285] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 7.03
+[    0.475502] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    0.475548] usb usb1: Product: xHCI Host Controller
+[    0.475579] usb usb1: Manufacturer: Linux 7.3.5-hg680kd-arm64-armbian-usb xhci-hcd
+[    0.475617] usb usb1: SerialNumber: f98a0000.usb
+[    0.476689] hub 1-0:1.0: USB hub found
+[    0.477471] usb usb2: We don't know the algorithms for LPM for this host, disabling LPM.
+[    0.477526] usb usb2: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 7.03
+[    0.477991] usb usb2: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    0.478044] usb usb2: Product: xHCI Host Controller
+[    0.478075] usb usb2: Manufacturer: Linux 7.3.5-hg680kd-arm64-armbian-usb xhci-hcd
+[    0.478115] usb usb2: SerialNumber: f98a0000.usb
+[    0.478995] hub 2-0:1.0: USB hub found
+[    0.479852] usbcore: registered new interface driver usb-storage
+[    0.516276] usbcore: registered new interface driver usbhid
+[    0.516557] usbhid: USB HID core driver
+[    0.531200] Bluetooth: RFCOMM TTY layer initialized
+[    0.533280] Bluetooth: RFCOMM socket layer initialized
+[    0.535413] Bluetooth: RFCOMM ver 1.11
+[    0.537476] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[    0.539555] Bluetooth: BNEP socket layer initialized
+[    0.541497] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+[    0.543511] Bluetooth: HIDP socket layer initialized
+[    0.571288] clk: Not disabling unused clocks
+[    0.608297] Waiting for root device PARTLABEL=HG680KD_ROOT...
+[    0.739075] usb 1-2: new high-speed USB device number 2 using xhci-hi3798mv320
+[    0.883362] usb 1-2: New USB device found, idVendor=0781, idProduct=5591, bcdDevice= 1.00
+[    0.891703] usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[    0.893567] usb 1-2: Product:  SanDisk 3.2Gen1
+[    0.895433] usb 1-2: Manufacturer:  USB
+[    0.897251] usb 1-2: SerialNumber: 0101cfcee42b331f192d48b3e59fbda6c24f3be5f136e94bd26dfc18fd44f96e5a58000000000000000000007058faeeff923f0091558107b1af6cae
+[    0.904210] usb-storage 1-2:1.0: USB Mass Storage device detected
+[    0.911621] scsi host0: usb-storage 1-2:1.0
+[    1.925757] scsi 0:0:0:0: Direct-Access      USB      SanDisk 3.2Gen1 1.00 PQ: 0 ANSI: 6
+[    5.803521] systemd[1]: Expecting device dev-disk-by\x2dpartlabel-HG680KD_BOOT.device - /dev/disk/by-partlabel/HG680KD_BOOT...
+[    5.831463] systemd[1]: Expecting device dev-disk-by\x2dpartlabel-HG680KD_SWAP.device - /dev/disk/by-partlabel/HG680KD_SWAP...
+[   10.486450] Bluetooth: HCI UART driver ver 2.3
+[   10.507782] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[   10.703282] usbcore: registered new interface driver uas
+[   11.174670] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
+[   11.570753] Bluetooth: hci0: Too short H5 packet
+[   11.575216] Bluetooth: hci0: Invalid header checksum
+[   11.964973] Bluetooth: hci0: RTL: rom_version status=0 version=3
+[   11.965005] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_fw.bin
+[   12.070735] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_config.bin
+[   12.119189] Bluetooth: hci0: RTL: cfg_sz 110, total sz 21738
+[   12.862514] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+[   30.267335] Bluetooth: MGMT ver 1.23
+[   31.840657] hisi-gmac f9840000.ethernet eth0: Link is Down
+[?2004hroot@hg680kd:~# 
+=== CMD: ip link show eth0; ethtool eth0 2>&1 || true; ls -la /sys/class/net/eth0/phydev /sys/bus/mdio_bus/devices 2>&1 || true ===
+ip link show eth0; ethtool eth0 2>&1 || true; ls -la /sys/class/net/eth0/phydev /sys/bus/mdio_bus/devices 2>&1 || true
+[?2004l2: [36meth0: [0m<NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state [31mDOWN [0mmode DEFAULT group default qlen 1000
+    link/ether [33m9e:8f:9d:d3:bf:ad[0m brd [33mff:ff:ff:ff:ff:ff[0m
+Settings for eth0:
+	Supported ports: [ TP MII ]
+	Supported link modes:   Not reported
+	Supported pause frame use: Symmetric Receive-only
+	Supports auto-negotiation: No
+	Supported FEC modes: Not reported
+	Advertised link modes:  Not reported
+	Advertised pause frame use: No
+	Advertised auto-negotiation: No
+	Advertised FEC modes: Not reported
+	Speed: 10Mb/s
+	Duplex: Half
+	Port: MII
+	PHYAD: 1
+	Transceiver: external
+	Auto-negotiation: off
+	Link detected: no
+lrwxrwxrwx 1 root root 0 Nov 20 19:41 [0m[01;36m/sys/class/net/eth0/phydev[0m -> [01;34m../../mdio_bus/f9840000.ethernet-mii/f9840000.ethernet-mii:01[0m
+
+/sys/bus/mdio_bus/devices:
+total 0
+drwxr-xr-x 2 root root 0 Nov 20 19:36 [01;34m.[0m
+drwxr-xr-x 4 root root 0 Nov 20 19:36 [01;34m..[0m
+lrwxrwxrwx 1 root root 0 Nov 20 19:36 [01;36mf9840000.ethernet-mii:01[0m -> [01;34m../../../devices/platform/soc/f9840000.ethernet/mdio_bus/f9840000.ethernet-mii/f9840000.ethernet-mii:01[0m
+[?2004hroot@hg680kd:~# 
+=== CMD: ip link set eth0 up; sleep 3; ethtool eth0 2>&1 || true; ip -br a ===
+ip link set eth0 up; sleep 3; ethtool eth0 2>&1 || true; ip -br a
+[?2004lSettings for eth0:
+	Supported ports: [ TP MII ]
+	Supported link modes:   Not reported
+	Supported pause frame use: Symmetric Receive-only
+	Supports auto-negotiation: No
+	Supported FEC modes: Not reported
+	Advertised link modes:  Not reported
+	Advertised pause frame use: No
+	Advertised auto-negotiation: No
+	Advertised FEC modes: Not reported
+	Speed: 10Mb/s
+	Duplex: Half
+	Port: MII
+	PHYAD: 1
+	Transceiver: external
+	Auto-negotiation: off
+	Link detected: no
+[36mlo               [0mUNKNOWN        [35m127.0.0.1[0m/8 [34m::1[0m/128 
+[36meth0             [0m[31mDOWN           [0m
+[?2004hroot@hg680kd:~# 
+=== CMD: DISPLAY=:0 glxinfo -B 2>&1 | head -n 30 ===
+DISPLAY=:0 glxinfo -B 2>&1 | head -n 30
+[?2004lAuthorization required, but no authorization protocol specified
+
+Error: unable to open display :0
+[?2004hroot@hg680kd:~# 
+=== CMD: DISPLAY=:0 xfconf-query -c xfwm4 -p /general/use_compositing ===
+DISPLAY=:0 xfconf-query -c xfwm4 -p /general/use_compositing
+[?2004lfalse
+[?2004hroot@hg680kd:~# 
+=== CMD: cat /sys/kernel/debug/f2fs/status 2>&1 | head -n 25 || true ===
+cat /sys/kernel/debug/f2fs/status 2>&1 | head -n 25 || true
+[?2004l
+=====[ partition info(sda3). #0, RW, CP: Good]=====
+[SBI: fs_dirty]
+[SB: 1] [CP: 2] [SIT: 2] [NAT: 62] [SSA: 28] [MAIN: 13815(OverProv:126 Resv:120)]
+
+Current Time Sec: 297 / Mounted Time Sec: 1
+
+Policy:
+  - IPU: [ FSYNC ]
+
+Utilization: 15% (1078496 valid blocks)
+  - Node: 127235 (Inode: 126783, Other: 452)
+  - Data: 951261
+  - Inline_xattr Inode: 5489
+  - Inline_data Inode: 1132
+  - Inline_dentry Inode: 645
+  - Compressed Inode: 3673, Blocks: 152049
+  - Swapfile Inode: 0
+  - Donate Inode: 0
+  - Orphan/Append/Update Inode: 1, 0, 0
+
+Main area: 13815 segs, 13815 secs 13815 zones
+    TYPE           blkoff    segno    secno   zoneno  dirty_seg   full_seg  valid_blk
+  - COLD   data:      219     4632     4632     4632         38       1047     551978
+  - WARM   data:      191     6907     6907     6907          2          0        564
+[?2004hroot@hg680kd:~# 

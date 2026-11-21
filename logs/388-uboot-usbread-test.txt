@@ -1,0 +1,12 @@
+<INTERRUPT>
+fastboot#mw.l 0x1fdffc0 0 1
+fastboot#usb read 0x1fdffc0 0x1028 0x7451
+
+usb read: device 0 block # 4136, count 29777 ... 29777 blocks read: OK
+fastboot#crc32 1fdffc0 e8a048
+CRC32 for 01fdffc0 ... 02e6a007 ==> b4cfc0a7
+fastboot#iminfo 1fdffc0
+
+## Checking Image at 01fdffc0 ...
+Unknown image format!
+fastboot#

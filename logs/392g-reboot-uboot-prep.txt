@@ -1,0 +1,17 @@
+
+=== CMD: pkill -f 'xfce4-terminal --geometry=100x34' || true; grep -E '^(root|hg680kd):' /etc/shadow | cut -d: -f1,2; cat /usr/local/sbin/hg680kd-zram-init; sync ===
+pkill -f 'xfce4-terminal --geometry=100x34' || true; grep -E '^(root|hg680kd):' /etc/shadow | cut -d: -f1,2; cat /usr/local/sbin/hg680kd-zram-init; sync
+[?2004lroot:$y$j9T$8SrbpiELC2Ql98vAXYaAR.$2myEJVGa4/eJ0ow0hS40EFSa7eRX3WPk.uBjXGvW0E3
+hg680kd:$y$j9T$C4HiljfuQc9dL8PAFenNi.$rODAeZLyBBPViQAX/YZKv9LR6ypuXw2rbcO2W/Fn3bB
+#!/bin/sh
+set -eu
+if [ -b /dev/zram0 ]; then
+    swapoff /dev/zram0 2>/dev/null || true
+    echo 1 > /sys/block/zram0/reset 2>/dev/null || true
+    echo zstd > /sys/block/zram0/comp_algorithm
+    echo 1073741824 > /sys/block/zram0/disksize
+    mkswap -L HG680KD_ZRAM /dev/zram0 >/dev/null
+    swapon -p 100 /dev/zram0
+fi
+[1]+  Terminated              XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 xfce4-terminal --geometry=100x34 --hold -e fastfetch > /dev/null 2>&1
+[?2004hroot@hg680kd:~# 

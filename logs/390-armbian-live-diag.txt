@@ -1,0 +1,114 @@
+
+=== CMD: uname -a; cat /proc/version ===
+uname -a; cat /proc/version
+[?2004lLinux hg680kd 7.3.5-hg680kd-arm64-armbian-usb #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64 GNU/Linux
+Linux version 7.3.5-hg680kd-arm64-armbian-usb (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+[?2004hroot@hg680kd:~# 
+=== CMD: findmnt -no TARGET,SOURCE,FSTYPE,OPTIONS / /boot ===
+findmnt -no TARGET,SOURCE,FSTYPE,OPTIONS / /boot
+[?2004l[?2004hroot@hg680kd:~# 
+=== CMD: zramctl; swapon --show; free -h ===
+zramctl; swapon --show; free -h
+[?2004lNAME       ALGORITHM DISKSIZE DATA COMPR TOTAL STREAMS MOUNTPOINT
+/dev/zram0 zstd            1G   4K   71B   20K         [SWAP]
+NAME       TYPE       SIZE USED PRIO
+/dev/zram0 partition 1024M   0B  100
+/dev/sda2  partition 1024M   0B   10
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       430Mi       1.0Gi        32Mi       548Mi       1.5Gi
+Swap:          2.0Gi          0B       2.0Gi
+[?2004hroot@hg680kd:~# 
+=== CMD: ip -br a; bluetoothctl list; lsmod ===
+ip -br a; bluetoothctl list; lsmod
+[?2004l[36mlo               [0mUNKNOWN        [35m127.0.0.1[0m/8 [34m::1[0m/128 
+[36meth0             [0m[31mDOWN           [0m
+Controller 00:E0:4C:23:99:87 hg680kd [default]
+Module                  Size  Used by
+uas                    24576  0
+hci_uart               40960  0
+crc_ccitt              12288  1 hci_uart
+btrtl                  28672  1 hci_uart
+fuse                  135168  1
+[?2004hroot@hg680kd:~# 
+=== CMD: ps -ef | grep -E 'lightdm|Xorg|xfce|xfwm' | grep -v grep ===
+ps -ef | grep -E 'lightdm|Xorg|xfce|xfwm' | grep -v grep
+[?2004lroot         524       1  0 19:37 ?        00:00:00 /usr/sbin/lightdm
+root         577     524  2 19:37 tty7     00:00:03 /usr/lib/xorg/Xorg :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+root         615     524  0 19:37 ?        00:00:00 lightdm --session-child 13 16
+hg680kd      694     615  1 19:37 ?        00:00:01 xfce4-session
+hg680kd      810     694  0 19:37 ?        00:00:00 /usr/bin/ssh-agent startxfce4
+hg680kd      869     630  0 19:37 ?        00:00:00 /usr/lib/aarch64-linux-gnu/xfce4/xfconf/xfconfd
+hg680kd      936     694  1 19:37 ?        00:00:01 xfwm4
+hg680kd     1100     694  1 19:37 ?        00:00:01 xfce4-panel
+hg680kd     1125    1100  0 19:37 ?        00:00:00 /usr/lib/aarch64-linux-gnu/xfce4/panel/wrapper-2.0 /usr/lib/aarch64-linux-gnu/xfce4/panel/plugins/libsystray.so 6 10485772 systray Status Tray Plugin Provides status notifier items (application indicators) and legacy systray items
+hg680kd     1126    1100  0 19:37 ?        00:00:00 /usr/lib/aarch64-linux-gnu/xfce4/panel/wrapper-2.0 /usr/lib/aarch64-linux-gnu/xfce4/panel/plugins/libactions.so 2 10485773 actions Action Buttons Log out, lock or other system actions
+hg680kd     1145     630  0 19:37 ?        00:00:00 /usr/lib/aarch64-linux-gnu/xfce4/notifyd/xfce4-notifyd
+hg680kd     1149     694  0 19:37 ?        00:00:00 xfce4-power-manager
+[?2004hroot@hg680kd:~# 
+=== CMD: cat /var/log/Xorg.0.log 2>/dev/null | grep -E 'EE|WW|glamor|modeset|simpledrm|drm' | tail -n 40 ===
+cat /var/log/Xorg.0.log 2>/dev/null | grep -E 'EE|WW|glamor|mode set|simpledrm|drm' | tail -n 40
+[?2004l[    33.680] (II) Loading /usr/lib/xorg/modules/drivers/modesetting_drv.so
+[    33.687] (II) Module modesetting: vendor="X.Org Foundation"
+[    33.692] (II) modesetting: Driver for Modesetting Kernel Drivers: kms
+[    33.746] (II) modeset(0): using drv /dev/dri/card0
+[    33.746] (WW) Falling back to old probe method for fbdev
+[    33.757] (WW) VGA arbiter: cannot open kernel arbiter, no multi-card support
+[    33.757] (II) modeset(0): Creating default Display subsection in Screen section
+[    33.757] (==) modeset(0): Depth 24, (==) framebuffer bpp 32
+[    33.758] (==) modeset(0): RGB weight 888
+[    33.758] (==) modeset(0): Default visual is TrueColor
+[    33.758] (II) Loading sub module "glamoregl"
+[    33.758] (II) LoadModule: "glamoregl"
+[    33.758] (II) Loading /usr/lib/xorg/modules/libglamoregl.so
+[    33.797] (II) Module glamoregl: vendor="X.Org Foundation"
+[    38.965] (II) modeset(0): glamor X acceleration enabled on Mali450
+[    38.966] (II) modeset(0): glamor initialized
+[    38.966] (==) modeset(0): VariableRefresh: disabled
+[    38.966] (==) modeset(0): AsyncFlipSecondaries: disabled
+[    38.966] (II) modeset(0): Output None-1 has no monitor section
+[    38.967] (II) modeset(0): EDID for output None-1
+[    38.968] (II) modeset(0): Printing probed modes for output None-1
+[    38.968] (II) modeset(0): Modeline "1920x1080"x60.0  124.42  1920 1920 1920 1920  1080 1080 1080 1080 (64.8 kHz eP)
+[    38.968] (II) modeset(0): Output None-1 connected
+[    38.969] (II) modeset(0): Using exact sizes for initial modes
+[    38.969] (II) modeset(0): Output None-1 using initial mode 1920x1080 +0+0
+[    38.969] (==) modeset(0): Using gamma correction (1.0, 1.0, 1.0)
+[    38.969] (==) modeset(0): DPI set to (96, 96)
+[    39.335] (==) modeset(0): Backing store enabled
+[    39.335] (==) modeset(0): Silken mouse enabled
+[    39.335] (II) modeset(0): Initializing kms color map for depth 24, 8 bpc.
+[    39.336] (==) modeset(0): DPMS enabled
+[    39.336] (WW) modeset(0): Option "PrimaryGPU" is not used
+[    39.336] (II) modeset(0): [DRI2] Setup complete
+[    39.336] (II) modeset(0): [DRI2]   DRI driver: simpledrm
+[    39.336] (II) modeset(0): [DRI2]   VDPAU driver: simpledrm
+[    39.355] (II) Initializing extension MIT-SCREEN-SAVER
+[    39.361] (EE) AIGLX error: dlopen of /usr/lib/aarch64-linux-gnu/dri/simpledrm_dri.so failed (/usr/lib/aarch64-linux-gnu/dri/simpledrm_dri.so: cannot open shared object file: No such file or directory)
+[    39.361] (EE) AIGLX error: unable to load driver simpledrm
+[    39.436] (II) modeset(0): Damage tracking initialized
+[    39.436] (II) modeset(0): Setting screen physical size to 508 x 285
+[?2004hroot@hg680kd:~# 
+=== CMD: fastfetch --logo none ===
+fastfetch --logo none
+[?2004l[m[m[1m[37mroot[m@[1m[37mhg680kd[m
+------------
+[m[1m[31mOS[m: [mArmbian_community 26.11.0-trunk.137 trixie aarch64
+[m[1m[31mHost[m: [mFiberHome HG680KD (ARM64)
+[m[1m[31mKernel[m: [mLinux 7.3.5-hg680kd-arm64-armbian-usb
+[m[1m[31mUptime[m: [m3 mins
+[m[1m[31mPackages[m: [m1242 (dpkg)
+[m[1m[31mShell[m: [mbash 5.2.37
+[m[1m[31mDisplay (Unknown-1)[m: [m1920x1080 @ 60 Hz in 23"
+[m[1m[31mCursor[m: [mAdwaita
+[m[1m[31mTerminal[m: [m/dev/ttyAMA0
+[m[1m[31mTerminal Font[m: [mVGA default kernel font
+[m[1m[31mCPU[m: [mhi3798mv320 (4) @ 1.00 GHz
+[m[1m[31mGPU[m: [mArm mali-450 [Integrated]
+[m[1m[31mMemory[m: [m434.04 MiB / 1.93 GiB ([32m22%[m)
+[m[1m[31mSwap[m: [m0 B / 2.00 GiB ([32m0%[m)
+[m[1m[31mDisk (]8;;file:///\/]8;;\)[m: [m4.54 GiB / 27.17 GiB ([32m17%[m) - f2fs
+[m[1m[31mLocale[m: [men_US.UTF-8
+
+[m[40m   [41m   [42m   [43m   [44m   [45m   [46m   [47m   [m
+[5m[100m   [101m   [102m   [103m   [104m   [105m   [106m   [107m   [m
+[?2004hroot@hg680kd:~# 

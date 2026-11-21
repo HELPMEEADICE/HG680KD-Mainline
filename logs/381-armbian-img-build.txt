@@ -1,0 +1,231 @@
+=== 1. Allocate sparse image (30784094208 bytes) and create GPT ===
+Model:  (file)
+Disk /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img: 60125184s
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+Disk Flags: 
+
+Number  Start     End        Size       File system  Name          Flags
+ 1      2048s     1050623s   1048576s                HG680KD_BOOT  msftdata
+ 2      1050624s  3147775s   2097152s                HG680KD_SWAP  swap
+ 3      3147776s  60123135s  56975360s               HG680KD_ROOT
+
+Loop device: /dev/loop0
+=== 2. Format BOOT (FAT32), SWAP (1 GiB), ROOT (F2FS + compression) ===
+mkfs.fat 4.2 (2021-01-31)
+Setting up swapspace version 1, size = 1024 MiB (1073737728 bytes)
+LABEL=HG680KD_SWAP, UUID=b7681eee-33bc-42ce-a8e6-4a4820e892a3
+
+    F2FS-tools: mkfs.f2fs Ver: 1.17.0 (2026-09-24)
+
+Info: Debug level = 0
+Info: Label = HG680KD_ROOT
+Info: Trim is enabled
+Info: Enable Compression
+Info: Segments per section = 1
+Info: Sections per zone = 1
+Info: sector size = 512
+Info: total sectors = 56975360 (27820 MB)
+Info: block size = 4096
+Info: zone aligned segment0 blkaddr: 512
+Info: format version with
+  "Linux version 7.3.5-zen1-1-zen (linux-zen@archlinux) (gcc (GCC) 16.2.1 20260810, GNU ld (GNU Binutils) 2.47) #1 ZEN SMP PREEMPT_DYNAMIC Tue, 17 Nov 2026 22:28:55 +0000"
+Info: [/dev/loop0p3] Discarding device
+Info: This device doesn't support BLKSECDISCARD
+Info: Discarded 27820 MB
+Info: Overprovision ratio = 0.880%
+Info: Overprovision segments = 126 (GC reserved = 120)
+Info: format successful
+/dev/loop0p3 /mnt/hg680kd-root f2fs rw,lazytime,noatime,background_gc=on,gc_merge,discard,discard_unit=block,user_xattr,inline_xattr,acl,inline_data,inline_dentry,flush_merge,barrier,extent_cache,mode=adaptive,active_logs=6,alloc_mode=default,checkpoint_merge,fsync_mode=posix,compress_algorithm=zstd:6,compress_log_size=2,compress_chksum,compress_mode=fs,atgc,memory=normal,errors=continue,lookup_mode=perf 0 0
+--------c------------- /mnt/hg680kd-root
+=== 3. Extract Armbian rootfs onto F2FS(zstd) ===
+lrwxrwxrwx 1 root root 7 Jul 18 01:05 /mnt/hg680kd-root/lib -> usr/lib
+--------c--I------N--- /mnt/hg680kd-root/usr
+=== 4. Populate /boot (Partition 1 FAT32) ===
+f5e3173703253ff79cd4c9e329c9b57856a42e7cbdb745656c19ed8288f67b70  boot.img
+4236d445c9bcc41e0546f363b72d15c80207447121dcebfe64d096e0e92a11f2  Image
+9e0e8493ae63d54d5edf1f1dea30b8f9af5b69c9c641745a09c839636b163f08  hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs-usb.dtb
+=== 5. Install Linux 7.3.5 modules & RTL8761BTV firmware ===
+=== 6. Chroot customization (fastfetch, vim, kernel cleanup, config) ===
+(Reading database ... 120319 files and directories currently installed.)
+Removing linux-image-current-meson64 (26.11.0-trunk.137) ...
+Armbian 'linux-image-current-meson64' for '6.18.64-current-meson64': 'prerm' starting.
+Armbian 'linux-image-current-meson64' for '6.18.64-current-meson64': 'prerm' finishing.
+Armbian 'linux-image-current-meson64' for '6.18.64-current-meson64': 'postrm' starting.
+Armbian 'linux-image-current-meson64' for '6.18.64-current-meson64': 'postrm' finishing.
+Purging configuration files for linux-image-current-meson64 (26.11.0-trunk.137) ...
+Armbian 'linux-image-current-meson64' for '6.18.64-current-meson64': 'postrm' starting.
+Armbian 'linux-image-current-meson64' for '6.18.64-current-meson64': 'postrm' finishing.
+Removing linux-dtb-current-meson64 (26.11.0-trunk.137) ...
+Get:1 http://mirrors.tuna.tsinghua.edu.cn/debian trixie InRelease [140 kB]
+Get:2 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-updates InRelease [47.3 kB]
+Get:3 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports InRelease [54.0 kB]
+Get:4 http://mirrors.tuna.tsinghua.edu.cn/debian-security trixie-security InRelease [43.4 kB]
+Get:5 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/main arm64 Packages [13.2 MB]
+Get:6 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/main arm64 Contents (deb) [12.6 MB]
+Get:7 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/main all Contents (deb) [38.2 MB]
+Get:8 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/contrib arm64 Packages [58.0 kB]
+Get:9 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/contrib all Contents (deb) [134 kB]
+Get:10 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/contrib arm64 Contents (deb) [115 kB]
+Get:11 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/non-free arm64 Packages [91.6 kB]
+Get:12 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/non-free all Contents (deb) [831 kB]
+Get:13 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/non-free arm64 Contents (deb) [45.3 kB]
+Get:14 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/non-free-firmware arm64 Packages [7078 B]
+Get:15 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/non-free-firmware arm64 Contents (deb) [288 B]
+Get:16 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/non-free-firmware all Contents (deb) [27.0 kB]
+Get:17 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-updates/main arm64 Packages [1108 B]
+Get:18 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-updates/main all Contents (deb) [11.7 kB]
+Get:19 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/main arm64 Packages [317 kB]
+Get:20 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/main arm64 Contents (deb) [3731 kB]
+Get:21 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/main all Contents (deb) [5075 kB]
+Get:22 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/contrib arm64 Packages [7908 B]
+Get:23 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/contrib all Contents (deb) [23.8 kB]
+Get:24 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/contrib arm64 Contents (deb) [23.6 kB]
+Get:25 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/non-free arm64 Packages [7308 B]
+Get:26 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/non-free arm64 Contents (deb) [6515 B]
+Get:27 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/non-free all Contents (deb) [35.0 kB]
+Get:28 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/non-free-firmware arm64 Packages [7368 B]
+Get:29 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/non-free-firmware arm64 Contents (deb) [184 B]
+Get:30 http://mirrors.tuna.tsinghua.edu.cn/debian trixie-backports/non-free-firmware all Contents (deb) [39.1 kB]
+Get:31 http://mirrors.tuna.tsinghua.edu.cn/debian-security trixie-security/main arm64 Packages [309 kB]
+Get:32 http://mirrors.tuna.tsinghua.edu.cn/debian-security trixie-security/contrib arm64 Packages [3152 B]
+Fetched 75.3 MB in 49s (1539 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  libyyjson0 vim-common vim-runtime
+Suggested packages:
+  ctags vim-doc vim-scripts
+Recommended packages:
+  xxd
+The following NEW packages will be installed:
+  fastfetch libyyjson0 vim vim-common vim-runtime
+0 upgraded, 5 newly installed, 0 to remove and 21 not upgraded.
+Need to get 9669 kB of archives.
+After this operation, 47.4 MB of additional disk space will be used.
+Get:1 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/main arm64 vim-common all 2:9.1.1230-2+deb13u2 [421 kB]
+Get:2 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/main arm64 libyyjson0 arm64 0.10.0+ds-1+b1 [84.3 kB]
+Get:3 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/main arm64 fastfetch arm64 2.40.4+dfsg-1 [506 kB]
+Get:4 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/main arm64 vim-runtime all 2:9.1.1230-2+deb13u2 [7129 kB]
+Get:5 http://mirrors.tuna.tsinghua.edu.cn/debian trixie/main arm64 vim arm64 2:9.1.1230-2+deb13u2 [1528 kB]
+Fetched 9669 kB in 1s (11.4 MB/s)
+Selecting previously unselected package vim-common.
+
+(Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 114767 files and directories currently installed.)
+
+Preparing to unpack .../vim-common_2%3a9.1.1230-2+deb13u2_all.deb ...
+
+Unpacking vim-common (2:9.1.1230-2+deb13u2) ...
+
+Selecting previously unselected package libyyjson0:arm64.
+
+Preparing to unpack .../libyyjson0_0.10.0+ds-1+b1_arm64.deb ...
+
+Unpacking libyyjson0:arm64 (0.10.0+ds-1+b1) ...
+
+Selecting previously unselected package fastfetch.
+
+Preparing to unpack .../fastfetch_2.40.4+dfsg-1_arm64.deb ...
+
+Unpacking fastfetch (2.40.4+dfsg-1) ...
+
+Selecting previously unselected package vim-runtime.
+
+Preparing to unpack .../vim-runtime_2%3a9.1.1230-2+deb13u2_all.deb ...
+
+Adding 'diversion of /usr/share/vim/vim91/doc/help.txt to /usr/share/vim/vim91/doc/help.txt.vim-tiny by vim-runtime'
+
+Adding 'diversion of /usr/share/vim/vim91/doc/tags to /usr/share/vim/vim91/doc/tags.vim-tiny by vim-runtime'
+
+Unpacking vim-runtime (2:9.1.1230-2+deb13u2) ...
+
+Selecting previously unselected package vim.
+
+Preparing to unpack .../vim_2%3a9.1.1230-2+deb13u2_arm64.deb ...
+
+Unpacking vim (2:9.1.1230-2+deb13u2) ...
+
+Setting up vim-common (2:9.1.1230-2+deb13u2) ...
+
+Setting up libyyjson0:arm64 (0.10.0+ds-1+b1) ...
+
+Setting up vim-runtime (2:9.1.1230-2+deb13u2) ...
+
+Setting up fastfetch (2.40.4+dfsg-1) ...
+
+Setting up vim (2:9.1.1230-2+deb13u2) ...
+
+update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/ex (ex) in auto mode
+
+update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/rview (rview) in auto mode
+
+update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/rvim (rvim) in auto mode
+
+update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vi (vi) in auto mode
+
+update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/view (view) in auto mode
+
+update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vim (vim) in auto mode
+
+update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vimdiff (vimdiff) in auto mode
+
+Processing triggers for hicolor-icon-theme (0.18-2) ...
+
+Processing triggers for libc-bin (2.41-12+deb13u4) ...
+
+Processing triggers for man-db (2.13.1-1) ...
+
+Processing triggers for desktop-file-utils (0.28-1) ...
+
+fastfetch 2.40.4-debug (aarch64)
+=== 7. Remove Amlogic leftovers and configure HG680KD ===
+ssh-keygen: generating new host keys: RSA ECDSA ED25519 
+=== 8. Verify F2FS compression & clean unmount ===
+--------c------------- /mnt/hg680kd-root/usr/bin/fastfetch
+--------c------------- /mnt/hg680kd-root/etc/fstab
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/loop0p3     28G  4.6G   23G  17% /mnt/hg680kd-root
+/dev/loop0p3     28G  4.6G   23G  17% /mnt/hg680kd-root
+Info: Use default preen mode
+Info: MKFS version
+  "Linux version 7.3.5-zen1-1-zen (linux-zen@archlinux) (gcc (GCC) 16.2.1 20260810, GNU ld (GNU Binutils) 2.47) #1 ZEN SMP PREEMPT_DYNAMIC Tue, 17 Nov 2026 22:28:55 +0000"
+Info: FSCK version
+  from "Linux version 7.3.5-zen1-1-zen (linux-zen@archlinux) (gcc (GCC) 16.2.1 20260810, GNU ld (GNU Binutils) 2.47) #1 ZEN SMP PREEMPT_DYNAMIC Tue, 17 Nov 2026 22:28:55 +0000"
+    to "Linux version 7.3.5-zen1-1-zen (linux-zen@archlinux) (gcc (GCC) 16.2.1 20260810, GNU ld (GNU Binutils) 2.47) #1 ZEN SMP PREEMPT_DYNAMIC Tue, 17 Nov 2026 22:28:55 +0000"
+Info: superblock features = 2828 :  extra_attr inode_checksum sb_checksum compression
+Info: superblock encrypt level = 0, salt = 00000000000000000000000000000000
+Info: Segments per section = 1
+Info: Sections per zone = 1
+Info: total FS sectors = 56975360 (27820 MB)
+Info: CKPT version = 3beb787f
+Info: Casefold: linear_lookup [enable]
+Info: checkpoint state = 145 :  trimmed crc compacted_summary unmount
+Info: No error was reported
+=== 9. Compress disk image with zstd ===
+-rw-r--r-- 1 root root  29G Nov 22 02:53 /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img
+-rw-r--r-- 1 root root 1.4G Nov 22 02:53 /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img.zst
+15ac293611c5265662e31e59490774fd0402716261a582dcc8218e2c4e1023d8  /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img
+ced25df23635a1c7e703872bbe9b90342609cea57d279a6e649e6955ba3eb1e1  /home/hedc/hg680kd-mainline/out/hg680kd-armbian-xfce-f2fs.img.zst

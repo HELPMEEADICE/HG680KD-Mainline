@@ -1,0 +1,13 @@
+<INTERRUPT>
+fastboot#usb start
+fastboot#setenv bootm_low 0x02000000
+fastboot#setenv bootm_size 0x10000000
+fastboot#fatload usb 0:1 0x03000000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#setenv bootm_low
+fastboot#setenv bootm_size
+fastboot#fatsize usb 0:1 boot.img
+fastboot#printenv filesize
+filesize=e8a048
+fastboot#

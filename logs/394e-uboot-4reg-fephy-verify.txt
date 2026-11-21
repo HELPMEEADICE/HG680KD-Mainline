@@ -1,0 +1,29 @@
+<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#mw.l f8a220cc 0
+fastboot#
+>>> mw.l f8a220cc 0
+mw.l f8a220d0 100010
+fastboot#
+>>> mw.l f8a220d0 100010
+mw.l f8a22388 1
+fastboot#
+>>> mw.l f8a22388 1
+mw.l f8a223bc 10
+fastboot#
+>>> mw.l f8a223bc 10
+mw.l f984300c 1f
+fastboot#
+>>> mw.l f984300c 1f
+mii read 1 2
+0000
+fastboot#
+>>> mii read 1 2
+mii read 1 3
+9908
+fastboot#
+>>> mii read 1 3

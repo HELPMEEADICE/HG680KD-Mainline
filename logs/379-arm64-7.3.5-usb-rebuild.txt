@@ -1,0 +1,142 @@
+make: Entering directory '/home/hedc/hg680kd-mainline/source/linux-7.3.5'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb'
+/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb/arm64.config:233:warning: override: reassigning to symbol BT_HCIUART
+#
+# configuration written to .config
+#
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb'
+make: Leaving directory '/home/hedc/hg680kd-mainline/source/linux-7.3.5'
+make: Entering directory '/home/hedc/hg680kd-mainline/source/linux-7.3.5'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb'
+#
+# No change to .config
+#
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb'
+make: Leaving directory '/home/hedc/hg680kd-mainline/source/linux-7.3.5'
+make: Entering directory '/home/hedc/hg680kd-mainline/source/linux-7.3.5'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb'
+  SYNC    include/config/auto.conf
+  DTC     arch/arm64/boot/dts/hisilicon/hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs-usb.dtb
+  CC      drivers/regulator/hi3798mv320-cpu-regulator.o
+  CC      drivers/clk/hisilicon/crg-hi3798mv320-reset.o
+  CC      drivers/block/zram/zram_drv.o
+  CC      drivers/usb/host/xhci-hi3798mv320.o
+  AR      drivers/bluetooth/built-in.a
+  CC      drivers/mmc/host/sdhci-hi3798mv320.o
+  CC      drivers/thermal/hi3798mv320-thermal.o
+  CC [M]  drivers/bluetooth/hci_ldisc.o
+  CC [M]  lib/crc/crc-ccitt.o
+  AR      lib/crc/built-in.a
+  CC [M]  drivers/bluetooth/hci_serdev.o
+  CC [M]  drivers/bluetooth/hci_h5.o
+  CC [M]  drivers/bluetooth/btusb.o
+  CC [M]  drivers/bluetooth/btrtl.o
+  UPD     kernel/config_data
+  GZIP    kernel/config_data.gz
+  CC      kernel/configs.o
+  CC      fs/f2fs/dir.o
+  CC      fs/f2fs/file.o
+  CC      fs/f2fs/inode.o
+  CC      fs/f2fs/namei.o
+  CC      fs/f2fs/hash.o
+  CC      fs/f2fs/super.o
+  CC      fs/f2fs/inline.o
+  CC      fs/f2fs/checkpoint.o
+  CC      fs/f2fs/gc.o
+  CC      fs/f2fs/data.o
+  CC      fs/f2fs/node.o
+  CC      fs/f2fs/segment.o
+  CC      fs/f2fs/recovery.o
+  CC      fs/f2fs/shrinker.o
+  CC      fs/f2fs/extent_cache.o
+  AR      drivers/usb/host/built-in.a
+  AR      drivers/usb/built-in.a
+  CC      fs/f2fs/sysfs.o
+  AR      lib/built-in.a
+  AR      drivers/thermal/built-in.a
+  CC      fs/f2fs/debug.o
+  CC      fs/f2fs/xattr.o
+  AR      kernel/built-in.a
+  CC      fs/f2fs/acl.o
+  AR      drivers/clk/hisilicon/built-in.a
+  AR      drivers/clk/built-in.a
+  CC      fs/f2fs/compress.o
+  AR      drivers/regulator/built-in.a
+  CC      fs/f2fs/iostat.o
+  AR      drivers/mmc/host/built-in.a
+  AR      drivers/mmc/built-in.a
+  LD [M]  drivers/bluetooth/hci_uart.o
+  AR      drivers/block/zram/built-in.a
+  AR      drivers/block/built-in.a
+  AR      drivers/built-in.a
+  AR      fs/f2fs/built-in.a
+  AR      fs/built-in.a
+  AR      built-in.a
+  AR      built-in-fixup.a
+  COPY    vmlinux.a
+  LD      vmlinux.o
+  MODPOST Module.symvers
+  CC      .vmlinux.export.o
+  CC [M]  lib/crc/crc-ccitt.mod.o
+  CC [M]  drivers/bluetooth/hci_uart.mod.o
+  LD [M]  drivers/bluetooth/btusb.ko
+  CC [M]  drivers/bluetooth/btrtl.mod.o
+  LD [M]  drivers/bluetooth/hci_uart.ko
+  LD [M]  lib/crc/crc-ccitt.ko
+  LD [M]  drivers/bluetooth/btrtl.ko
+  KSYMS   .tmp_vmlinux0.kallsyms.S
+  AS      .tmp_vmlinux0.kallsyms.o
+  LD      .tmp_vmlinux1
+  NM      .tmp_vmlinux1.syms
+  KSYMS   .tmp_vmlinux1.kallsyms.S
+  AS      .tmp_vmlinux1.kallsyms.o
+  LD      .tmp_vmlinux2
+  NM      .tmp_vmlinux2.syms
+  KSYMS   .tmp_vmlinux2.kallsyms.S
+  AS      .tmp_vmlinux2.kallsyms.o
+  LD      vmlinux.unstripped
+  NM      System.map
+  SORTTAB vmlinux.unstripped
+  GEN     modules.builtin.modinfo
+  OBJCOPY vmlinux
+  GEN     modules.builtin
+  OBJCOPY arch/arm64/boot/Image
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb'
+make: Leaving directory '/home/hedc/hg680kd-mainline/source/linux-7.3.5'
+make: Entering directory '/home/hedc/hg680kd-mainline/source/linux-7.3.5'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb'
+  SYMLINK /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/build
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/modules.order
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/modules.builtin
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/modules.builtin.modinfo
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/fs/exfat/exfat.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/fs/ntfs3/ntfs3.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/fs/fuse/fuse.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/fs/overlayfs/overlay.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/lib/crc/crc-ccitt.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/usb/storage/uas.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/usb/class/cdc-acm.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/usb/serial/usbserial.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/usb/serial/ch341.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/usb/serial/cp210x.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/usb/serial/ftdi_sio.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/bluetooth/hci_uart.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/bluetooth/btusb.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/bluetooth/btintel.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/drivers/bluetooth/btrtl.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/netfilter/nf_conntrack.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/netfilter/nf_nat.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/netfilter/nf_tables.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/netfilter/nft_ct.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/netfilter/nft_nat.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/netfilter/nft_chain_nat.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/netfilter/x_tables.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/netfilter/xt_tcpudp.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/ipv4/netfilter/nf_defrag_ipv4.ko
+  INSTALL /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb/kernel/net/ipv6/netfilter/nf_defrag_ipv6.ko
+  DEPMOD  /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/rootfs-mods/lib/modules/7.3.5-hg680kd-arm64-armbian-usb
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/arm64-7.3.5-armbian-usb'
+make: Leaving directory '/home/hedc/hg680kd-mainline/source/linux-7.3.5'
+-rw-r--r-- 1 hedc hedc  15M Nov 22 02:48 /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb.tar.gz
+-rw-r--r-- 1 hedc hedc  15M Nov 22 02:48 /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/Image
+-rw-r--r-- 1 hedc hedc 7.6K Nov 22 02:48 /home/hedc/hg680kd-mainline/out/release-arm64-7.3.5-armbian-usb/hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs-usb.dtb

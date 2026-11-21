@@ -1,0 +1,75 @@
+
+=== CMD: findmnt /; findmnt /boot; cat /etc/fstab ===
+findmnt /; findmnt /boot; cat /etc/fstab
+[?2004lTARGET SOURCE FSTYPE OPTIONS
+/      /dev/sda3
+              f2fs   rw,noatime,lazytime,background_gc=on,gc_merge,nodiscard,use
+TARGET SOURCE  FSTYPE OPTIONS
+/boot  /dev/sda1
+               vfat   rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=i
+PARTLABEL=HG680KD_ROOT  /      f2fs  defaults,compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime,noatime  0 1
+PARTLABEL=HG680KD_BOOT  /boot  vfat  defaults,umask=0022  0 2
+PARTLABEL=HG680KD_SWAP  none   swap  sw,pri=10  0 0
+tmpfs                   /tmp   tmpfs defaults,nosuid,nodev 0 0
+[?2004hroot@hg680kd:~# 
+=== CMD: nmcli dev status; nmcli con show; cat /sys/class/net/eth0/operstate /sys/class/net/eth0/carrier 2>&1 ===
+nmcli dev status; nmcli con show; cat /sys/class/net/eth0/operst ate /sys/class/net/eth0/carrier 2>&1
+[?2004lDEVICE  TYPE      STATE                   CONNECTION 
+[32;2mlo[0m      [32;2mloopback[0m  [32;2mconnected (externally)[0m  [32;2mlo[0m         
+[2meth0[0m    [2methernet[0m  [2munavailable[0m             [2m--[0m         
+NAME                UUID                                  TYPE      DEVICE [m
+[32;2mlo[0m                  [32;2m2657ec08-9fb3-4baf-a690-ca0d95ff4d37[0m  [32;2mloopback[0m  [32;2mlo[0m     [m
+Wired connection 1  4a394e7c-0c42-385d-a66d-43327aa26318  ethernet  --     [m
+[Kdown
+0
+[?2004hroot@hg680kd:~# 
+=== CMD: cat /sys/class/thermal/thermal_zone0/temp; cat /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq; cat /sys/class/mmc_host/mmc0/mmc0:*/../../*/block/mmcblk0/ro /sys/block/mmcblk0/ro ===
+cat /sys/class/thermal/thermal_zone0/temp; cat /sys/devices/syst em/cpu/cpufreq/policy0/scaling_cur_freq; cat /sys/class/mmc_host/mmc0/mmc0:*/../ ../*/block/mmcblk0/ro /sys/block/mmcblk0/ro
+[?2004l52000
+800000
+cat: '/sys/class/mmc_host/mmc0/mmc0:*/../../*/block/mmcblk0/ro': No such file or directory
+1
+[?2004hroot@hg680kd:~# 
+=== CMD: dmesg | grep -E 'lima|mmc0|bluetooth|hisi-gmac|tsensor|simple-framebuffer|f2fs' | tail -n 40 ===
+dmesg | grep -E 'lima|mmc0|bluetooth|hisi-gmac|tsensor|simple-framebuffer|f2fs' | tail -n 40
+[?2004l[    0.454253] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 1
+[    0.515089] mmc0: SDHCI controller on f9830000.mmc [f9830000.mmc] using ADMA
+[    0.823869] mmc0: new HS400 Enhanced strobe MMC card at address 0001
+[    0.826525] mmcblk0: mmc0:0001 B10030 7.28 GiB (ro)
+[    0.839692] mmcblk0rpmb: mmc0:0001 B10030 4.00 MiB, chardev (253:0)
+[    2.103245] F2FS-fs (sda3): f2fs_recover_fsync_data: recovery fsync data, check_only: 0
+[    2.119806] VFS: Mounted root (f2fs filesystem) readonly on device 8:3.
+[   31.840657] hisi-gmac f9840000.ethernet eth0: Link is Down
+[   46.065341] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.065387] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.065511] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.065536] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.065608] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   46.065632] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   46.094293] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.094338] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.099363] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.099407] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.099550] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   46.099577] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   46.104722] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.104764] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.107165] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   46.107205] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   46.109149] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.109186] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.109516] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.109540] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.109617] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   46.109638] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   46.114054] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.114089] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.114284] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.114303] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   56.163386] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   56.163498] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   58.366507] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   58.366548] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   58.366623] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   58.366643] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[?2004hroot@hg680kd:~# 

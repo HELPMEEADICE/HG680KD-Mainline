@@ -1,0 +1,75 @@
+
+=== CMD: date; ls -la /etc/X11/xorg.conf.d/; cat /etc/X11/xorg.conf.d/* 2>/dev/null; ps -ef | grep -E 'Xorg|xfce4-terminal|xfwm4' | grep -v grep; tail -n 30 /var/log/Xorg.0.log; tail -n 25 /home/hg680kd/.xsession-errors 2>/dev/null || true ===
+date; ls -la /etc/X11/xorg.conf.d/; cat /etc/X11/xorg.conf.d/* 2>/dev/null; ps -ef | grep -E 'Xorg|xfce4-terminal|xfwm4' | grep -v grep; tail -n 30 /var/log/Xorg.0.log; tail -n 25 /home/hg680kd/.xsession-errors 2>/dev/null | | true
+[?2004lFri Nov 20 07:44:39 PM UTC 2026
+total 15
+drwxr-xr-x 2 root root 3452 Nov 20 19:38 [0m[01;34m.[0m
+drwxr-xr-x 9 root root 3452 Nov 19 06:06 [01;34m..[0m
+-rw-r--r-- 1 root root   25 Nov 20 18:27 01-armbian-defaults.conf
+-rw-r--r-- 1 root root  144 Nov 21  2026 02-driver.conf
+# Default Armbian config
+Section "OutputClass"
+    Identifier "SimpleDRM"
+    MatchDriver "simpledrm"
+    Driver "modesetting"
+    Option "PrimaryGPU" "true"
+EndSection
+root         577     524  0 19:37 tty7     00:00:03 /usr/lib/xorg/Xorg :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+hg680kd      936     694  0 19:37 ?        00:00:01 xfwm4
+root        1403     666  2 19:43 ?        00:00:01 xfce4-terminal --geometry=100x34 --hold -e fastfetch
+[    39.348] (II) Initializing extension XKEYBOARD
+[    39.349] (II) Initializing extension XC-MISC
+[    39.350] (II) Initializing extension SECURITY
+[    39.350] (II) Initializing extension XFIXES
+[    39.351] (II) Initializing extension RENDER
+[    39.352] (II) Initializing extension RANDR
+[    39.353] (II) Initializing extension COMPOSITE
+[    39.354] (II) Initializing extension DAMAGE
+[    39.355] (II) Initializing extension MIT-SCREEN-SAVER
+[    39.355] (II) Initializing extension DOUBLE-BUFFER
+[    39.356] (II) Initializing extension RECORD
+[    39.357] (II) Initializing extension DPMS
+[    39.357] (II) Initializing extension Present
+[    39.358] (II) Initializing extension DRI3
+[    39.359] (II) Initializing extension X-Resource
+[    39.359] (II) Initializing extension XVideo
+[    39.360] (II) Initializing extension XVideo-MotionCompensation
+[    39.360] (II) Initializing extension SELinux
+[    39.360] (II) SELinux: Disabled on system
+[    39.360] (II) Initializing extension GLX
+[    39.361] (EE) AIGLX error: dlopen of /usr/lib/aarch64-linux-gnu/dri/simpledrm_dri.so failed (/usr/lib/aarch64-linux-gnu/dri/simpledrm_dri.so: cannot open shared object file: No such file or directory)
+[    39.361] (EE) AIGLX error: unable to load driver simpledrm
+[    39.432] (II) IGLX: Loaded and initialized swrast
+[    39.432] (II) GLX: Initialized DRISWRAST GL provider for screen 0
+[    39.432] (II) Initializing extension XFree86-VidModeExtension
+[    39.433] (II) Initializing extension XFree86-DGA
+[    39.434] (II) Initializing extension XFree86-DRI
+[    39.434] (II) Initializing extension DRI2
+[    39.436] (II) modeset(0): Damage tracking initialized
+[    39.436] (II) modeset(0): Setting screen physical size to 508 x 285
+(wrapper-2.0:1125): dbind-WARNING **: 19:37:30.988: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+
+(wrapper-2.0:1126): dbind-WARNING **: 19:37:31.086: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+
+(light-locker:1142): dbind-WARNING **: 19:37:32.121: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+
+(polkit-mate-authentication-agent-1:1148): dbind-WARNING **: 19:37:32.233: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+
+(polkit-mate-authentication-agent-1:1148): GLib-CRITICAL **: 19:37:32.387: g_variant_new_string: assertion 'string != NULL' failed
+
+(xfce4-power-manager:1149): dbind-WARNING **: 19:37:32.390: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+
+(polkit-mate-authentication-agent-1:1148): polkit-mate-1-WARNING **: 19:37:32.396: Failed to register client: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.gnome.SessionManager was not provided by any .service files
+
+(xfsettingsd:1153): dbind-WARNING **: 19:37:32.495: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+
+(nm-applet:1155): dbind-WARNING **: 19:37:32.625: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+
+** (xfpm-power-backlight-helper:1217): WARNING **: 19:37:33.886: failed to find any devices: Error opening directory ?/sys/class/backlight?: No such file or directory
+
+(blueman-applet:1156): dbind-WARNING **: 19:37:35.615: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+blueman-applet 19.37.37 WARNING  PluginManager:153 __load_plugin: Not loading PPPSupport because its conflict has higher priority
+blueman-applet 19.37.37 WARNING  PluginManager:153 __load_plugin: Not loading DhcpClient because its conflict has higher priority
+
+(blueman-tray:1281): dbind-WARNING **: 19:37:38.962: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+[?2004hroot@hg680kd:~# 

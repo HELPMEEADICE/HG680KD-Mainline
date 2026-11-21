@@ -1,0 +1,72 @@
+=== UNAME & VERSION ===
+Linux hg680kd 7.3.5-hg680kd-arm64-armbian-usb #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64 GNU/Linux
+Linux version 7.3.5-hg680kd-arm64-armbian-usb (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+=== F2FS & BOOT ===
+/ /dev/sda3 f2fs rw,noatime,lazytime,background_gc=on,gc_merge,nodiscard,user_xattr,inline_xattr,acl,inline_data,inline_dentry,noflush_merge,barrier,extent_cache,mode=adaptive,active_logs=6,alloc_mode=default,checkpoint_merge,fsync_mode=posix,compress_algorithm=zstd:6,compress_log_size=2,compress_chksum,compress_mode=fs,atgc,memory=normal,errors=continue,lookup_mode=perf
+/boot /dev/sda1 vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro
+  - Compressed Inode: 3118, Blocks: 79897
+=== ZRAM & SWAP ===
+NAME       ALGORITHM DISKSIZE DATA COMPR TOTAL STREAMS MOUNTPOINT
+/dev/zram0 zstd            1G   4K   71B   20K         [SWAP]
+NAME       TYPE       SIZE USED PRIO
+/dev/zram0 partition 1024M   0B  100
+/dev/sda2  partition 1024M   0B   10
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       464Mi       1.1Gi        36Mi       433Mi       1.5Gi
+Swap:          2.0Gi          0B       2.0Gi
+vm.swappiness = 100
+=== NETWORK & BT ===
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0             UP             192.168.6.125/24 240e:3a2:ac02:4840:894e:7df8:ac96:1ee5/64 fde4:7f58:b6df:0:b4b:dc24:4a64:5f31/64 fe80::8453:5ef4:566:180b/64 
+	Speed: 100Mb/s
+	Duplex: Full
+	Auto-negotiation: on
+	Link detected: yes
+0x20669908
+Controller 00:E0:4C:23:99:87 hg680kd [default]
+active
+active
+active
+active
+=== THERMAL & DVFS ===
+58000
+CPU_SET 200000 -> 200000
+CPU_SET 600000 -> 600000
+CPU_SET 1000000 -> 1000000
+CPU_GOV=schedutil
+GPU_SET 300000000 -> 300000000
+GPU_SET 200000000 -> 200000000
+GPU_GOV=simple_ondemand
+=== EMMC ===
+1
+clock:		192000000 Hz
+actual clock:	192000000 Hz
+bus width:	3 (8 bits)
+timing spec:	10 (mmc HS400 enhanced strobe)
+signal voltage:	1 (1.80 V)
+a4c12bc4d82e15b1f79586c8059673bcfad541e633ce05db7537265989af1192  -
+=== FASTFETCH ===
+root@hg680kd
+------------
+OS: Armbian_community 26.11.0-trunk.137 trixie aarch64
+Host: FiberHome HG680KD (ARM64)
+Kernel: Linux 7.3.5-hg680kd-arm64-armbian-usb
+Uptime: 2 mins
+Packages: 1242 (dpkg)
+Shell: sshd-session: root@notty
+Display (Unknown-1): 1920x1080 @ 60 Hz in 23"
+Cursor: Adwaita
+Terminal: 
+CPU: hi3798mv320 (4) @ 1.00 GHz
+GPU: Arm mali-450 [Integrated]
+Memory: 486.54 MiB / 1.93 GiB (25%)
+Swap: 0 B / 2.00 GiB (0%)
+Disk (/): 4.61 GiB / 27.17 GiB (17%) - f2fs
+Local IP (eth0): 192.168.6.125/24
+Locale: en_US.UTF-8
+
+[40m   [41m   [42m   [43m   [44m   [45m   [46m   [47m   [m
+[100m   [101m   [102m   [103m   [104m   [105m   [106m   [107m   [m
+
+=== USER SSH ===
+uid=1000(hg680kd) gid=1000(hg680kd) groups=1000(hg680kd),4(adm),20(dialout),24(cdrom),27(sudo),29(audio),30(dip),44(video),46(plugdev),105(netdev),107(bluetooth),991(render),995(input)

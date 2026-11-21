@@ -1,0 +1,138 @@
+
+=== CMD: XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 glxinfo -B 2>&1 ===
+XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 glxinfo -B 2>&1
+[?2004lname of display: :0
+display: :0  screen: 0
+direct rendering: Yes
+Extended renderer info (GLX_MESA_query_renderer):
+    Vendor: Mesa (0x13b5)
+    Device: Mali450 (0xffffffff)
+    Version: 27.0.0
+    Accelerated: yes
+    Video memory: 0MB
+    Unified memory: yes
+    Preferred profile: compat (0x2)
+    Max core profile version: 0.0
+    Max compat profile version: 2.1
+    Max GLES1 profile version: 1.1
+    Max GLES[23] profile version: 2.0
+OpenGL vendor string: Mesa
+OpenGL renderer string: Mali450
+OpenGL version string: 2.1 Mesa 27.0.0~git202610251245.e737139f66-1+armbian1.1~trixie
+OpenGL shading language version string: 1.20
+
+OpenGL ES profile version string: OpenGL ES 2.0 Mesa 27.0.0~git202610251245.e737139f66-1+armbian1.1~trixie
+OpenGL ES profile shading language version string: OpenGL ES GLSL ES 1.0.16
+
+[?2004hroot@hg680kd:~# 
+=== CMD: XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 es2_info 2>&1 | head -n 30 ===
+XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 es2_info 2>&1 | head -n 30
+[?2004lEGL_VERSION: 1.5
+EGL_VENDOR: Mesa Project
+EGL_EXTENSIONS:
+    EGL_ANDROID_blob_cache, EGL_ANDROID_native_fence_sync, 
+    EGL_CHROMIUM_sync_control, EGL_ANGLE_sync_control_rate, 
+    EGL_EXT_buffer_age, EGL_EXT_config_select_group, 
+    EGL_EXT_image_dma_buf_import, EGL_EXT_image_dma_buf_import_modifiers, 
+    EGL_EXT_surface_compression, EGL_EXT_swap_buffers_with_damage, 
+    EGL_KHR_cl_event2, EGL_KHR_config_attribs, EGL_KHR_context_flush_control, 
+    EGL_KHR_create_context, EGL_KHR_create_context_no_error, 
+    EGL_KHR_fence_sync, EGL_KHR_get_all_proc_addresses, EGL_KHR_gl_colorspace, 
+    EGL_KHR_gl_renderbuffer_image, EGL_KHR_gl_texture_2D_image, 
+    EGL_KHR_gl_texture_3D_image, EGL_KHR_gl_texture_cubemap_image, 
+    EGL_KHR_image, EGL_KHR_image_base, EGL_KHR_image_pixmap, 
+    EGL_KHR_no_config_context, EGL_KHR_partial_update, EGL_KHR_reusable_sync, 
+    EGL_KHR_surfaceless_context, EGL_KHR_swap_buffers_with_damage, 
+    EGL_EXT_pixel_format_float, EGL_KHR_wait_sync, 
+    EGL_MESA_configless_context, EGL_MESA_gl_interop, 
+    EGL_MESA_image_dma_buf_export, EGL_MESA_query_driver, 
+    EGL_MESA_x11_native_visual_id, EGL_NOK_texture_from_pixmap
+EGL_CLIENT_APIS: OpenGL OpenGL_ES 
+GL_VENDOR: Mesa
+GL_VERSION: OpenGL ES 2.0 Mesa 27.0.0~git202610251245.e737139f66-1+armbian1.1~trixie
+GL_SHADING_LANGUAGE_VERSION: OpenGL ES GLSL ES 1.0.16
+GL_RENDERER: Mal[  328.308504] lima f9200000.gpu: pp0 error irq state=201 status=40
+i450
+GL_EXTENSI[  328.308609] lima f9200000.gpu: pp1 error irq state=201 status=40
+ONS:
+    GL_EXT_blend_minmax, GL_EXT_multi_draw_arrays, 
+    GL_EXT_texture_filter_anisotropic, GL_EXT_texture_compression_s3tc, 
+    GL_EXT_texture_compression_dxt1, GL_EXT_texture_format_BGRA8888, 
+    GL_OES_compressed_ETC1_RGB8_texture, GL_OES_depth24, 
+[?2004hroot@hg680kd:~# 
+=== CMD: ls -la /sys/devices/system/cpu/cpufreq/policy0 /sys/devices/platform/soc/f9200000.gpu/devfreq/* 2>&1 ===
+ls -la /sys/devices/system/cpu/cpufreq/policy0 /sys/devices/platform/soc/f9200000.gpu/devfreq/* 2>&1
+[?2004l/sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu:
+total 0
+drwxr-xr-x 3 root root    0 Nov 20 19:36 [0m[01;34m.[0m
+drwxr-xr-x 3 root root    0 Nov 20 19:36 [01;34m..[0m
+-r--r--r-- 1 root root 4096 Nov 20 19:42 available_frequencies
+-r--r--r-- 1 root root 4096 Nov 20 19:42 available_governors
+-r--r--r-- 1 root root 4096 Nov 20 19:42 cur_freq
+lrwxrwxrwx 1 root root    0 Nov 20 19:42 [01;36mdevice[0m -> [01;34m../../../f9200000.gpu[0m
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 governor
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 max_freq
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 min_freq
+-r--r--r-- 1 root root 4096 Nov 20 19:42 name
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 polling_interval
+drwxr-xr-x 2 root root    0 Nov 20 19:42 [01;34mpower[0m
+lrwxrwxrwx 1 root root    0 Nov 20 19:36 [01;36msubsystem[0m -> [01;34m../../../../../../class/devfreq[0m
+-r--r--r-- 1 root root 4096 Nov 20 19:42 target_freq
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 timer
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 trans_stat
+-rw-r--r-- 1 root root 4096 Nov 20 19:36 uevent
+
+/sys/devices/system/cpu/cpufreq/policy0:
+total 0
+drwxr-xr-x 2 root root    0 Nov 20 19:39 [01;34m.[0m
+drwxr-xr-x 4 root root    0 Nov 20 19:39 [01;34m..[0m
+-r--r--r-- 1 root root 4096 Nov 20 19:42 affected_cpus
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 boost
+-r-------- 1 root root 4096 Nov 20 19:42 cpuinfo_cur_freq
+-r--r--r-- 1 root root 4096 Nov 20 19:39 cpuinfo_max_freq
+-r--r--r-- 1 root root 4096 Nov 20 19:42 cpuinfo_min_freq
+-r--r--r-- 1 root root 4096 Nov 20 19:42 cpuinfo_transition_latency
+-r--r--r-- 1 root root 4096 Nov 20 19:42 related_cpus
+-r--r--r-- 1 root root 4096 Nov 20 19:41 scaling_available_frequencies
+-r--r--r-- 1 root root 4096 Nov 20 19:42 scaling_available_governors
+-r--r--r-- 1 root root 4096 Nov 20 19:42 scaling_boost_frequencies
+-r--r--r-- 1 root root 4096 Nov 20 19:40 scaling_cur_freq
+-r--r--r-- 1 root root 4096 Nov 20 19:42 scaling_driver
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 scaling_governor
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 scaling_max_freq
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 scaling_min_freq
+-rw-r--r-- 1 root root 4096 Nov 20 19:42 scaling_setspeed
+[?2004hroot@hg680kd:~# 
+=== CMD: dmesg | grep -E 'lima|thermal|dvdd|cpu_supply|cpufreq' | tail -n 30 ===
+dmesg | grep -E 'lima|thermal|dvdd|cpu_supply|cpufreq' | tail -n 30
+[?2004l[   46.065608] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   46.065632] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   46.094293] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.094338] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.099363] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.099407] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.099550] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   46.099577] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   46.104722] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.104764] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.107165] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   46.107205] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   46.109149] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.109186] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.109516] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.109540] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.109617] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   46.109638] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   46.114054] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.114089] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   46.114284] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   46.114303] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   56.163386] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   56.163498] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[   58.366507] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   58.366548] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   58.366623] lima f9200000.gpu: pp0 task error 0 int_state=0 status=0
+[   58.366643] lima f9200000.gpu: pp1 task error 1 int_state=0 status=0
+[  328.308504] lima f9200000.gpu: pp0 error irq state=201 status=40
+[  328.308609] lima f9200000.gpu: pp1 error irq state=201 status=40
+[?2004hroot@hg680kd:~# 

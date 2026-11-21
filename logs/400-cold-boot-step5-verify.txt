@@ -1,0 +1,135 @@
+
+=== CMD: stty cols 260; uname -a; cat /proc/version ===
+stty cols 260; uname -a; cat /proc/version
+[?2004lLinux hg680kd 7.3.5-hg680kd-arm64-armbian-usb #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64 GNU/Linux
+Linux version 7.3.5-hg680kd-arm64-armbian-usb (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+[?2004hroot@hg680kd:~# 
+=== CMD: findmnt -no FSTYPE,OPTIONS /; findmnt -no TARGET,SOURCE,FSTYPE /boot; cat /sys/kernel/debug/f2fs/status | head -n 22 ===
+findmnt -no FSTYPE,OPTIONS /; findmnt -no TARGET,SOURCE,FSTYPE /boot; cat /sys/kernel/debug/f2fs/status | head -n 22
+[?2004lf rw,noatime,lazytime,background_gc=on,gc_merge,nodiscard,user_xattr,inline_xattr,acl,inline_data,inline_dentry,noflush_merge,barrier,extent_cache,mode=adaptive,active_logs=6,alloc_mode=default,checkpoint_merge,fsync_mode=posix,compress_algorithm=zstd:6,compre
+/boot /dev/sda1 vfat
+
+=====[ partition info(sda3). #0, RW, CP: Good]=====
+[SBI: fs_dirty]
+[SB: 1] [CP: 2] [SIT: 2] [NAT: 62] [SSA: 28] [MAIN: 13815(OverProv:126 Resv:120)]
+
+Current Time Sec: 58 / Mounted Time Sec: 1
+
+Policy:
+  - IPU: [ FSYNC ]
+
+Utilization: 15% (1095325 valid blocks)
+  - Node: 127281 (Inode: 126813, Other: 468)
+  - Data: 968044
+  - Inline_xattr Inode: 4344
+  - Inline_data Inode: 604
+  - Inline_dentry Inode: 624
+  - Compressed Inode: 3075, Blocks: 77599
+  - Swapfile Inode: 0
+  - Donate Inode: 0
+  - Orphan/Append/Update Inode: 0, 0, 0
+
+Main area: 13815 segs, 13815 secs 13815 zones
+[?2004hroot@hg680kd:~# 
+=== CMD: zramctl; swapon --show; free -h; sysctl vm.swappiness ===
+zramctl; swapon --show; free -h; sysctl vm.swappiness
+[?2004lNAME       ALGORITHM DISKSIZE DATA COMPR TOTAL STREAMS MOUNTPOINT
+/dev/zram0 zstd            1G   4K   71B   20K         [SWAP]
+NAME       TYPE       SIZE USED PRIO
+/dev/zram0 partition 1024M   0B  100
+/dev/sda2  partition 1024M   0B   10
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       478Mi       1.1Gi        49Mi       436Mi       1.5Gi
+Swap:          2.0Gi          0B       2.0Gi
+vm.swappiness = 100
+[?2004hroot@hg680kd:~# 
+=== CMD: systemctl is-active ssh lightdm bluetooth hg680kd-zram; ip -br a; ping -c 3 192.168.6.172; cat /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/phy_id ===
+systemctl is-active ssh lightdm bluetooth hg680kd-zram; ip -br a; ping -c 3 192.168.6.172; cat /sys/bus/mdio_bus/devices/f9840000.ethernet-mii:01/phy_id
+[?2004lactive
+active
+active
+active
+[36mlo               [0mUNKNOWN        [35m127.0.0.1[0m/8 [34m::1[0m/128 
+[36meth0             [0m[32mUP             [0m[35m192.168.6.125[0m/24 [34m240e:3a2:ac02:4840:894e:7df8:ac96:1ee5[0m/64 [34mfde4:7f58:b6df:0:b4b:dc24:4a64:5f31[0m/64 [34mfe80::8453:5ef4:566:180b[0m/64 
+PING 192.168.6.172 (192.168.6.172) 56(84) bytes of data.
+64 bytes from 192.168.6.172: icmp_seq=1 ttl=128 time=0.599 ms
+64 bytes from 192.168.6.172: icmp_seq=2 ttl=128 time=0.986 ms
+64 bytes from 192.168.6.172: icmp_seq=3 ttl=128 time=0.515 ms
+
+--- 192.168.6.172 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2022ms
+rtt min/avg/max/mdev = 0.515/0.700/0.986/0.205 ms
+0x20669908
+[?2004hroot@hg680kd:~# 
+=== CMD: bluetoothctl list; hcitool dev 2>/dev/null || true; dmesg | grep -E 'hci0|rtl8761' ===
+bluetoothctl list; hcitool dev 2>/dev/null || true; dmesg | grep -E 'hci0|rtl8761'
+[?2004lController 00:E0:4C:23:99:87 hg680kd [default]
+Devices:
+	hci0	00:E0:4C:23:99:87
+[   11.073541] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
+[   11.077807] Bluetooth: hci0: RTL: rom_version status=0 version=3
+[   11.077916] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_fw.bin
+[   11.103320] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_config.bin
+[   11.127129] Bluetooth: hci0: RTL: cfg_sz 110, total sz 21738
+[   12.009816] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+[?2004hroot@hg680kd:~# 
+=== CMD: cat /sys/class/thermal/thermal_zone0/temp; cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq; cat /sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu/available_frequencies /sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu/cur_freq ===
+cat /sys/class/thermal/thermal_zone0/temp; cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq; cat /sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu/available_frequencies /sys/devices/platform/soc/f9200000.gpu/devfreq/f9200000.gpu/cur_freq
+[?2004l60000
+0-3
+200000 400000 600000 800000 1000000 
+800000
+200000000 300000000
+200000000
+[?2004hroot@hg680kd:~# 
+=== CMD: cat /sys/block/mmcblk0/ro; cat /sys/kernel/debug/mmc0/ios; DISPLAY=:0 xfconf-query -c xfwm4 -p /general/use_compositing ===
+cat /sys/block/mmcblk0/ro; cat /sys/kernel/debug/mmc0/ios; DISPLAY=:0 xfconf-query -c xfwm4 -p /general/use_compositing
+[?2004l1
+clock:		192000000 Hz
+actual clock:	192000000 Hz
+vdd:		21 (3.3 ~ 3.4 V)
+bus mode:	2 (push-pull)
+chip select:	0 (don't care)
+power mode:	2 (on)
+bus width:	3 (8 bits)
+timing spec:	10 (mmc HS400 enhanced strobe)
+signal voltage:	1 (1.80 V)
+driver type:	0 (driver type B)
+false
+[?2004hroot@hg680kd:~# 
+=== CMD: fastfetch --logo none ===
+fastfetch --logo none
+[?2004l[m[m[1m[37mroot[m@[1m[37mhg680kd[m
+------------
+[m[1m[31mOS[m: [mArmbian_community 26.11.0-trunk.137 trixie aarch64
+[m[1m[31mHost[m: [mFiberHome HG680KD (ARM64)
+[m[1m[31mKernel[m: [mLinux 7.3.5-hg680kd-arm64-armbian-usb
+[m[1m[31mUptime[m: [m1 min
+[m[1m[31mPackages[m: [m1242 (dpkg)
+[m[1m[31mShell[m: [mbash 5.2.37
+[m[1m[31mDisplay (Unknown-1)[m: [m1920x1080 @ 60 Hz in 23"
+[m[1m[31mCursor[m: [mAdwaita
+[m[1m[31mTerminal[m: [m/dev/ttyAMA0
+[m[1m[31mTerminal Font[m: [mVGA default kernel font
+[m[1m[31mCPU[m: [mhi3798mv320 (4) @ 1.00 GHz
+[m[1m[31mGPU[m: [mArm mali-450 [Integrated]
+[m[1m[31mMemory[m: [m473.45 MiB / 1.93 GiB ([32m24%[m)
+[m[1m[31mSwap[m: [m0 B / 2.00 GiB ([32m0%[m)
+[m[1m[31mDisk (]8;;file:///\/]8;;\)[m: [m4.61 GiB / 27.17 GiB ([32m17%[m) - f2fs
+[m[1m[31mLocal IP (eth0)[m: [m192.168.6.125/24
+[m[1m[31mLocale[m: [men_US.UTF-8
+
+[m[40m   [41m   [42m   [43m   [44m   [45m   [46m   [47m   [m
+[5m[100m   [101m   [102m   [103m   [104m   [105m   [106m   [107m   [m
+[?2004hroot@hg680kd:~# 
+=== CMD: XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 xfce4-terminal --geometry=105x34 --hold -e fastfetch >/dev/null 2>&1 & sleep 3; ps -ef | grep xfce4-terminal | grep -v grep ===
+XAUTHORITY=/home/hg680kd/.Xauthority DISPLAY=:0 xfce4-terminal --geometry=105x34 --hold -e fastfetch >/dev/null 2>&1 & sleep 3; ps -ef | grep xfce4-terminal | grep -v grep
+[?2004l[1] 1452
+[   64.381638] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   64.381680] lima f9200000.gpu: pp1 error irq state=201 status=40
+[   64.381746] lima f9200000.gpu: pp0 task error 0 int_state=0 status=1
+[   64.381768] lima f9200000.gpu: pp1 task error 1 int_state=0 status=1
+[   65.303603] lima f9200000.gpu: pp0 error irq state=201 status=40
+[   65.303662] lima f9200000.gpu: pp1 error irq state=201 status=40
+root        1452     622 39 19:51 ?        00:00:01 xfce4-terminal --geometry=105x34 --hold -e fastfetch
+[?2004hroot@hg680kd:~# 

@@ -1,0 +1,29 @@
+<INTERRUPT>
+fastboot#fatload usb 0:1 0x00040000 BOOT-SHA256SUMS
+277 bytes read in 5 ms (53.7 KiB/s)
+fastboot#fatload usb 0:1 0x004f0000 BOOT-SHA256SUMS
+277 bytes read in 4 ms (67.4 KiB/s)
+fastboot#fatload usb 0:1 0x00500000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#fatload usb 0:1 0x70000000 BOOT-SHA256SUMS
+** Reading file would overwrite reserved memory **
+Failed to load 'BOOT-SHA256SUMS'
+fastboot#help usbboot
+usbboot - boot from USB device
+
+Usage:
+usbboot loadAddr dev:part
+fastboot#help unzip
+unzip - unzip a memory region
+
+Usage:
+unzip srcaddr dstaddr [dstsize]
+fastboot#help source
+source - run script from memory
+
+Usage:
+source [addr]
+	- run script starting at addr
+	- A valid image header must be present
+fastboot#

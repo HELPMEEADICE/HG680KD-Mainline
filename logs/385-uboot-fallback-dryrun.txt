@@ -1,0 +1,20 @@
+<INTERRUPT>
+fastboot#usb start; mw.l 0x1fdffc0 0 1; fatload usb 0:1 0x1fdffc0 boot.img; bootm 0x1fdffc0; echo FALLBACK_REACHED
+starting USB...
+USB0:   Register 1000140 NbrPorts 1
+Starting the controller
+USB XHCI 1.10
+scanning bus 0 for devices... 1 USB Device(s) found
+USB1:   Register 3000140 NbrPorts 3
+Starting the controller
+USB XHCI 1.10
+scanning bus 1 for devices... 1 USB Device(s) found
+       scanning usb for storage devices... 0 Storage Device(s) found
+       scanning usb for ethernet devices... 0 Ethernet Device(s) found
+** Bad device specification usb 0 **
+Couldn't find partition usb 0:1
+Can't set block device
+Wrong Image Format for bootm command
+ERROR: can't get kernel image!
+FALLBACK_REACHED
+fastboot#
