@@ -1,0 +1,28 @@
+uname -r; ip -4 -brief addr; lsblk -ro NAME,RO,TYPE,MOUNTPOINT
+
+[?2004l
+7.3.5-hg680kd-arm64-armbian-usb
+
+[36mlo               [0mUNKNOWN        [35m127.0.0.1[0m/8 
+
+[36meth0             [0m[32mUP             [0m[35m192.168.6.125[0m/24 
+
+NAME RO TYPE MOUNTPOINT
+
+sda 0 disk 
+
+sda1 0 part /boot
+
+sda2 0 part [SWAP]
+
+sda3 0 part /
+
+mmcblk0 1 disk 
+
+mmcblk0p1 1 part 
+
+mmcblk0p2 1 part 
+
+zram0 0 disk [SWAP]
+
+[?2004hroot@hg680kd:~# 

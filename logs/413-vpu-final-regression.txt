@@ -1,0 +1,115 @@
+
+# echo N >/sys/module/printk/parameters/ignore_loglevel; dmesg -n 4; d=/sys/bus/platform/drivers/hi3798mv320-vpu-probe; for n in 1 2 3; do echo f8c30000.video-decoder >$d/unbind && echo f8c30000.video-decoder >$d/bind && test -L $d/f8c30000.video-decoder || break; uptime=$(cat /proc/uptime); echo "VPU_REBIND=$n uptime=$uptime"; done; dmesg | grep -E "hi3798mv320-vpu-probe f8c30000|SError|Data Abort|Unable to handle|Internal error"
+sh: test: not found
+<6>[    0.348065] hi3798mv320-vpu-probe f8c30000.video-decoder: VDEC CRG enabled, Linux IRQs PXP=16 SCD=17 SMMU=18
+<6>[    0.348091] hi3798mv320-vpu-probe f8c30000.video-decoder: factory SoC identity=37980320 feature=c0100000
+<6>[    0.348114] hi3798mv320-vpu-probe f8c30000.video-decoder: before reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[    0.348145] hi3798mv320-vpu-probe f8c30000.video-decoder: PXP reset ack=00000002 deasserted-ack=00000000 request-after=00000000
+<6>[    0.348168] hi3798mv320-vpu-probe f8c30000.video-decoder: after reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[   27.364695] hi3798mv320-vpu-probe f8c30000.video-decoder: VDEC CRG enabled, Linux IRQs PXP=16 SCD=17 SMMU=18
+<6>[   27.364729] hi3798mv320-vpu-probe f8c30000.video-decoder: factory SoC identity=37980320 feature=c0100000
+<6>[   27.364747] hi3798mv320-vpu-probe f8c30000.video-decoder: before reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[   27.364770] hi3798mv320-vpu-probe f8c30000.video-decoder: PXP reset ack=00000002 deasserted-ack=00000000 request-after=00000000
+<6>[   27.364787] hi3798mv320-vpu-probe f8c30000.video-decoder: after reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+# 
+[host] shell command elapsed: 0.22 s
+p=/sys/devices/system/cpu/cpufreq/policy0; g=$(cat $p/scaling_governor); echo userspace >$p/scaling_governor; for f in 200000 400000 600000 800000 1000000; do echo $f >$p/scaling_setspeed || break; echo CPU_REQUEST=$f; cat $p/cpuinfo_cur_freq /sys/class/thermal/thermal_zone0/temp; done; echo "$g" >$p/scaling_governor; cat $p/scaling_governor /sys/class/thermal/thermal_zone0/type /sys/class/thermal/thermal_zone0/trip_point_0_temp; ls -l /sys/class/thermal
+CPU_REQUEST=200000
+200000
+56000
+CPU_REQUEST=400000
+400000
+56000
+CPU_REQUEST=600000
+600000
+56000
+CPU_REQUEST=800000
+800000
+56000
+CPU_REQUEST=1000000
+1000000
+56000
+schedutil
+soc-thermal
+68000
+lrwxrwxrwx    1         0 cooling_device0 -> ../../devices/virtual/thermal/cooling_device0
+lrwxrwxrwx    1         0 thermal_zone0 -> ../../devices/virtual/thermal/thermal_zone0
+lrwxrwxrwx    1         0 cooling_device1 -> ../../devices/virtual/thermal/cooling_device1
+# 
+[host] shell command elapsed: 0.11 s
+g=/sys/class/devfreq/f9200000.gpu; saved=$(cat $g/governor); echo userspace >$g/governor; for f in 200000000 300000000; do echo $f >$g/userspace/set_freq || break; echo GPU_REQUEST=$f; lima-test; echo LIMA_EXIT=$?; cat $g/cur_freq; done; echo "$saved" >$g/governor; cat $g/governor
+GPU_REQUEST=200000000
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+LIMA_EXIT=0
+200000000
+GPU_REQUEST=300000000
+DRM device /dev/dri/renderD128: driver=lima version=1.1.0 desc=lima DRM
+Lima params: gpu_id=2 num_pp=2 gp_ver=0x0d070000 pp_ver=0xcf070000
+Created Lima context id=0
+GEM BOs: fb=0x00000000 pp_buf=0x00004000 plb=0x00005000 plbu_cmd=0x00007000 gp_stream=0x00008000 heap=0x00009000
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xff336699: 4096/4096 pixels matched (first=0xff336699 mid=0xff336699 last=0xff336699)
+GP PLBU pass complete: plb[0..3]=0xe0000003 0xb0000000 0x00000000 0x00000000
+PP DLBU clear 0xffaabbcc: 4096/4096 pixels matched (first=0xffaabbcc mid=0xffaabbcc last=0xffaabbcc)
+LIMA GP+PP OFFSCREEN RENDER TEST: PASS
+LIMA_EXIT=0
+300000000
+simple_ondemand
+# 
+[host] shell command elapsed: 0.17 s
+bt-test 10; echo BT_EXIT=$?
+hci0: HCI 0x09 rev 0x1ed6, LMP 0x09 subver 0xb420, manufacturer 0x005d
+hci0: controller BD_ADDR 00:E0:4C:23:99:87
+BLE passive scan for 10 s
+LE advertisement 07:33:72:29:23:8E type=3 address_type=1 rssi=-42 data=1eff060001092002fb71f3a46e18ffe55626870130718198b46b05a8f1aa3a
+LE advertisement 03:9D:2B:1F:76:1C type=3 address_type=1 rssi=-68 data=1e16f3fe4a172347354f41113222ab6338db504ad121864774e57065c90877
+BLE passive scan: 2 advertising reports
+BT_EXIT=0
+# 
+[host] shell command elapsed: 10.03 s
+ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; sleep 2; cat /sys/class/net/eth0/speed /sys/class/net/eth0/duplex; ping -c 3 192.168.6.160
+100
+full
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+64 bytes from 192.168.6.160: seq=0 ttl=64 time=4.229 ms
+64 bytes from 192.168.6.160: seq=1 ttl=64 time=0.364 ms
+64 bytes from 192.168.6.160: seq=2 ttl=64 time=0.396 ms
+
+--- 192.168.6.160 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.364/1.663/4.229 ms
+# 
+[host] shell command elapsed: 4.05 s
+cat /sys/block/mmcblk0/ro /sys/block/mmcblk0/mmcblk0p1/ro /sys/block/mmcblk0/mmcblk0p2/ro; cat /sys/kernel/debug/mmc0/ios; dd if=/dev/mmcblk0 bs=512 skip=229376 count=24032 | sha256sum; cat /sys/kernel/debug/mmc0/err_stats
+1
+1
+1
+clock:		192000000 Hz
+actual clock:	192000000 Hz
+vdd:		21 (3.3 ~ 3.4 V)
+bus mode:	2 (push-pull)
+chip select:	0 (don't care)
+power mode:	2 (on)
+bus width:	3 (8 bits)
+timing spec:	10 (mmc HS400 enhanced strobe)
+signal voltage:	1 (1.80 V)
+driver type:	0 (driver type B)
+24032+0 records in
+24032+0 records out
+97f4e2b5d88ee6d6fae8ced4809420d7f875c4ff8b0acfe817c6409b6f02a6b8  -
+# 
+[host] shell command elapsed: 0.52 s
+Command Timeout Occurred:	 0
+# 
+[host] shell command elapsed: 0.02 s
+Command CRC Errors Occurred:	 0
+# 
+[host] shell command elapsed: 0.01 s

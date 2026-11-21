@@ -14,6 +14,11 @@ elif [[ $variant == 7.3.5-* ]]; then
     linux_ver=7.3.5
     base_variant=${variant#7.3.5-}
 fi
+vpu_probe=
+if [[ $variant == 7.3.5-vpu-probe ]]; then
+    base_variant=all-2g-hdmi-bt-dvfs
+    vpu_probe=y
+fi
 linux="$root/source/linux-$linux_ver"
 busybox="$root/source/busybox-1.37.0"
 musl="$root/source/musl-1.2.5"
@@ -151,6 +156,13 @@ if [[ $dvfs ]]; then
         board+=-usb
         install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
     fi
+fi
+if [[ $vpu_probe ]]; then
+    variant_key+=" HI3798MV320_VPU_PROBE"
+    apply_board_patch "$inputs/0010-SOC-hisilicon-add-Hi3798MV320-VPU-probe.patch"
+    install -m644 "$inputs/hi3798mv320-vpu-probe.c" "$linux/drivers/soc/hisilicon/"
+    board=hi3798mv320-fiberhome-hg680kd-arm64-vpu-probe
+    install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
 if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
     printf 'dtb-y += %s.dtb\n' "$board" >> "$linux/arch/arm64/boot/dts/hisilicon/Makefile"
@@ -341,6 +353,10 @@ if [[ $base_variant != core ]]; then
 fi
 kernel=(make -C "$linux" O="$out" ARCH=arm64 CROSS_COMPILE="$cross")
 "${kernel[@]}" KCONFIG_ALLCONFIG="$config" allnoconfig
+if [[ $vpu_probe ]]; then
+    "$linux/scripts/config" --file "$out/.config" --enable HI3798MV320_VPU_PROBE \
+        --set-str LOCALVERSION "-hg680kd-arm64-vpu-probe"
+fi
 if [[ -z $usb_root ]]; then
     "$linux/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/initramfs.cpio"
 else

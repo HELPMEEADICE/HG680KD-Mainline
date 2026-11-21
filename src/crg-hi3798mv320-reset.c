@@ -19,6 +19,10 @@
 #define CRG_GPU_FREQ_SEL	0x124
 #define CRG_GPU_FREQ_MASK	0x7
 
+#define CRG_VDEC_CTRL		0x078
+#define CRG_VDEC_DISABLE	BIT(0)
+#define CRG_VDEC_INIT_MASK	(GENMASK(9, 8) | GENMASK(17, 12))
+
 #define CRG_APLL_FRAC		0x000
 #define CRG_APLL_DIV		0x004
 #define CRG_CPU_CLK		0x048
@@ -67,6 +71,7 @@ struct hi3798mv320_crg_priv {
 	struct clk_hw_onecell_data *clk_data;
 	struct hi3798mv320_gpu_clk clks[2];
 	struct clk_hw cpu_clk;
+	struct clk_hw vdec_clk;
 };
 
 static struct hi3798mv320_gpu_clk *to_gpu_clk(struct clk_hw *hw)
@@ -167,6 +172,45 @@ static void hi3798mv320_crg_update(void __iomem *base, u32 reg, u32 mask, u32 va
 {
 	writel((readl(base + reg) & ~mask) | val, base + reg);
 }
+
+static int hi3798mv320_vdec_enable(struct clk_hw *hw)
+{
+	struct hi3798mv320_crg_priv *priv =
+		container_of(hw, struct hi3798mv320_crg_priv, vdec_clk);
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->lock, flags);
+	hi3798mv320_crg_update(priv->base, CRG_VDEC_CTRL,
+			       CRG_VDEC_DISABLE | CRG_VDEC_INIT_MASK, 0);
+	spin_unlock_irqrestore(&priv->lock, flags);
+	return 0;
+}
+
+static void hi3798mv320_vdec_disable(struct clk_hw *hw)
+{
+	struct hi3798mv320_crg_priv *priv =
+		container_of(hw, struct hi3798mv320_crg_priv, vdec_clk);
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->lock, flags);
+	hi3798mv320_crg_update(priv->base, CRG_VDEC_CTRL,
+			       CRG_VDEC_DISABLE, CRG_VDEC_DISABLE);
+	spin_unlock_irqrestore(&priv->lock, flags);
+}
+
+static int hi3798mv320_vdec_is_enabled(struct clk_hw *hw)
+{
+	struct hi3798mv320_crg_priv *priv =
+		container_of(hw, struct hi3798mv320_crg_priv, vdec_clk);
+
+	return !(readl(priv->base + CRG_VDEC_CTRL) & CRG_VDEC_DISABLE);
+}
+
+static const struct clk_ops hi3798mv320_vdec_clk_ops = {
+	.enable = hi3798mv320_vdec_enable,
+	.disable = hi3798mv320_vdec_disable,
+	.is_enabled = hi3798mv320_vdec_is_enabled,
+};
 
 static unsigned int hi3798mv320_apll_divisor(u32 frac, u32 div)
 {
@@ -318,7 +362,8 @@ static int hi3798mv320_register_clks(struct platform_device *pdev,
 	};
 	struct device *dev = &pdev->dev;
 	bool dvfs = of_device_is_compatible(dev->of_node, "hisilicon,hi3798mv320-crg-dvfs");
-	unsigned int num_clks = dvfs ? 3 : 2;
+	bool vdec = of_device_is_compatible(dev->of_node, "hisilicon,hi3798mv320-crg-vpu-probe");
+	unsigned int num_clks = vdec ? 4 : dvfs ? 3 : 2;
 	struct resource *res;
 	int i, ret;
 
@@ -365,6 +410,18 @@ static int hi3798mv320_register_clks(struct platform_device *pdev,
 		if (ret)
 			return ret;
 		priv->clk_data->hws[2] = &priv->cpu_clk;
+	}
+	if (vdec) {
+		const struct clk_init_data init = {
+			.name = "vdec",
+			.ops = &hi3798mv320_vdec_clk_ops,
+		};
+
+		priv->vdec_clk.init = &init;
+		ret = devm_clk_hw_register(dev, &priv->vdec_clk);
+		if (ret)
+			return ret;
+		priv->clk_data->hws[3] = &priv->vdec_clk;
 	}
 
 	return devm_of_clk_add_hw_provider(dev, of_clk_hw_onecell_get, priv->clk_data);

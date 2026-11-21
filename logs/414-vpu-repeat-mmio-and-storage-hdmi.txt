@@ -1,0 +1,68 @@
+
+# d=/sys/bus/platform/drivers/hi3798mv320-vpu-probe; for n in 1 2 3; do echo f8c30000.video-decoder >$d/unbind && echo f8c30000.video-decoder >$d/bind && readlink $d/f8c30000.video-decoder || break; echo VPU_REBIND=$n; done; dmesg | grep "f8c30000.video-decoder" | tail -n 15; printf '\nVPU-CHECK-%s=%s\n' 0 $?
+../../../../devices/platform/soc/f8c30000.video-decoder
+VPU_REBIND=1
+../../../../devices/platform/soc/f8c30000.video-decoder
+VPU_REBIND=2
+../../../../devices/platform/soc/f8c30000.video-decoder
+VPU_REBIND=3
+sh: tail: not found
+
+VPU-CHECK-0=127
+# 
+# dmesg | grep "f8c30000.video-decoder"; printf '\nVPU-CHECK-%s=%s\n' 1 $?
+<6>[    0.348065] hi3798mv320-vpu-probe f8c30000.video-decoder: VDEC CRG enabled, Linux IRQs PXP=16 SCD=17 SMMU=18
+<6>[    0.348091] hi3798mv320-vpu-probe f8c30000.video-decoder: factory SoC identity=37980320 feature=c0100000
+<6>[    0.348114] hi3798mv320-vpu-probe f8c30000.video-decoder: before reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[    0.348145] hi3798mv320-vpu-probe f8c30000.video-decoder: PXP reset ack=00000002 deasserted-ack=00000000 request-after=00000000
+<6>[    0.348168] hi3798mv320-vpu-probe f8c30000.video-decoder: after reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[   27.364695] hi3798mv320-vpu-probe f8c30000.video-decoder: VDEC CRG enabled, Linux IRQs PXP=16 SCD=17 SMMU=18
+<6>[   27.364729] hi3798mv320-vpu-probe f8c30000.video-decoder: factory SoC identity=37980320 feature=c0100000
+<6>[   27.364747] hi3798mv320-vpu-probe f8c30000.video-decoder: before reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[   27.364770] hi3798mv320-vpu-probe f8c30000.video-decoder: PXP reset ack=00000002 deasserted-ack=00000000 request-after=00000000
+<6>[   27.364787] hi3798mv320-vpu-probe f8c30000.video-decoder: after reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[  209.250905] hi3798mv320-vpu-probe f8c30000.video-decoder: VDEC CRG enabled, Linux IRQs PXP=16 SCD=17 SMMU=18
+<6>[  209.250939] hi3798mv320-vpu-probe f8c30000.video-decoder: factory SoC identity=37980320 feature=c0100000
+<6>[  209.250958] hi3798mv320-vpu-probe f8c30000.video-decoder: before reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[  209.251033] hi3798mv320-vpu-probe f8c30000.video-decoder: PXP reset ack=00000002 deasserted-ack=00000000 request-after=00000000
+<6>[  209.251053] hi3798mv320-vpu-probe f8c30000.video-decoder: after reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[  209.257601] hi3798mv320-vpu-probe f8c30000.video-decoder: VDEC CRG enabled, Linux IRQs PXP=16 SCD=17 SMMU=18
+<6>[  209.257652] hi3798mv320-vpu-probe f8c30000.video-decoder: factory SoC identity=37980320 feature=c0100000
+<6>[  209.257685] hi3798mv320-vpu-probe f8c30000.video-decoder: before reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[  209.257730] hi3798mv320-vpu-probe f8c30000.video-decoder: PXP reset ack=00000002 deasserted-ack=00000000 request-after=00000000
+<6>[  209.257760] hi3798mv320-vpu-probe f8c30000.video-decoder: after reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[  209.263978] hi3798mv320-vpu-probe f8c30000.video-decoder: VDEC CRG enabled, Linux IRQs PXP=16 SCD=17 SMMU=18
+<6>[  209.264010] hi3798mv320-vpu-probe f8c30000.video-decoder: factory SoC identity=37980320 feature=c0100000
+<6>[  209.264029] hi3798mv320-vpu-probe f8c30000.video-decoder: before reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+<6>[  209.264052] hi3798mv320-vpu-probe f8c30000.video-decoder: PXP reset ack=00000002 deasserted-ack=00000000 request-after=00000000
+<6>[  209.264069] hi3798mv320-vpu-probe f8c30000.video-decoder: after reset: VDH clk=00002aaa reset=00000000 ack=00000000 PXP state=00000000 irq=00000000 SCD irq=00000000 mask=00000001 SMMU ctrl=00000001 irq=00000000
+
+VPU-CHECK-1=0
+# dmesg | grep -Ei 'SError|Data Abort|Unable to handle|Internal error' || echo NO_MMIO_FAULTS; printf '\nVPU-CHECK-%s=%s\n' 2 $?
+NO_MMIO_FAULTS
+
+VPU-CHECK-2=0
+# cat /sys/kernel/debug/mmc0/err_stats; printf '\nVPU-CHECK-%s=%s\n' 3 $?
+# Command Timeout Occurred:	 0
+# Command CRC Errors Occurred:	 0
+# Data Timeout Occurred:	 0
+# Data CRC Errors Occurred:	 0
+# Auto-Cmd Error Occurred:	 0
+# ADMA Error Occurred:	 0
+# Tuning Error Occurred:	 0
+# CMDQ RED Errors:	 0
+# CMDQ GCE Errors:	 0
+# CMDQ ICCE Errors:	 0
+# Request Timedout:	 0
+# CMDQ Request Timedout:	 0
+# ICE Config Errors:	 0
+# Controller Timedout errors:	 0
+# Unexpected IRQ errors:	 0
+
+VPU-CHECK-3=0
+# mount -t vfat -o ro,nosuid,nodev,noexec /dev/sda1 /tmp && grep ' /tmp ' /proc/mounts && sha256sum /tmp/boot.img && umount /tmp && cat /sys/bus/usb/devices/1-2/speed; printf '\nVPU-CHECK-%s=%s\n' 4 $?
+[  224.337203] vfat: Unknown parameter 'nosuid'
+mount: mounting /dev/sda1 on /tmp failed: Invalid argument
+
+VPU-CHECK-4=255
+# 

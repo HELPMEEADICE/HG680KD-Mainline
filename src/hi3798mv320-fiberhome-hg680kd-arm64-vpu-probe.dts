@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs.dts"
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+&crg {
+	compatible = "hisilicon,hi3798mv320-crg-vpu-probe",
+		     "hisilicon,hi3798mv320-crg-dvfs",
+		     "hisilicon,hi3798mv320-crg", "syscon";
+};
+
+&{/soc} {
+	video-decoder@f8c30000 {
+		compatible = "hisilicon,hi3798mv320-vpu-probe";
+		reg = <0x0 0xf8c30000 0x0 0x1000>,
+		      <0x0 0xf8c3a000 0x0 0x1000>,
+		      <0x0 0xf8c39c00 0x0 0x400>,
+		      <0x0 0xf8c3d000 0x0 0x1000>,
+		      <0x0 0xf8000ee0 0x0 0x4>,
+		      <0x0 0xf8a20840 0x0 0x4>;
+		reg-names = "vdh", "vdh-global", "scd", "smmu", "soc-id", "soc-feature";
+		interrupts = <GIC_SPI 137 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 149 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "pxp", "scd", "smmu";
+		clocks = <&crg 3>;
+		clock-names = "vdec";
+	};
+};

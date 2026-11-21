@@ -2,6 +2,17 @@
 
 本项目最初以 Linux 6.18.64 为基线、后经 Linux 7.2.5 验证全硬件并在最新阶段通过 GCC 14.2.0 升级至 **Linux 7.3.5**，可从原厂 U-Boot 2022.07 和 BL31 直接冷启动 U 盘 **Armbian (Trixie arm64) + Xfce 桌面**（亦保留各版本 RAM 镜像作回退）。设备为海思 Hi3798MV320，四核 Cortex-A55，实装 2 GiB LPDDR4，板载 eMMC 始终强制只读（`ro=1`）。
 
+## ARM64 Linux 7.3.5 VPU 探测（TFTP RAM）
+
+`arm64-7.3.5-vpu-probe` 使用 GCC 14.2.0 构建，继承现役 HDMI、蓝牙、DVFS 和 eMMC HS400ES 只读基线。实机通过 VDEC 时钟启用、VDH PXP 复位握手和重复绑定。复位请求期间 ACK 为 `0x2`，释放后回落为 `0x0`，VDH、SCD、SMMU 状态均可稳定读取。四核、HDMI 1080p、Lima、蓝牙、CPU/GPU DVFS、温控、GMAC、USB 和 eMMC 只读回归通过。[VPU 逆向与构建复现](VPU-REVERSE.md) · [TFTP 启动串口](logs/411-mainline-arm64-7.3.5-vpu-final-boot.txt) · [外设回归](logs/413-vpu-final-regression.txt) · [重复复位](logs/414-vpu-repeat-mmio-and-storage-hdmi.txt)
+
+| 用途 | 镜像 | SHA256 |
+| --- | --- | --- |
+| VPU 探测 | [arm64-7.3.5-vpu-probe/boot.img](artifacts/arm64-7.3.5-vpu-probe/boot.img) | `555e2875db0eb4833129a8087fedf6c3b4f82541e8c19754836daf998c1390b9` |
+| 现役 RAM 回退 | [arm64-7.3.5-all-2g-hdmi-bt-dvfs/boot.img](artifacts/arm64-7.3.5-all-2g-hdmi-bt-dvfs/boot.img) | `3c8cb9aab2c60da79206d043067ab23bbe7b9bb1643996d3c5e6b668ca017811` |
+
+本轮交付探测镜像。H.264 单帧硬解、VDH/SCD 独立版本号及 SMMU DMA 旁路仍待验证。文档列有下一轮所需的寄存器、H.264 消息与 I420 参考帧。该镜像通过 `bootm 0x1fdffc0` 从 RAM 启动。
+
 ## ARM64 Linux 7.3.5 + Armbian Xfce（U 盘冷启动，F2FS zstd + ZRAM）
 
 在保持 7.2.5 基线与 eMMC 严格只读（`MMC_CAP2_FORCE_READ_ONLY | MMC_CAP2_BOOTPART_NOACC`）的前提下，将全部补丁、DTS 与自研驱动（`0005` / `0009` 已适配 Linux 7.3 `COMMON_CLK_HISI` / `reset-hisilicon`）使用 `aarch64-linux-gcc (GCC) 14.2.0` 前向移植至官方 **Linux 7.3.5**，并针对 U 盘根文件系统部署了基于 **Armbian_community 26.11.0-trunk.137 (Debian Trixie aarch64) + Xfce 4.20.1** 的完整桌面系统。详情、原厂 `printenv` 快照、U-Boot LMB 与 FEPHY 唤醒机制见 [UBOOT-USB-BOOT.md](UBOOT-USB-BOOT.md)。

@@ -1,0 +1,55 @@
+=== libOMX.hivendor.video.decoder.so ===
+libOMX.hivendor.video.decoder.so: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, for Android 28, BuildID[md5/uuid]=f591afd6cc8fc7e5156d72cda6cd92b2, stripped
+ 0x00000001 (NEEDED)                     Shared library: [libutils.so]
+ 0x00000001 (NEEDED)                     Shared library: [liblog.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhi_common.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhi_msp.so]
+ 0x00000001 (NEEDED)                     Shared library: [libcutils.so]
+ 0x00000001 (NEEDED)                     Shared library: [libsecurec.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhiavplayer_adp.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc++.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so]
+ 0x00000001 (NEEDED)                     Shared library: [libm.so]
+ 0x00000001 (NEEDED)                     Shared library: [libdl.so]
+ 0x0000000e (SONAME)                     Library soname: [libOMX.hivendor.video.decoder.so]
+    44: 00000000     0 FUNC    GLOBAL DEFAULT  UND ioctl@LIBC (2)
+/dev/hi_omxvdec
+=== libhi_msp.so ===
+libhi_msp.so: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, for Android 28, BuildID[md5/uuid]=9d596eb87f388bf80593d4ce96a9c462, stripped
+ 0x00000001 (NEEDED)                     Shared library: [libhi_common.so]
+ 0x00000001 (NEEDED)                     Shared library: [libcutils.so]
+ 0x00000001 (NEEDED)                     Shared library: [libutils.so]
+ 0x00000001 (NEEDED)                     Shared library: [liblog.so]
+ 0x00000001 (NEEDED)                     Shared library: [libjpeg.so]
+ 0x00000001 (NEEDED)                     Shared library: [libhi_jpeg.so]
+ 0x00000001 (NEEDED)                     Shared library: [libsecurec.so]
+ 0x00000001 (NEEDED)                     Shared library: [libmbedtls.so]
+ 0x00000001 (NEEDED)                     Shared library: [libuapi_jpgd.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc++.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so]
+ 0x00000001 (NEEDED)                     Shared library: [libm.so]
+ 0x00000001 (NEEDED)                     Shared library: [libdl.so]
+ 0x0000000e (SONAME)                     Library soname: [libhi_msp.so]
+    12: 00000000     0 FUNC    GLOBAL DEFAULT  UND ioctl@LIBC (2)
+/dev/hi_vdec
+=== libHV.VIDEO.FFMPEG_VDEC.decode.so ===
+libHV.VIDEO.FFMPEG_VDEC.decode.so: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, for Android 28, BuildID[md5/uuid]=3918e93b8708a0b0b038129fe5ddbd30, stripped
+ 0x00000001 (NEEDED)                     Shared library: [liblog.so]
+ 0x00000001 (NEEDED)                     Shared library: [libutils.so]
+ 0x00000001 (NEEDED)                     Shared library: [libavutil.so]
+ 0x00000001 (NEEDED)                     Shared library: [libavcodec.so]
+ 0x00000001 (NEEDED)                     Shared library: [libavformat.so]
+ 0x00000001 (NEEDED)                     Shared library: [libsecurec.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc++.so]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so]
+ 0x00000001 (NEEDED)                     Shared library: [libm.so]
+ 0x00000001 (NEEDED)                     Shared library: [libdl.so]
+ 0x0000000e (SONAME)                     Library soname: [libHV.VIDEO.FFMPEG_VDEC.decode.so]
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+debugfs 1.47.4 (6-Mar-2025)
+bc4448c181b4507582d3e0d739c581395ee50ce184ec639882d8dcf1ec7b74f6  analysis/vpu/extracted/vendor/lib/libhiavplayer_adp.so
+f06772c0d6990c49f1a8b3af99f1a8aa47c01c35b8a88c2730e17cdef5f48411  analysis/vpu/extracted/vendor/lib/libavcodec.so
+fa8fe5bd327b87f19dca0db6699258d8ea21774e05f58d1f9c5ef46905d43439  analysis/vpu/extracted/vendor/lib/libavutil.so
+1d3f2078fa854b48c7810735656613513245a0d17772a2e6888e85769c69dce8  analysis/vpu/extracted/vendor/lib/libavformat.so

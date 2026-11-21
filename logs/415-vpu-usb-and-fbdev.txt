@@ -1,0 +1,14 @@
+
+# mount -t vfat -o ro /dev/sda1 /tmp && grep " /tmp " /proc/mounts && sha256sum /tmp/boot.img && umount /tmp && cat /sys/bus/usb/devices/1-2/speed; echo USB_CHECK=$?
+/dev/sda1 /tmp vfat ro,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+f5e3173703253ff79cd4c9e329c9b57856a42e7cbdb745656c19ed8288f67b70  /tmp/boot.img
+480
+USB_CHECK=0
+# 
+[host] shell command elapsed: 1.45 s
+cat /sys/class/graphics/fb0/virtual_size; echo 0 >/sys/class/graphics/fbcon/cursor_blink; printf "\033[?25l" >/dev/tty1; fb-test; echo FB_EXIT=$?
+1920,1080
+fbdev color bars: 1920x1080, pitch 7680, 1080 rows read back
+FB_EXIT=0
+# 
+[host] shell command elapsed: 0.14 s

@@ -1,0 +1,23 @@
+--- a/drivers/soc/hisilicon/Kconfig
++++ b/drivers/soc/hisilicon/Kconfig
+@@ -3,6 +3,14 @@
+ menu "Hisilicon SoC drivers"
+ 	depends on ARCH_HISI || COMPILE_TEST
+ 
++config HI3798MV320_VPU_PROBE
++	tristate "Hi3798MV320 VPU diagnostic probe"
++	depends on ARM64 && OF && COMMON_CLK_HI3798MV320_RESET
++	help
++	  Enable VDEC clocks, exercise the PXP reset handshake and report
++	  idle VDH, SCD and SMMU status on the HG680KD TFTP RAM build.
++	  This driver does not submit video or start DMA.
++
+ config KUNPENG_HCCS
+ 	tristate "HCCS driver on Kunpeng SoC"
+ 	depends on ACPI
+--- a/drivers/soc/hisilicon/Makefile
++++ b/drivers/soc/hisilicon/Makefile
+@@ -1,2 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++obj-$(CONFIG_HI3798MV320_VPU_PROBE) += hi3798mv320-vpu-probe.o
+ obj-$(CONFIG_KUNPENG_HCCS)	+= kunpeng_hccs.o

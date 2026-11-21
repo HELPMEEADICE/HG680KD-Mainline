@@ -1,0 +1,92 @@
+system:/system/lib/libstagefright_omx.so	290828
+system:/system/lib/android.hardware.media.omx@1.0.so	369644
+system:/system/lib/libmedia_omx.so	183168
+system:/system/lib/libstagefright_omx_utils.so	28848
+system:/system/etc/media_profiles_V1_0.dtd	2727
+vendor:/lib/libOMX.hivendor.audio.aacenc.so	20056
+vendor:/lib/libOMX_Core.so	24168
+vendor:/lib/libOMX.hivendor.audio.aacdec.so	20108
+vendor:/lib/libhi_common.so	84296
+vendor:/lib/libOMX.hivendor.video.encoder.so	58160
+vendor:/lib/libOMX.hivendor.audio.mp3dec.so	20096
+vendor:/lib/libhi_msp.so	1123164
+vendor:/lib/libOMX.hivendor.video.decoder.so	91684
+vendor:/lib/libOMX.hivendor.audio.utils.so	41196
+vendor:/lib/libOMX.hivendor.audio.ddpdec.so	20048
+vendor:/lib/libHV.VIDEO.FFMPEG_VDEC.decode.so	24468
+vendor:/etc/media_codecs_performance.xml	7459
+vendor:/etc/media_codecs_google_audio.xml	4830
+vendor:/etc/media_codecs.xml	10660
+vendor:/etc/media_codecs_google_video.xml	6405
+vendor:/etc/media_profiles_V1_0.xml	18058
+vendor:/lib/modules/btmtk_uart_unify.ko	185848
+vendor:/lib/modules/uwe5621_bt_sdio.ko	44172
+vendor:/lib/modules/wlan_mt7961_pcie.ko	2844580
+vendor:/lib/modules/rtk_btusb.ko	68456
+vendor:/lib/modules/rtl8822cs.ko	3106404
+vendor:/lib/modules/hi_sdio_detect.ko	4876
+vendor:/lib/modules/uwe5621_bsp_sdio.ko	247804
+vendor:/lib/modules/uwe5621_wifi_sdio.ko	397820
+vendor:/bin/hw/android.hardware.media.omx@1.0-service	20192
+vendor:/etc/init/android.hardware.media.omx@1.0-service.rc	211
+analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml:18:        <MediaCodec name="OMX.hivendor.video.decoder.avc" type="video/avc" update="true">
+analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml:24:        <MediaCodec name="OMX.hivendor.video.decoder.hevc" type="video/hevc" update="true">
+analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml:31:        <MediaCodec name="OMX.hivendor.video.decoder.mpeg4" type="video/mp4v-es" update="true">
+analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml:37:        <MediaCodec name="OMX.hivendor.video.decoder.mpeg2" type="video/mpeg2" update="true">
+analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml:40:        <MediaCodec name="OMX.hivendor.video.decoder.vp9" type="video/x-vnd.on2.vp9" update="true">
+analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml:46:        <MediaCodec name="OMX.hivendor.video.decoder.vp8" type="video/x-vnd.on2.vp8" update="true">
+analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml:85:        <MediaCodec name="OMX.hivendor.video.encoder.avc" type="video/avc" update="true">
+analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml:91:        <MediaCodec name="OMX.hivendor.video.encoder.hevc" type="video/hevc" update="true">
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:84:        <MediaCodec name="OMX.hivendor.video.decoder.avc" type="video/avc" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:95:        <MediaCodec name="OMX.hivendor.video.decoder.avc.secure" type="video/avc" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:107:        <MediaCodec name="OMX.hivendor.video.decoder.hevc" type="video/hevc" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:119:        <MediaCodec name="OMX.hivendor.video.decoder.hevc.secure" type="video/hevc" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:132:        <MediaCodec name="OMX.hivendor.video.decoder.mpeg4" type="video/mp4v-es" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:143:        <MediaCodec name="OMX.hivendor.video.decoder.mpeg4.secure" type="video/mp4v-es" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:155:        <MediaCodec name="OMX.hivendor.video.decoder.mpeg2" type="video/mpeg2" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:167:        <MediaCodec name="OMX.hivendor.video.decoder.mpeg2.secure" type="video/mpeg2" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:194:        <MediaCodec name="OMX.hivendor.video.encoder.avc" type="video/avc" >
+analysis/vpu/extracted/vendor/etc/media_codecs.xml:204:        <MediaCodec name="OMX.hivendor.video.encoder.hevc" type="video/hevc" >
+cf428978980d5e0aa5341f7c4b55a933e9241ad220ebaed66cd88c1eabe0b0fb  analysis/vpu/extracted/system/system/etc/media_profiles_V1_0.dtd
+d603b6aa49d6c50f6740e0083b7a1465fb4c0680b9dca6807becc59cc00c465c  analysis/vpu/extracted/system/system/lib/android.hardware.media.omx@1.0.so
+d0834cbf83cbb55e04bf0509a07c1304a9dc852d95655a630be9e68b46e55ba9  analysis/vpu/extracted/system/system/lib/libmedia_omx.so
+f26c1af5904f24cd5d18d2525f89a56284e8edfef6c9e37cf10ccfd947971945  analysis/vpu/extracted/system/system/lib/libstagefright_omx.so
+f83e1b92d7dc018a9b4a997134c4b2139c30d4949497da7b7f849275e1e9f62a  analysis/vpu/extracted/system/system/lib/libstagefright_omx_utils.so
+53ca1d55670976b1283c42c5cf51d22628e9acfd53b80f0c15542a6cf98f919f  analysis/vpu/extracted/vendor/bin/hw/android.hardware.media.omx@1.0-service
+92327bd0cbccbed25e25d68a67d3db0b06ee8763d474740a0deaaefc9e6e509f  analysis/vpu/extracted/vendor/etc/init/android.hardware.media.omx@1.0-service.rc
+59eab6329dd3c2851262e24d037c579365d65823b921688a2947749777004af0  analysis/vpu/extracted/vendor/etc/media_codecs.xml
+c3acd6442046ac4bd949b5c6f18d79f2707b5bdc677fa8e676bd02a88035ac75  analysis/vpu/extracted/vendor/etc/media_codecs_google_audio.xml
+e6d2c5acbba57f9523e61f72c014b8f6d8dfa59461735e903686f02b50eb1937  analysis/vpu/extracted/vendor/etc/media_codecs_google_video.xml
+dd696125c3b298f8a2408c5aa40aa4401ec53a8dcfd48abf27a5b7052e00f8a1  analysis/vpu/extracted/vendor/etc/media_codecs_performance.xml
+d62cdd4e30181a30c7c9d1cef31db1162ebbf89c86ec267ee7b24829d6a0168e  analysis/vpu/extracted/vendor/etc/media_profiles_V1_0.xml
+c475b3234e7a5c2ca872d2d08675fd0633116f0dabbd50d9bf38553f85305ff3  analysis/vpu/extracted/vendor/lib/libHV.VIDEO.FFMPEG_VDEC.decode.so
+d3b4aa3f678eddbca92589f85a53f53f7ae424a5d12ee3d0c5b4495965c5c7c9  analysis/vpu/extracted/vendor/lib/libOMX.hivendor.audio.aacdec.so
+e7834961690e32b6bb0f6bab65c9c022c85eddc8990f3598ad5b92f526c1137f  analysis/vpu/extracted/vendor/lib/libOMX.hivendor.audio.aacenc.so
+eba12d7ca2ac2b5ae13a8ffd5f0e94c8d9bd3d1dd68ed31bd0540f3fd949b4a9  analysis/vpu/extracted/vendor/lib/libOMX.hivendor.audio.ddpdec.so
+a8625f19ce0f9052a7fc4808b48a6371112500a7190b5b1428e681cdeea232d4  analysis/vpu/extracted/vendor/lib/libOMX.hivendor.audio.mp3dec.so
+bf4e95f5eadcd72af61e923d08dc27af42386db73e3bf5c73c1b263e187750bc  analysis/vpu/extracted/vendor/lib/libOMX.hivendor.audio.utils.so
+af67f4999bd4bcbf70e361465a5739d6a4400e9126a41b86e51dd6d84716b8e9  analysis/vpu/extracted/vendor/lib/libOMX.hivendor.video.decoder.so
+779f0d3725e33cbbc08e1e30f9fda5a80a282a6793f50938e0f9bc314dcc3af1  analysis/vpu/extracted/vendor/lib/libOMX.hivendor.video.encoder.so
+ddc35bbd9e8593222451aff40e26892200d91a376878b5a557bf8e2939b21dc7  analysis/vpu/extracted/vendor/lib/libOMX_Core.so
+3ba14f45ef7b87d5368f8506efe06cfc726e58b3954eb3c5e7c8fad52ec9c4ff  analysis/vpu/extracted/vendor/lib/libhi_common.so
+b3beff7cb2cefd46e79fff19631240004689ddabe1517140b58d45bdcd095672  analysis/vpu/extracted/vendor/lib/libhi_msp.so
+278-	};
+279-
+280:	reserved-memory {
+281-		#address-cells = <0x01>;
+282-		#size-cells = <0x01>;
+--
+1136-			compatible = "virt-device";
+1137-			interrupts = <0x00 0x1d 0x04 0x00 0x24 0x04 0x00 0x25 0x04 0x00 0x2f 0x04 0x00 0x2f 0x04 0x00 0x30 0x04 0x00 0x30 0x04 0x00 0x47 0x04 0x00 0x4b 0x04 0x00 0x52 0x04 0x00 0x54 0x04 0x00 0x58 0x04 0x00 0x5a 0x04 0x00 0x5b 0x04 0x00 0x5b 0x04 0x00 0x5d 0x04 0x00 0x5e 0x04 0x00 0x5f 0x04 0x00 0x5f 0x04 0x00 0x60 0x04 0x00 0x61 0x04 0x00 0x65 0x04 0x00 0x66 0x04 0x00 0x68 0x04 0x00 0x69 0x04 0x00 0x6a 0x04 0x00 0x7e 0x04 0x00 0x88 0x04 0x00 0x89 0x04 0x00 0x8a 0x04 0x00 0x8b 0x04 0x00 0x92 0x04 0x00 0x93 0x04 0x00 0x94 0x04 0x00 0x94 0x04 0x00 0x95 0x04 0x00 0x96 0x04 0x00 0x9d 0x04>;
+1138:			interrupt-names = "wdg0", "sci0", "sci1", "ir_std", "ir_s2", "keyled_ct1642", "keyled_std", "gsf0", "spacc_int_ree", "dmx", "aiao", "hdmi", "vdp", "tde", "gfx2d", "vpss0", "gpu", "vdec_vdh", "mdma_irq", "png", "jpeg", "venc", "jpge", "vdec_scd", "vdec_vdh_safe", "vdec_scd_safe", "spacc_int_tee", "vdh_pxp_safe", "vdh_pxp", "vdh_bd_safe", "vdh_bd", "SecInvokeirq", "hdmi_cec", "mmu_vdh_safe", "mmu_vdh_s", "mmu_vdh", "pastc", "sm2";
+1139-		};
+1140-	};
+--
+1172-		freq_volt_check = "/freq_volt_check@0";
+1173-		avs_compensation = "/avs@0";
+1174:		rsvmem = "/reserved-memory";
+1175:		ramoops_ram = "/reserved-memory/ramoops";
+1176:		dump_mem = "/reserved-memory/mntndump";
+1177:		mntn_mem = "/reserved-memory/bbox-mem";
+1178-		cluster0 = "/cpus/cpu-map/cluster0";
+1179-		CPU0 = "/cpus/cpu@0";
