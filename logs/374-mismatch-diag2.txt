@@ -1,0 +1,5 @@
+cat /sys/kernel/debug/mmc0/err_stats
+# Command Timeout Occurred:	 0
+# Command CRC Errors Occurred:	 0
+# Data Timeout Occurred:	 0
+# Data CRC Errors Occurred

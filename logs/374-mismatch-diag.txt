@@ -1,0 +1,13 @@
+ls -la /tmp/hg680kd-emmc-backup/; cat /sys/kernel/debug/mmc0/err_stats; dmesg | grep -iE 'mmc|sda|usb|fat|error|fail|reset' | tail -n 40
+-rwxr-xr-x    1      1025 ext_csd.hex
+-rwxr-xr-x    1      3989 RESTORE.md
+-rwxr-xr-x    1      2914 partition-layout.txt
+-rwxr-xr-x    1      2408 uboot-printenv.txt
+-rwxr-xr-x    1 1375731712 mmcblk0.img.part03
+-rwxr-xr-x    1 2147483648 mmcblk0.img.part02
+-rwxr-xr-x    1 2147483648 mmcblk0.img.part01
+-rwxr-xr-x    1 2147483648 mmcblk0.img.part00
+drwxr-xr-x    2     16384 partitions
+drwxr-xr-x    7     16384 ..
+drwxr-xr-x    3     16384 .
+# Command Timeout Occurr

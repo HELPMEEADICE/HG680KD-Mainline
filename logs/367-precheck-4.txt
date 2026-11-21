@@ -1,0 +1,35 @@
+
+# busybox --list; mkdir -p /mnt/usb; mount -o ro /dev/sda1 /mnt/usb && df -h /mnt/usb && df -k /mnt/usb && mount | grep sda1 && ls -la /mnt/usb; umount /mnt/usb
+ash
+cat
+chmod
+cttyhack
+cut
+dd
+dmesg
+echo
+find
+free
+grep
+hexdump
+hostname
+ifconfig
+ls
+mount
+ping
+printf
+readlink
+reboot
+setsid
+sh
+sha256sum
+sleep
+stat
+umount
+uname
+wget
+sh: mkdir: not found
+mount: mounting /dev/sda1 on /mnt/usb failed: No such file or directory
+umount: can't unmount /mnt/usb: No such file or directory
+# 
+[host] shell command elapsed: 0.05 s

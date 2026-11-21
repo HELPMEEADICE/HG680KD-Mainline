@@ -1,0 +1,26 @@
+
+# mount -t debugfs none /sys/kernel/debug 2>/dev/null; ls /sys/kernel/debug/mmc0/; cat /sys/kernel/debug/mmc0/ios; grep ^ /sys/block/mmcblk0/device/name /sys/block/mmcblk0/device/cid /sys/block/mmcblk0/device/csd /sys/block/mmcblk0/device/enhanced_area_offset /sys/block/mmcblk0/device/raw_rpmb_size_mult 2>/dev/null; mount; fdisk -l /dev/sda /dev/mmcblk0 2>/dev/null; blkid /dev/sda* 2>/dev/null; which dd sha256sum blkid fdisk mount umount blockdev
+ios        caps       caps2      clock      err_state  err_stats  mmc0:0001
+clock:		192000000 Hz
+actual clock:	192000000 Hz
+vdd:		21 (3.3 ~ 3.4 V)
+bus mode:	2 (push-pull)
+chip select:	0 (don't care)
+power mode:	2 (on)
+bus width:	3 (8 bits)
+timing spec:	10 (mmc HS400 enhanced strobe)
+signal voltage:	1 (1.80 V)
+driver type:	0 (driver type B)
+/sys/block/mmcblk0/device/name:B10030
+/sys/block/mmcblk0/device/cid:f4012242313030333021576bcdff6b00
+/sys/block/mmcblk0/device/csd:d00f01320f5903ffffffffef8a404000
+/sys/block/mmcblk0/device/enhanced_area_offset:18446744073709551594
+/sys/block/mmcblk0/device/raw_rpmb_size_mult:0x20
+rootfs on / type rootfs (rw,size=1009420k,nr_inodes=252355)
+devtmpfs on /dev type devtmpfs (rw,relatime,size=1009420k,nr_inodes=252355,mode=755)
+proc on /proc type proc (rw,relatime)
+sysfs on /sys type sysfs (rw,relatime)
+none on /sys/kernel/debug type debugfs (rw,relatime)
+sh: which: not found
+# 
+[host] shell command elapsed: 0.12 s

@@ -1,0 +1,6 @@
+
+# mount -o ro /dev/sda1 /tmp && grep sda1 /proc/mounts && stat -f /tmp && ls -la /tmp; umount /tmp
+/dev/sda1 /tmp vfat ro,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+stat: unrecognized option: f
+# 
+[host] shell command elapsed: 0.05 s

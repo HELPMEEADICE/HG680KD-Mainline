@@ -1,0 +1,19 @@
+
+# busybox --list | tr '\n' ' '; echo; cat /proc/filesystems; ls /sys/kernel/debug/mmc0/mmc0:0001/
+sh: tr: not found
+
+nodev	sysfs
+nodev	tmpfs
+nodev	proc
+nodev	devtmpfs
+nodev	debugfs
+nodev	sockfs
+nodev	pipefs
+nodev	ramfs
+nodev	devpts
+	ext3
+	ext4
+	vfat
+state    quirks   status   ext_csd
+# 
+[host] shell command elapsed: 0.03 s

@@ -1,0 +1,57 @@
+
+# ls -la / /mnt /tmp /bin /usr/bin 2>/dev/null; mount -o ro /dev/sda1 /mnt && ls -la /mnt && umount /mnt
+/bin:
+-rwxr-xr-x    1    329408 busybox
+-rwxr-xr-x    1   2063976 fastfetch
+-rwxr-xr-x    1    178336 lima-test
+-rwxr-xr-x    1    235888 memtest-2g
+-rwxr-xr-x    1    179632 fb-test
+-rwxr-xr-x    1    179560 bt-test
+lrwxrwxrwx    1         7 cat -> busybox
+lrwxrwxrwx    1         7 cttyhack -> busybox
+lrwxrwxrwx    1         7 cut -> busybox
+lrwxrwxrwx    1         7 dd -> busybox
+lrwxrwxrwx    1         7 dmesg -> busybox
+lrwxrwxrwx    1         7 echo -> busybox
+lrwxrwxrwx    1         7 find -> busybox
+lrwxrwxrwx    1         7 free -> busybox
+lrwxrwxrwx    1         7 grep -> busybox
+lrwxrwxrwx    1         7 hexdump -> busybox
+lrwxrwxrwx    1         7 hostname -> busybox
+lrwxrwxrwx    1         7 ls -> busybox
+lrwxrwxrwx    1         7 mount -> busybox
+lrwxrwxrwx    1         7 printf -> busybox
+lrwxrwxrwx    1         7 readlink -> busybox
+lrwxrwxrwx    1         7 reboot -> busybox
+lrwxrwxrwx    1         7 setsid -> busybox
+lrwxrwxrwx    1         7 sha256sum -> busybox
+lrwxrwxrwx    1         7 sh -> busybox
+lrwxrwxrwx    1         7 sleep -> busybox
+lrwxrwxrwx    1         7 stat -> busybox
+lrwxrwxrwx    1         7 umount -> busybox
+lrwxrwxrwx    1         7 uname -> busybox
+lrwxrwxrwx    1         7 ifconfig -> busybox
+lrwxrwxrwx    1         7 ping -> busybox
+lrwxrwxrwx    1         7 wget -> busybox
+lrwxrwxrwx    1         7 chmod -> busybox
+drwxrwxrwt    9       200 ..
+drwxr-xr-x    2       700 .
+
+/tmp:
+drwxrwxrwt    9       200 ..
+drwxrwxrwt    2        40 .
+
+/:
+drwxr-xr-x    2       700 bin
+drwxr-xr-x    4      1840 dev
+drwxr-xr-x    3       120 etc
+dr-xr-xr-x   82         0 proc
+dr-xr-xr-x   12         0 sys
+drwxrwxrwt    2        40 tmp
+-rwxr-xr-x    1       685 init
+drwxr-xr-x    3        60 lib
+drwxrwxrwt    9       200 ..
+drwxrwxrwt    9       200 .
+mount: mounting /dev/sda1 on /mnt failed: No such file or directory
+# 
+[host] shell command elapsed: 0.19 s

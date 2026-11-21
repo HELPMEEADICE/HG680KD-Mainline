@@ -117,6 +117,13 @@ bash scripts/build.sh full "$root" "$root/inputs" arm64-all-2g-hdmi-wifi-probe
   - **GPU Devfreq**：`f9200000.gpu` 支持 `200/300 MHz`（共享 `dvdd` 实读 `896607 µV`），两档位均通过 `lima-test` 4096/4096 像素匹配。[GPU Devfreq 日志](logs/365-dvfs-gpu-devfreq.txt)
   - **全项回归**：四核 SMP（`0-3`）、`MemTotal = 2,023,512 kB`、HDMI 1080p `simpledrm`、RTL8761BTV 蓝牙 `hci0`、GMAC 100 Mb/s（0% 丢包）、USB U 盘与 eMMC HS400ES（`ro=1`）均无退化。[全项回归日志](logs/366-dvfs-full-regression.txt)
 
+### eMMC 全量无损备份与逐位校验
+
+基于纯 RAM 启动的 [arm64-7.2.5-all-2g-hdmi-bt-dvfs/boot.img](artifacts/arm64-7.2.5-all-2g-hdmi-bt-dvfs/boot.img)（eMMC HS400ES 192 MHz 8-bit，`ro=1` 全程只读），已完成板载 `7,818,182,656` 字节（`15,269,888` 扇区，`7.28 GiB`）eMMC 到外接 SanDisk FAT32 U 盘（`/hg680kd-emmc-backup/`）的双层无损备份与防缓存冷读逐位校验：
+- **引导与分区拓扑**：`EXT_CSD[179] = 0x38`（`BOOT_PARTITION_ENABLE = 7`，从 User Area LBA 0 启动，未启用 `boot0`/`boot1` 硬件引导分区）；无 MBR/GPT 头，分区由原厂 U-Boot `blkdevparts` 定义（共 24 个分区）。[U-Boot printenv 快照](logs/370-uboot-printenv.txt)
+- **整盘分卷与校验**：因 FAT32 单文件 4 GiB 上限，按 `2048 MiB` 切分为 `mmcblk0.img.part00`–`part03`。`sync` + `drop_caches=3` 后从 U 盘冷读拼合流与直接读取 `/dev/mmcblk0` 的 SHA256 100% 一致：`addea687905f550835a996b24b36c2697e031539b8f91aa4a4516bdd8039696b`（`mmc0 err_stats` 全程 0 错误）。[校验清单](logs/373-backup-sha256sums.txt) · [校验日志](logs/375-emmc-backup-reverify.txt)
+- **独立关键分区与元数据**：已单独导出 `fastboot.bin`、`bootargs.bin`、`bootargsbak.bin`、`recovery.img`、`deviceinfo.bin`、`securestore.bin`、`atf.bin`、`baseparam.bin`、`pqparam.bin`、`dtbo.img`、`logo.img`、`logobak.img`、`dfx.bin`、`recoverybak.img`、`boot.img`、`misc.bin`、`trustedcore.bin` 共 17 个关键分区（全部冷读逐位一致），并在 U 盘备份目录内生成 `uboot-printenv.txt`、`partition-layout.txt`、`ext_csd.hex`、`SHA256SUMS.txt` 与 `RESTORE.md`，最后已安全 `umount` U 盘。
+
 每个产物目录同时保存内核映像（ARM32 的 `zImage` 或 ARM64 的 `Image`）、DTB、initramfs、配置、System.map、vmlinux 和 SHA256 清单。
 
 ## 内存和装载地址

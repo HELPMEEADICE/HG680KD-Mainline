@@ -1,0 +1,15 @@
+
+# grep ^ /sys/block/mmcblk0/ro /sys/block/mmcblk0/mmcblk0p*/ro /sys/block/mmcblk0/size /sys/block/mmcblk0/queue/hw_sector_size /sys/block/mmcblk0/queue/logical_block_size; cat /sys/kernel/debug/mmc0/ios; ls -la /dev/mmcblk0*
+/sys/block/mmcblk0/ro:1
+/sys/block/mmcblk0/mmcblk0p1/ro:1
+/sys/block/mmcblk0/mmcblk0p2/ro:1
+/sys/block/mmcblk0/size:15269888
+/sys/block/mmcblk0/queue/hw_sector_size:512
+/sys/block/mmcblk0/queue/logical_block_size:512
+cat: can't open '/sys/kernel/debug/mmc0/ios': No such file or directory
+crw-------    1  253,   0 /dev/mmcblk0rpmb
+brw-------    1  179,   2 /dev/mmcblk0p2
+brw-------    1  179,   1 /dev/mmcblk0p1
+brw-------    1  179,   0 /dev/mmcblk0
+# 
+[host] shell command elapsed: 0.06 s

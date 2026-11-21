@@ -1,0 +1,10 @@
+
+# mount -o ro /dev/sda1 /tmp && ls -la /tmp; umount /tmp
+drwxr-xr-x    3     16384 Android
+drwxr-xr-x    2     16384 LOST.DIR
+drwxr-xr-x    3     16384 HG680KD
+drwxr-xr-x    2     16384 System Volume Information
+drwxrwxrwt    9       200 ..
+drwxr-xr-x    6     16384 .
+# 
+[host] shell command elapsed: 0.11 s
