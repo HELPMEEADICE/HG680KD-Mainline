@@ -1,0 +1,42 @@
+
+# uname -r; cat /proc/cmdline; command -v ffmpeg; ffmpeg -hwaccels; cat /proc/mounts; cat /sys/block/mmcblk0/ro; ls /dev/video* /dev/media*; ip addr; ip route
+7.3.5-hg680kd-arm64-vdec
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+sh: command: not found
+sh: ffmpeg: not found
+rootfs / rootfs rw,size=809608k,nr_inodes=202402 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=809608k,nr_inodes=202402,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+1
+/dev/media0  /dev/video0
+sh: ip: not found
+sh: ip: not found
+# 
+# ifconfig -a; ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up; ping -c 2 -W 2 192.168.6.160; cat /sys/devices/system/cpu/online; ls /sys/class/thermal; ls /sys/devices/system/cpu/cpufreq
+eth0      Link encap:Ethernet  HWaddr 22:AC:23:0C:6F:28  
+          BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+          Interrupt:17 
+
+lo        Link encap:Local Loopback  
+          LOOPBACK  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+PING 192.168.6.160 (192.168.6.160): 56 data bytes
+64 bytes from 192.168.6.160: seq=0 ttl=64 time=0.646 ms
+64 bytes from 192.168.6.160: seq=1 ttl=64 time=0.364 ms
+
+--- 192.168.6.160 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 0.364/0.505/0.646 ms
+0-3
+cooling_device0  thermal_zone0    cooling_device1
+policy0    boost      schedutil
+# 

@@ -1,0 +1,15 @@
+
+# (uname -r; cat /proc/mounts; cat /sys/block/mmcblk0/ro; grep hi3798mv320-vdec /proc/interrupts; grep Cma /proc/meminfo); printf '\nEXIT=%s\n' $?
+7.3.5-hg680kd-arm64-vdec
+rootfs / rootfs rw,size=812040k,nr_inodes=203010 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=812040k,nr_inodes=203010,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+1
+  19:       4824          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+CmaTotal:         393216 kB
+CmaFree:          388568 kB
+
+EXIT=0
+# 

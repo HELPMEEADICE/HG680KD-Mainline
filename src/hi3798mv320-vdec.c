@@ -6,6 +6,8 @@
 #include <linux/genalloc.h>
 #include <linux/interrupt.h>
 #include <linux/io.h>
+#include <linux/ktime.h>
+#include <linux/math64.h>
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/platform_device.h>
@@ -112,6 +114,7 @@ struct vdec_dev {
 	void *sinks;
 	dma_addr_t sinks_dma;
 	int pxp_irq, smmu_irq;
+	ktime_t pxp_done_at;
 	u32 status, fault;
 	unsigned int slot;
 	bool tlb_dirty, dead;
@@ -141,6 +144,11 @@ struct vdec_hevc_tiles {
 	unsigned int cols, rows;
 };
 
+struct vdec_timing {
+	u64 rbsp_ns, hw_ns, detile_ns, clear_ns;
+	u32 frames;
+};
+
 struct vdec_ctx {
 	struct vdec_dev *vdec;
 	const struct vdec_codec_ops *codec;
@@ -153,6 +161,8 @@ struct vdec_ctx {
 	unsigned int stride, y_size, vu_size, tail_size, pmv_offset, pmv_size;
 	unsigned int sequence_out, sequence_cap;
 	unsigned int num_slices, stream_used, last_mb;
+	u64 picture_rbsp_ns;
+	struct vdec_timing timing;
 	struct vdec_buffer *held;
 	u64 held_timestamp;
 	struct v4l2_ctrl_h264_sps picture_sps;
@@ -250,6 +260,8 @@ static irqreturn_t vdec_pxp_irq(int irq, void *data)
 
 	if (!ack && !(status & PXP_DECODE_ERROR))
 		return IRQ_NONE;
+	if (status & PXP_DECODE_DONE)
+		vdec->pxp_done_at = ktime_get();
 	if (ack)
 		writel(ack, vdec->pxp + PXP_IRQ_CLEAR);
 	if (status & (PXP_DECODE_DONE | PXP_DECODE_ERROR)) {
@@ -315,10 +327,11 @@ static int vdec_reset(struct vdec_dev *vdec)
 	return 0;
 }
 
-static int vdec_submit(struct vdec_dev *vdec, const struct vdec_dma *work)
+static int vdec_submit(struct vdec_dev *vdec, const struct vdec_dma *work, u64 *hw_ns)
 {
 	void __iomem *slot = vdec->vdh + VDH_SLOT + vdec->slot * VDH_SLOT_STRIDE;
 	unsigned long done;
+	ktime_t submitted_at;
 	u32 status, fault;
 	int ret = 0;
 
@@ -340,6 +353,7 @@ static int vdec_submit(struct vdec_dev *vdec, const struct vdec_dma *work)
 	writel(work->iova >> 4, slot + 0x08);
 	dma_wmb();
 	vdec->tlb_dirty = true;
+	submitted_at = ktime_get();
 	writel(1, slot);
 	writel(1, slot + 0x10);
 
@@ -356,6 +370,9 @@ static int vdec_submit(struct vdec_dev *vdec, const struct vdec_dma *work)
 	else if (FIELD_GET(GENMASK(26, 24), status) != vdec->slot ||
 		 !(status & PXP_DECODE_DONE) || (status & (PXP_DECODE_ERROR | 0xffff)))
 		ret = -EIO;
+
+	if (!ret)
+		*hw_ns = ktime_sub(vdec->pxp_done_at, submitted_at);
 
 	if (ret) {
 		const __le32 *up = work->cpu + MSG_UP;
@@ -712,10 +729,11 @@ static void vdec_detile_p010(__le16 *dst, const u8 *src, const u8 *tail,
 	}
 }
 
-static int vdec_copy_rbsp(u8 *dst, const u8 *src, unsigned int size,
+static int vdec_copy_rbsp(struct vdec_ctx *ctx, u8 *dst, const u8 *src, unsigned int size,
 			  unsigned int header)
 {
 	unsigned int i, length = header, zeroes = 0;
+	ktime_t start = ktime_get();
 
 	/* Keep the start code and NAL header ahead of the VDH's bit offset. */
 	memcpy(dst, src, length);
@@ -734,6 +752,7 @@ static int vdec_copy_rbsp(u8 *dst, const u8 *src, unsigned int size,
 		dst[length++] = byte;
 		zeroes = byte ? 0 : min(zeroes + 1, 2U);
 	}
+	ctx->picture_rbsp_ns += ktime_sub(ktime_get(), start);
 	return length;
 }
 
@@ -751,6 +770,9 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 	struct vdec_buffer *out = to_vdec_buffer(&dst->vb2_buf);
 	unsigned int width = ctx->output.width, height = ctx->output.height;
 	u8 *output = vb2_plane_vaddr(&dst->vb2_buf, 0);
+	struct vdec_timing *timing = &ctx->timing;
+	ktime_t start;
+	u64 clear_ns, hw_ns;
 	int ret;
 
 	ctx->codec->end_picture(ctx);
@@ -758,11 +780,14 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 	if (ctx->vdec->dead)
 		return -EIO;
 
+	start = ktime_get();
 	memset(out->surface.cpu, 0, out->surface.size);
-	ret = vdec_submit(ctx->vdec, &ctx->workspace);
+	clear_ns = ktime_sub(ktime_get(), start);
+	ret = vdec_submit(ctx->vdec, &ctx->workspace, &hw_ns);
 	if (ret)
 		return ret;
 
+	start = ktime_get();
 	if (ctx->tail_size) {
 		const u8 *tail = out->surface.cpu + ctx->y_size + ctx->vu_size;
 
@@ -776,6 +801,12 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 		vdec_detile_plane(output + width * height, out->surface.cpu + ctx->y_size,
 				  width, height / 2, ctx->stride, 8);
 	}
+	timing->detile_ns += ktime_sub(ktime_get(), start);
+	timing->rbsp_ns += ctx->picture_rbsp_ns;
+	timing->hw_ns += hw_ns;
+	timing->clear_ns += clear_ns;
+	timing->frames++;
+	ctx->picture_rbsp_ns = 0;
 	out->decoded = true;
 	out->timestamp = ctx->held_timestamp;
 	vb2_set_plane_payload(&dst->vb2_buf, 0, ctx->capture.plane_fmt[0].sizeimage);
@@ -833,6 +864,7 @@ static int vdec_h264_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *
 			return -EINVAL;
 		ctx->held = out;
 		ctx->held_timestamp = src->vb2_buf.timestamp;
+		ctx->picture_rbsp_ns = 0;
 		ctx->stream_used = 0;
 		ctx->picture_sps = *sps;
 		ctx->picture_pps = *pps;
@@ -895,7 +927,7 @@ static int vdec_h264_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *
 
 	stream = ctx->workspace.cpu + STREAM_OFFSET + ctx->stream_used;
 	/* The VDH entropy decoder consumes RBSP at the slice data offset. */
-	ret = vdec_copy_rbsp(stream, input, bytes, prefix + 1);
+	ret = vdec_copy_rbsp(ctx, stream, input, bytes, prefix + 1);
 	if (ret < 0)
 		return ret;
 	bytes = ret;
@@ -1375,6 +1407,7 @@ static int vdec_hevc_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *
 			return -EINVAL;
 		ctx->held = out;
 		ctx->held_timestamp = src->vb2_buf.timestamp;
+		ctx->picture_rbsp_ns = 0;
 		ctx->stream_used = 0;
 		ctx->hevc_picture_sps = *sps;
 		ctx->hevc_picture_pps = *pps;
@@ -1450,8 +1483,11 @@ static int vdec_hevc_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *
 	else
 		return -EINVAL;
 	if (input[prefix] != sp->nal_unit_type << 1 || input[prefix + 1] != sp->nuh_temporal_id_plus1 ||
-	    sp->data_byte_offset < prefix + 2 || sp->data_byte_offset >= bytes ||
-	    sp->bit_size != bytes * 8)
+	    sp->data_byte_offset < prefix + 2 || sp->data_byte_offset >= bytes)
+		return -EINVAL;
+	/* Clients report either the whole NAL span or the slice payload span. */
+	if (sp->bit_size != bytes * 8 &&
+	    sp->bit_size != (bytes - sp->data_byte_offset) * 8)
 		return -EINVAL;
 	/* Annex B data_byte_offset includes the prefix and the RBSP header. */
 	bit = sp->data_byte_offset * 8;
@@ -1470,7 +1506,7 @@ static int vdec_hevc_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *
 		vdec_hevc_picture_message(ctx, out, refs, log2_ctu, ctu_width, ctu_height);
 
 	stream = ctx->workspace.cpu + HEVC_STREAM_OFFSET + ctx->stream_used;
-	ret = vdec_copy_rbsp(stream, input, bytes, prefix + 2);
+	ret = vdec_copy_rbsp(ctx, stream, input, bytes, prefix + 2);
 	if (ret < 0)
 		return ret;
 	bytes = ret;
@@ -1563,6 +1599,7 @@ static void vdec_worker(struct work_struct *work)
 	}
 	if (ret) {
 		ctx->num_slices = 0;
+		ctx->picture_rbsp_ns = 0;
 		src->flags &= ~V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF;
 		dev_dbg(vdec->dev, "request decode returned %d\n", ret);
 	}
@@ -1677,6 +1714,7 @@ static int vdec_start_streaming(struct vb2_queue *vq, unsigned int count)
 static void vdec_stop_streaming(struct vb2_queue *vq)
 {
 	struct vdec_ctx *ctx = vb2_get_drv_priv(vq);
+	struct vdec_timing *timing = &ctx->timing;
 	struct vb2_queue *cap = v4l2_m2m_get_dst_vq(ctx->fh.m2m_ctx);
 	bool output = V4L2_TYPE_IS_OUTPUT(vq->type);
 	struct vb2_v4l2_buffer *buf;
@@ -1697,6 +1735,18 @@ static void vdec_stop_streaming(struct vb2_queue *vq)
 			to_vdec_buffer(vb)->decoded = false;
 	}
 	ctx->num_slices = 0;
+	ctx->picture_rbsp_ns = 0;
+	if (timing->frames) {
+		dev_info(ctx->vdec->dev,
+			 "%p4cc -> %p4cc %ux%u timing frames=%u avg_ns/frame rbsp=%llu hw=%llu detile=%llu clear=%llu\n",
+			 &ctx->output.pixelformat, &ctx->capture.pixelformat,
+			 ctx->output.width, ctx->output.height, timing->frames,
+			 div_u64(timing->rbsp_ns, timing->frames),
+			 div_u64(timing->hw_ns, timing->frames),
+			 div_u64(timing->detile_ns, timing->frames),
+			 div_u64(timing->clear_ns, timing->frames));
+		*timing = (struct vdec_timing) {};
+	}
 	if (output)
 		vdec_dma_free(ctx->vdec, &ctx->workspace);
 	mutex_unlock(&ctx->vdec->hw_lock);

@@ -1,0 +1,151 @@
+
+# (echo 'func vdec_worker +p' > /proc/dynamic_debug/control; grep 'request decode returned' /proc/dynamic_debug/control); printf '\nEXIT=%s\n' $?
+drivers/media/platform/hi3798mv320-vdec.c:1604 [hi3798mv320_vdec]vdec_worker =p "request decode returned %d\n"
+
+EXIT=0
+# (cd /tmp; AV_LOG_FORCE_NOCOLOR=1 ./ld-musl-aarch64.so.1 --library-path /tmp ./ffmpeg -nostdin -hide_banner -loglevel error -xerror -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p.mp4 -frames:v 40 -c:v wrapped_avframe -f null -; dmesg | grep -E 'request decode returned|PXP 0x|timing frames='); printf '\nEXIT=%s\n' $?
+<3>[   22.938600] hi3798mv320-vdec f8c30000.video-decoder: slot 0: decode -5 PXP 0x60000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/00000d08/94230000
+<3>[   25.641965] hi3798mv320-vdec f8c30000.video-decoder: slot 1: decode -5 PXP 0x1060000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/0000009e/94230000
+<3>[   25.688755] hi3798mv320-vdec f8c30000.video-decoder: slot 1: decode -5 PXP 0x1060000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/0000005e/94230000
+<3>[   25.735302] hi3798mv320-vdec f8c30000.video-decoder: slot 1: decode -5 PXP 0x1060000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/0000011e/94230000
+<6>[   28.281264] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=15 avg_ns/frame rbsp=258566 hw=4565763 detile=34374202 clear=618361
+<6>[   37.646251] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 1920x1080 timing frames=240 avg_ns/frame rbsp=104378 hw=2533805 detile=32747667 clear=634294
+<6>[   72.112510] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 3840x2160 timing frames=240 avg_ns/frame rbsp=244916 hw=9705947 detile=128662781 clear=2322788
+<6>[  160.874050] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> P010 little-endian (0x30313050) 3840x2160 timing frames=240 avg_ns/frame rbsp=306590 hw=9767439 detile=352017485 clear=3237811
+<3>[  166.006664] hi3798mv320-vdec f8c30000.video-decoder: slot 0: decode -5 PXP 0x60000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/00000d08/94230000
+<7>[  166.006719] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -5
+<7>[  166.006917] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.008811] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.010850] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.013335] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.015079] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.015373] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.015899] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.016072] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.021614] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.022002] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.022293] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.024305] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.024922] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.025728] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.025804] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.026195] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.026829] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.029092] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.029376] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.030101] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.032625] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.033365] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.033867] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.034123] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.034371] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.034968] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.035241] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.035824] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.036415] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.036975] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.037104] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.037880] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.038276] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.038832] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.041409] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.041922] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.042765] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.043111] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.043524] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.043795] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.044787] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.045412] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.045771] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<7>[  166.046293] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -2
+<6>[  166.060823] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=4 avg_ns/frame rbsp=191510 hw=5203396 detile=32031385 clear=665323
+
+EXIT=0
+# (echo 'func vdec_worker -p' > /proc/dynamic_debug/control); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (cd /tmp && wget -q -O h264-1080p-single-ref.mp4 http://192.168.6.172:8098/h264-1080p-single-ref.mp4 && sha256sum h264-1080p-single-ref.mp4); printf '\nEXIT=%s\n' $?
+af45ee4f7b2c88e47a98f931c4954c38eff4efe212fbe938064efb1456e033d6  h264-1080p-single-ref.mp4
+
+EXIT=0
+# (AV_LOG_FORCE_NOCOLOR=1 sh /tmp/vdec_ffmpeg_board.sh check h264-1080p-single-ref nv21); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p-single-ref.mp4 -map 0:v:0 -an -sn -dn -vf hwdownload,format=nv21 -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y h264-1080p-single-ref.hw.framemd5
+[h264 @ 0xffff9f159460] Reinit context to 1920x1088, pix_fmt: yuv420p
+[vist#0:0/h264 @ 0xffff9f158cc0] Selecting decoder 'h264' because of requested hwaccel method v4l2request
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'h264-1080p-single-ref.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9837 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High), 1 reference frame (avc1 / 0x31637661), yuv420p(progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], 9830 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx264
+[out#0/framemd5 @ 0xffff9f154830] Adding streams from explicit maps...
+[vost#0:0/rawvideo @ 0xffff9f156030] Created video stream from input stream 0:0
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> rawvideo (native))
+[vost#0:0/rawvideo @ 0xffff9f156030] Starting thread...
+[vf#0:0 @ 0xffff9f155030] Starting thread...
+[vist#0:0/h264 @ 0xffff9f158cc0] [dec:h264 @ 0xffff9f14e030] Starting thread...
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9f08f9e0] Starting thread...
+[AVHWFramesContext @ 0xffff9f159d10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S264
+[AVHWFramesContext @ 0xffff9f159d10] Using CAPTURE buffer format NV21 (1920x1088)
+[h264 @ 0xffff9f14c490] Reinit context to 1920x1088, pix_fmt: drm_prime
+[graph -1 input from stream 0:0 @ 0xffff9efff800] w:1920 h:1080 pixfmt:drm_prime tb:1/15360 fr:60/1 sar:1/1 csp:unknown range:unknown alpha:unspecified
+[graph -1 input from stream 0:0 @ 0xffff9efff800] video frame properties congruent with link at pts_time: 0
+Output #0, framemd5, to 'h264-1080p-single-ref.hw.framemd5':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: rawvideo, 1 reference frame (NV21 / 0x3132564E), nv21(progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 1492992 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      handler_name    : GPAC ISO Video Handler
+[out#0/framemd5 @ 0xffff9f154830] Starting thread...
+frame=   15 fps=0.0 q=-0.0 size=       1KiB time=00:00:00.25 bitrate=  42.8kbits/s speed=0.496x elapsed=0:00:00.50    frame=   31 fps= 31 q=-0.0 size=       3KiB time=00:00:00.53 bitrate=  39.3kbits/s speed=0.531x elapsed=0:00:01.00    frame=   49 fps= 33 q=-0.0 size=       4KiB time=00:00:00.85 bitrate=  38.2kbits/s speed=0.565x elapsed=0:00:01.50    frame=   67 fps= 33 q=-0.0 size=       5KiB time=00:00:01.15 bitrate=  38.2kbits/s speed=0.574x elapsed=0:00:02.00    frame=   88 fps= 35 q=-0.0 size=       7KiB time=00:00:01.55 bitrate=  37.0kbits/s speed=0.619x elapsed=0:00:02.50    frame=  109 fps= 36 q=-0.0 size=       9KiB time=00:00:01.95 bitrate=  36.3kbits/s speed=0.648x elapsed=0:00:03.00    frame=  127 fps= 36 q=-0.0 size=      10KiB time=00:00:02.25 bitrate=  36.6kbits/s speed=0.641x elapsed=0:00:03.50    frame=  144 fps= 36 q=-0.0 size=      11KiB time=00:00:02.53 bitrate=  36.8kbits/s speed=0.632x elapsed=0:00:04.00    frame=  159 fps= 35 q=-0.0 size=      13KiB time=00:00:02.78 bitrate=  37.0kbits/s speed=0.617x elapsed=0:00:04.51    frame=  175 fps= 35 q=-0.0 size=      14KiB time=00:00:03.05 bitrate=  37.1kbits/s speed=0.608x elapsed=0:00:05.01    frame=  192 fps= 35 q=-0.0 size=      15KiB time=00:00:03.33 bitrate=  37.2kbits/s speed=0.603x elapsed=0:00:05.52    frame=  209 fps= 35 q=-0.0 size=      16KiB time=00:00:03.61 bitrate=  37.3kbits/s speed= 0.6x elapsed=0:00:06.02    [in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9f08f9e0] EOF while reading input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9f08f9e0] Terminating thread with return code 0 (success)
+[vist#0:0/h264 @ 0xffff9f158cc0] [dec:h264 @ 0xffff9f14e030] Decoder thread received EOF packet
+frame=  225 fps= 34 q=-0.0 size=      18KiB time=00:00:03.88 bitrate=  37.4kbits/s speed=0.595x elapsed=0:00:06.52    [vist#0:0/h264 @ 0xffff9f158cc0] [dec:h264 @ 0xffff9f14e030] Decoder returned EOF, finishing
+[vist#0:0/h264 @ 0xffff9f158cc0] [dec:h264 @ 0xffff9f14e030] Terminating thread with return code 0 (success)
+[vf#0:0 @ 0xffff9f155030] Filtergraph returned EOF, finishing
+[vf#0:0 @ 0xffff9f155030] All consumers returned EOF
+[vf#0:0 @ 0xffff9f155030] Terminating thread with return code 0 (success)
+[vost#0:0/rawvideo @ 0xffff9f156030] [enc:rawvideo @ 0xffff9f159f10] Encoder thread received EOF
+[vost#0:0/rawvideo @ 0xffff9f156030] Terminating thread with return code 0 (success)
+frame=  240 fps= 34 q=-0.0 size=      19KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:07.02    [out#0/framemd5 @ 0xffff9f154830] All streams finished
+[out#0/framemd5 @ 0xffff9f154830] Terminating thread with return code 0 (success)
+[AVIOContext @ 0xffff9f14e2c0] Statistics: 19417 bytes written, 0 seeks, 1 writeouts
+[out#0/framemd5 @ 0xffff9f154830] Output file #0 (h264-1080p-single-ref.hw.framemd5):
+[out#0/framemd5 @ 0xffff9f154830]   Output stream #0:0 (video): 240 frames encoded; 240 packets muxed (746496000 bytes); 
+[out#0/framemd5 @ 0xffff9f154830]   Total: 240 packets (746496000 bytes) muxed
+[out#0/framemd5 @ 0xffff9f154830] video:729000KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 34 q=-0.0 Lsize=      19KiB time=00:00:04.00 bitrate=  38.8kbits/s speed=0.568x elapsed=0:00:07.04    
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9f08f9e0] Input file #0 (h264-1080p-single-ref.mp4):
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9f08f9e0]   Input stream #0:0 (video): 240 packets read (4915139 bytes); 240 frames decoded; 0 decode errors; 
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9f08f9e0]   Total: 240 packets (4915139 bytes) demuxed
+[AVIOContext @ 0xffff9f08fb30] Statistics: 4918661 bytes read, 0 seeks
+
+Exiting with exit code 0
+1280b9af285220071a97424d40d66481856640dac791be679855758e5af01956  -
+  19:        744          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  19:        984          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+EXIT=0
+# 

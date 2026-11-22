@@ -1,0 +1,7 @@
+stream|codec_name=h264|profile=High|width=1920|height=1080|pix_fmt=yuv420p|r_frame_rate=60/1|bit_rate=10405068|nb_frames=240
+    158 B
+      2 I
+     80 P
+56e922abad7fc3b2e24e95581f3f6c1e597b9633c5af47ba65a80fa8de8578b9  -
+67072988ec018d95b03b8cc90e2684de90a22b8cb255c29044bf50f92c9da863  h264-1080p-no-direct.mp4
+[libx264 @ 0x559a1a5c4640] frame B:158   Avg QP:25.84  size: 11851

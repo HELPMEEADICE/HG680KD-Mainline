@@ -1,0 +1,404 @@
+
+# (uname -r; cat /proc/mounts; printf 'EMMC_RO='; cat /sys/block/mmcblk0/ro); printf '\nEXIT=%s\n' $?
+7.3.5-hg680kd-arm64-vdec
+rootfs / rootfs rw,size=812040k,nr_inodes=203010 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=812040k,nr_inodes=203010,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+EMMC_RO=1
+
+EXIT=0
+# (echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 3); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (cd /tmp && wget -q -O ffmpeg http://192.168.6.172:8098/ffmpeg && sha256sum ffmpeg); printf '\nEXIT=%s\n' $?
+501b35250c63b8ee23ff7a41a516381163f394caf3862a612e25dc413c404634  ffmpeg
+
+EXIT=0
+# (cd /tmp && wget -q -O ld-musl-aarch64.so.1 http://192.168.6.172:8098/ld-musl-aarch64.so.1 && sha256sum ld-musl-aarch64.so.1); printf '\nEXIT=%s\n' $?
+42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c  ld-musl-aarch64.so.1
+
+EXIT=0
+# (cd /tmp && wget -q -O libdrm.so.2 http://192.168.6.172:8098/libdrm.so.2 && sha256sum libdrm.so.2); printf '\nEXIT=%s\n' $?
+a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd  libdrm.so.2
+
+EXIT=0
+# (cd /tmp && wget -q -O libudev.so.1 http://192.168.6.172:8098/libudev.so.1 && sha256sum libudev.so.1); printf '\nEXIT=%s\n' $?
+ad842e6ba84b99bf3e0f1bdfee801798e6114c455d601845df7f5cff8854b10c  libudev.so.1
+
+EXIT=0
+# (cd /tmp && wget -q -O vdec_ffmpeg_board.sh http://192.168.6.172:8098/vdec_ffmpeg_board.sh && sha256sum vdec_ffmpeg_board.sh); printf '\nEXIT=%s\n' $?
+c4d8e21322a627bfed74b489fc571691d9073a4096d6d4d5c39fbeaa4286ac80  vdec_ffmpeg_board.sh
+
+EXIT=0
+# (cd /tmp && wget -q -O h264-1080p.mp4 http://192.168.6.172:8098/h264-1080p.mp4 && sha256sum h264-1080p.mp4); printf '\nEXIT=%s\n' $?
+dbca2cd4ad1578460f62e246745dd236bfd13d71335c6e5b77b229bc1a709f2f  h264-1080p.mp4
+
+EXIT=0
+# (cd /tmp && wget -q -O hevc-1080p.mp4 http://192.168.6.172:8098/hevc-1080p.mp4 && sha256sum hevc-1080p.mp4); printf '\nEXIT=%s\n' $?
+a660d5262f738e3b7d8b20026e70c54196e6f1bd722df8632567c28c97dc2113  hevc-1080p.mp4
+
+EXIT=0
+# (cd /tmp && wget -q -O hevc-2160p.mp4 http://192.168.6.172:8098/hevc-2160p.mp4 && sha256sum hevc-2160p.mp4); printf '\nEXIT=%s\n' $?
+ecf5506f772c07df4db8d76eff89459a0bfacf3db6ec800840e115d6fbccb874  hevc-2160p.mp4
+
+EXIT=0
+# (cd /tmp && wget -q -O hevc10-2160p.mp4 http://192.168.6.172:8098/hevc10-2160p.mp4 && sha256sum hevc10-2160p.mp4); printf '\nEXIT=%s\n' $?
+d81c699d4179c88dc9e6fea073490867ccbd85795d6417f5b70ca7cc98704323  hevc10-2160p.mp4
+
+EXIT=0
+# (cd /tmp && chmod 755 ffmpeg ld-musl-aarch64.so.1); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh probe); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -version
+ffmpeg version b57fbbe Copyright (c) 2000-2026 the FFmpeg developers
+built with gcc 14.2.0 (GCC)
+configuration: --arch=aarch64 --target-os=linux --enable-cross-compile --cross-prefix=/home/hedc/hg680kd-mainline/source/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux- --cc=/home/hedc/hg680kd-mainline/out/musl-arm64/bin/musl-gcc --disable-autodetect --pkg-config=pkg-config --extra-cflags='-mno-outline-atomics -idirafter /home/hedc/hg680kd-mainline/out/headers-arm64/usr/include' --extra-ldflags='-L/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/lib -Wl,-rpath-link,/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/lib:/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/usr/lib' --extra-libs='-l:libc.musl-aarch64.so.1' --disable-doc --disable-debug --disable-ffplay --disable-ffprobe --disable-everything --disable-avdevice --enable-libdrm --enable-v4l2-request --enable-hwaccel='h264_v4l2request,hevc_v4l2request' --enable-decoder='h264,hevc' --enable-parser='h264,hevc' --enable-demuxer='mov,h264,hevc' --enable-protocol='file,pipe' --enable-encoder='wrapped_avframe,rawvideo' --enable-muxer='null,framemd5' --enable-filter='hwdownload,format,scale' --enable-bsf='h264_mp4toannexb,hevc_mp4toannexb'
+libavutil      60. 26.100 / 60. 26.100
+libavcodec     62. 28.100 / 62. 28.100
+libavformat    62. 12.100 / 62. 12.100
+libavfilter    11. 14.100 / 11. 14.100
+libswscale      9.  5.100 /  9.  5.100
+libswresample   6.  3.100 /  6.  3.100
+
+Exiting with exit code 0
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -hwaccels
+ffmpeg version b57fbbe Copyright (c) 2000-2026 the FFmpeg developers
+  built with gcc 14.2.0 (GCC)
+  configuration: --arch=aarch64 --target-os=linux --enable-cross-compile --cross-prefix=/home/hedc/hg680kd-mainline/source/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux- --cc=/home/hedc/hg680kd-mainline/out/musl-arm64/bin/musl-gcc --disable-autodetect --pkg-config=pkg-config --extra-cflags='-mno-outline-atomics -idirafter /home/hedc/hg680kd-mainline/out/headers-arm64/usr/include' --extra-ldflags='-L/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/lib -Wl,-rpath-link,/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/lib:/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/usr/lib' --extra-libs='-l:libc.musl-aarch64.so.1' --disable-doc --disable-debug --disable-ffplay --disable-ffprobe --disable-everything --disable-avdevice --enable-libdrm --enable-v4l2-request --enable-hwaccel='h264_v4l2request,hevc_v4l2request' --enable-decoder='h264,hevc' --enable-parser='h264,hevc' --enable-demuxer='mov,h264,hevc' --enable-protocol='file,pipe' --enable-encoder='wrapped_avframe,rawvideo' --enable-muxer='null,framemd5' --enable-filter='hwdownload,format,scale' --enable-bsf='h264_mp4toannexb,hevc_mp4toannexb'
+  libavutil      60. 26.100 / 60. 26.100
+  libavcodec     62. 28.100 / 62. 28.100
+  libavformat    62. 12.100 / 62. 12.100
+  libavfilter    11. 14.100 / 11. 14.100
+  libswscale      9.  5.100 /  9.  5.100
+  libswresample   6.  3.100 /  6.  3.100
+Hardware acceleration methods:
+drm
+v4l2request
+
+crw-------    1   81,   0 /dev/video0
+crw-------    1  253,   0 /dev/media0
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh check h264-1080p nv21); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p.mp4 -map 0:v:0 -an -sn -dn -vf hwdownload,format=nv21 -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y h264-1080p.hw.framemd5
+[0;36m[h264 @ 0xffffad2ab460] [0m[0;32mReinit context to 1920x1088, pix_fmt: yuv420p
+[0m[0;35m[vist#0:0/h264 @ 0xffffad2aacc0] [0m[0;32mSelecting decoder 'h264' because of requested hwaccel method v4l2request
+[0mInput #0, mov,mp4,m4a,3gp,3g2,mj2, from 'h264-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9763 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High), 1 reference frame (avc1 / 0x31637661), yuv420p(progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], 9756 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx264
+[1;35m[out#0/framemd5 @ 0xffffad2a6830] [0m[0;32mAdding streams from explicit maps...
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffad2a8030] [0m[0;32mCreated video stream from [0m[0;32minput stream 0:0[0m[0;32m
+[0mStream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> rawvideo (native))
+[1;35m[vost#0:0/rawvideo @ 0xffffad2a8030] [0m[0;32mStarting thread...
+[0m[1;32m[vf#0:0 @ 0xffffad2a7030] [0m[0;32mStarting thread...
+[0m[0;35m[vist#0:0/h264 @ 0xffffad2aacc0] [0m[0;39m[dec:h264 @ 0xffffad2a3030] [0m[0;32mStarting thread...
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffad1df9e0] [0m[0;32mStarting thread...
+[0m[0;39m[AVHWFramesContext @ 0xffffad284230] [0mUsing V4L2 media driver hi3798mv320-vde (7.3.5) for S264
+[0;39m[AVHWFramesContext @ 0xffffad284230] [0m[0;32mUsing CAPTURE buffer format NV21 (1920x1088)
+[0m[0;36m[h264 @ 0xffffad284490] [0m[0;32mReinit context to 1920x1088, pix_fmt: drm_prime
+[0m[1;32m[graph -1 input from stream 0:0 @ 0xffffad136800] [0m[0;32mw:1920 h:1080 pixfmt:drm_prime tb:1/15360 fr:60/1 sar:1/1 csp:unknown range:unknown alpha:unspecified
+[0m[1;32m[graph -1 input from stream 0:0 @ 0xffffad136800] [0m[0;32mvideo frame properties congruent with link at pts_time: 0
+[0mOutput #0, framemd5, to 'h264-1080p.hw.framemd5':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: rawvideo, 1 reference frame (NV21 / 0x3132564E), nv21(progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 1492992 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      handler_name    : GPAC ISO Video Handler
+[1;35m[out#0/framemd5 @ 0xffffad2a6830] [0m[0;32mStarting thread...
+[0mframe=   13 fps=0.0 q=-0.0 size=       1KiB time=00:00:00.35 bitrate=  26.9kbits/s speed= 0.7x elapsed=0:00:00.50    frame=   34 fps= 34 q=-0.0 size=       3KiB time=00:00:00.70 bitrate=  32.7kbits/s speed= 0.7x elapsed=0:00:01.00    frame=   55 fps= 37 q=-0.0 size=       4KiB time=00:00:01.05 bitrate=  34.6kbits/s speed= 0.7x elapsed=0:00:01.50    frame=   76 fps= 38 q=-0.0 size=       6KiB time=00:00:01.40 bitrate=  35.5kbits/s speed= 0.7x elapsed=0:00:02.00    frame=   98 fps= 39 q=-0.0 size=       8KiB time=00:00:01.76 bitrate=  36.1kbits/s speed=0.706x elapsed=0:00:02.50    frame=  119 fps= 40 q=-0.0 size=       9KiB time=00:00:02.11 bitrate=  36.5kbits/s speed=0.704x elapsed=0:00:03.00    frame=  140 fps= 40 q=-0.0 size=      11KiB time=00:00:02.46 bitrate=  36.8kbits/s speed=0.704x elapsed=0:00:03.50    frame=  161 fps= 40 q=-0.0 size=      13KiB time=00:00:02.81 bitrate=  37.0kbits/s speed=0.703x elapsed=0:00:04.00    frame=  183 fps= 41 q=-0.0 size=      14KiB time=00:00:03.18 bitrate=  37.1kbits/s speed=0.706x elapsed=0:00:04.50    frame=  204 fps= 41 q=-0.0 size=      16KiB time=00:00:03.53 bitrate=  37.3kbits/s speed=0.706x elapsed=0:00:05.00    [0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffad1df9e0] [0m[0;32mEOF while reading input
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffad1df9e0] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[0;35m[vist#0:0/h264 @ 0xffffad2aacc0] [0m[0;39m[dec:h264 @ 0xffffad2a3030] [0m[0;32mDecoder thread received EOF packet
+[0mframe=  225 fps= 41 q=-0.0 size=      18KiB time=00:00:03.88 bitrate=  37.4kbits/s speed=0.705x elapsed=0:00:05.50    [0;35m[vist#0:0/h264 @ 0xffffad2aacc0] [0m[0;39m[dec:h264 @ 0xffffad2a3030] [0m[0;32mDecoder returned EOF, finishing
+[0m[0;35m[vist#0:0/h264 @ 0xffffad2aacc0] [0m[0;39m[dec:h264 @ 0xffffad2a3030] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[1;32m[vf#0:0 @ 0xffffad2a7030] [0m[0;32mFiltergraph returned EOF, finishing
+[0m[1;32m[vf#0:0 @ 0xffffad2a7030] [0m[0;32mAll consumers returned EOF
+[0m[1;32m[vf#0:0 @ 0xffffad2a7030] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffad2a8030] [0m[0;39m[enc:rawvideo @ 0xffffad2abf10] [0m[0;32mEncoder thread received EOF
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffad2a8030] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[1;35m[out#0/framemd5 @ 0xffffad2a6830] [0m[0;32mAll streams finished
+[0m[1;35m[out#0/framemd5 @ 0xffffad2a6830] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[0;39m[AVIOContext @ 0xffffad2a32b0] [0m[0;32mStatistics: 19417 bytes written, 0 seeks, 1 writeouts
+[0m[1;35m[out#0/framemd5 @ 0xffffad2a6830] [0m[0;32mOutput file #0 (h264-1080p.hw.framemd5):
+[0m[1;35m[out#0/framemd5 @ 0xffffad2a6830] [0m[0;32m  Output stream #0:0 (video): [0m[0;32m240 frames encoded[0m[0;32m; [0m[0;32m240 packets muxed (746496000 bytes); [0m[0;32m
+[0m[1;35m[out#0/framemd5 @ 0xffffad2a6830] [0m[0;32m  Total: 240 packets (746496000 bytes) muxed
+[0m[1;35m[out#0/framemd5 @ 0xffffad2a6830] [0mvideo:729000KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 41 q=-0.0 Lsize=      19KiB time=00:00:04.00 bitrate=  38.8kbits/s speed=0.681x elapsed=0:00:05.87    
+[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffad1df9e0] [0m[0;32mInput file #0 (h264-1080p.mp4):
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffad1df9e0] [0m[0;32m  Input stream #0:0 (video): [0m[0;32m240 packets read (4878452 bytes); [0m[0;32m240 frames decoded; 0 decode errors[0m[0;32m; [0m[0;32m
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffad1df9e0] [0m[0;32m  Total: 240 packets (4878452 bytes) demuxed
+[0m[0;39m[AVIOContext @ 0xffffad1dfb30] [0m[0;32mStatistics: 4881999 bytes read, 0 seeks
+[0m[0;32m
+[0m[0;32mExiting with exit code 0
+[0m2a5dfe032b945396f4d939b4b4d701b5f70d314b4e4bd31747e5a5ab7ddf9bce  -
+  19:          0          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  19:         19          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh check hevc-1080p nv21); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc-1080p.mp4 -map 0:v:0 -an -sn -dn -vf hwdownload,format=nv21 -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y hevc-1080p.hw.framemd5
+[0;35m[vist#0:0/hevc @ 0xffffb3277cc0] [0m[0;32mSelecting decoder 'hevc' because of requested hwaccel method v4l2request
+[0mInput #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9376 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main), 1 reference frame (hvc1 / 0x31637668), yuv420p(tv, progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], 9362 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+[1;35m[out#0/framemd5 @ 0xffffb3278840] [0m[0;32mAdding streams from explicit maps...
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffb3272030] [0m[0;32mCreated video stream from [0m[0;32minput stream 0:0[0m[0;32m
+[0mStream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> rawvideo (native))
+[1;35m[vost#0:0/rawvideo @ 0xffffb3272030] [0m[0;32mStarting thread...
+[0m[1;32m[vf#0:0 @ 0xffffb3270080] [0m[0;32mStarting thread...
+[0m[0;35m[vist#0:0/hevc @ 0xffffb3277cc0] [0m[0;39m[dec:hevc @ 0xffffb3278e90] [0m[0;32mStarting thread...
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb31bf9e0] [0m[0;32mStarting thread...
+[0m[0;39m[AVHWFramesContext @ 0xffffb3263a20] [0mUsing V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+[0;39m[AVHWFramesContext @ 0xffffb3263a20] [0m[0;32mUsing CAPTURE buffer format NV21 (1920x1080)
+[0m[0;39m[V4L2RequestContext @ 0xffffb3277b50] [0m[0;32mslice-based decoder with SLICE_PARAMS=1, ENTRY_POINT_OFFSETS=0 and SCALING_MATRIX=1 controls
+[0m[1;32m[graph -1 input from stream 0:0 @ 0xffffb2dfc9d0] [0m[0;32mw:1920 h:1080 pixfmt:drm_prime tb:1/15360 fr:60/1 sar:1/1 csp:unknown range:tv alpha:unspecified
+[0m[1;32m[graph -1 input from stream 0:0 @ 0xffffb2dfc9d0] [0m[0;32mvideo frame properties congruent with link at pts_time: 0
+[0mOutput #0, framemd5, to 'hevc-1080p.hw.framemd5':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: rawvideo, 1 reference frame (NV21 / 0x3132564E), nv21(tv, progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 1492992 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      handler_name    : GPAC ISO Video Handler
+[1;35m[out#0/framemd5 @ 0xffffb3278840] [0m[0;32mStarting thread...
+[0mframe=    8 fps=0.0 q=-0.0 size=       1KiB time=00:00:00.13 bitrate=  46.6kbits/s speed=0.267x elapsed=0:00:00.50    frame=   21 fps= 21 q=-0.0 size=       2KiB time=00:00:00.35 bitrate=  41.5kbits/s speed=0.349x elapsed=0:00:01.00    frame=   34 fps= 23 q=-0.0 size=       3KiB time=00:00:00.56 bitrate=  40.3kbits/s speed=0.377x elapsed=0:00:01.50    frame=   49 fps= 24 q=-0.0 size=       4KiB time=00:00:00.81 bitrate=  39.7kbits/s speed=0.408x elapsed=0:00:02.00    frame=   62 fps= 25 q=-0.0 size=       5KiB time=00:00:01.03 bitrate=  39.5kbits/s speed=0.412x elapsed=0:00:02.50    frame=   76 fps= 25 q=-0.0 size=       6KiB time=00:00:01.28 bitrate=  38.8kbits/s speed=0.427x elapsed=0:00:03.00    frame=   91 fps= 26 q=-0.0 size=       7KiB time=00:00:01.51 bitrate=  39.1kbits/s speed=0.432x elapsed=0:00:03.51    frame=  103 fps= 26 q=-0.0 size=       8KiB time=00:00:01.71 bitrate=  39.0kbits/s speed=0.428x elapsed=0:00:04.01    frame=  116 fps= 26 q=-0.0 size=       9KiB time=00:00:01.93 bitrate=  39.0kbits/s speed=0.428x elapsed=0:00:04.51    frame=  132 fps= 26 q=-0.0 size=      10KiB time=00:00:02.20 bitrate=  38.9kbits/s speed=0.438x elapsed=0:00:05.01    frame=  145 fps= 26 q=-0.0 size=      11KiB time=00:00:02.41 bitrate=  38.9kbits/s speed=0.438x elapsed=0:00:05.52    frame=  158 fps= 26 q=-0.0 size=      12KiB time=00:00:02.63 bitrate=  38.8kbits/s speed=0.437x elapsed=0:00:06.02    frame=  172 fps= 26 q=-0.0 size=      14KiB time=00:00:02.86 bitrate=  38.8kbits/s speed=0.44x elapsed=0:00:06.52    frame=  186 fps= 26 q=-0.0 size=      15KiB time=00:00:03.10 bitrate=  38.8kbits/s speed=0.441x elapsed=0:00:07.02    frame=  199 fps= 26 q=-0.0 size=      16KiB time=00:00:03.31 bitrate=  38.7kbits/s speed=0.44x elapsed=0:00:07.53    frame=  213 fps= 27 q=-0.0 size=      17KiB time=00:00:03.55 bitrate=  38.7kbits/s speed=0.442x elapsed=0:00:08.03    [0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb31bf9e0] [0m[0;32mEOF while reading input
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb31bf9e0] [0m[0;32mTerminating thread with return code 0 (success)
+[0mframe=  227 fps= 27 q=-0.0 size=      18KiB time=00:00:03.78 bitrate=  38.7kbits/s speed=0.443x elapsed=0:00:08.53    [0;35m[vist#0:0/hevc @ 0xffffb3277cc0] [0m[0;39m[dec:hevc @ 0xffffb3278e90] [0m[0;32mDecoder thread received EOF packet
+[0m[0;35m[vist#0:0/hevc @ 0xffffb3277cc0] [0m[0;39m[dec:hevc @ 0xffffb3278e90] [0m[0;32mDecoder returned EOF, finishing
+[0m[1;32m[vf#0:0 @ 0xffffb3270080] [0m[0;32mFiltergraph returned EOF, finishing
+[0m[1;32m[vf#0:0 @ 0xffffb3270080] [0m[0;32mAll consumers returned EOF
+[0m[1;32m[vf#0:0 @ 0xffffb3270080] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffb3272030] [0m[0;39m[enc:rawvideo @ 0xffffb32639a0] [0m[0;32mEncoder thread received EOF
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffb3272030] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[0;35m[vist#0:0/hevc @ 0xffffb3277cc0] [0m[0;39m[dec:hevc @ 0xffffb3278e90] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[1;35m[out#0/framemd5 @ 0xffffb3278840] [0m[0;32mAll streams finished
+[0m[1;35m[out#0/framemd5 @ 0xffffb3278840] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[0;39m[AVIOContext @ 0xffffb314ec00] [0m[0;32mStatistics: 19417 bytes written, 0 seeks, 1 writeouts
+[0m[1;35m[out#0/framemd5 @ 0xffffb3278840] [0m[0;32mOutput file #0 (hevc-1080p.hw.framemd5):
+[0m[1;35m[out#0/framemd5 @ 0xffffb3278840] [0m[0;32m  Output stream #0:0 (video): [0m[0;32m240 frames encoded[0m[0;32m; [0m[0;32m240 packets muxed (746496000 bytes); [0m[0;32m
+[0m[1;35m[out#0/framemd5 @ 0xffffb3278840] [0m[0;32m  Total: 240 packets (746496000 bytes) muxed
+[0m[1;35m[out#0/framemd5 @ 0xffffb3278840] [0mvideo:729000KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 27 q=-0.0 Lsize=      19KiB time=00:00:04.00 bitrate=  38.8kbits/s speed=0.448x elapsed=0:00:08.93    
+[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb31bf9e0] [0m[0;32mInput file #0 (hevc-1080p.mp4):
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb31bf9e0] [0m[0;32m  Input stream #0:0 (video): [0m[0;32m240 packets read (4681212 bytes); [0m[0;32m240 frames decoded; 0 decode errors[0m[0;32m; [0m[0;32m
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb31bf9e0] [0m[0;32m  Total: 240 packets (4681212 bytes) demuxed
+[0m[0;39m[AVIOContext @ 0xffffb31bfb30] [0m[0;32mStatistics: 4688038 bytes read, 0 seeks
+[0m[0;32m
+[0m[0;32mExiting with exit code 0
+[0me8b40187b06b57a08851c6be36510b17b8783291449e3c332f626a6fbc9d49cb  -
+  19:         19          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  19:        259          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh check hevc-2160p nv21); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc-2160p.mp4 -map 0:v:0 -an -sn -dn -vf hwdownload,format=nv21 -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y hevc-2160p.hw.framemd5
+[0;35m[vist#0:0/hevc @ 0xffffa5de44d0] [0m[0;32mSelecting decoder 'hevc' because of requested hwaccel method v4l2request
+[0mInput #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc-2160p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 22646 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main), 1 reference frame (hvc1 / 0x31637668), yuv420p(tv, progressive, left), 3840x2160 [SAR 1:1 DAR 16:9], 22632 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+[1;35m[out#0/framemd5 @ 0xffffa5de7a30] [0m[0;32mAdding streams from explicit maps...
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffa5de4820] [0m[0;32mCreated video stream from [0m[0;32minput stream 0:0[0m[0;32m
+[0mStream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> rawvideo (native))
+[1;35m[vost#0:0/rawvideo @ 0xffffa5de4820] [0m[0;32mStarting thread...
+[0m[1;32m[vf#0:0 @ 0xffffa5ddc010] [0m[0;32mStarting thread...
+[0m[0;35m[vist#0:0/hevc @ 0xffffa5de44d0] [0m[0;39m[dec:hevc @ 0xffffa5de8d50] [0m[0;32mStarting thread...
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffa5d1f9e0] [0m[0;32mStarting thread...
+[0m[0;39m[AVHWFramesContext @ 0xffffa5de8720] [0mUsing V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+[0;39m[AVHWFramesContext @ 0xffffa5de8720] [0m[0;32mUsing CAPTURE buffer format NV21 (3840x2160)
+[0m[0;39m[V4L2RequestContext @ 0xffffa5de4380] [0m[0;32mslice-based decoder with SLICE_PARAMS=1, ENTRY_POINT_OFFSETS=0 and SCALING_MATRIX=1 controls
+[0m[1;32m[graph -1 input from stream 0:0 @ 0xffffa55ac470] [0m[0;32mw:3840 h:2160 pixfmt:drm_prime tb:1/15360 fr:60/1 sar:1/1 csp:unknown range:tv alpha:unspecified
+[0m[1;32m[graph -1 input from stream 0:0 @ 0xffffa55ac470] [0m[0;32mvideo frame properties congruent with link at pts_time: 0
+[0mOutput #0, framemd5, to 'hevc-2160p.hw.framemd5':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: rawvideo, 1 reference frame (NV21 / 0x3132564E), nv21(tv, progressive, left), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 5971968 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      handler_name    : GPAC ISO Video Handler
+[1;35m[out#0/framemd5 @ 0xffffa5de7a30] [0m[0;32mStarting thread...
+[0mframe=    1 fps=0.0 q=-0.0 size=       0KiB time=00:00:00.01 bitrate= 104.2kbits/s speed=0.0333x elapsed=0:00:00.50    frame=    2 fps=2.0 q=-0.0 size=       0KiB time=00:00:00.03 bitrate=  71.3kbits/s speed=0.0333x elapsed=0:00:01.00    frame=    5 fps=3.3 q=-0.0 size=       1KiB time=00:00:00.08 bitrate=  51.6kbits/s speed=0.0555x elapsed=0:00:01.50    frame=    8 fps=4.0 q=-0.0 size=       1KiB time=00:00:00.13 bitrate=  46.6kbits/s speed=0.0666x elapsed=0:00:02.00    frame=   12 fps=4.8 q=-0.0 size=       1KiB time=00:00:00.20 bitrate=  43.9kbits/s speed=0.08x elapsed=0:00:02.50    frame=   16 fps=5.3 q=-0.0 size=       1KiB time=00:00:00.26 bitrate=  42.5kbits/s speed=0.0888x elapsed=0:00:03.00    frame=   19 fps=5.4 q=-0.0 size=       2KiB time=00:00:00.31 bitrate=  41.9kbits/s speed=0.0904x elapsed=0:00:03.50    frame=   23 fps=5.7 q=-0.0 size=       2KiB time=00:00:00.38 bitrate=  41.3kbits/s speed=0.0957x elapsed=0:00:04.00    frame=   26 fps=5.8 q=-0.0 size=       2KiB time=00:00:00.43 bitrate=  40.9kbits/s speed=0.0962x elapsed=0:00:04.50    frame=   31 fps=6.2 q=-0.0 size=       3KiB time=00:00:00.51 bitrate=  40.5kbits/s speed=0.103x elapsed=0:00:05.00    frame=   33 fps=6.0 q=-0.0 size=       3KiB time=00:00:00.55 bitrate=  40.4kbits/s speed=0.0998x elapsed=0:00:05.51    frame=   37 fps=6.1 q=-0.0 size=       3KiB time=00:00:00.61 bitrate=  40.2kbits/s speed=0.102x elapsed=0:00:06.01    frame=   40 fps=6.1 q=-0.0 size=       3KiB time=00:00:00.66 bitrate=  40.0kbits/s speed=0.102x elapsed=0:00:06.51    frame=   44 fps=6.3 q=-0.0 size=       4KiB time=00:00:00.73 bitrate=  39.9kbits/s speed=0.104x elapsed=0:00:07.02    frame=   48 fps=6.4 q=-0.0 size=       4KiB time=00:00:00.80 bitrate=  39.8kbits/s speed=0.106x elapsed=0:00:07.52    frame=   51 fps=6.4 q=-0.0 size=       4KiB time=00:00:00.85 bitrate=  39.7kbits/s speed=0.106x elapsed=0:00:08.02    frame=   55 fps=6.4 q=-0.0 size=       4KiB time=00:00:00.91 bitrate=  39.6kbits/s speed=0.107x elapsed=0:00:08.52    frame=   58 fps=6.4 q=-0.0 size=       5KiB time=00:00:00.96 bitrate=  39.5kbits/s speed=0.107x elapsed=0:00:09.03    frame=   62 fps=6.5 q=-0.0 size=       5KiB time=00:00:01.03 bitrate=  39.5kbits/s speed=0.108x elapsed=0:00:09.53    frame=   66 fps=6.6 q=-0.0 size=       5KiB time=00:00:01.10 bitrate=  39.4kbits/s speed=0.11x elapsed=0:00:10.04    frame=   69 fps=6.5 q=-0.0 size=       6KiB time=00:00:01.16 bitrate=  38.8kbits/s speed=0.111x elapsed=0:00:10.54    frame=   73 fps=6.6 q=-0.0 size=       6KiB time=00:00:01.21 bitrate=  39.3kbits/s speed=0.11x elapsed=0:00:11.04    frame=   76 fps=6.6 q=-0.0 size=       6KiB time=00:00:01.26 bitrate=  39.3kbits/s speed=0.11x elapsed=0:00:11.54    frame=   80 fps=6.6 q=-0.0 size=       6KiB time=00:00:01.33 bitrate=  39.2kbits/s speed=0.111x elapsed=0:00:12.05    frame=   83 fps=6.6 q=-0.0 size=       7KiB time=00:00:01.38 bitrate=  39.2kbits/s speed=0.11x elapsed=0:00:12.55    frame=   86 fps=6.6 q=-0.0 size=       7KiB time=00:00:01.46 bitrate=  38.3kbits/s speed=0.112x elapsed=0:00:13.05    frame=   91 fps=6.7 q=-0.0 size=       7KiB time=00:00:01.51 bitrate=  39.1kbits/s speed=0.112x elapsed=0:00:13.55    frame=   94 fps=6.7 q=-0.0 size=       7KiB time=00:00:01.58 bitrate=  38.7kbits/s speed=0.113x elapsed=0:00:14.05    frame=   97 fps=6.7 q=-0.0 size=       8KiB time=00:00:01.61 bitrate=  39.1kbits/s speed=0.111x elapsed=0:00:14.55    frame=  101 fps=6.7 q=-0.0 size=       8KiB time=00:00:01.68 bitrate=  39.1kbits/s speed=0.112x elapsed=0:00:15.05    frame=  104 fps=6.7 q=-0.0 size=       8KiB time=00:00:01.73 bitrate=  39.0kbits/s speed=0.111x elapsed=0:00:15.55    frame=  108 fps=6.7 q=-0.0 size=       9KiB time=00:00:01.80 bitrate=  39.0kbits/s speed=0.112x elapsed=0:00:16.06    frame=  111 fps=6.7 q=-0.0 size=       9KiB time=00:00:01.85 bitrate=  39.0kbits/s speed=0.112x elapsed=0:00:16.56    frame=  115 fps=6.7 q=-0.0 size=       9KiB time=00:00:01.91 bitrate=  39.0kbits/s speed=0.112x elapsed=0:00:17.07    frame=  118 fps=6.7 q=-0.0 size=       9KiB time=00:00:01.96 bitrate=  39.0kbits/s speed=0.112x elapsed=0:00:17.57    frame=  122 fps=6.7 q=-0.0 size=      10KiB time=00:00:02.03 bitrate=  38.9kbits/s speed=0.112x elapsed=0:00:18.08    frame=  125 fps=6.7 q=-0.0 size=      10KiB time=00:00:02.08 bitrate=  38.9kbits/s speed=0.112x elapsed=0:00:18.58    frame=  129 fps=6.8 q=-0.0 size=      10KiB time=00:00:02.15 bitrate=  38.9kbits/s speed=0.113x elapsed=0:00:19.08    frame=  133 fps=6.8 q=-0.0 size=      11KiB time=00:00:02.21 bitrate=  38.9kbits/s speed=0.113x elapsed=0:00:19.58    frame=  136 fps=6.8 q=-0.0 size=      11KiB time=00:00:02.26 bitrate=  38.9kbits/s speed=0.113x elapsed=0:00:20.08    frame=  140 fps=6.8 q=-0.0 size=      11KiB time=00:00:02.33 bitrate=  38.9kbits/s speed=0.113x elapsed=0:00:20.58    frame=  143 fps=6.8 q=-0.0 size=      11KiB time=00:00:02.38 bitrate=  38.9kbits/s speed=0.113x elapsed=0:00:21.08    frame=  147 fps=6.8 q=-0.0 size=      12KiB time=00:00:02.45 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:21.58    frame=  150 fps=6.8 q=-0.0 size=      12KiB time=00:00:02.50 bitrate=  38.8kbits/s speed=0.113x elapsed=0:00:22.08    frame=  154 fps=6.8 q=-0.0 size=      12KiB time=00:00:02.56 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:22.58    frame=  157 fps=6.8 q=-0.0 size=      12KiB time=00:00:02.61 bitrate=  38.8kbits/s speed=0.113x elapsed=0:00:23.08    frame=  161 fps=6.8 q=-0.0 size=      13KiB time=00:00:02.68 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:23.59    frame=  164 fps=6.8 q=-0.0 size=      13KiB time=00:00:02.73 bitrate=  38.8kbits/s speed=0.113x elapsed=0:00:24.09    frame=  168 fps=6.8 q=-0.0 size=      13KiB time=00:00:02.80 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:24.59    frame=  172 fps=6.9 q=-0.0 size=      14KiB time=00:00:02.86 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:25.09    frame=  175 fps=6.8 q=-0.0 size=      14KiB time=00:00:02.91 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:25.59    frame=  179 fps=6.9 q=-0.0 size=      14KiB time=00:00:02.98 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:26.10    frame=  182 fps=6.8 q=-0.0 size=      14KiB time=00:00:03.03 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:26.60    frame=  186 fps=6.9 q=-0.0 size=      15KiB time=00:00:03.10 bitrate=  38.8kbits/s speed=0.114x elapsed=0:00:27.10    frame=  189 fps=6.8 q=-0.0 size=      15KiB time=00:00:03.15 bitrate=  38.7kbits/s speed=0.114x elapsed=0:00:27.60    frame=  193 fps=6.9 q=-0.0 size=      15KiB time=00:00:03.21 bitrate=  38.7kbits/s speed=0.114x elapsed=0:00:28.10    frame=  197 fps=6.9 q=-0.0 size=      16KiB time=00:00:03.28 bitrate=  38.7kbits/s speed=0.115x elapsed=0:00:28.60    frame=  200 fps=6.9 q=-0.0 size=      16KiB time=00:00:03.33 bitrate=  38.7kbits/s speed=0.115x elapsed=0:00:29.10    frame=  203 fps=6.9 q=-0.0 size=      16KiB time=00:00:03.38 bitrate=  38.7kbits/s speed=0.114x elapsed=0:00:29.60    frame=  207 fps=6.9 q=-0.0 size=      16KiB time=00:00:03.45 bitrate=  38.7kbits/s speed=0.115x elapsed=0:00:30.10    frame=  211 fps=6.9 q=-0.0 size=      17KiB time=00:00:03.51 bitrate=  38.7kbits/s speed=0.115x elapsed=0:00:30.60    frame=  214 fps=6.9 q=-0.0 size=      17KiB time=00:00:03.56 bitrate=  38.7kbits/s speed=0.115x elapsed=0:00:31.10    frame=  217 fps=6.9 q=-0.0 size=      17KiB time=00:00:03.63 bitrate=  38.5kbits/s speed=0.115x elapsed=0:00:31.60    frame=  221 fps=6.9 q=-0.0 size=      17KiB time=00:00:03.68 bitrate=  38.7kbits/s speed=0.115x elapsed=0:00:32.10    [0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffa5d1f9e0] [0m[0;32mEOF while reading input
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffa5d1f9e0] [0m[0;32mTerminating thread with return code 0 (success)
+[0mframe=  224 fps=6.9 q=-0.0 size=      18KiB time=00:00:03.76 bitrate=  38.4kbits/s speed=0.116x elapsed=0:00:32.60    frame=  228 fps=6.9 q=-0.0 size=      18KiB time=00:00:03.80 bitrate=  38.7kbits/s speed=0.115x elapsed=0:00:33.10    frame=  232 fps=6.9 q=-0.0 size=      18KiB time=00:00:03.88 bitrate=  38.5kbits/s speed=0.116x elapsed=0:00:33.61    [0;35m[vist#0:0/hevc @ 0xffffa5de44d0] [0m[0;39m[dec:hevc @ 0xffffa5de8d50] [0m[0;32mDecoder thread received EOF packet
+[0m[0;35m[vist#0:0/hevc @ 0xffffa5de44d0] [0m[0;39m[dec:hevc @ 0xffffa5de8d50] [0m[0;32mDecoder returned EOF, finishing
+[0mframe=  236 fps=6.9 q=-0.0 size=      19KiB time=00:00:03.96 bitrate=  38.4kbits/s speed=0.116x elapsed=0:00:34.11    [1;32m[vf#0:0 @ 0xffffa5ddc010] [0m[0;32mFiltergraph returned EOF, finishing
+[0m[1;32m[vf#0:0 @ 0xffffa5ddc010] [0m[0;32mAll consumers returned EOF
+[0m[1;32m[vf#0:0 @ 0xffffa5ddc010] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffa5de4820] [0m[0;39m[enc:rawvideo @ 0xffffa5de84a0] [0m[0;32mEncoder thread received EOF
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffa5de4820] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[0;35m[vist#0:0/hevc @ 0xffffa5de44d0] [0m[0;39m[dec:hevc @ 0xffffa5de8d50] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[1;35m[out#0/framemd5 @ 0xffffa5de7a30] [0m[0;32mAll streams finished
+[0m[1;35m[out#0/framemd5 @ 0xffffa5de7a30] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[0;39m[AVIOContext @ 0xffffa5c78160] [0m[0;32mStatistics: 19417 bytes written, 0 seeks, 1 writeouts
+[0m[1;35m[out#0/framemd5 @ 0xffffa5de7a30] [0m[0;32mOutput file #0 (hevc-2160p.hw.framemd5):
+[0m[1;35m[out#0/framemd5 @ 0xffffa5de7a30] [0m[0;32m  Output stream #0:0 (video): [0m[0;32m240 frames encoded[0m[0;32m; [0m[0;32m240 packets muxed (2985984000 bytes); [0m[0;32m
+[0m[1;35m[out#0/framemd5 @ 0xffffa5de7a30] [0m[0;32m  Total: 240 packets (2985984000 bytes) muxed
+[0m[1;35m[out#0/framemd5 @ 0xffffa5de7a30] [0mvideo:2916000KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=6.9 q=-0.0 Lsize=      19KiB time=00:00:04.00 bitrate=  38.8kbits/s speed=0.116x elapsed=0:00:34.55    
+[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffa5d1f9e0] [0m[0;32mInput file #0 (hevc-2160p.mp4):
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffa5d1f9e0] [0m[0;32m  Input stream #0:0 (video): [0m[0;32m240 packets read (11316462 bytes); [0m[0;32m240 frames decoded; 0 decode errors[0m[0;32m; [0m[0;32m
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffa5d1f9e0] [0m[0;32m  Total: 240 packets (11316462 bytes) demuxed
+[0m[0;39m[AVIOContext @ 0xffffa5d1fb30] [0m[0;32mStatistics: 11323406 bytes read, 0 seeks
+[0m[0;32m
+[0m[0;32mExiting with exit code 0
+[0m8cead96de75e55bb1d0f95071f6ec778c5fb6b1fdc9fe371cc59dfd7185886ee  -
+  19:        259          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  19:        499          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh check hevc10-2160p p010le); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc10-2160p.mp4 -map 0:v:0 -an -sn -dn -vf hwdownload,format=p010le -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y hevc10-2160p.hw.framemd5
+[0;35m[vist#0:0/hevc @ 0xffffb8e5ecc0] [0m[0;32mSelecting decoder 'hevc' because of requested hwaccel method v4l2request
+[0mInput #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc10-2160p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 22317 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main 10), 1 reference frame (hvc1 / 0x31637668), yuv420p10le(tv, progressive, left), 3840x2160 [SAR 1:1 DAR 16:9], 22303 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+[1;35m[out#0/framemd5 @ 0xffffb8e63840] [0m[0;32mAdding streams from explicit maps...
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffb8e59020] [0m[0;32mCreated video stream from [0m[0;32minput stream 0:0[0m[0;32m
+[0mStream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> rawvideo (native))
+[1;35m[vost#0:0/rawvideo @ 0xffffb8e59020] [0m[0;32mStarting thread...
+[0m[1;32m[vf#0:0 @ 0xffffb8e570a0] [0m[0;32mStarting thread...
+[0m[0;35m[vist#0:0/hevc @ 0xffffb8e5ecc0] [0m[0;39m[dec:hevc @ 0xffffb8e63d50] [0m[0;32mStarting thread...
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb8d9f9e0] [0m[0;32mStarting thread...
+[0m[0;39m[AVHWFramesContext @ 0xffffb8e4a820] [0mUsing V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+[0;39m[AVHWFramesContext @ 0xffffb8e4a820] [0m[0;32mUsing CAPTURE buffer format P010 (3840x2160)
+[0m[0;39m[V4L2RequestContext @ 0xffffb8e5eb50] [0m[0;32mslice-based decoder with SLICE_PARAMS=1, ENTRY_POINT_OFFSETS=0 and SCALING_MATRIX=1 controls
+[0m[1;32m[graph -1 input from stream 0:0 @ 0xffffb8525480] [0m[0;32mw:3840 h:2160 pixfmt:drm_prime tb:1/15360 fr:60/1 sar:1/1 csp:unknown range:tv alpha:unspecified
+[0m[1;32m[graph -1 input from stream 0:0 @ 0xffffb8525480] [0m[0;32mvideo frame properties congruent with link at pts_time: 0
+[0mOutput #0, framemd5, to 'hevc10-2160p.hw.framemd5':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: rawvideo, 1 reference frame, p010le(tv, progressive, left), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 7464960 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      handler_name    : GPAC ISO Video Handler
+[1;35m[out#0/framemd5 @ 0xffffb8e63840] [0m[0;32mStarting thread...
+[0mframe=    1 fps=1.0 q=-0.0 size=       0KiB time=00:00:00.01 bitrate= 104.2kbits/s speed=0.0167x elapsed=0:00:01.00    frame=    1 fps=0.7 q=-0.0 size=       0KiB time=00:00:00.01 bitrate= 104.2kbits/s speed=0.0111x elapsed=0:00:01.50    frame=    1 fps=0.5 q=-0.0 size=       0KiB time=00:00:00.01 bitrate= 104.2kbits/s speed=0.00833x elapsed=0:00:02.00    frame=    3 fps=1.2 q=-0.0 size=       0KiB time=00:00:00.05 bitrate=  60.3kbits/s speed=0.02x elapsed=0:00:02.50    frame=    4 fps=1.3 q=-0.0 size=       0KiB time=00:00:00.06 bitrate=  54.8kbits/s speed=0.0222x elapsed=0:00:03.00    frame=    6 fps=1.7 q=-0.0 size=       1KiB time=00:00:00.10 bitrate=  49.4kbits/s speed=0.0285x elapsed=0:00:03.50    frame=    8 fps=2.0 q=-0.0 size=       1KiB time=00:00:00.13 bitrate=  46.6kbits/s speed=0.0333x elapsed=0:00:04.00    frame=    9 fps=2.0 q=-0.0 size=       1KiB time=00:00:00.15 bitrate=  45.7kbits/s speed=0.0333x elapsed=0:00:04.50    frame=   11 fps=2.2 q=-0.0 size=       1KiB time=00:00:00.18 bitrate=  44.4kbits/s speed=0.0366x elapsed=0:00:05.00    frame=   11 fps=2.0 q=-0.0 size=       1KiB time=00:00:00.18 bitrate=  44.4kbits/s speed=0.0333x elapsed=0:00:05.50    frame=   14 fps=2.3 q=-0.0 size=       1KiB time=00:00:00.23 bitrate=  43.1kbits/s speed=0.0388x elapsed=0:00:06.00    frame=   15 fps=2.3 q=-0.0 size=       1KiB time=00:00:00.25 bitrate=  42.8kbits/s speed=0.0384x elapsed=0:00:06.51    frame=   17 fps=2.4 q=-0.0 size=       1KiB time=00:00:00.28 bitrate=  42.3kbits/s speed=0.0404x elapsed=0:00:07.01    frame=   19 fps=2.5 q=-0.0 size=       2KiB time=00:00:00.31 bitrate=  41.9kbits/s speed=0.0421x elapsed=0:00:07.51    frame=   20 fps=2.5 q=-0.0 size=       2KiB time=00:00:00.33 bitrate=  41.7kbits/s speed=0.0416x elapsed=0:00:08.01    frame=   22 fps=2.6 q=-0.0 size=       2KiB time=00:00:00.36 bitrate=  41.4kbits/s speed=0.0431x elapsed=0:00:08.51    frame=   22 fps=2.4 q=-0.0 size=       2KiB time=00:00:00.36 bitrate=  41.4kbits/s speed=0.0407x elapsed=0:00:09.01    frame=   24 fps=2.5 q=-0.0 size=       2KiB time=00:00:00.40 bitrate=  41.1kbits/s speed=0.042x elapsed=0:00:09.51    frame=   25 fps=2.5 q=-0.0 size=       2KiB time=00:00:00.41 bitrate=  41.0kbits/s speed=0.0416x elapsed=0:00:10.01    frame=   27 fps=2.6 q=-0.0 size=       2KiB time=00:00:00.45 bitrate=  40.8kbits/s speed=0.0428x elapsed=0:00:10.51    frame=   28 fps=2.5 q=-0.0 size=       2KiB time=00:00:00.46 bitrate=  40.7kbits/s speed=0.0424x elapsed=0:00:11.01    frame=   31 fps=2.7 q=-0.0 size=       3KiB time=00:00:00.51 bitrate=  40.5kbits/s speed=0.0449x elapsed=0:00:11.51    frame=   31 fps=2.6 q=-0.0 size=       3KiB time=00:00:00.51 bitrate=  40.5kbits/s speed=0.043x elapsed=0:00:12.01    frame=   33 fps=2.6 q=-0.0 size=       3KiB time=00:00:00.56 bitrate=  39.2kbits/s speed=0.0453x elapsed=0:00:12.51    frame=   34 fps=2.6 q=-0.0 size=       3KiB time=00:00:00.56 bitrate=  40.3kbits/s speed=0.0435x elapsed=0:00:13.01    frame=   36 fps=2.7 q=-0.0 size=       3KiB time=00:00:00.60 bitrate=  40.2kbits/s speed=0.0444x elapsed=0:00:13.51    frame=   38 fps=2.7 q=-0.0 size=       3KiB time=00:00:00.63 bitrate=  40.1kbits/s speed=0.0452x elapsed=0:00:14.01    frame=   39 fps=2.7 q=-0.0 size=       3KiB time=00:00:00.65 bitrate=  40.1kbits/s speed=0.0448x elapsed=0:00:14.51    frame=   41 fps=2.7 q=-0.0 size=       3KiB time=00:00:00.70 bitrate=  39.1kbits/s speed=0.0466x elapsed=0:00:15.02    frame=   42 fps=2.7 q=-0.0 size=       3KiB time=00:00:00.70 bitrate=  40.0kbits/s speed=0.0451x elapsed=0:00:15.52    frame=   43 fps=2.7 q=-0.0 size=       3KiB time=00:00:00.73 bitrate=  39.0kbits/s speed=0.0458x elapsed=0:00:16.02    frame=   44 fps=2.7 q=-0.0 size=       4KiB time=00:00:00.73 bitrate=  39.9kbits/s speed=0.0444x elapsed=0:00:16.52    frame=   46 fps=2.7 q=-0.0 size=       4KiB time=00:00:00.76 bitrate=  39.8kbits/s speed=0.045x elapsed=0:00:17.02    frame=   48 fps=2.7 q=-0.0 size=       4KiB time=00:00:00.80 bitrate=  39.8kbits/s speed=0.0456x elapsed=0:00:17.53    frame=   50 fps=2.8 q=-0.0 size=       4KiB time=00:00:00.83 bitrate=  39.7kbits/s speed=0.0462x elapsed=0:00:18.03    frame=   51 fps=2.8 q=-0.0 size=       4KiB time=00:00:00.85 bitrate=  39.7kbits/s speed=0.0459x elapsed=0:00:18.53    frame=   53 fps=2.8 q=-0.0 size=       4KiB time=00:00:00.88 bitrate=  39.6kbits/s speed=0.0464x elapsed=0:00:19.03    frame=   54 fps=2.8 q=-0.0 size=       4KiB time=00:00:00.90 bitrate=  39.6kbits/s speed=0.0461x elapsed=0:00:19.53    frame=   55 fps=2.7 q=-0.0 size=       4KiB time=00:00:00.91 bitrate=  39.6kbits/s speed=0.0457x elapsed=0:00:20.03    frame=   57 fps=2.8 q=-0.0 size=       5KiB time=00:00:00.95 bitrate=  39.6kbits/s speed=0.0463x elapsed=0:00:20.53    frame=   58 fps=2.8 q=-0.0 size=       5KiB time=00:00:00.96 bitrate=  39.5kbits/s speed=0.0459x elapsed=0:00:21.03    frame=   60 fps=2.8 q=-0.0 size=       5KiB time=00:00:01.00 bitrate=  39.5kbits/s speed=0.0464x elapsed=0:00:21.53    frame=   61 fps=2.8 q=-0.0 size=       5KiB time=00:00:01.01 bitrate=  39.5kbits/s speed=0.0461x elapsed=0:00:22.04    frame=   63 fps=2.8 q=-0.0 size=       5KiB time=00:00:01.05 bitrate=  39.4kbits/s speed=0.0466x elapsed=0:00:22.54    frame=   65 fps=2.8 q=-0.0 size=       5KiB time=00:00:01.08 bitrate=  39.4kbits/s speed=0.047x elapsed=0:00:23.04    frame=   66 fps=2.8 q=-0.0 size=       5KiB time=00:00:01.10 bitrate=  39.4kbits/s speed=0.0467x elapsed=0:00:23.54    frame=   67 fps=2.8 q=-0.0 size=       5KiB time=00:00:01.13 bitrate=  38.8kbits/s speed=0.0471x elapsed=0:00:24.04    frame=   69 fps=2.8 q=-0.0 size=       6KiB time=00:00:01.15 bitrate=  39.4kbits/s speed=0.0469x elapsed=0:00:24.54    frame=   70 fps=2.8 q=-0.0 size=       6KiB time=00:00:01.16 bitrate=  39.3kbits/s speed=0.0466x elapsed=0:00:25.04    frame=   70 fps=2.7 q=-0.0 size=       6KiB time=00:00:01.16 bitrate=  39.3kbits/s speed=0.0457x elapsed=0:00:25.54    frame=   72 fps=2.8 q=-0.0 size=       6KiB time=00:00:01.21 bitrate=  38.8kbits/s speed=0.0467x elapsed=0:00:26.04    frame=   74 fps=2.8 q=-0.0 size=       6KiB time=00:00:01.23 bitrate=  39.3kbits/s speed=0.0465x elapsed=0:00:26.54    frame=   76 fps=2.8 q=-0.0 size=       6KiB time=00:00:01.26 bitrate=  39.3kbits/s speed=0.0468x elapsed=0:00:27.05    frame=   77 fps=2.8 q=-0.0 size=       6KiB time=00:00:01.28 bitrate=  39.3kbits/s speed=0.0466x elapsed=0:00:27.55    frame=   79 fps=2.8 q=-0.0 size=       6KiB time=00:00:01.31 bitrate=  39.2kbits/s speed=0.0469x elapsed=0:00:28.05    frame=   80 fps=2.8 q=-0.0 size=       6KiB time=00:00:01.33 bitrate=  39.2kbits/s speed=0.0467x elapsed=0:00:28.55    frame=   82 fps=2.8 q=-0.0 size=       7KiB time=00:00:01.36 bitrate=  39.2kbits/s speed=0.047x elapsed=0:00:29.05    frame=   84 fps=2.8 q=-0.0 size=       7KiB time=00:00:01.40 bitrate=  39.2kbits/s speed=0.0474x elapsed=0:00:29.55    frame=   85 fps=2.8 q=-0.0 size=       7KiB time=00:00:01.41 bitrate=  39.2kbits/s speed=0.0471x elapsed=0:00:30.05    frame=   86 fps=2.8 q=-0.0 size=       7KiB time=00:00:01.43 bitrate=  39.2kbits/s speed=0.0469x elapsed=0:00:30.55    frame=   87 fps=2.8 q=-0.0 size=       7KiB time=00:00:01.45 bitrate=  39.2kbits/s speed=0.0467x elapsed=0:00:31.06    frame=   89 fps=2.8 q=-0.0 size=       7KiB time=00:00:01.48 bitrate=  39.1kbits/s speed=0.047x elapsed=0:00:31.56    frame=   91 fps=2.8 q=-0.0 size=       7KiB time=00:00:01.51 bitrate=  39.1kbits/s speed=0.0473x elapsed=0:00:32.06    frame=   93 fps=2.9 q=-0.0 size=       7KiB time=00:00:01.55 bitrate=  39.1kbits/s speed=0.0476x elapsed=0:00:32.57    frame=   93 fps=2.8 q=-0.0 size=       7KiB time=00:00:01.55 bitrate=  39.1kbits/s speed=0.0469x elapsed=0:00:33.07    frame=   95 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.60 bitrate=  38.7kbits/s speed=0.0476x elapsed=0:00:33.58    frame=   97 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.61 bitrate=  39.1kbits/s speed=0.0474x elapsed=0:00:34.08    frame=   97 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.61 bitrate=  39.1kbits/s speed=0.0467x elapsed=0:00:34.58    frame=   98 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.63 bitrate=  39.1kbits/s speed=0.0466x elapsed=0:00:35.08    frame=   99 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.68 bitrate=  38.3kbits/s speed=0.0473x elapsed=0:00:35.59    frame=  101 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.68 bitrate=  39.1kbits/s speed=0.0466x elapsed=0:00:36.10    frame=  103 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.71 bitrate=  39.0kbits/s speed=0.0469x elapsed=0:00:36.60    frame=  103 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.71 bitrate=  39.0kbits/s speed=0.0463x elapsed=0:00:37.10    frame=  105 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.75 bitrate=  39.0kbits/s speed=0.0465x elapsed=0:00:37.60    frame=  106 fps=2.8 q=-0.0 size=       8KiB time=00:00:01.78 bitrate=  38.7kbits/s speed=0.0468x elapsed=0:00:38.10    frame=  108 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.80 bitrate=  39.0kbits/s speed=0.0466x elapsed=0:00:38.60    frame=  109 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.81 bitrate=  39.0kbits/s speed=0.0465x elapsed=0:00:39.10    frame=  110 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.83 bitrate=  39.0kbits/s speed=0.0463x elapsed=0:00:39.60    frame=  112 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.86 bitrate=  39.0kbits/s speed=0.0465x elapsed=0:00:40.10    frame=  114 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.90 bitrate=  39.0kbits/s speed=0.0468x elapsed=0:00:40.60    frame=  115 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.91 bitrate=  39.0kbits/s speed=0.0466x elapsed=0:00:41.10    frame=  115 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.91 bitrate=  39.0kbits/s speed=0.0461x elapsed=0:00:41.60    frame=  117 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.95 bitrate=  39.0kbits/s speed=0.0463x elapsed=0:00:42.10    frame=  118 fps=2.8 q=-0.0 size=       9KiB time=00:00:01.96 bitrate=  39.0kbits/s speed=0.0462x elapsed=0:00:42.61    frame=  119 fps=2.8 q=-0.0 size=       9KiB time=00:00:02.00 bitrate=  38.6kbits/s speed=0.0464x elapsed=0:00:43.11    frame=  120 fps=2.8 q=-0.0 size=      10KiB time=00:00:02.00 bitrate=  38.9kbits/s speed=0.0458x elapsed=0:00:43.62    frame=  121 fps=2.7 q=-0.0 size=      10KiB time=00:00:02.01 bitrate=  38.9kbits/s speed=0.0457x elapsed=0:00:44.12    frame=  123 fps=2.8 q=-0.0 size=      10KiB time=00:00:02.05 bitrate=  38.9kbits/s speed=0.0459x elapsed=0:00:44.62    frame=  125 fps=2.8 q=-0.0 size=      10KiB time=00:00:02.08 bitrate=  38.9kbits/s speed=0.0462x elapsed=0:00:45.12    frame=  126 fps=2.8 q=-0.0 size=      10KiB time=00:00:02.10 bitrate=  38.9kbits/s speed=0.046x elapsed=0:00:45.62    frame=  127 fps=2.8 q=-0.0 size=      10KiB time=00:00:02.11 bitrate=  38.9kbits/s speed=0.0459x elapsed=0:00:46.13    frame=  128 fps=2.7 q=-0.0 size=      10KiB time=00:00:02.13 bitrate=  38.9kbits/s speed=0.0457x elapsed=0:00:46.63    frame=  130 fps=2.8 q=-0.0 size=      10KiB time=00:00:02.16 bitrate=  38.9kbits/s speed=0.046x elapsed=0:00:47.14    frame=  131 fps=2.7 q=-0.0 size=      10KiB time=00:00:02.18 bitrate=  38.9kbits/s speed=0.0458x elapsed=0:00:47.64    frame=  132 fps=2.7 q=-0.0 size=      10KiB time=00:00:02.20 bitrate=  38.9kbits/s speed=0.0457x elapsed=0:00:48.14    frame=  133 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.23 bitrate=  38.6kbits/s speed=0.0459x elapsed=0:00:48.64    frame=  135 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.25 bitrate=  38.9kbits/s speed=0.0458x elapsed=0:00:49.14    frame=  136 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.26 bitrate=  38.9kbits/s speed=0.0457x elapsed=0:00:49.64    frame=  137 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.30 bitrate=  38.6kbits/s speed=0.0459x elapsed=0:00:50.14    frame=  139 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.31 bitrate=  38.9kbits/s speed=0.0457x elapsed=0:00:50.64    frame=  140 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.33 bitrate=  38.9kbits/s speed=0.0456x elapsed=0:00:51.15    frame=  141 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.35 bitrate=  38.9kbits/s speed=0.0455x elapsed=0:00:51.65    frame=  143 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.38 bitrate=  38.9kbits/s speed=0.0457x elapsed=0:00:52.15    frame=  144 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.40 bitrate=  38.9kbits/s speed=0.0456x elapsed=0:00:52.66    frame=  145 fps=2.7 q=-0.0 size=      11KiB time=00:00:02.41 bitrate=  38.9kbits/s speed=0.0455x elapsed=0:00:53.16    frame=  147 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.45 bitrate=  38.8kbits/s speed=0.0457x elapsed=0:00:53.66    frame=  147 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.45 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:00:54.16    frame=  148 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.48 bitrate=  38.6kbits/s speed=0.0454x elapsed=0:00:54.66    frame=  150 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.50 bitrate=  38.8kbits/s speed=0.0453x elapsed=0:00:55.17    frame=  152 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.53 bitrate=  38.8kbits/s speed=0.0455x elapsed=0:00:55.67    frame=  153 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.55 bitrate=  38.8kbits/s speed=0.0454x elapsed=0:00:56.18    frame=  154 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.56 bitrate=  38.8kbits/s speed=0.0453x elapsed=0:00:56.68    frame=  155 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.58 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:00:57.18    frame=  157 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.61 bitrate=  38.8kbits/s speed=0.0454x elapsed=0:00:57.68    frame=  158 fps=2.7 q=-0.0 size=      12KiB time=00:00:02.63 bitrate=  38.8kbits/s speed=0.0453x elapsed=0:00:58.18    frame=  159 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.65 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:00:58.68    frame=  160 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.66 bitrate=  38.8kbits/s speed=0.0451x elapsed=0:00:59.18    frame=  162 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.70 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:00:59.68    frame=  163 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.71 bitrate=  38.8kbits/s speed=0.0451x elapsed=0:01:00.19    frame=  164 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.73 bitrate=  38.8kbits/s speed=0.045x elapsed=0:01:00.69    frame=  166 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.76 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:01:01.19    frame=  168 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.80 bitrate=  38.8kbits/s speed=0.0454x elapsed=0:01:01.69    frame=  169 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.81 bitrate=  38.8kbits/s speed=0.0453x elapsed=0:01:02.20    frame=  170 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.83 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:01:02.70    frame=  171 fps=2.7 q=-0.0 size=      13KiB time=00:00:02.85 bitrate=  38.8kbits/s speed=0.0451x elapsed=0:01:03.20    frame=  173 fps=2.7 q=-0.0 size=      14KiB time=00:00:02.88 bitrate=  38.8kbits/s speed=0.0453x elapsed=0:01:03.70    frame=  174 fps=2.7 q=-0.0 size=      14KiB time=00:00:02.90 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:01:04.20    frame=  175 fps=2.7 q=-0.0 size=      14KiB time=00:00:02.91 bitrate=  38.8kbits/s speed=0.0451x elapsed=0:01:04.70    frame=  176 fps=2.7 q=-0.0 size=      14KiB time=00:00:02.93 bitrate=  38.8kbits/s speed=0.045x elapsed=0:01:05.20    frame=  178 fps=2.7 q=-0.0 size=      14KiB time=00:00:02.96 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:01:05.70    frame=  179 fps=2.7 q=-0.0 size=      14KiB time=00:00:02.98 bitrate=  38.8kbits/s speed=0.0451x elapsed=0:01:06.20    frame=  180 fps=2.7 q=-0.0 size=      14KiB time=00:00:03.00 bitrate=  38.8kbits/s speed=0.045x elapsed=0:01:06.71    frame=  182 fps=2.7 q=-0.0 size=      14KiB time=00:00:03.03 bitrate=  38.8kbits/s speed=0.0451x elapsed=0:01:07.21    frame=  183 fps=2.7 q=-0.0 size=      14KiB time=00:00:03.06 bitrate=  38.5kbits/s speed=0.0453x elapsed=0:01:07.71    frame=  185 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.08 bitrate=  38.8kbits/s speed=0.0452x elapsed=0:01:08.22    frame=  185 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.08 bitrate=  38.8kbits/s speed=0.0449x elapsed=0:01:08.72    frame=  186 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.11 bitrate=  38.5kbits/s speed=0.045x elapsed=0:01:09.22    frame=  188 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.13 bitrate=  38.7kbits/s speed=0.0449x elapsed=0:01:09.72    frame=  190 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.16 bitrate=  38.7kbits/s speed=0.0451x elapsed=0:01:10.22    frame=  191 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.18 bitrate=  38.7kbits/s speed=0.045x elapsed=0:01:10.73    frame=  193 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.21 bitrate=  38.7kbits/s speed=0.0452x elapsed=0:01:11.23    frame=  194 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.23 bitrate=  38.7kbits/s speed=0.0451x elapsed=0:01:11.73    frame=  195 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.25 bitrate=  38.7kbits/s speed=0.045x elapsed=0:01:12.24    frame=  195 fps=2.7 q=-0.0 size=      15KiB time=00:00:03.25 bitrate=  38.7kbits/s speed=0.0447x elapsed=0:01:12.74    frame=  197 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.28 bitrate=  38.7kbits/s speed=0.0448x elapsed=0:01:13.24    frame=  199 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.31 bitrate=  38.7kbits/s speed=0.045x elapsed=0:01:13.74    frame=  200 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.33 bitrate=  38.7kbits/s speed=0.0449x elapsed=0:01:14.24    frame=  201 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.35 bitrate=  38.7kbits/s speed=0.0448x elapsed=0:01:14.74    frame=  201 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.35 bitrate=  38.7kbits/s speed=0.0445x elapsed=0:01:15.24    frame=  204 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.40 bitrate=  38.7kbits/s speed=0.0449x elapsed=0:01:15.74    frame=  205 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.41 bitrate=  38.7kbits/s speed=0.0448x elapsed=0:01:16.24    frame=  206 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.43 bitrate=  38.7kbits/s speed=0.0447x elapsed=0:01:16.74    frame=  208 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.46 bitrate=  38.7kbits/s speed=0.0449x elapsed=0:01:17.24    frame=  208 fps=2.7 q=-0.0 size=      16KiB time=00:00:03.46 bitrate=  38.7kbits/s speed=0.0446x elapsed=0:01:17.75    frame=  210 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.51 bitrate=  38.5kbits/s speed=0.0449x elapsed=0:01:18.25    frame=  212 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.53 bitrate=  38.7kbits/s speed=0.0449x elapsed=0:01:18.75    frame=  213 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.56 bitrate=  38.5kbits/s speed=0.045x elapsed=0:01:19.26    frame=  214 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.56 bitrate=  38.7kbits/s speed=0.0447x elapsed=0:01:19.76    frame=  216 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.60 bitrate=  38.7kbits/s speed=0.0448x elapsed=0:01:20.26    frame=  217 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.61 bitrate=  38.7kbits/s speed=0.0448x elapsed=0:01:20.77    frame=  218 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.63 bitrate=  38.7kbits/s speed=0.0447x elapsed=0:01:21.27    frame=  219 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.65 bitrate=  38.7kbits/s speed=0.0446x elapsed=0:01:21.77    frame=  221 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.68 bitrate=  38.7kbits/s speed=0.0448x elapsed=0:01:22.27    frame=  222 fps=2.7 q=-0.0 size=      17KiB time=00:00:03.70 bitrate=  38.7kbits/s speed=0.0447x elapsed=0:01:22.77    frame=  223 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.71 bitrate=  38.7kbits/s speed=0.0446x elapsed=0:01:23.27    [0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb8d9f9e0] [0m[0;32mEOF while reading input
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb8d9f9e0] [0m[0;32mTerminating thread with return code 0 (success)
+[0mframe=  224 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.73 bitrate=  38.7kbits/s speed=0.0446x elapsed=0:01:23.78    frame=  226 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.76 bitrate=  38.7kbits/s speed=0.0447x elapsed=0:01:24.28    frame=  227 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.80 bitrate=  38.5kbits/s speed=0.0448x elapsed=0:01:24.78    frame=  229 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.81 bitrate=  38.7kbits/s speed=0.0448x elapsed=0:01:25.28    frame=  230 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.83 bitrate=  38.7kbits/s speed=0.0447x elapsed=0:01:25.78    frame=  231 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.85 bitrate=  38.7kbits/s speed=0.0446x elapsed=0:01:26.28    frame=  232 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.86 bitrate=  38.7kbits/s speed=0.0446x elapsed=0:01:26.78    [0;35m[vist#0:0/hevc @ 0xffffb8e5ecc0] [0m[0;39m[dec:hevc @ 0xffffb8e63d50] [0m[0;32mDecoder thread received EOF packet
+[0mframe=  233 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.88 bitrate=  38.7kbits/s speed=0.0445x elapsed=0:01:27.28    frame=  235 fps=2.7 q=-0.0 size=      18KiB time=00:00:03.93 bitrate=  38.5kbits/s speed=0.0448x elapsed=0:01:27.78    [0;35m[vist#0:0/hevc @ 0xffffb8e5ecc0] [0m[0;39m[dec:hevc @ 0xffffb8e63d50] [0m[0;32mDecoder returned EOF, finishing
+[0m[1;32m[vf#0:0 @ 0xffffb8e570a0] [0m[0;32mFiltergraph returned EOF, finishing
+[0m[1;32m[vf#0:0 @ 0xffffb8e570a0] [0m[0;32mAll consumers returned EOF
+[0m[1;32m[vf#0:0 @ 0xffffb8e570a0] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[0;35m[vist#0:0/hevc @ 0xffffb8e5ecc0] [0m[0;39m[dec:hevc @ 0xffffb8e63d50] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffb8e59020] [0m[0;39m[enc:rawvideo @ 0xffffb8e4a920] [0m[0;32mEncoder thread received EOF
+[0m[1;35m[vost#0:0/rawvideo @ 0xffffb8e59020] [0m[0;32mTerminating thread with return code 0 (success)
+[0mframe=  236 fps=2.7 q=-0.0 size=      19KiB time=N/A bitrate=N/A speed=N/A elapsed=0:01:28.28    frame=  239 fps=2.7 q=-0.0 size=      19KiB time=N/A bitrate=N/A speed=N/A elapsed=0:01:28.78    [1;35m[out#0/framemd5 @ 0xffffb8e63840] [0m[0;32mAll streams finished
+[0m[1;35m[out#0/framemd5 @ 0xffffb8e63840] [0m[0;32mTerminating thread with return code 0 (success)
+[0m[0;39m[AVIOContext @ 0xffffb8cf5170] [0m[0;32mStatistics: 19417 bytes written, 0 seeks, 1 writeouts
+[0m[1;35m[out#0/framemd5 @ 0xffffb8e63840] [0m[0;32mOutput file #0 (hevc10-2160p.hw.framemd5):
+[0m[1;35m[out#0/framemd5 @ 0xffffb8e63840] [0m[0;32m  Output stream #0:0 (video): [0m[0;32m240 frames encoded[0m[0;32m; [0m[0;32m240 packets muxed (5971968000 bytes); [0m[0;32m
+[0m[1;35m[out#0/framemd5 @ 0xffffb8e63840] [0m[0;32m  Total: 240 packets (5971968000 bytes) muxed
+[0m[1;35m[out#0/framemd5 @ 0xffffb8e63840] [0mvideo:5832000KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=2.7 q=-0.0 Lsize=      19KiB time=00:00:04.00 bitrate=  38.8kbits/s speed=0.0448x elapsed=0:01:29.25    
+[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb8d9f9e0] [0m[0;32mInput file #0 (hevc10-2160p.mp4):
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb8d9f9e0] [0m[0;32m  Input stream #0:0 (video): [0m[0;32m240 packets read (11151857 bytes); [0m[0;32m240 frames decoded; 0 decode errors[0m[0;32m; [0m[0;32m
+[0m[0;35m[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffb8d9f9e0] [0m[0;32m  Total: 240 packets (11151857 bytes) demuxed
+[0m[0;39m[AVIOContext @ 0xffffb8d9fb30] [0m[0;32mStatistics: 11158763 bytes read, 0 seeks
+[0m[0;32m
+[0m[0;32mExiting with exit code 0
+[0m7678094fd8d6edd846ba680c0e85c0c1543feea74594029f89a2435b2e51fb1f  -
+  19:        499          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  19:        739          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+EXIT=0
+# 

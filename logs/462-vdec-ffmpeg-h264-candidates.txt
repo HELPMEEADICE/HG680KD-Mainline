@@ -1,0 +1,96 @@
+
+# (cd /tmp && wget -q -O vdec_ffmpeg_board.sh http://192.168.6.172:8098/vdec_ffmpeg_board.sh && sha256sum vdec_ffmpeg_board.sh); printf '\nEXIT=%s\n' $?
+d6a7eda934805922b4377efdcbd3f622e4bef2e476688114cbb45146a7f2cd1f  vdec_ffmpeg_board.sh
+
+EXIT=0
+# (cd /tmp && wget -q -O h264-1080p-no-direct.mp4 http://192.168.6.172:8098/h264-1080p-no-direct.mp4 && sha256sum h264-1080p-no-direct.mp4); printf '\nEXIT=%s\n' $?
+67072988ec018d95b03b8cc90e2684de90a22b8cb255c29044bf50f92c9da863  h264-1080p-no-direct.mp4
+
+EXIT=0
+# (cd /tmp && wget -q -O h264-1080p-cavlc.mp4 http://192.168.6.172:8098/h264-1080p-cavlc.mp4 && sha256sum h264-1080p-cavlc.mp4); printf '\nEXIT=%s\n' $?
+f2be43a5174474d23ce3ca73f99bf5569fe5058c50f97d57febe9227ec99bd14  h264-1080p-cavlc.mp4
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh check h264-1080p-no-direct nv21); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p-no-direct.mp4 -map 0:v:0 -an -sn -dn -vf hwdownload,format=nv21 -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y h264-1080p-no-direct.hw.framemd5
+[h264 @ 0xffff9a907460] Reinit context to 1920x1088, pix_fmt: yuv420p
+[vist#0:0/h264 @ 0xffff9a906cc0] Selecting decoder 'h264' because of requested hwaccel method v4l2request
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'h264-1080p-no-direct.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 10412 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High), 1 reference frame (avc1 / 0x31637661), yuv420p(progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], 10405 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx264
+[out#0/framemd5 @ 0xffff9a907840] Adding streams from explicit maps...
+[vost#0:0/rawvideo @ 0xffff9a8fe030] Created video stream from input stream 0:0
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> rawvideo (native))
+[vost#0:0/rawvideo @ 0xffff9a8fe030] Starting thread...
+[vf#0:0 @ 0xffff9a903030] Starting thread...
+[vist#0:0/h264 @ 0xffff9a906cc0] [dec:h264 @ 0xffff9a8fc030] Starting thread...
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9a83f9e0] Starting thread...
+[AVHWFramesContext @ 0xffff9a907d10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S264
+[AVHWFramesContext @ 0xffff9a907d10] Using CAPTURE buffer format NV21 (1920x1088)
+[h264 @ 0xffff9a8fa490] Reinit context to 1920x1088, pix_fmt: drm_prime
+[graph -1 input from stream 0:0 @ 0xffff9a7acc00] w:1920 h:1080 pixfmt:drm_prime tb:1/15360 fr:60/1 sar:1/1 csp:unknown range:unknown alpha:unspecified
+[graph -1 input from stream 0:0 @ 0xffff9a7acc00] video frame properties congruent with link at pts_time: 0
+Output #0, framemd5, to 'h264-1080p-no-direct.hw.framemd5':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: rawvideo, 1 reference frame (NV21 / 0x3132564E), nv21(progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 1492992 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      handler_name    : GPAC ISO Video Handler
+[out#0/framemd5 @ 0xffff9a907840] Starting thread...
+frame=    7 fps=0.0 q=-0.0 size=       1KiB time=00:00:00.11 bitrate=  47.8kbits/s speed=0.233x elapsed=0:00:00.50    frame=   19 fps= 19 q=-0.0 size=       2KiB time=00:00:00.31 bitrate=  41.9kbits/s speed=0.317x elapsed=0:00:01.00    frame=   33 fps= 22 q=-0.0 size=       3KiB time=00:00:00.55 bitrate=  40.4kbits/s speed=0.366x elapsed=0:00:01.50    frame=   46 fps= 23 q=-0.0 size=       4KiB time=00:00:00.76 bitrate=  39.8kbits/s speed=0.383x elapsed=0:00:02.00    frame=   59 fps= 24 q=-0.0 size=       5KiB time=00:00:00.98 bitrate=  39.5kbits/s speed=0.393x elapsed=0:00:02.50    frame=   72 fps= 24 q=-0.0 size=       6KiB time=00:00:01.20 bitrate=  39.3kbits/s speed= 0.4x elapsed=0:00:03.00    frame=   85 fps= 24 q=-0.0 size=       7KiB time=00:00:01.41 bitrate=  39.2kbits/s speed=0.405x elapsed=0:00:03.50    frame=   98 fps= 24 q=-0.0 size=       8KiB time=00:00:01.63 bitrate=  39.1kbits/s speed=0.408x elapsed=0:00:04.00    frame=  111 fps= 25 q=-0.0 size=       9KiB time=00:00:01.85 bitrate=  39.0kbits/s speed=0.411x elapsed=0:00:04.50    frame=  124 fps= 25 q=-0.0 size=      10KiB time=00:00:02.06 bitrate=  38.9kbits/s speed=0.413x elapsed=0:00:05.00    frame=  137 fps= 25 q=-0.0 size=      11KiB time=00:00:02.28 bitrate=  38.9kbits/s speed=0.415x elapsed=0:00:05.50    frame=  150 fps= 25 q=-0.0 size=      12KiB time=00:00:02.50 bitrate=  38.8kbits/s speed=0.416x elapsed=0:00:06.00    frame=  163 fps= 25 q=-0.0 size=      13KiB time=00:00:02.73 bitrate=  38.6kbits/s speed=0.42x elapsed=0:00:06.50    frame=  176 fps= 25 q=-0.0 size=      14KiB time=00:00:02.93 bitrate=  38.8kbits/s speed=0.418x elapsed=0:00:07.01    frame=  190 fps= 25 q=-0.0 size=      15KiB time=00:00:03.18 bitrate=  38.5kbits/s speed=0.424x elapsed=0:00:07.51    frame=  201 fps= 25 q=-0.0 size=      16KiB time=00:00:03.36 bitrate=  38.5kbits/s speed=0.42x elapsed=0:00:08.01    frame=  215 fps= 25 q=-0.0 size=      17KiB time=00:00:03.58 bitrate=  38.7kbits/s speed=0.421x elapsed=0:00:08.51    [in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9a83f9e0] EOF while reading input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9a83f9e0] Terminating thread with return code 0 (success)
+frame=  228 fps= 25 q=-0.0 size=      18KiB time=00:00:03.80 bitrate=  38.7kbits/s speed=0.422x elapsed=0:00:09.01    [vist#0:0/h264 @ 0xffff9a906cc0] [dec:h264 @ 0xffff9a8fc030] Decoder thread received EOF packet
+[vist#0:0/h264 @ 0xffff9a906cc0] [dec:h264 @ 0xffff9a8fc030] Decoder returned EOF, finishing
+[vf#0:0 @ 0xffff9a903030] Filtergraph returned EOF, finishing
+[vf#0:0 @ 0xffff9a903030] All consumers returned EOF
+[vf#0:0 @ 0xffff9a903030] Terminating thread with return code 0 (success)
+[vost#0:0/rawvideo @ 0xffff9a8fe030] [enc:rawvideo @ 0xffff9a907f10] Encoder thread received EOF
+[vost#0:0/rawvideo @ 0xffff9a8fe030] Terminating thread with return code 0 (success)
+[vist#0:0/h264 @ 0xffff9a906cc0] [dec:h264 @ 0xffff9a8fc030] Terminating thread with return code 0 (success)
+[out#0/framemd5 @ 0xffff9a907840] All streams finished
+[out#0/framemd5 @ 0xffff9a907840] Terminating thread with return code 0 (success)
+[AVIOContext @ 0xffff9a8fc2c0] Statistics: 19417 bytes written, 0 seeks, 1 writeouts
+[out#0/framemd5 @ 0xffff9a907840] Output file #0 (h264-1080p-no-direct.hw.framemd5):
+[out#0/framemd5 @ 0xffff9a907840]   Output stream #0:0 (video): 240 frames encoded; 240 packets muxed (746496000 bytes); 
+[out#0/framemd5 @ 0xffff9a907840]   Total: 240 packets (746496000 bytes) muxed
+[out#0/framemd5 @ 0xffff9a907840] video:729000KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 25 q=-0.0 Lsize=      19KiB time=00:00:04.00 bitrate=  38.8kbits/s speed=0.425x elapsed=0:00:09.42    
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9a83f9e0] Input file #0 (h264-1080p-no-direct.mp4):
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9a83f9e0]   Input stream #0:0 (video): 240 packets read (5202534 bytes); 240 frames decoded; 0 decode errors; 
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffff9a83f9e0]   Total: 240 packets (5202534 bytes) demuxed
+[AVIOContext @ 0xffff9a83fb30] Statistics: 5206072 bytes read, 0 seeks
+
+Exiting with exit code 0
+HASH FRAMES 240
+56e922abad7fc3b2e24e95581f3f6c1e597b9633c5af47ba65a80fa8de8578b9  -
+  19:       3144          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  19:       3384          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+EXIT=0
+# 
+[host] h264-1080p-no-direct pixels MATCH

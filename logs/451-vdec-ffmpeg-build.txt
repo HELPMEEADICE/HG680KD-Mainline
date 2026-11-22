@@ -1,0 +1,593 @@
+787bfb407d5554c87f76e1a87fa92d28a1958e62603ec9de1703fc0049cf5cbe  /home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/eudev-dev-3.2.14-r5.apk
+395c832a65081563b82cd52776afe16ac3de483c776753bae376280caf8bb0cd  /home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/eudev-libs-3.2.14-r5.apk
+e966fb3fc167255ed3de436134425e6207a38438e4df2e54ee807431ab4230f3  /home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/libdrm-2.4.124-r0.apk
+5794a2582947f899036006a77a2aff14dfaee230a4427a0e8e9208b276157ec5  /home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/libdrm-dev-2.4.124-r0.apk
+d616c430bcbe0bf452b7f6ea2669f2cad14e85644a7599f4f495115d021742ef  /home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/musl-1.2.5-r13.apk
+install prefix            /usr/local
+source path               src
+C compiler                /home/hedc/hg680kd-mainline/out/musl-arm64/bin/musl-gcc
+C library                 
+host C compiler           gcc
+host C library            glibc
+ARCH                      aarch64 (generic)
+big-endian                no
+runtime cpu detection     yes
+NEON enabled              yes
+DOTPROD enabled           yes
+I8MM enabled              yes
+SVE enabled               yes
+SVE2 enabled              yes
+SME enabled               yes
+SME-I16I64 enabled        yes
+SME2 enabled              yes
+debug symbols             no
+strip symbols             yes
+optimize for size         no
+optimizations             yes
+static                    yes
+shared                    no
+network support           yes
+threading support         pthreads
+safe bitstream reader     yes
+texi2html enabled         no
+perl enabled              yes
+pod2man enabled           no
+makeinfo enabled          yes
+makeinfo supports HTML    yes
+experimental features     yes
+xmllint enabled           yes
+
+External libraries:
+iconv                   libudev
+
+External libraries providing hardware acceleration:
+libdrm                  v4l2_request
+
+Libraries:
+avcodec                 avformat                swresample
+avfilter                avutil                  swscale
+
+Programs:
+ffmpeg
+
+Enabled decoders:
+h264                    hevc
+
+Enabled encoders:
+rawvideo                wrapped_avframe
+
+Enabled hwaccels:
+h264_v4l2request        hevc_v4l2request
+
+Enabled parsers:
+h264                    hevc
+
+Enabled demuxers:
+h264                    hevc                    mov
+
+Enabled muxers:
+framemd5                null
+
+Enabled protocols:
+file                    pipe
+
+Enabled filters:
+aformat                 hflip                   transpose
+anull                   hwdownload              trim
+atrim                   null                    vflip
+crop                    rotate
+format                  scale
+
+Enabled bsfs:
+h264_mp4toannexb        hevc_mp4toannexb
+
+Enabled indevs:
+
+Enabled outdevs:
+
+License: LGPL version 2.1 or later
+config_components.h is unchanged
+libavutil/avconfig.h is unchanged
+libavfilter/filter_list.c is unchanged
+libavcodec/codec_list.c is unchanged
+libavcodec/parser_list.c is unchanged
+libavcodec/bsf_list.c is unchanged
+libavformat/demuxer_list.c is unchanged
+libavformat/muxer_list.c is unchanged
+libavdevice/indev_list.c is unchanged
+libavdevice/outdev_list.c is unchanged
+libavformat/protocol_list.c is unchanged
+ffbuild/config.sh is unchanged
+CC	libavfilter/af_aformat.o
+CC	libavfilter/af_anull.o
+CC	libavfilter/allfilters.o
+CC	libavfilter/audio.o
+CC	libavfilter/avfilter.o
+CC	libavfilter/avfiltergraph.o
+CC	libavfilter/buffersink.o
+CC	libavfilter/buffersrc.o
+CC	libavfilter/ccfifo.o
+CC	libavfilter/drawutils.o
+CC	libavfilter/colorspace.o
+CC	libavfilter/formats.o
+CC	libavfilter/framepool.o
+CC	libavfilter/framequeue.o
+CC	libavfilter/framesync.o
+CC	libavfilter/graphdump.o
+CC	libavfilter/graphparser.o
+CC	libavfilter/pthread.o
+CC	libavfilter/scale_eval.o
+CC	libavfilter/trim.o
+CC	libavfilter/version.o
+CC	libavfilter/vf_crop.o
+CC	libavfilter/vf_format.o
+CC	libavfilter/vf_hflip.o
+CC	libavfilter/vf_hwdownload.o
+CC	libavfilter/vf_null.o
+CC	libavfilter/vf_rotate.o
+CC	libavfilter/vf_scale.o
+CC	libavfilter/vf_transpose.o
+CC	libavfilter/vf_vflip.o
+CC	libavfilter/video.o
+CC	libavformat/allformats.o
+CC	libavformat/av1.o
+CC	libavformat/avformat.o
+CC	libavformat/avio.o
+CC	libavformat/aviobuf.o
+CC	libavformat/codecstring.o
+CC	libavformat/demux.o
+CC	libavformat/demux_utils.o
+CC	libavformat/dovi_isom.o
+CC	libavformat/dump.o
+CC	libavformat/dv.o
+CC	libavformat/dvdclut.o
+CC	libavformat/file.o
+CC	libavformat/format.o
+CC	libavformat/framehash.o
+CC	libavformat/h264dec.o
+CC	libavformat/hashenc.o
+CC	libavformat/hevcdec.o
+CC	libavformat/iamf.o
+CC	libavformat/iamf_parse.o
+CC	libavformat/iamf_reader.o
+CC	libavformat/id3v1.o
+CC	libavformat/id3v2.o
+CC	libavformat/isom.o
+CC	libavformat/isom_tags.o
+CC	libavformat/metadata.o
+CC	libavformat/mov.o
+CC	libavformat/mov_chan.o
+CC	libavformat/mov_esds.o
+CC	libavformat/mux.o
+CC	libavformat/mux_utils.o
+CC	libavformat/network.o
+CC	libavformat/nullenc.o
+CC	libavformat/options.o
+CC	libavformat/os_support.o
+CC	libavformat/qtpalette.o
+CC	libavformat/rawdec.o
+src/libavformat/rawdec.c:106:12: warning: 'raw_data_read_header' defined but not used [-Wunused-function]
+  106 | static int raw_data_read_header(AVFormatContext *s)
+      |            ^~~~~~~~~~~~~~~~~~~~
+CC	libavformat/replaygain.o
+CC	libavformat/riff.o
+CC	libavformat/riffdec.o
+CC	libavformat/sdp.o
+CC	libavformat/seek.o
+CC	libavformat/url.o
+CC	libavformat/utils.o
+CC	libavformat/version.o
+CC	libavformat/vpcc.o
+CC	libavcodec/aarch64/fdctdsp_init_aarch64.o
+AS	libavcodec/aarch64/fdctdsp_neon.o
+CC	libavcodec/aarch64/h264chroma_init_aarch64.o
+AS	libavcodec/aarch64/h264cmc_neon.o
+CC	libavcodec/aarch64/h264dsp_init_aarch64.o
+AS	libavcodec/aarch64/h264dsp_neon.o
+AS	libavcodec/aarch64/h264idct_neon.o
+CC	libavcodec/aarch64/h264pred_init.o
+AS	libavcodec/aarch64/h264pred_neon.o
+CC	libavcodec/aarch64/h264qpel_init_aarch64.o
+AS	libavcodec/aarch64/h264qpel_neon.o
+AS	libavcodec/aarch64/h26x/epel_neon.o
+AS	libavcodec/aarch64/h26x/qpel_neon.o
+AS	libavcodec/aarch64/h26x/sao_neon.o
+AS	libavcodec/aarch64/hevcdsp_deblock_neon.o
+AS	libavcodec/aarch64/hevcdsp_dequant_neon.o
+AS	libavcodec/aarch64/hevcdsp_idct_neon.o
+CC	libavcodec/aarch64/hevcdsp_init_aarch64.o
+AS	libavcodec/aarch64/hpeldsp_neon.o
+CC	libavcodec/aarch64/idctdsp_init_aarch64.o
+AS	libavcodec/aarch64/idctdsp_neon.o
+CC	libavcodec/aarch64/me_cmp_init_aarch64.o
+AS	libavcodec/aarch64/me_cmp_neon.o
+AS	libavcodec/aarch64/simple_idct_neon.o
+AS	libavcodec/aarch64/videodsp.o
+CC	libavcodec/aarch64/videodsp_init.o
+CC	libavcodec/ac3_parser.o
+CC	libavcodec/adts_parser.o
+CC	libavcodec/allcodecs.o
+CC	libavcodec/aom_film_grain.o
+CC	libavcodec/atsc_a53.o
+CC	libavcodec/avcodec.o
+CC	libavcodec/avdct.o
+CC	libavcodec/bitstream.o
+CC	libavcodec/bitstream_filters.o
+CC	libavcodec/bsf.o
+CC	libavcodec/bsf/h264_mp4toannexb.o
+CC	libavcodec/bsf/hevc_mp4toannexb.o
+CC	libavcodec/bswapdsp.o
+CC	libavcodec/cabac.o
+CC	libavcodec/codec_desc.o
+CC	libavcodec/codec_par.o
+CC	libavcodec/d3d11va.o
+CC	libavcodec/decode.o
+CC	libavcodec/dirac.o
+CC	libavcodec/dovi_rpu.o
+CC	libavcodec/dovi_rpudec.o
+CC	libavcodec/dv_profile.o
+CC	libavcodec/dynamic_hdr_vivid.o
+CC	libavcodec/encode.o
+CC	libavcodec/error_resilience.o
+CC	libavcodec/exif.o
+CC	libavcodec/faandct.o
+CC	libavcodec/faanidct.o
+CC	libavcodec/fdctdsp.o
+CC	libavcodec/frame_thread_encoder.o
+CC	libavcodec/get_buffer.o
+CC	libavcodec/h2645_parse.o
+CC	libavcodec/h2645_sei.o
+CC	libavcodec/h2645_vui.o
+CC	libavcodec/h264_cabac.o
+CC	libavcodec/h264_cavlc.o
+CC	libavcodec/h264_direct.o
+CC	libavcodec/h264_loopfilter.o
+CC	libavcodec/h264_mb.o
+CC	libavcodec/h264_parse.o
+CC	libavcodec/h264_parser.o
+CC	libavcodec/h264_picture.o
+CC	libavcodec/h264_ps.o
+CC	libavcodec/h264_refs.o
+CC	libavcodec/h264_sei.o
+CC	libavcodec/h264_slice.o
+CC	libavcodec/h264chroma.o
+CC	libavcodec/h264data.o
+CC	libavcodec/h264dec.o
+CC	libavcodec/h264dsp.o
+CC	libavcodec/h264idct.o
+CC	libavcodec/h264pred.o
+CC	libavcodec/h264qpel.o
+CC	libavcodec/h274.o
+CC	libavcodec/hevc/cabac.o
+CC	libavcodec/hevc/dsp.o
+CC	libavcodec/hevc/filter.o
+CC	libavcodec/hevc/hevcdec.o
+CC	libavcodec/hevc/mvs.o
+CC	libavcodec/hevc/parse.o
+CC	libavcodec/hevc/parser.o
+CC	libavcodec/hevc/pred.o
+CC	libavcodec/hevc/ps.o
+CC	libavcodec/hevc/refs.o
+CC	libavcodec/hevc/sei.o
+CC	libavcodec/idctdsp.o
+CC	libavcodec/imgconvert.o
+CC	libavcodec/jfdctint.o
+CC	libavcodec/jni.o
+CC	libavcodec/jrevdct.o
+CC	libavcodec/mathtables.o
+CC	libavcodec/me_cmp.o
+CC	libavcodec/mediacodec.o
+CC	libavcodec/mpeg4audio.o
+CC	libavcodec/options.o
+CC	libavcodec/packet.o
+CC	libavcodec/parser.o
+CC	libavcodec/parsers.o
+CC	libavcodec/profiles.o
+CC	libavcodec/pthread.o
+CC	libavcodec/pthread_frame.o
+CC	libavcodec/pthread_slice.o
+CC	libavcodec/qsv_api.o
+CC	libavcodec/raw.o
+CC	libavcodec/rawenc.o
+CC	libavcodec/simple_idct.o
+CC	libavcodec/startcode.o
+CC	libavcodec/threadprogress.o
+CC	libavcodec/tiff_common.o
+CC	libavcodec/utils.o
+CC	libavcodec/v4l2_request.o
+CC	libavcodec/v4l2_request_h264.o
+CC	libavcodec/v4l2_request_hevc.o
+CC	libavcodec/version.o
+CC	libavcodec/videodsp.o
+CC	libavcodec/vlc.o
+CC	libavcodec/vorbis_parser.o
+CC	libavcodec/wrapped_avframe.o
+CC	libavcodec/xiph.o
+CC	libavcodec/to_upper4.o
+CC	libswresample/aarch64/audio_convert_init.o
+AS	libswresample/aarch64/audio_convert_neon.o
+AS	libswresample/aarch64/resample.o
+CC	libswresample/aarch64/resample_init.o
+CC	libswresample/audioconvert.o
+CC	libswresample/dither.o
+CC	libswresample/options.o
+CC	libswresample/rematrix.o
+CC	libswresample/resample.o
+CC	libswresample/resample_dsp.o
+CC	libswresample/swresample.o
+CC	libswresample/swresample_frame.o
+CC	libswresample/version.o
+AS	libswscale/aarch64/hscale.o
+AS	libswscale/aarch64/input.o
+AS	libswscale/aarch64/output.o
+AS	libswscale/aarch64/range_convert_neon.o
+CC	libswscale/aarch64/rgb2rgb.o
+AS	libswscale/aarch64/rgb2rgb_neon.o
+CC	libswscale/aarch64/swscale.o
+CC	libswscale/aarch64/swscale_unscaled.o
+AS	libswscale/aarch64/swscale_unscaled_neon.o
+AS	libswscale/aarch64/xyz2rgb_neon.o
+AS	libswscale/aarch64/yuv2rgb_neon.o
+CC	libswscale/alphablend.o
+CC	libswscale/cms.o
+CC	libswscale/csputils.o
+CC	libswscale/format.o
+CC	libswscale/gamma.o
+CC	libswscale/graph.o
+CC	libswscale/hscale.o
+CC	libswscale/hscale_fast_bilinear.o
+CC	libswscale/input.o
+CC	libswscale/lut3d.o
+CC	libswscale/ops.o
+In function 'add_level',
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'vlc_multi_gen' at src/libavcodec/vlc.c:508:5,
+    inlined from 'ff_vlc_init_multi_from_lengths' at src/libavcodec/vlc.c:564:11:
+src/libavcodec/vlc.c:443:36: warning: array subscript 3 is above array bounds of 'uint16_t[3]' {aka 'short unsigned int[3]'} [-Warray-bounds=]
+  443 |             if (is16bit) info.val16[curlevel] = sym;
+      |                          ~~~~~~~~~~^~~~~~~~~~
+In file included from src/libavcodec/vlc.c:39:
+src/libavcodec/vlc.h: In function 'ff_vlc_init_multi_from_lengths':
+src/libavcodec/vlc.h:59:18: note: while referencing 'val16'
+   59 |         uint16_t val16[VLC_MULTI_MAX_SYMBOLS / 2];
+      |                  ^~~~~
+In function 'add_level',
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'vlc_multi_gen' at src/libavcodec/vlc.c:508:5,
+    inlined from 'ff_vlc_init_multi_from_lengths' at src/libavcodec/vlc.c:564:11:
+src/libavcodec/vlc.c:443:36: warning: array subscript 4 is above array bounds of 'uint16_t[3]' {aka 'short unsigned int[3]'} [-Warray-bounds=]
+  443 |             if (is16bit) info.val16[curlevel] = sym;
+      |                          ~~~~~~~~~~^~~~~~~~~~
+src/libavcodec/vlc.h: In function 'ff_vlc_init_multi_from_lengths':
+src/libavcodec/vlc.h:59:18: note: while referencing 'val16'
+   59 |         uint16_t val16[VLC_MULTI_MAX_SYMBOLS / 2];
+      |                  ^~~~~
+In function 'add_level',
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'add_level' at src/libavcodec/vlc.c:457:17,
+    inlined from 'vlc_multi_gen' at src/libavcodec/vlc.c:508:5,
+    inlined from 'ff_vlc_init_multi_from_lengths' at src/libavcodec/vlc.c:564:11:
+src/libavcodec/vlc.c:443:36: warning: array subscript 5 is above array bounds of 'uint16_t[3]' {aka 'short unsigned int[3]'} [-Warray-bounds=]
+  443 |             if (is16bit) info.val16[curlevel] = sym;
+      |                          ~~~~~~~~~~^~~~~~~~~~
+src/libavcodec/vlc.h: In function 'ff_vlc_init_multi_from_lengths':
+src/libavcodec/vlc.h:59:18: note: while referencing 'val16'
+   59 |         uint16_t val16[VLC_MULTI_MAX_SYMBOLS / 2];
+      |                  ^~~~~
+CC	libswscale/ops_backend.o
+CC	libswscale/ops_chain.o
+CC	libswscale/ops_dispatch.o
+CC	libswscale/ops_memcpy.o
+CC	libswscale/ops_optimizer.o
+CC	libswscale/options.o
+CC	libswscale/output.o
+CC	libswscale/rgb2rgb.o
+CC	libswscale/slice.o
+CC	libswscale/swscale.o
+CC	libswscale/swscale_unscaled.o
+CC	libswscale/utils.o
+CC	libswscale/version.o
+CC	libswscale/vscale.o
+CC	libswscale/yuv2rgb.o
+CC	libavutil/aarch64/cpu.o
+AS	libavutil/aarch64/cpu_sme.o
+AS	libavutil/aarch64/cpu_sve.o
+AS	libavutil/aarch64/crc.o
+CC	libavutil/aarch64/float_dsp_init.o
+AS	libavutil/aarch64/float_dsp_neon.o
+CC	libavutil/aarch64/tx_float_init.o
+AS	libavutil/aarch64/tx_float_neon.o
+CC	libavutil/adler32.o
+CC	libavutil/aes.o
+CC	libavutil/aes_ctr.o
+CC	libavutil/ambient_viewing_environment.o
+CC	libavutil/avsscanf.o
+CC	libavutil/avstring.o
+CC	libavutil/base64.o
+CC	libavutil/blowfish.o
+CC	libavutil/buffer.o
+CC	libavutil/camellia.o
+CC	libavutil/cast5.o
+CC	libavutil/channel_layout.o
+CC	libavutil/container_fifo.o
+CC	libavutil/cpu.o
+CC	libavutil/crc.o
+CC	libavutil/des.o
+CC	libavutil/detection_bbox.o
+CC	libavutil/dict.o
+CC	libavutil/display.o
+CC	libavutil/downmix_info.o
+CC	libavutil/encryption_info.o
+CC	libavutil/error.o
+CC	libavutil/eval.o
+CC	libavutil/executor.o
+CC	libavutil/fifo.o
+CC	libavutil/file.o
+CC	libavutil/file_open.o
+CC	libavutil/film_grain_params.o
+CC	libavutil/fixed_dsp.o
+CC	libavutil/float_dsp.o
+CC	libavutil/frame.o
+CC	libavutil/hash.o
+CC	libavutil/hdr_dynamic_metadata.o
+CC	libavutil/hdr_dynamic_vivid_metadata.o
+CC	libavutil/hwcontext.o
+CC	libavutil/hwcontext_drm.o
+CC	libavutil/hwcontext_stub.o
+CC	libavutil/hwcontext_v4l2request.o
+CC	libavutil/iamf.o
+CC	libavutil/imgutils.o
+CC	libavutil/integer.o
+CC	libavutil/intmath.o
+CC	libavutil/lfg.o
+CC	libavutil/lls.o
+CC	libavutil/log.o
+CC	libavutil/lzo.o
+CC	libavutil/mastering_display_metadata.o
+CC	libavutil/mathematics.o
+CC	libavutil/md5.o
+CC	libavutil/mem.o
+CC	libavutil/murmur3.o
+CC	libavutil/opt.o
+CC	libavutil/parseutils.o
+CC	libavutil/pixdesc.o
+CC	libavutil/pixelutils.o
+CC	libavutil/random_seed.o
+CC	libavutil/rational.o
+CC	libavutil/refstruct.o
+CC	libavutil/ripemd.o
+CC	libavutil/sha.o
+CC	libavutil/sha512.o
+CC	libavutil/side_data.o
+CC	libavutil/slicethread.o
+CC	libavutil/stereo3d.o
+CC	libavutil/tdrdi.o
+CC	libavutil/tea.o
+CC	libavutil/threadmessage.o
+CC	libavutil/time.o
+CC	libavutil/timecode.o
+CC	libavutil/timestamp.o
+CC	libavutil/twofish.o
+CC	libavutil/tx.o
+CC	libavutil/tx_double.o
+CC	libavutil/tx_float.o
+CC	libavutil/tx_int32.o
+CC	libavutil/utils.o
+CC	libavutil/version.o
+CC	libavutil/video_enc_params.o
+CC	libavutil/video_hint.o
+CC	libavutil/xga_font_data.o
+CC	libavutil/xtea.o
+CC	libavutil/half2float.o
+CC	fftools/ffmpeg_dec.o
+CC	fftools/ffmpeg_demux.o
+CC	fftools/ffmpeg_enc.o
+CC	fftools/ffmpeg_filter.o
+CC	fftools/ffmpeg_hw.o
+CC	fftools/ffmpeg_mux.o
+CC	fftools/ffmpeg_mux_init.o
+CC	fftools/ffmpeg_opt.o
+CC	fftools/ffmpeg_sched.o
+CC	fftools/graph/graphprint.o
+CC	fftools/thread_queue.o
+CC	fftools/resources/resman.o
+CC	fftools/cmdutils.o
+CC	fftools/opt_common.o
+CC	fftools/ffmpeg.o
+AR	libavfilter/libavfilter.a
+AR	libswresample/libswresample.a
+AR	libavformat/libavformat.a
+AR	libavutil/libavutil.a
+AR	libavcodec/libavcodec.a
+AR	libswscale/libswscale.a
+LD	ffmpeg_g
+STRIP	ffmpeg
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           AArch64
+  Version:                           0x1
+  Entry point address:               0x414ca4
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          5048080 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         7
+  Size of section headers:           64 (bytes)
+  Number of section headers:         26
+  Section header string table index: 25
+
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  PHDR           0x0000000000000040 0x0000000000400040 0x0000000000400040
+                 0x0000000000000188 0x0000000000000188  R      0x8
+  INTERP         0x00000000000001c8 0x00000000004001c8 0x00000000004001c8
+                 0x000000000000001a 0x000000000000001a  R      0x1
+      [Requesting program interpreter: /lib/ld-musl-aarch64.so.1]
+  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                 0x00000000004c6048 0x00000000004c6048  R E    0x10000
+  LOAD           0x00000000004cfd90 0x00000000008dfd90 0x00000000008dfd90
+                 0x0000000000000878 0x000000000010d230  RW     0x10000
+  DYNAMIC        0x00000000004cfdb0 0x00000000008dfdb0 0x00000000008dfdb0
+                 0x0000000000000200 0x0000000000000200  RW     0x8
+  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x0000000000000000 0x0000000000000000  RW     0x10
+  GNU_RELRO      0x00000000004cfd90 0x00000000008dfd90 0x00000000008dfd90
+                 0x0000000000000270 0x0000000000000270  R      0x1
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .interp 
+   02     .interp .hash .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt .text .fini .rodata .eh_frame 
+   03     .init_array .fini_array .data.rel.ro .dynamic .got .got.plt .data .bss 
+   04     .dynamic 
+   05     
+   06     .init_array .fini_array .data.rel.ro .dynamic .got 
+
+Dynamic section at offset 0x4cfdb0 contains 27 entries:
+  Tag        Type                         Name/Value
+ 0x0000000000000001 (NEEDED)             Shared library: [libudev.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdrm.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.musl-aarch64.so.1]
+ 0x000000000000000c (INIT)               0x403160
+ 0x000000000000000d (FINI)               0x801c90
+ 0x0000000000000019 (INIT_ARRAY)         0x8dfd90
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x8dfd98
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x0000000000000004 (HASH)               0x4001e8
+ 0x000000006ffffef5 (GNU_HASH)           0x4006d0
+ 0x0000000000000005 (STRTAB)             0x401820
+ 0x0000000000000006 (SYMTAB)             0x400740
+ 0x000000000000000a (STRSZ)              1751 (bytes)
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000015 (DEBUG)              0x0
+ 0x0000000000000003 (PLTGOT)             0x8dffe8
+ 0x0000000000000002 (PLTRELSZ)           4152 (bytes)
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000017 (JMPREL)             0x402128
+ 0x0000000000000007 (RELA)               0x402080
+ 0x0000000000000008 (RELASZ)             168 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffffe (VERNEED)            0x402060
+ 0x000000006fffffff (VERNEEDNUM)         1
+ 0x000000006ffffff0 (VERSYM)             0x401ef8
+ 0x0000000000000000 (NULL)               0x0
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.musl-aarch64.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.musl-aarch64.so.1]

@@ -1,0 +1,25 @@
+stream|codec_name=h264|width=3840|height=2160|pix_fmt=yuv420p|r_frame_rate=60/1
+h264-1080p.mp4
+stream|codec_name=h264|profile=High|width=1920|height=1080|pix_fmt=yuv420p|r_frame_rate=60/1|bit_rate=9756904|nb_frames=240
+    113 B
+      2 I
+    125 P
+hevc-1080p.mp4
+stream|codec_name=hevc|profile=Main|width=1920|height=1080|pix_fmt=yuv420p|r_frame_rate=60/1|bit_rate=9362424|nb_frames=240
+    177 B
+      2 I
+     61 P
+hevc-2160p.mp4
+stream|codec_name=hevc|profile=Main|width=3840|height=2160|pix_fmt=yuv420p|r_frame_rate=60/1|bit_rate=22632924|nb_frames=240
+    177 B
+      2 I
+     61 P
+hevc10-2160p.mp4
+stream|codec_name=hevc|profile=Main 10|width=3840|height=2160|pix_fmt=yuv420p10le|r_frame_rate=60/1|bit_rate=22303714|nb_frames=240
+    177 B
+      2 I
+     61 P
+dbca2cd4ad1578460f62e246745dd236bfd13d71335c6e5b77b229bc1a709f2f  h264-1080p.mp4
+a660d5262f738e3b7d8b20026e70c54196e6f1bd722df8632567c28c97dc2113  hevc-1080p.mp4
+ecf5506f772c07df4db8d76eff89459a0bfacf3db6ec800840e115d6fbccb874  hevc-2160p.mp4
+d81c699d4179c88dc9e6fea073490867ccbd85795d6417f5b70ca7cc98704323  hevc10-2160p.mp4
