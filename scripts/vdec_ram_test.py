@@ -1,4 +1,4 @@
-"""Boot a decoder image via TFTP into RAM and compare board NV21 frame hashes."""
+"""Boot via TFTP into RAM and compare board NV21/P010 frame hashes."""
 
 import argparse
 import hashlib
@@ -61,37 +61,41 @@ def shell(console, command):
 
 
 def report(console, name, hashes, reference, frames):
-    raw = reference.read_bytes()
-    size, remainder = divmod(len(raw), frames)
+    size, remainder = divmod(reference.stat().st_size, frames)
     if not size or remainder:
         raise ValueError(f"invalid reference size for {name}")
     matches = 0
-    for i in range(frames):
-        expected = hashlib.sha256(raw[i * size:(i + 1) * size]).hexdigest()
-        actual = hashes[i].decode() if i < len(hashes) else "missing"
-        result = "MATCH" if actual == expected else "MISMATCH"
-        matches += actual == expected
-        console.record(f"[host] {name} frame {i} board={actual} FFmpeg={expected} {result}\n".encode())
+    with reference.open("rb") as raw:
+        for i in range(frames):
+            expected = hashlib.sha256(raw.read(size)).hexdigest()
+            actual = hashes[i].decode() if i < len(hashes) else "missing"
+            result = "MATCH" if actual == expected else "MISMATCH"
+            matches += actual == expected
+            console.record(f"[host] {name} frame {i} board={actual} FFmpeg={expected} {result}\n".encode())
     console.record(f"[host] RESULT {name} {matches}/{frames}\n".encode())
     return matches == frames and len(hashes) == frames
 
 
 def compare_fixture(console, fixture, visible_height):
     header = fixture.with_suffix(".txt").read_text(encoding="ascii").splitlines()[0].split()
-    hevc = header[0] == "HEVC"
+    hevc = header[0] in ("HEVC", "HEVC10")
+    main10 = header[0] == "HEVC10"
     width, height, frames = map(int, header[int(hevc):int(hevc) + 3])
-    size = width * height * 3 // 2
+    stride = width * (2 if main10 else 1)
+    size = stride * height * 3 // 2
+    extension = "p010" if main10 else "nv21"
+    raw = "/tmp/vdec-check.raw"
     name = fixture.name
     if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
         raise ValueError(f"invalid fixture name {name!r}")
     code = 265 if hevc else 264
     output = shell(console, f"echo TEST-{name}; "
                    f"vdec-request /dev/video0 /dev/media0 /etc/vdec-test/{name}.txt "
-                   f"/etc/vdec-test/{name}.{code} /tmp/vdec-check.nv21 && "
+                   f"/etc/vdec-test/{name}.{code} {raw} && "
                    f"for n in {' '.join(map(str, range(frames)))}; do "
-                   f"dd if=/tmp/vdec-check.nv21 bs={size} skip=$n count=1 2>/dev/null | sha256sum; done; "
+                   f"dd if={raw} bs={size} skip=$n count=1 2>/dev/null | sha256sum; done; "
                    "grep hi3798mv320-vdec /proc/interrupts")
-    passed = report(console, name, HASH.findall(output), fixture.with_suffix(".nv21"), frames)
+    passed = report(console, name, HASH.findall(output), fixture.with_suffix(f".{extension}"), frames)
     if visible_height and passed:
         hashes = []
         if not 0 < visible_height <= height:
@@ -99,12 +103,13 @@ def compare_fixture(console, fixture, visible_height):
         for i in range(frames):
             start = i * height * 3 // 2
             hashes.extend(HASH.findall(shell(
-                console, f"{{ dd if=/tmp/vdec-check.nv21 bs={width} skip={start} count={visible_height}; "
-                f"dd if=/tmp/vdec-check.nv21 bs={width} skip={start + height} count={visible_height // 2}; "
+                console, f"{{ dd if={raw} bs={stride} skip={start} count={visible_height}; "
+                f"dd if={raw} bs={stride} skip={start + height} count={visible_height // 2}; "
                 "} 2>/dev/null | sha256sum",
             )))
         passed &= report(console, f"{name}-visible", hashes,
-                         fixture.with_suffix(".visible.nv21"), frames)
+                         fixture.with_suffix(f".visible.{extension}"), frames)
+    shell(console, f": > {raw}")
     return passed
 
 
@@ -131,7 +136,8 @@ def main():
         else:
             port.write(b"\r")
             console.expect(SHELL_PROMPT)
-        shell(console, "uname -r; cat /proc/mounts; cat /sys/block/mmcblk0/ro; "
+        shell(console, "uname -r; cat /proc/cmdline; grep Cma /proc/meminfo; "
+              "cat /proc/mounts; cat /sys/block/mmcblk0/ro; "
               "grep hi3798mv320-vdec /proc/interrupts")
         shell(console, "echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 3")
         for fixture in args.fixtures:

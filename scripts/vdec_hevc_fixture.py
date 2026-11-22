@@ -1,4 +1,4 @@
-"""Prepare Main profile Annex B fixtures and FFmpeg NV21 reference frames."""
+"""Prepare Main/Main10 Annex B fixtures and FFmpeg NV21/P010 reference frames."""
 
 import argparse
 from pathlib import Path
@@ -131,13 +131,15 @@ def pred_weights(row, l0, l1):
     return fields
 
 
-def reorder_nv21(stream, out, pocs, width, height, visible=False):
+def write_reference(stream, out, pocs, width, height, main10, visible=False):
     ffmpeg("-loglevel", "error", "-apply_cropping", "all" if visible else "none",
-           "-i", stream, "-pix_fmt", "nv21", "-f", "rawvideo", out)
-    pixels = out.read_bytes()
-    size = width * height * 3 // 2
-    if len(pixels) != len(pocs) * size:
+           "-i", stream, "-pix_fmt", "p010le" if main10 else "nv21", "-f", "rawvideo", out)
+    size = width * height * 3 // (1 if main10 else 2)
+    if out.stat().st_size != len(pocs) * size:
         raise ValueError(f"unexpected reference frame size in {out}")
+    if pocs == sorted(pocs):
+        return
+    pixels = out.read_bytes()
     order = {poc: i for i, poc in enumerate(sorted(pocs))}
     out.write_bytes(b"".join(pixels[order[poc] * size:(order[poc] + 1) * size] for poc in pocs))
 
@@ -149,13 +151,18 @@ def fixture(stream, out):
         raise ValueError("trace does not match the VCL NAL units")
     width = sps["pic_width_in_luma_samples"]
     height = sps["pic_height_in_luma_samples"]
-    if (sps["general_profile_idc"] != 1 or sps["chroma_format_idc"] != 1 or sps["bit_depth_luma_minus8"] or
-            sps["bit_depth_chroma_minus8"] or sps["num_short_term_ref_pic_sets"] or
+    depth = sps["bit_depth_luma_minus8"]
+    if (sps["general_profile_idc"] not in (1, 2) or sps["chroma_format_idc"] != 1 or
+            depth not in (0, 2) or sps["bit_depth_chroma_minus8"] != depth or
+            sps["num_short_term_ref_pic_sets"] or
             sps.get("long_term_ref_pics_present_flag") or
             sps.get("sps_scaling_list_data_present_flag") or pps.get("pps_scaling_list_data_present_flag")):
-        raise ValueError("fixture requires Main profile, explicit short-term RPS, and default matrices")
+        raise ValueError("fixture requires Main/Main10, explicit short-term RPS, and default matrices")
+    main10 = depth == 2
+    extension = "p010" if main10 else "nv21"
     rows = [
-        ["HEVC", width, height, sum(row["first_slice_segment_in_pic_flag"] for row in slices)],
+        ["HEVC10" if main10 else "HEVC", width, height,
+         sum(row["first_slice_segment_in_pic_flag"] for row in slices)],
         [*(sps.get(key, 0) for key in SPS_FIELDS), flags(sps, SPS_FLAGS)],
         [*(pps.get(key, 0) for key in PPS_FIELDS), flags(pps, PPS_FLAGS)],
     ]
@@ -214,13 +221,13 @@ def fixture(stream, out):
         "".join(" ".join(map(str, row)) + "\n" for row in rows), encoding="ascii", newline="\n",
     )
     out.with_suffix(".265").write_bytes(b"".join(unit for unit, _ in units))
-    reorder_nv21(stream, out.with_suffix(".nv21"), pocs, width, height)
+    write_reference(stream, out.with_suffix(f".{extension}"), pocs, width, height, main10)
     left, right, top, bottom = (
         2 * sps.get(f"conf_win_{side}_offset", 0) for side in ("left", "right", "top", "bottom")
     )
     if left or right or top or bottom:
-        reorder_nv21(stream, out.with_suffix(".visible.nv21"), pocs,
-                     width - left - right, height - top - bottom, visible=True)
+        write_reference(stream, out.with_suffix(f".visible.{extension}"), pocs,
+                        width - left - right, height - top - bottom, main10, visible=True)
 
 
 if __name__ == "__main__":

@@ -378,7 +378,7 @@ python scripts/vdec_ram_test.py --image "$out/final/boot.img" `
 
 镜像 SHA256 为 `b13e4218b67343a10fce90ee0229ebd7cabdff5177d1027edfca080366044fb2`。U-Boot 从 `0x01fdffc0` 读回 16,644,168 B，CRC32 为 `9690610d`。PXP INTID 169 从 0 增至 44，SMMU INTID 181 全程为 0。U 盘未挂载，`mmcblk0/ro=1`。U-Boot 只读取原厂 ATF 并设置临时会话变量，镜像通过 TFTP 写入 RAM。[最终 boot.img](artifacts/arm64-7.3.5-vdec-hevc/final/boot.img)
 
-单 CTU 行的 HEVC 图像在探测镜像中有 slice UP 更新，但 PXP 不完成。实测包括使用 64×64 CTU 的 64×64 与 128×64，以及使用 32×32 CTU 的 128×32。最终驱动在硬件提交前以 `-EOPNOTSUPP` 拒绝此组合，负向测试中两个中断计数均未增加。当前解码路径限于逐行 8-bit 4:2:0，PCM 与 Main10 留待后续。长期参考地址和索引已按原厂布局映射，本轮的 I/P/B 向量验证了短期参考。[单 CTU 行日志](logs/441-vdec-hevc-pixels.txt)
+单 CTU 行的 HEVC 图像在探测镜像中有 slice UP 更新，但 PXP 不完成。实测包括使用 64×64 CTU 的 64×64 与 128×64，以及使用 32×32 CTU 的 128×32。最终驱动在硬件提交前以 `-EOPNOTSUPP` 拒绝此组合，负向测试中两个中断计数均未增加。本节的板测使用逐行 8-bit 4:2:0。长期参考地址和索引已按原厂布局映射，本轮的 I/P/B 向量验证了短期参考。[单 CTU 行日志](logs/441-vdec-hevc-pixels.txt)
 
 | 样本 | NV21 帧 SHA256 匹配 |
 | --- | ---: |
@@ -389,3 +389,62 @@ python scripts/vdec_ram_test.py --image "$out/final/boot.img" `
 | 1080p 四片，1920×1088 编码面及 1920×1080 可视区域 | 各 4/4 |
 | 128×128 空间与时间直接预测 B 帧、720p 双片 B 帧 | 各 3/3 |
 | 128×128 加权 P，含非默认亮度与色度权值和偏移 | 5/5 |
+
+## 11. Linux 7.3.5 UHD 与 HEVC Main10
+
+### 尺寸、行缓冲与内存容量
+
+H.264 和 HEVC 的 OUTPUT 与 CAPTURE 最大编码面为 4096×2176，分别按 16 和 8 像素步进。原厂 `pdt_get_dec_cap`（`c081e3d4`）给出 4096×2304 的通用尺寸。4096×2176 的 H.264 宏块网格为 256×136，HEVC 在 16×16 CTU 下也是 256×136，在 64×64 CTU 下为 64×34。最大网格的总块数减一为 34,815，可装入 `pub[2]` 的低 20 位。横纵计数减一分别为 255、135，可装入 H.264 `pic[0]` 的宽高字段与 HEVC `pic[0]` 的两个 9-bit 字段。编码宽高及并排的 CTU、宏块坐标可装入 `core+0x5cc`、`pub[31]` 等处的半字。HEVC 的两个 512 B Tile 查找表按 16 像素索引，最大使用 256 项和 136 项。3840×2160 使用 3840 B 主面 stride 与 2176 行分配高度。[原厂导出](artifacts/vpu-reverse-factory/arm32-result.txt) · [HEVC 导出](artifacts/vpu-reverse-factory/arm32-hevc-result.txt)
+
+`hal_h264_fill_ext_mem`（`c07a8c40`）在 1 KiB 对齐的基址上分配 `0x21000` B，子区起点为 `0x0000`、`0x6000`、`0xe000` 和 `0x1e000`。逐行 H.264 的宽度超过 256 个宏块才启用 `pub[21]`。HEVC 的 `dec_hal_calc_mem_param`（`c077bc40`）把像素宽度 ≤4096 的标志送入 `hal_h265_write_pub_msg`，该范围内 `pub[21]` 为零。HEVC 沿用第 10 节的固定 `0x38100` B 工作区，原厂 `hal_h265_fill_ext_mem` 的分配没有位深分支。H.264 和 HEVC 的 PMV / ColMV 分别按 `ALIGN(w,64) * ALIGN(h,32) / 4 + 256` 与 `ALIGN(w,64) * ALIGN(h,64) / 4 + 256` 分配。Main10 保持相同的 PMV 容量，随扩展后的参考面移动 PMV 起点。[原厂导出](artifacts/vpu-reverse-factory/arm32-result.txt) · [HEVC 导出](artifacts/vpu-reverse-factory/arm32-hevc-result.txt)
+
+私有 SMMU 的 IOVA 池为 1 GiB，地址范围是 `0x10000000–0x4fffffff`，4 MiB 平坦页表使用 4 KiB 页。最大编码面的一个 8-bit 或 Main10 硬件参考面分别占 15,605,760 B 或 18,948,096 B，均含 PMV 和页对齐。17 个最大 Main10 面共约 307 MiB，另有 4 MiB 页表和最多约 17 MiB 任务区。此前 RAM 内核的 CMA 为 0。本版仅对 VDEC RAM 构建启用 CMA 和 DMA CMA，并在强制内核命令行加入 `cma=384M`。VB2 OUTPUT/CAPTURE 保留 MMAP 接口，软件读写的线性和码流缓冲改用 `vb2_vmalloc_memops`，硬件参考面、任务区和页表仍用连续 DMA。
+
+### Main10 消息与原厂布局
+
+`hevc_process_sps`（`c07af4c4`、`c07af5c4`、`c07af6c8` 附近）读取两个位深减 8 的 Exp-Golomb 值，将实际位深写入 SPS `+0x58/+0x60`，并在 `+0x5c/+0x64` 存入 `6 × (bit_depth - 8)`。`dps_h265_make_dps_pic` 把这些字段从 SPS `+0x38` 开始的结构复制到 DPS。`hal_h265_write_pic_msg` 将亮度、色度实际位深放入 `pic[3]` 的低两个半字节，对应的 QP 偏移从 bit 16、22 开始。逐行 4:2:0、关闭 PCM 时，Main 8-bit 为 `0x00000088`，Main10 为 `0x030c00aa`。`slice[6]` 的 bit 19–25 为 7-bit QP 字段，Main10 的 QP 下界为 −12。[HEVC 导出](artifacts/vpu-reverse-factory/arm32-hevc-result.txt)
+
+原厂 `pdt_get_y8b_data` / `pdt_get_ynb_data` 以及 `pdt_get_c8b_data` / `pdt_get_cnb_data` 读取两套平面，再用 `(MSB8 << 2) | LSB2` 恢复采样。非压缩 Main10 的 8-bit 主面保持 Y、VU 的 Tiled 布局，随后是独立的 2-bit Y、VU 平面。每个低位平面用 64 个采样 × 2 行的小块，四个采样按低位优先装进一字节。令 `S = ALIGN(w,256)`、`Y = S × ALIGN(h,64)`，则主面总大小为 `3Y/2`，低位 Y 和 VU 分别为 `Y/4`、`Y/8`，低位 stride 为 `S/4`。低位平面内坐标 `(x,y)` 的字节偏移为 `(y & ~1) × (S/4) + (x/64) × 32 + (y%2) × 16 + (x%64)/4`，其中色度的 `x` 计入交织的 V 与 U 两个采样。[原厂导出](artifacts/vpu-reverse-factory/arm32-result.txt)
+
+| 消息字段 | 非压缩 Main10 写入值 |
+| --- | --- |
+| `pub[3]`、`pub[9..12]` | HEVC 协议和原有非压缩控制保持 `0x0003c00d`，起址、主面 stride 和 Y 区大小仍用 8-bit 主面参数 |
+| `pub[14..16]` | `S/4`、`3Y/2`、`Y/4`，分别是低位 stride、相对参考面基址的低位 Y 偏移、低位 VU 相对低位 Y 的偏移 |
+| `pub[20]`、`pub[23]` | 四个平面结束地址、当前面 PMV 地址 |
+| `core+0x500/0x540/0x580` | 16 槽 DPB 的主面基址、主面基址加 `3Y/2`、低位 Y 基址 |
+| `core+0x5f0/0x608` | 每组的低位 VU 偏移 `Y/4` 与低位 stride `S/4` |
+| `core+0x614/0x61c` | 当前面分别填主面基址加 `3Y/2` 与低位 Y 基址 |
+| `pic[8..23]`、`slice[23]` | DPB 仍以各主面基址索引，ColMV 指向相应参考面的 PMV |
+
+通用低位计算出自 `dec_hal_calc_dec_mem_param`（`c077b9bc`），任务字段由 `dec_hal_write_pub_msg` 和 `hal_h265_write_msg` 写入。表中基址按 VDH 的 16 B 单位传递，stride 和相对偏移保留字节单位。原厂在某些 UHD 配置下会选压缩参考面，主线使用上表的非压缩路径。[原厂导出](artifacts/vpu-reverse-factory/arm32-result.txt) · [HEVC 导出](artifacts/vpu-reverse-factory/arm32-hevc-result.txt)
+
+应用先设置 HEVC OUTPUT，再用当前 SPS 选择 CAPTURE 默认格式，也可显式协商 CAPTURE。SPS 的 luma 和 chroma 位深必须同时为 8 或同时为 10。10-bit CAPTURE 用单缓冲 P010，亮度后接交织 UV，每个 LE16 字的高 10 位包含采样。8-bit CAPTURE 继续输出 NV21。切换位深时应停止流并释放 CAPTURE 缓冲后重新协商。测试 manifest 的 `HEVC10` 标记选择 P010，软件参考为 FFmpeg `p010le`，含 B 帧的参考按请求解码顺序比较。[驱动](src/hi3798mv320-vdec.c) · [样本生成器](scripts/vdec_hevc_fixture.py) · [V4L2 P010](https://docs.kernel.org/userspace-api/media/v4l/pixfmt-yuv-planar.html#v4l2-pix-fmt-p010)
+
+### COM4 TFTP 纯 RAM 板测
+
+初版 P010 解排布逐采样读取 coherent DMA。4K 首帧有 PXP 中断，但使用者的 3 秒 Media Request 轮询超时。把 64 B 主平面行及 16 B 低位行批量复制到栈上再拼接像素后，沿用同一超时设置通过全部阶梯。3840×2160 P010 首帧中有 7,009,383 个采样的低两位非零，整帧 SHA256 与 FFmpeg 一致。[优化前串口](artifacts/arm64-7.3.5-vdec-uhd/main10/serial.txt) · [最终串口与逐帧 SHA256](logs/443-vdec-uhd-tftp.txt)
+
+| 样本 | CAPTURE | 与 FFmpeg 逐帧 SHA256 匹配 |
+| --- | --- | ---: |
+| HEVC Main，3840×2160 I/P | NV21 | 3/3 |
+| H.264 High，3840×2160 四 slice I/P | NV21 | 3/3 |
+| HEVC Main10，64×64 IDR / I+P，32×32 CTU | P010 | 1/1、2/2 |
+| HEVC Main10，128×128，含 B 帧 | P010 | 4/4 |
+| HEVC Main10，1920×1080 I/P | P010 | 3/3 |
+| HEVC Main10，3840×2160 I/P | P010 | 3/3 |
+| HEVC Main，1920×1080 I/P 回归 | NV21 | 3/3 |
+| H.264 High，1920×1088 编码面与 1920×1080 可视区回归 | NV21 | 各 4/4 |
+| HEVC Main10，4096×2176 I/P，17 个 CAPTURE 缓冲 | P010 | 17/17 |
+| HEVC Main10，128×128 加权 P | P010 | 6/6 |
+
+同一次启动共解码 49 帧，裁剪复核单独比对。PXP INTID 169 从 0 增至 49，SMMU INTID 181 全程为 0。板端报告 `CmaTotal=393216 kB`、启动后 `CmaFree=388608 kB`。4096×2176 样本一次申请并使用 17 个 CAPTURE 缓冲，验证了对应 17 个最大 Main10 硬件面的分配。
+
+构建机为 `hedc@ArchLinux-E5-Server:/home/hedc/hg680kd-mainline`，使用 `scripts/remote.ps1` 同步驱动、测试程序和样本。若源树已应用旧版 `0012`，同步 `VIDEO_HI3798MV320_VDEC` 的 `select VIDEOBUF2_VMALLOC` 行后可复用同一构建目录。
+
+```bash
+JOBS=36 VDEC_TEST=1 \
+  VDEC_FIXTURES="hevc4k h2644k hevc10idr64 hevc10ip64 hevc10b128 hevc10ip1080 hevc10ip4k h265ip1080 ip1080crop hevc10alloc hevc10wp" \
+  bash scripts/build.sh full "$PWD" "$PWD/inputs" arm64-7.3.5-vdec
+```
+
+最终 `boot.img` 为 20,514,888 B，SHA256 为 `73cfb5259195b64192f5790641968e6a7e4b69c3bfb9c5092a15556a941d6f16`。COM4 115200 8N1 由单个进程独占，U-Boot 对 TFTP RAM 地址 `0x01fdffc0` 回读的 CRC32 为 `389ac230`。U-Boot 从 eMMC 只读装载 BL31，Linux 镜像和测试输出都位于 RAM。实测 USB 未挂载，`mmcblk0/ro=1`，全过程没有持久化环境变量或写入 U 盘、eMMC 与 OTP。[远程构建与校验](logs/442-vdec-uhd-build.txt) · [COM4 日志](logs/443-vdec-uhd-tftp.txt) · [最终 boot.img](artifacts/arm64-7.3.5-vdec-uhd/final/boot.img)

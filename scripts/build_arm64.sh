@@ -169,7 +169,7 @@ if [[ $vpu_probe ]]; then
     variant_key+=" HI3798MV320_VPU_PROBE"
 fi
 if [[ $vdec ]]; then
-    variant_key+=" VIDEO_HI3798MV320_VDEC V4L2_MEM2MEM_DEV MEDIA_CONTROLLER VIDEOBUF2_DMA_CONTIG"
+    variant_key+=" VIDEO_HI3798MV320_VDEC V4L2_MEM2MEM_DEV MEDIA_CONTROLLER VIDEOBUF2_VMALLOC CMA DMA_CMA"
     apply_board_patch "$inputs/0012-media-add-Hi3798MV320-vdec.patch"
     install -m644 "$inputs/hi3798mv320-vdec.c" "$inputs/hi3798mv320-vdec-cabac.h" \
         "$inputs/hi3798mv320-vdh.h" "$linux/drivers/media/platform/"
@@ -331,7 +331,7 @@ if [[ $vdec && ${VDEC_TEST:-0} == 1 ]]; then
     for fixture in "${fixtures[@]}"; do
         read -r codec _ <"$inputs/$fixture.txt"
         stream_ext=264
-        if [[ $codec == HEVC ]]; then
+        if [[ $codec == HEVC || $codec == HEVC10 ]]; then
             stream_ext=265
         fi
         for ext in txt "$stream_ext"; do
@@ -394,8 +394,10 @@ fi
 if [[ $vdec ]]; then
     "$linux/scripts/config" --file "$out/.config" --enable MEDIA_SUPPORT \
         --enable MEDIA_PLATFORM_SUPPORT --enable MEDIA_PLATFORM_DRIVERS --enable VIDEO_DEV \
-        --enable V4L_MEM2MEM_DRIVERS --enable VIDEO_HI3798MV320_VDEC \
+        --enable V4L_MEM2MEM_DRIVERS --enable VIDEO_HI3798MV320_VDEC --enable CMA --enable DMA_CMA \
         --set-str LOCALVERSION "-hg680kd-arm64-${variant#7.3.5-}"
+    cmdline=$(sed -n 's/^CONFIG_CMDLINE="\(.*\)"$/\1/p' "$out/.config")
+    "$linux/scripts/config" --file "$out/.config" --set-str CMDLINE "$cmdline cma=384M"
     if [[ ${VDEC_TEST:-0} == 1 ]]; then
         "$linux/scripts/config" --file "$out/.config" --enable DYNAMIC_DEBUG
     fi

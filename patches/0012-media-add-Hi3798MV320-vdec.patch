@@ -11,7 +11,7 @@
 +	depends on V4L_MEM2MEM_DRIVERS
 +	select GENERIC_ALLOCATOR
 +	select MEDIA_CONTROLLER
-+	select VIDEOBUF2_DMA_CONTIG
++	select VIDEOBUF2_VMALLOC
 +	select V4L2_MEM2MEM_DEV
 +	help
 +	  Enable the H.264 and HEVC V4L2 stateless decoder on Hi3798MV320.

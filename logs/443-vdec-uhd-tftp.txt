@@ -1,0 +1,625 @@
+
+# reboot -f
+[  151.490817] reboot: Restarting system
+Systÿ
+Bootrom start
+Boot Media: EMMC
+Decrypt auxiliary code ...OK
+
+lsadc voltage min: 0000006B, max: 00000070, aver: 0000006D, index: 0000000B
+
+Enter boot auxiliary code
+
+Auxiliary code - v1.00
+DDR code - V2.2.4 20241026
+Build: Oct 26 2024 - 15:52:06
+
+Reg Version:  v2.2.3d
+Reg Time:     2024/11/27 15:19:10
+Reg Name:     hi3798mv320dma_Hi3798MV320_LPDDR4-2666-2rank_2GB_32bitx1_2layers.reg
+
+cpu_hpm_otp:
+00000125
+cpu_hpm:
+00000125
+cpu_otp_comp:
+0000002D
+cpu svb done!
+
+gpu_hpm_otp:
+0000011D
+gpu_hpm:
+00000113
+core_hpm_otp:
+0000017B
+core_hpm:
+0000016D
+gpu_otp_comp:
+0000002D
+gpu_otp_comp:
+0000002D
+core_otp_comp:
+0000002D
+training volt:
+0000036A
+DDR traning...done!
+
+core_otp_comp:
+0000002D
+core svb done:
+
+Boot auxiliary code success
+Bootrom success
+
+
+
+
+
+U-Boot 2022.07-g80522c56-dirty (Jun 05 2025 - 21:16:17 +0800), Build: jenkins-STB-git_FVOS_HISI_9_CTCGUANGDONG_p-hisi-iptv_fh_product_20240318-60
+
+
+CPU:		   HI3798MV320 ()
+Boot Media:	eMMC
+DDR Size:	  2 GiB (Boot:  2 GiB)
+
+
+WARNING: Caches not enabled
+[INFO][record_exce_type]:set reboot_reason is 0x43
+[INFO]last bootup_keypoint is [30]
+MMC:   MMC/SD Card:
+    MID:         0xf4
+    Read Block:  512 Bytes
+    Write Block: 512 Bytes
+    Chip Size:   7818182656 Bytes (High Capacity)
+    Name:        "B1003"
+    Chip Type:   MMC
+    Version:     5.1
+    Speed:       192000000Hz
+    Bus Width:   8bit
+    Mode:        HS400ES
+    Boot Mode:   normal(), 61 ms
+Loading Environment from MMC... OK
+LOGO Flag:00aaaaaa
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+Net:   gmac0
+
+SDK Version: HiHuanglong_V100R009C01SPC023_v2024111912
+
+jpgd_dfx_print_timestamp 69 cnt: 1, hard in 1280 720 out 1280 720  sample 1 fmt 17 17 total 8 alloc yuv 0 dec 4 csc 0
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+get_devinfo_item_ptr: date_type 2 is null !!
+check remote recovery button begin
+ __recovery__into no IR KEY
+lsadc value 108
+already set hardwareid and boardid, skip!
+env not set emergency_log, skip!
+Reserve Memory
+    Start Addr:          0x7FFFE000
+    Bound Addr:          0x20000000
+    Free  Addr:          0x7F684000
+    Alloc Block:  Addr         Size
+                  0x17FFD000   0x2000
+                  0x17FFB000   0x1000
+                  0x17FF8000   0x2000
+                  0x7FEAB000   0x152000
+                  0x7F6C1000   0x7E9000
+                  0x7F6BF000   0x1000
+                  0x7F6B5000   0x9000
+                  0x7F684000   0x30000
+
+BBOX:
+[INFO][create_reboot_reason_cmdline][reboot_reason=AP_S_AWDT][exception_subtype=SUB_APWDT_AP]
+[INFO][record_exce_type]:set reboot_reason is 0xff
+Autobooting in 3 seconds, Press Ctrl+C to stop autoboot
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.172
+fastboot#setenv tftpdstp 1069
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+172576256 Bytes/s
+fastboot#tftpboot 1fdffc0 boot.img
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.172; our IP address is 192.168.6.249
+Filename 'boot.img'.
+Load address: 0x1fdffc0
+Loading: *#	[ Connected ]
+################################	[ 2.888 MB]
+################################	[ 5.752 MB]
+################################	[ 8.616 MB]
+################################	[11.480 MB]
+################################	[14.344 MB]
+################################	[17.208 MB]
+##########################
+	 3.7 MiB/s
+done
+Bytes transferred = 20514888 (1390848 hex)
+fastboot#
+[host] boot.img SHA256 73cfb5259195b64192f5790641968e6a7e4b69c3bfb9c5092a15556a941d6f16
+crc32 1fdffc0 1390848
+CRC32 for 01fdffc0 ... 03370807 ==> 389ac230
+fastboot#
+[host] CRC32 matches local image: 389ac230
+bootm 1fdffc0
+## Booting kernel from Legacy Image at 01fdffc0 ...
+   Image Name:   Linux HG680KD ARM64
+   Image Type:   AArch64 Linux Kernel Image (uncompressed)
+   Data Size:    20514824 Bytes = 19.6 MiB
+   Load Address: 01fe0000
+   Entry Point:  01fe0000
+   XIP Kernel Image
+
+Starting kernel ...
+
+Start ATF with aarch64 kernel...
+bl33_ep->spsr = 0x3C5
+Start Warm Reseting
+[    8.875758][cpu0]NOTICE:  BL31: lts-v2.8.6(release):98d5f24
+[    8.879848][cpu0]NOTICE:  BL31: Built : 21:47:11, Jul 22 2024
+[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+[    0.000000] Linux version 7.3.5-hg680kd-arm64-vdec (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+[    0.000000] Machine model: FiberHome HG680KD (ARM64)
+[    0.000000] earlycon: pl11 MMIO32:0x00000000f8b00000 (options '')
+[    0.000000] printk: legacy bootconsole [pl11] enabled
+[    0.000000] printk: debug: ignoring loglevel setting.
+[    0.000000] OF: reserved mem: 0x00000000053e0000..0x0000000005bdffff (8192 KiB) nomap non-reusable firmware-log@53e0000
+[    0.000000] OF: reserved mem: 0x00000000063dc000..0x00000000063dffff (16 KiB) nomap non-reusable crash-log@63dc000
+[    0.000000] OF: reserved mem: 0x0000000008000000..0x00000000083fffff (4096 KiB) nomap non-reusable atf@8000000
+[    0.000000] OF: reserved mem: 0x0000000017ff8000..0x0000000017ffffff (32 KiB) nomap non-reusable uboot-resmem-low@17ff8000
+[    0.000000] OF: reserved mem: 0x000000007f67f000..0x000000007f6c0fff (264 KiB) nomap non-reusable uboot-resmem-high@7f67f000
+[    0.000000] OF: reserved mem: 0x000000007f6c1000..0x000000007fea9fff (8100 KiB) nomap non-reusable framebuffer@7f6c1000
+[    0.000000] OF: reserved mem: 0x000000007feaa000..0x000000007fffffff (1368 KiB) nomap non-reusable uboot-resmem-tail@7feaa000
+[    0.000000] cma: Reserved 384 MiB at 0x0000000067000000
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.2
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000000000000-0x000000007fffffff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000053dffff]
+[    0.000000]   node   0: [mem 0x00000000053e0000-0x0000000005bdffff]
+[    0.000000]   node   0: [mem 0x0000000005be0000-0x00000000063dbfff]
+[    0.000000]   node   0: [mem 0x00000000063dc000-0x00000000063dffff]
+[    0.000000]   node   0: [mem 0x00000000063e0000-0x0000000007ffffff]
+[    0.000000]   node   0: [mem 0x0000000008000000-0x00000000083fffff]
+[    0.000000]   node   0: [mem 0x0000000008400000-0x0000000017ff7fff]
+[    0.000000]   node   0: [mem 0x0000000017ff8000-0x0000000017ffffff]
+[    0.000000]   node   0: [mem 0x0000000018000000-0x000000007f67efff]
+[    0.000000]   node   0: [mem 0x000000007f67f000-0x000000007fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000007fffffff]
+[    0.000000] percpu: Embedded 15 pages/cpu s30232 r0 d31208 u61440
+[    0.000000] pcpu-alloc: s30232 r0 d31208 u61440 alloc=15*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+[    0.000000] Detected VIPT I-cache on CPU0
+[    0.000000] CPU features: detected: GICv3 CPU interface
+[    0.000000] alternatives: applying boot alternatives
+[    0.000000] Kernel command line: console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+[    0.000000] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+[    0.000000] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.000000] software IO TLB: SWIOTLB bounce buffer size adjusted to 2MB
+[    0.000000] software IO TLB: area num 4.
+[    0.000000] software IO TLB: mapped [mem 0x0000000064d00000-0x0000000064f00000] (2MB)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 524288
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] GICv3: 224 SPIs implemented
+[    0.000000] GICv3: 0 Extended SPIs implemented
+[    0.000000] Root IRQ handler: gic_handle_irq
+[    0.000000] GICv3: GICv3 features: 16 PPIs
+[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0x00000000f1040000
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.000001] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.008238] Console: colour dummy device 80x25
+[    0.012748] printk: legacy console [tty0] enabled
+[    0.017940] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+[    0.028345] pid_max: default: 32768 minimum: 301
+[    0.033263] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.040773] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.049010] VFS: Finished mounting rootfs on nullfs
+[    0.055155] rcu: Hierarchical SRCU implementation.
+[    0.060038] rcu: 	Max phase no-delay instances is 1000.
+[    0.065887] smp: Bringing up secondary CPUs ...
+[    0.070914] Detected VIPT I-cache on CPU1
+[    0.070980] GICv3: CPU1: found redistributor 100 region 0:0x00000000f1060000
+[    0.071018] CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
+[    0.071481] Detected VIPT I-cache on CPU2
+[    0.071526] GICv3: CPU2: found redistributor 200 region 0:0x00000000f1080000
+[    0.071549] CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
+[    0.071954] Detected VIPT I-cache on CPU3
+[    0.071998] GICv3: CPU3: found redistributor 300 region 0:0x00000000f10a0000
+[    0.072019] CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
+[    0.072091] smp: Brought up 1 node, 4 CPUs
+[    0.129648] SMP: Total of 4 processors activated.
+[    0.134414] CPU: All CPU(s) started at EL1
+[    0.138564] CPU features: detected: 32-bit EL0 Support
+[    0.143769] CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+[    0.152493] CPU features: detected: CRC32 instructions
+[    0.157701] CPU features: detected: RCpc load-acquire (LDAPR)
+[    0.163522] CPU features: detected: LSE atomic instructions
+[    0.169167] CPU features: detected: Privileged Access Never
+[    0.174813] CPU features: detected: XNX
+[    0.178694] CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+[    0.185773] alternatives: applying system-wide alternatives
+[    0.194141] Memory: 1615880K/2097152K available (7488K kernel code, 834K rwdata, 1828K rodata, 9600K init, 245K bss, 84716K reserved, 393216K cma-reserved)
+[    0.208966] devtmpfs: initialized
+[    0.214110] posixtimers hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    0.221706] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.234739] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.241500] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.249664] thermal_sys: Registered thermal governor 'step_wise'
+[    0.249738] ASID allocator initialised with 65536 entries
+[    0.261355] Serial: AMBA PL011 UART driver
+[    0.266892] f8b00000.serial: ttyAMA0 MMIO:0x00000000f8b00000 (irq = 13, base_baud = 0) is a PL011 rev2
+[    0.276390] printk: console [ttyAMA0] enabled
+[    0.276390] printk: console [ttyAMA0] enabled
+[    0.285174] printk: legacy bootconsole [pl11] disabled
+[    0.285174] printk: legacy bootconsole [pl11] disabled
+[    0.297123] f8b02000.serial: ttyAMA1 MMIO:0x00000000f8b02000 (irq = 14, base_baud = 0) is a PL011 rev2
+[    0.306603] serial serial0: tty port ttyAMA1 registered
+[    0.313844] SCSI subsystem initialized
+[    0.313999] usbcore: registered new interface driver usbfs
+[    0.314037] usbcore: registered new interface driver hub
+[    0.314074] usbcore: registered new device driver usb
+[    0.314107] mc: Linux media interface: v0.10
+[    0.314140] videodev: Linux video capture interface: v2.00
+[    0.314668] Bluetooth: Core ver 2.22
+[    0.314717] NET: Registered PF_BLUETOOTH protocol family
+[    0.314731] Bluetooth: HCI device and connection manager initialized
+[    0.314749] Bluetooth: HCI socket layer initialized
+[    0.314763] Bluetooth: L2CAP socket layer initialized
+[    0.314782] Bluetooth: SCO socket layer initialized
+[    0.314923] clocksource: Switched to clocksource arch_sys_counter
+[    0.321297] NET: Registered PF_INET protocol family
+[    0.321487] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    0.322852] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.322891] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.322980] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    0.323090] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+[    0.323479] TCP: Hash tables configured (established 16384 bind 16384)
+[    0.323594] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.340619] workingset: timestamp_bits=62 (anon: 57) max_order=19 bucket_order=0 (anon: 0)
+[    0.346128] pl061_gpio f8b24000.gpio: PL061 GPIO chip registered
+[    0.346770] dvdd: Voltage range but no REGULATOR_CHANGE_VOLTAGE
+[    0.348943] [drm] Initialized simpledrm 1.0.0 for 7f6c1000.framebuffer on minor 0
+[    0.368024] Console: switching to colour frame buffer device 240x67
+[    0.388681] simple-framebuffer 7f6c1000.framebuffer: [drm] fb0: simpledrmdrmfb frame buffer device
+[    0.404329] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+[    0.404436] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+[    0.404495] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+[    0.404553] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+[    0.404600] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+[    0.405515] lima f9200000.gpu: bus rate = 200000000
+[    0.405573] lima f9200000.gpu: mod rate = 200000000
+[    0.406563] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 1
+[    0.419024] zram: Added device: zram0
+[    0.420375] (unnamed net_device) (uninitialized): using random MAC address 22:ac:23:0c:6f:28
+[    0.455970] xhci-hi3798mv320 f98a0000.usb: xHCI Host Controller
+[    0.456058] xhci-hi3798mv320 f98a0000.usb: new USB bus registered, assigned bus number 1
+[    0.456245] xhci-hi3798mv320 f98a0000.usb: hcc params 0x0228fe6d hci version 0x110 quirks 0x0000000020000010
+[    0.456340] xhci-hi3798mv320 f98a0000.usb: irq 18, io mem 0xf98a0000
+[    0.456504] xhci-hi3798mv320 f98a0000.usb: xHCI Host Controller
+[    0.456546] xhci-hi3798mv320 f98a0000.usb: new USB bus registered, assigned bus number 2
+[    0.456592] xhci-hi3798mv320 f98a0000.usb: Host supports USB 3.0 SuperSpeed
+[    0.458322] hub 1-0:1.0: USB hub found
+[    0.458570] hub 1-0:1.0: 2 ports detected
+[    0.459183] usb usb2: We don't know the algorithms for LPM for this host, disabling LPM.
+[    0.459972] hub 2-0:1.0: USB hub found
+[    0.460163] hub 2-0:1.0: 1 port detected
+[    0.460721] usbcore: registered new interface driver usb-storage
+[    0.468000] hi3798mv320-vdec f8c30000.video-decoder: H.264 stateless decoder registered as video0, PXP IRQ 19 SMMU IRQ 20
+[    0.468533] Bluetooth: HCI UART driver ver 2.3
+[    0.468615] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[    0.473150] cpufreq: cpufreq_policy_online: CPU0: Running at unlisted initial frequency: 1250000 kHz, changing to: 1000000 kHz
+[    0.502937] mmc0: SDHCI controller on f9830000.mmc [f9830000.mmc] using ADMA
+[    0.503373] NET: Registered PF_PACKET protocol family
+[    0.517935] clk: Not disabling unused clocks
+[    0.655780] mmc0: new HS400 Enhanced strobe MMC card at address 0001
+[    0.656595] mmcblk0: mmc0:0001 B10030 7.28 GiB (ro)
+[    0.657353]  mmcblk0: p1(system) p2(vendor)
+[    0.658004] mmcblk0rpmb: mmc0:0001 B10030 4.00 MiB, chardev (252:0)
+[    0.707269] usb 1-2: new high-speed USB device number 2 using xhci-hi3798mv320
+[    0.847165] usb-storage 1-2:1.0: USB Mass Storage device detected
+[    0.848874] scsi host0: usb-storage 1-2:1.0
+[    1.089210] Freeing unused kernel memory: 9600K
+[    1.089465] Run /init as init process
+[    1.089505]   with arguments:
+[    1.089533]     /init
+[    1.094987]   with environment:
+[    1.097106]     HOME=/
+[    1.099211]     TERM=linux
+
+HG680KD AArch64 RAM bring-up
+Linux hg680kd 7.3.5-hg680kd-arm64-vdec #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+Online CPUs: 0-3
+Clocksource: arch_sys_counter
+Timer interrupt counts before and after one second:
+            CPU0       CPU1       CPU2       CPU3       
+  11:        267        205        273        240  GIC[    1.141203] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
+v3      27 Level[    1.151098] Bluetooth: hci0: RTL: rom_version status=0 version=3
+     arch_timer[    1.153206] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_fw.bin
+
+1.00 3.08
+[    1.155622] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_config.bin
+[    1.183000] Bluetooth: hci0: RTL: cfg_sz 110, total sz 21738
+[    1.865574] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+[    1.880571] scsi 0:0:0:0: Direct-Access      USB      SanDisk 3.2Gen1 1.00 PQ: 0 ANSI: 6
+[    1.895022] sd 0:0:0:0: [sda] 60125184 512-byte logical blocks: (30.8 GB/28.7 GiB)
+[    1.902322] sd 0:0:0:0: [sda] Write Protect is off
+[    1.905565] sd 0:0:0:0: [sda] Mode Sense: 43 00 00 00
+[    1.909331] sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+[    1.951939]  sda: sda1 sda2 sda3
+[    1.959596] sd 0:0:0:0: [sda] Attached SCSI removable disk
+            CPU0       CPU1       CPU2       CPU3       
+  11:        519        450        614        491  GICv3      27 Level     arch_timer
+2.01 6.74
+
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+# uname -r; cat /proc/cmdline; grep Cma /proc/meminfo; cat /proc/mounts; cat /sys/block/mmcblk0/ro; grep hi3798mv320-vdec /proc/interrupts
+7.3.5-hg680kd-arm64-vdec
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+CmaTotal:         393216 kB
+CmaFree:          388608 kB
+rootfs / rootfs rw,size=809608k,nr_inodes=202402 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=809608k,nr_inodes=202402,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+1
+  19:          0          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 3
+# echo TEST-hevc4k; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc4k.txt /etc/vdec-test/hevc4k.265 /tmp/vdec-check.raw && for n in 0 1 2; do dd if=/tmp/vdec-check.raw bs=12441600 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-hevc4k
+frame 0: POC 0, 3840x2160 NV21 12441600 bytes, CAPTURE index 0
+frame 1: POC 1, 3840x2160 NV21 12441600 bytes, CAPTURE index 1
+frame 2: POC 2, 3840x2160 NV21 12441600 bytes, CAPTURE index 2
+bc22e2a5dc502b9e49ba07b17516f599bf03df96fa91dbf25aeeff38b37e757c  -
+f6758170a36d0fdb0f5f4227a3b7cd11258a7288cdb69772adba79c824206e66  -
+d552b88e7ba1739e6514abb54a88d54eda830d2696aed4f50f9e6d90e0d14348  -
+  19:          3          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] hevc4k frame 0 board=bc22e2a5dc502b9e49ba07b17516f599bf03df96fa91dbf25aeeff38b37e757c FFmpeg=bc22e2a5dc502b9e49ba07b17516f599bf03df96fa91dbf25aeeff38b37e757c MATCH
+[host] hevc4k frame 1 board=f6758170a36d0fdb0f5f4227a3b7cd11258a7288cdb69772adba79c824206e66 FFmpeg=f6758170a36d0fdb0f5f4227a3b7cd11258a7288cdb69772adba79c824206e66 MATCH
+[host] hevc4k frame 2 board=d552b88e7ba1739e6514abb54a88d54eda830d2696aed4f50f9e6d90e0d14348 FFmpeg=d552b88e7ba1739e6514abb54a88d54eda830d2696aed4f50f9e6d90e0d14348 MATCH
+[host] RESULT hevc4k 3/3
+: > /tmp/vdec-check.raw
+# echo TEST-h2644k; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/h2644k.txt /etc/vdec-test/h2644k.264 /tmp/vdec-check.raw && for n in 0 1 2; do dd if=/tmp/vdec-check.raw bs=12441600 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-h2644k
+hi3798mv320-vdec on platform:f8c30000.video-decoder
+frame 0: 3840x2160 NV21 12441600 bytes, CAPTURE index 0
+frame 1: 3840x2160 NV21 12441600 bytes, CAPTURE index 1
+frame 2: 3840x2160 NV21 12441600 bytes, CAPTURE index 2
+11c8b1b7cba981d989ae4084ef0da456b22db067496470f804799a0d856f2f04  -
+a43ba4c2a10a96346066d181787fd7bf131c4a60dfd132d76fc94bf8ab874265  -
+33cff827e958250ea5fc16517ccbe0acaf1b8ab45ef79dcff72cf26a1c140b1f  -
+  19:          6          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] h2644k frame 0 board=11c8b1b7cba981d989ae4084ef0da456b22db067496470f804799a0d856f2f04 FFmpeg=11c8b1b7cba981d989ae4084ef0da456b22db067496470f804799a0d856f2f04 MATCH
+[host] h2644k frame 1 board=a43ba4c2a10a96346066d181787fd7bf131c4a60dfd132d76fc94bf8ab874265 FFmpeg=a43ba4c2a10a96346066d181787fd7bf131c4a60dfd132d76fc94bf8ab874265 MATCH
+[host] h2644k frame 2 board=33cff827e958250ea5fc16517ccbe0acaf1b8ab45ef79dcff72cf26a1c140b1f FFmpeg=33cff827e958250ea5fc16517ccbe0acaf1b8ab45ef79dcff72cf26a1c140b1f MATCH
+[host] RESULT h2644k 3/3
+: > /tmp/vdec-check.raw
+# echo TEST-hevc10idr64; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10idr64.txt /etc/vdec-test/hevc10idr64.265 /tmp/vdec-check.raw && for n in 0; do dd if=/tmp/vdec-check.raw bs=12288 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-hevc10idr64
+frame 0: POC 0, 64x64 P010 12288 bytes, CAPTURE index 0
+de0680777cab19d51cabdde7ecbc9951ecc8da71024f003dfbb1b9fb3aa153ae  -
+  19:          7          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] hevc10idr64 frame 0 board=de0680777cab19d51cabdde7ecbc9951ecc8da71024f003dfbb1b9fb3aa153ae FFmpeg=de0680777cab19d51cabdde7ecbc9951ecc8da71024f003dfbb1b9fb3aa153ae MATCH
+[host] RESULT hevc10idr64 1/1
+: > /tmp/vdec-check.raw
+# echo TEST-hevc10ip64; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10ip64.txt /etc/vdec-test/hevc10ip64.265 /tmp/vdec-check.raw && for n in 0 1; do dd if=/tmp/vdec-check.raw bs=12288 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-hevc10ip64
+frame 0: POC 0, 64x64 P010 12288 bytes, CAPTURE index 0
+frame 1: POC 1, 64x64 P010 12288 bytes, CAPTURE index 1
+871c61cf94dcaa7c789960eaac09daaa1fddaba96a4a58d6c6f16df80a655861  -
+8aaeb6982a67e93fa2bf9252fb71c4f974919d5067f3435e74223e028663586e  -
+  19:          9          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] hevc10ip64 frame 0 board=871c61cf94dcaa7c789960eaac09daaa1fddaba96a4a58d6c6f16df80a655861 FFmpeg=871c61cf94dcaa7c789960eaac09daaa1fddaba96a4a58d6c6f16df80a655861 MATCH
+[host] hevc10ip64 frame 1 board=8aaeb6982a67e93fa2bf9252fb71c4f974919d5067f3435e74223e028663586e FFmpeg=8aaeb6982a67e93fa2bf9252fb71c4f974919d5067f3435e74223e028663586e MATCH
+[host] RESULT hevc10ip64 2/2
+: > /tmp/vdec-check.raw
+# echo TEST-hevc10b128; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10b128.txt /etc/vdec-test/hevc10b128.265 /tmp/vdec-check.raw && for n in 0 1 2 3; do dd if=/tmp/vdec-check.raw bs=49152 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-hevc10b128
+frame 0: POC 0, 128x128 P010 49152 bytes, CAPTURE index 0
+frame 1: POC 2, 128x128 P010 49152 bytes, CAPTURE index 1
+frame 2: POC 1, 128x128 P010 49152 bytes, CAPTURE index 2
+frame 3: POC 3, 128x128 P010 49152 bytes, CAPTURE index 3
+0d3024b3b036f67189492ad18b5c20bad48cdb98931f40af47f8e94fc9363a9d  -
+5ee289d69a8a46ee3e1464d79a87eba78184e34c4fc82545e2ee617794ac4008  -
+e36015244bdc6ff5ab07338b0c0f158d2ad8951bd077f8b67d043bb71863c27c  -
+eba74134e4293fd79aa78e502407035e8a7a848d286fc56ee0fe42a44c959fa3  -
+  19:         13          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] hevc10b128 frame 0 board=0d3024b3b036f67189492ad18b5c20bad48cdb98931f40af47f8e94fc9363a9d FFmpeg=0d3024b3b036f67189492ad18b5c20bad48cdb98931f40af47f8e94fc9363a9d MATCH
+[host] hevc10b128 frame 1 board=5ee289d69a8a46ee3e1464d79a87eba78184e34c4fc82545e2ee617794ac4008 FFmpeg=5ee289d69a8a46ee3e1464d79a87eba78184e34c4fc82545e2ee617794ac4008 MATCH
+[host] hevc10b128 frame 2 board=e36015244bdc6ff5ab07338b0c0f158d2ad8951bd077f8b67d043bb71863c27c FFmpeg=e36015244bdc6ff5ab07338b0c0f158d2ad8951bd077f8b67d043bb71863c27c MATCH
+[host] hevc10b128 frame 3 board=eba74134e4293fd79aa78e502407035e8a7a848d286fc56ee0fe42a44c959fa3 FFmpeg=eba74134e4293fd79aa78e502407035e8a7a848d286fc56ee0fe42a44c959fa3 MATCH
+[host] RESULT hevc10b128 4/4
+: > /tmp/vdec-check.raw
+# echo TEST-hevc10ip1080; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10ip1080.txt /etc/vdec-test/hevc10ip1080.265 /tmp/vdec-check.raw && for n in 0 1 2; do dd if=/tmp/vdec-check.raw bs=6220800 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-hevc10ip1080
+frame 0: POC 0, 1920x1080 P010 6220800 bytes, CAPTURE index 0
+frame 1: POC 1, 1920x1080 P010 6220800 bytes, CAPTURE index 1
+frame 2: POC 2, 1920x1080 P010 6220800 bytes, CAPTURE index 2
+ae1e7df80a3943b74f179b2b60df22215e7407f6f9d713ed03517677e8ac7b12  -
+04c4094ea4aa171328901462236139ebdd7c4cc63277f5622db2024e9136edbc  -
+1591e9d08f001054cfd938cbadcd594a313909c76a08f6ed4d3b64b9ab8540b9  -
+  19:         16          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] hevc10ip1080 frame 0 board=ae1e7df80a3943b74f179b2b60df22215e7407f6f9d713ed03517677e8ac7b12 FFmpeg=ae1e7df80a3943b74f179b2b60df22215e7407f6f9d713ed03517677e8ac7b12 MATCH
+[host] hevc10ip1080 frame 1 board=04c4094ea4aa171328901462236139ebdd7c4cc63277f5622db2024e9136edbc FFmpeg=04c4094ea4aa171328901462236139ebdd7c4cc63277f5622db2024e9136edbc MATCH
+[host] hevc10ip1080 frame 2 board=1591e9d08f001054cfd938cbadcd594a313909c76a08f6ed4d3b64b9ab8540b9 FFmpeg=1591e9d08f001054cfd938cbadcd594a313909c76a08f6ed4d3b64b9ab8540b9 MATCH
+[host] RESULT hevc10ip1080 3/3
+: > /tmp/vdec-check.raw
+# echo TEST-hevc10ip4k; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10ip4k.txt /etc/vdec-test/hevc10ip4k.265 /tmp/vdec-check.raw && for n in 0 1 2; do dd if=/tmp/vdec-check.raw bs=24883200 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-hevc10ip4k
+frame 0: POC 0, 3840x2160 P010 24883200 bytes, CAPTURE index 0
+frame 1: POC 1, 3840x2160 P010 24883200 bytes, CAPTURE index 1
+frame 2: POC 2, 3840x2160 P010 24883200 bytes, CAPTURE index 2
+9a6c120f4015941756e6a1115c3af3b74f867ad829f0fc0007cca563e2557bc6  -
+6c54db3741f54590943aa43a5363c296cc3b5132d12ae9c4822c783f63376e44  -
+800ab8d4b2909e7b6b0b3b05f4e3e133830ce38ddfcf67067726c6749b900967  -
+  19:         19          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] hevc10ip4k frame 0 board=9a6c120f4015941756e6a1115c3af3b74f867ad829f0fc0007cca563e2557bc6 FFmpeg=9a6c120f4015941756e6a1115c3af3b74f867ad829f0fc0007cca563e2557bc6 MATCH
+[host] hevc10ip4k frame 1 board=6c54db3741f54590943aa43a5363c296cc3b5132d12ae9c4822c783f63376e44 FFmpeg=6c54db3741f54590943aa43a5363c296cc3b5132d12ae9c4822c783f63376e44 MATCH
+[host] hevc10ip4k frame 2 board=800ab8d4b2909e7b6b0b3b05f4e3e133830ce38ddfcf67067726c6749b900967 FFmpeg=800ab8d4b2909e7b6b0b3b05f4e3e133830ce38ddfcf67067726c6749b900967 MATCH
+[host] RESULT hevc10ip4k 3/3
+: > /tmp/vdec-check.raw
+# echo TEST-h265ip1080; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/h265ip1080.txt /etc/vdec-test/h265ip1080.265 /tmp/vdec-check.raw && for n in 0 1 2; do dd if=/tmp/vdec-check.raw bs=3110400 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-h265ip1080
+frame 0: POC 0, 1920x1080 NV21 3110400 bytes, CAPTURE index 0
+frame 1: POC 1, 1920x1080 NV21 3110400 bytes, CAPTURE index 1
+frame 2: POC 2, 1920x1080 NV21 3110400 bytes, CAPTURE index 2
+baf03ab84f83d6087021541221bc3d91c2b924eb580ef8bea013f7a313086ad8  -
+535be5f835c92c7831d34286b77850be844ca154725659fc61965366792b5485  -
+a9267674531f5a889b791d31e792382eb97e2258c13b3833d9592fa827a19ec3  -
+  19:         22          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] h265ip1080 frame 0 board=baf03ab84f83d6087021541221bc3d91c2b924eb580ef8bea013f7a313086ad8 FFmpeg=baf03ab84f83d6087021541221bc3d91c2b924eb580ef8bea013f7a313086ad8 MATCH
+[host] h265ip1080 frame 1 board=535be5f835c92c7831d34286b77850be844ca154725659fc61965366792b5485 FFmpeg=535be5f835c92c7831d34286b77850be844ca154725659fc61965366792b5485 MATCH
+[host] h265ip1080 frame 2 board=a9267674531f5a889b791d31e792382eb97e2258c13b3833d9592fa827a19ec3 FFmpeg=a9267674531f5a889b791d31e792382eb97e2258c13b3833d9592fa827a19ec3 MATCH
+[host] RESULT h265ip1080 3/3
+: > /tmp/vdec-check.raw
+# echo TEST-ip1080crop; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/ip1080crop.txt /etc/vdec-test/ip1080crop.264 /tmp/vdec-check.raw && for n in 0 1 2 3; do dd if=/tmp/vdec-check.raw bs=3133440 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-ip1080crop
+hi3798mv320-vdec on platform:f8c30000.video-decoder
+frame 0: 1920x1088 NV21 3133440 bytes, CAPTURE index 0
+frame 1: 1920x1088 NV21 3133440 bytes, CAPTURE index 1
+frame 2: 1920x1088 NV21 3133440 bytes, CAPTURE index 2
+frame 3: 1920x1088 NV21 3133440 bytes, CAPTURE index 3
+25cdeb4d771640cc697782f15192cc42787eb8849e44a3bb8add32ec419c4552  -
+548cb592bc67e1f4c8ea1bdc1586dcf383f2fcaf68051fad4c3c90b9c5b94f88  -
+880915311317f586b676284c8b66cd8a52175fded3f729753495bee3c072f624  -
+7f7dc31f0048264eeb9ee49419c108a604116143628ac5fa65d7d624504ab799  -
+  19:         26          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] ip1080crop frame 0 board=25cdeb4d771640cc697782f15192cc42787eb8849e44a3bb8add32ec419c4552 FFmpeg=25cdeb4d771640cc697782f15192cc42787eb8849e44a3bb8add32ec419c4552 MATCH
+[host] ip1080crop frame 1 board=548cb592bc67e1f4c8ea1bdc1586dcf383f2fcaf68051fad4c3c90b9c5b94f88 FFmpeg=548cb592bc67e1f4c8ea1bdc1586dcf383f2fcaf68051fad4c3c90b9c5b94f88 MATCH
+[host] ip1080crop frame 2 board=880915311317f586b676284c8b66cd8a52175fded3f729753495bee3c072f624 FFmpeg=880915311317f586b676284c8b66cd8a52175fded3f729753495bee3c072f624 MATCH
+[host] ip1080crop frame 3 board=7f7dc31f0048264eeb9ee49419c108a604116143628ac5fa65d7d624504ab799 FFmpeg=7f7dc31f0048264eeb9ee49419c108a604116143628ac5fa65d7d624504ab799 MATCH
+[host] RESULT ip1080crop 4/4
+{ dd if=/tmp/vdec-check.raw bs=1920 skip=0 count=1080; dd if=/tmp/vdec-check.raw bs=1920 skip=1088 count=540; } 2>/dev/null | sha256sum
+3d5801f831882229347abfd73028bd24e977b2d8b9c9a35e3a38dab8eccaa535  -
+# { dd if=/tmp/vdec-check.raw bs=1920 skip=1632 count=1080; dd if=/tmp/vdec-check.raw bs=1920 skip=2720 count=540; } 2>/dev/null | sha256sum
+47fd8d81d3a565d4b3efd2411ef37e313241fa2c13363397b24fd22c333adfaa  -
+# { dd if=/tmp/vdec-check.raw bs=1920 skip=3264 count=1080; dd if=/tmp/vdec-check.raw bs=1920 skip=4352 count=540; } 2>/dev/null | sha256sum
+7a0795d5963a6ef95799214e58ed450c76afb2888022403f28cc89860185b0a8  -
+# { dd if=/tmp/vdec-check.raw bs=1920 skip=4896 count=1080; dd if=/tmp/vdec-check.raw bs=1920 skip=5984 count=540; } 2>/dev/null | sha256sum
+60d8252cb1468870ed26f969a866ebea2090cc5f8809878cebc05d276edef0a2  -
+# [host] ip1080crop-visible frame 0 board=3d5801f831882229347abfd73028bd24e977b2d8b9c9a35e3a38dab8eccaa535 FFmpeg=3d5801f831882229347abfd73028bd24e977b2d8b9c9a35e3a38dab8eccaa535 MATCH
+[host] ip1080crop-visible frame 1 board=47fd8d81d3a565d4b3efd2411ef37e313241fa2c13363397b24fd22c333adfaa FFmpeg=47fd8d81d3a565d4b3efd2411ef37e313241fa2c13363397b24fd22c333adfaa MATCH
+[host] ip1080crop-visible frame 2 board=7a0795d5963a6ef95799214e58ed450c76afb2888022403f28cc89860185b0a8 FFmpeg=7a0795d5963a6ef95799214e58ed450c76afb2888022403f28cc89860185b0a8 MATCH
+[host] ip1080crop-visible frame 3 board=60d8252cb1468870ed26f969a866ebea2090cc5f8809878cebc05d276edef0a2 FFmpeg=60d8252cb1468870ed26f969a866ebea2090cc5f8809878cebc05d276edef0a2 MATCH
+[host] RESULT ip1080crop-visible 4/4
+: > /tmp/vdec-check.raw
+# echo TEST-hevc10alloc; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10alloc.txt /etc/vdec-test/hevc10alloc.265 /tmp/vdec-check.raw && for n in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16; do dd if=/tmp/vdec-check.raw bs=26738688 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-hevc10alloc
+frame 0: POC 0, 4096x2176 P010 26738688 bytes, CAPTURE index 0
+frame 1: POC 1, 4096x2176 P010 26738688 bytes, CAPTURE index 1
+frame 2: POC 2, 4096x2176 P010 26738688 bytes, CAPTURE index 2
+frame 3: POC 3, 4096x2176 P010 26738688 bytes, CAPTURE index 3
+frame 4: POC 4, 4096x2176 P010 26738688 bytes, CAPTURE index 4
+frame 5: POC 5, 4096x2176 P010 26738688 bytes, CAPTURE index 5
+frame 6: POC 6, 4096x2176 P010 26738688 bytes, CAPTURE index 6
+frame 7: POC 7, 4096x2176 P010 26738688 bytes, CAPTURE index 7
+frame 8: POC 8, 4096x2176 P010 26738688 bytes, CAPTURE index 8
+frame 9: POC 9, 4096x2176 P010 26738688 bytes, CAPTURE index 9
+frame 10: POC 10, 4096x2176 P010 26738688 bytes, CAPTURE index 10
+frame 11: POC 11, 4096x2176 P010 26738688 bytes, CAPTURE index 11
+frame 12: POC 12, 4096x2176 P010 26738688 bytes, CAPTURE index 12
+frame 13: POC 13, 4096x2176 P010 26738688 bytes, CAPTURE index 13
+frame 14: POC 14, 4096x2176 P010 26738688 bytes, CAPTURE index 14
+frame 15: POC 15, 4096x2176 P010 26738688 bytes, CAPTURE index 15
+frame 16: POC 16, 4096x2176 P010 26738688 bytes, CAPTURE index 16
+4e5093b7952a7bc8ea3d44ab50030dfbeebd26e05b951fb659c4225bf97aba4c  -
+d8206975b7659976acc95087de273c5a438591b5b50af26b6fc4308878059eba  -
+dd6fc032697433d49e6d7edfd627a55d4b665fd5c90a5ab87f967d33d827d2b9  -
+445893c6f7a806e04a428b5d7ffdd9aaf1aee52331d30bb53309fe078c6f4904  -
+e165187b19da94c6643ea2b7e068a73227e829c0a8f04edc99ea7ae920a3d413  -
+c0eaa34d726c7f305ed2d8f327be693e8d9eaecde2106d73e30ab3fb920af3c7  -
+eabdfef5bbce49aacef46a492fb6bdd6b0fc7c3f382e6d90352d05c2c1b6eef5  -
+f9c2c83b646d377cf8e0168cc9080b22b2f797d73eeb28073e654c8cdcc6bf44  -
+9a6b0fd16ae63a64e5f08cd50e01590bff51dca7313fdba13f985bd7ae783f82  -
+464f74b6144d4edfcb8ac8b71b0f094e508d89c1395ceac2c181139c51b09f1e  -
+7718da39fcaf6fc54b2c502aa35e76404fdfcc589ee8f0fc857efc2ee9255661  -
+9d07a21eba4fa9c14625473995f84e30cd3de7b00a9600a57acb41efb4542f67  -
+d3e01b31b03264d85d7c2005575d14a8f7e3af68d96d4fc25d2c769a53cf089c  -
+b962f89b2951612b5e2fedea5700dcd55654d864f0dc437d732f8cc6f9489ec8  -
+c67b14df64897432c8ff81c44686334f769522c326d06b2956e78dd2779daaca  -
+be275a0a934cc1da7c2429d3ebe020c402a1ecfe0e7457a435fd0bbb93ab6a3e  -
+bcf1202a7c8146b607fd951ae558258548fc0b24bffecc856d39868ae0b1908d  -
+  19:         43          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] hevc10alloc frame 0 board=4e5093b7952a7bc8ea3d44ab50030dfbeebd26e05b951fb659c4225bf97aba4c FFmpeg=4e5093b7952a7bc8ea3d44ab50030dfbeebd26e05b951fb659c4225bf97aba4c MATCH
+[host] hevc10alloc frame 1 board=d8206975b7659976acc95087de273c5a438591b5b50af26b6fc4308878059eba FFmpeg=d8206975b7659976acc95087de273c5a438591b5b50af26b6fc4308878059eba MATCH
+[host] hevc10alloc frame 2 board=dd6fc032697433d49e6d7edfd627a55d4b665fd5c90a5ab87f967d33d827d2b9 FFmpeg=dd6fc032697433d49e6d7edfd627a55d4b665fd5c90a5ab87f967d33d827d2b9 MATCH
+[host] hevc10alloc frame 3 board=445893c6f7a806e04a428b5d7ffdd9aaf1aee52331d30bb53309fe078c6f4904 FFmpeg=445893c6f7a806e04a428b5d7ffdd9aaf1aee52331d30bb53309fe078c6f4904 MATCH
+[host] hevc10alloc frame 4 board=e165187b19da94c6643ea2b7e068a73227e829c0a8f04edc99ea7ae920a3d413 FFmpeg=e165187b19da94c6643ea2b7e068a73227e829c0a8f04edc99ea7ae920a3d413 MATCH
+[host] hevc10alloc frame 5 board=c0eaa34d726c7f305ed2d8f327be693e8d9eaecde2106d73e30ab3fb920af3c7 FFmpeg=c0eaa34d726c7f305ed2d8f327be693e8d9eaecde2106d73e30ab3fb920af3c7 MATCH
+[host] hevc10alloc frame 6 board=eabdfef5bbce49aacef46a492fb6bdd6b0fc7c3f382e6d90352d05c2c1b6eef5 FFmpeg=eabdfef5bbce49aacef46a492fb6bdd6b0fc7c3f382e6d90352d05c2c1b6eef5 MATCH
+[host] hevc10alloc frame 7 board=f9c2c83b646d377cf8e0168cc9080b22b2f797d73eeb28073e654c8cdcc6bf44 FFmpeg=f9c2c83b646d377cf8e0168cc9080b22b2f797d73eeb28073e654c8cdcc6bf44 MATCH
+[host] hevc10alloc frame 8 board=9a6b0fd16ae63a64e5f08cd50e01590bff51dca7313fdba13f985bd7ae783f82 FFmpeg=9a6b0fd16ae63a64e5f08cd50e01590bff51dca7313fdba13f985bd7ae783f82 MATCH
+[host] hevc10alloc frame 9 board=464f74b6144d4edfcb8ac8b71b0f094e508d89c1395ceac2c181139c51b09f1e FFmpeg=464f74b6144d4edfcb8ac8b71b0f094e508d89c1395ceac2c181139c51b09f1e MATCH
+[host] hevc10alloc frame 10 board=7718da39fcaf6fc54b2c502aa35e76404fdfcc589ee8f0fc857efc2ee9255661 FFmpeg=7718da39fcaf6fc54b2c502aa35e76404fdfcc589ee8f0fc857efc2ee9255661 MATCH
+[host] hevc10alloc frame 11 board=9d07a21eba4fa9c14625473995f84e30cd3de7b00a9600a57acb41efb4542f67 FFmpeg=9d07a21eba4fa9c14625473995f84e30cd3de7b00a9600a57acb41efb4542f67 MATCH
+[host] hevc10alloc frame 12 board=d3e01b31b03264d85d7c2005575d14a8f7e3af68d96d4fc25d2c769a53cf089c FFmpeg=d3e01b31b03264d85d7c2005575d14a8f7e3af68d96d4fc25d2c769a53cf089c MATCH
+[host] hevc10alloc frame 13 board=b962f89b2951612b5e2fedea5700dcd55654d864f0dc437d732f8cc6f9489ec8 FFmpeg=b962f89b2951612b5e2fedea5700dcd55654d864f0dc437d732f8cc6f9489ec8 MATCH
+[host] hevc10alloc frame 14 board=c67b14df64897432c8ff81c44686334f769522c326d06b2956e78dd2779daaca FFmpeg=c67b14df64897432c8ff81c44686334f769522c326d06b2956e78dd2779daaca MATCH
+[host] hevc10alloc frame 15 board=be275a0a934cc1da7c2429d3ebe020c402a1ecfe0e7457a435fd0bbb93ab6a3e FFmpeg=be275a0a934cc1da7c2429d3ebe020c402a1ecfe0e7457a435fd0bbb93ab6a3e MATCH
+[host] hevc10alloc frame 16 board=bcf1202a7c8146b607fd951ae558258548fc0b24bffecc856d39868ae0b1908d FFmpeg=bcf1202a7c8146b607fd951ae558258548fc0b24bffecc856d39868ae0b1908d MATCH
+[host] RESULT hevc10alloc 17/17
+: > /tmp/vdec-check.raw
+# echo TEST-hevc10wp; vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10wp.txt /etc/vdec-test/hevc10wp.265 /tmp/vdec-check.raw && for n in 0 1 2 3 4 5; do dd if=/tmp/vdec-check.raw bs=49152 skip=$n count=1 2>/dev/null | sha256sum; done; grep hi3798mv320-vdec /proc/interrupts
+TEST-hevc10wp
+frame 0: POC 0, 128x128 P010 49152 bytes, CAPTURE index 0
+frame 1: POC 1, 128x128 P010 49152 bytes, CAPTURE index 1
+frame 2: POC 2, 128x128 P010 49152 bytes, CAPTURE index 2
+frame 3: POC 3, 128x128 P010 49152 bytes, CAPTURE index 3
+frame 4: POC 4, 128x128 P010 49152 bytes, CAPTURE index 4
+frame 5: POC 5, 128x128 P010 49152 bytes, CAPTURE index 5
+ea581afeb6f96c6748680568a509b02b329039cdbf30b41494c178e2b1de3a7b  -
+7fc0186152f3ba0ac25543b06d8b4160cfa288dbbbe92de691f7f4b88e0b5963  -
+2f1da5cdf75075494b33fb6307a73f17ca2e820a43d2d4b278069713c932d3d1  -
+7db8ff06495519294c008cdd028682b56ac64635259815eb0e644c77e63908f1  -
+2011bd5fa182507dc9ca476bc0c56b3492ca8f2e58689e21c798df9f6a8d55ae  -
+010aebfc7418ea0b895f51072a26716bbcdb74caf85450cc2918d491687a3e11  -
+  19:         49          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# [host] hevc10wp frame 0 board=ea581afeb6f96c6748680568a509b02b329039cdbf30b41494c178e2b1de3a7b FFmpeg=ea581afeb6f96c6748680568a509b02b329039cdbf30b41494c178e2b1de3a7b MATCH
+[host] hevc10wp frame 1 board=7fc0186152f3ba0ac25543b06d8b4160cfa288dbbbe92de691f7f4b88e0b5963 FFmpeg=7fc0186152f3ba0ac25543b06d8b4160cfa288dbbbe92de691f7f4b88e0b5963 MATCH
+[host] hevc10wp frame 2 board=2f1da5cdf75075494b33fb6307a73f17ca2e820a43d2d4b278069713c932d3d1 FFmpeg=2f1da5cdf75075494b33fb6307a73f17ca2e820a43d2d4b278069713c932d3d1 MATCH
+[host] hevc10wp frame 3 board=7db8ff06495519294c008cdd028682b56ac64635259815eb0e644c77e63908f1 FFmpeg=7db8ff06495519294c008cdd028682b56ac64635259815eb0e644c77e63908f1 MATCH
+[host] hevc10wp frame 4 board=2011bd5fa182507dc9ca476bc0c56b3492ca8f2e58689e21c798df9f6a8d55ae FFmpeg=2011bd5fa182507dc9ca476bc0c56b3492ca8f2e58689e21c798df9f6a8d55ae MATCH
+[host] hevc10wp frame 5 board=010aebfc7418ea0b895f51072a26716bbcdb74caf85450cc2918d491687a3e11 FFmpeg=010aebfc7418ea0b895f51072a26716bbcdb74caf85450cc2918d491687a3e11 MATCH
+[host] RESULT hevc10wp 6/6
+: > /tmp/vdec-check.raw
+# grep hi3798mv320-vdec /proc/interrupts; dmesg | grep -E 'PXP 0x|SMMU fault|decode returned'
+  19:         49          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+# 

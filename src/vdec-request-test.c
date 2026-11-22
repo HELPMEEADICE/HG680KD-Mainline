@@ -182,10 +182,12 @@ static void set_references(struct v4l2_ctrl_h264_decode_params *dec,
 
 static unsigned int setup_decoder(int video, uint32_t fourcc, unsigned int width,
 				  unsigned int height, unsigned int frames,
-				  struct mapping *src, struct mapping *dst)
+				  struct mapping *src, struct mapping *dst,
+				  struct v4l2_ext_controls *sequence, uint32_t pixel_format)
 {
 	enum v4l2_buf_type output = OUTPUT, capture = CAPTURE;
-	unsigned int frame_size = width * height * 3 / 2;
+	unsigned int stride = width * (pixel_format == V4L2_PIX_FMT_P010 ? 2 : 1);
+	unsigned int frame_size = stride * height * 3 / 2;
 	struct v4l2_format fmt = { .type = OUTPUT };
 
 	fmt.fmt.pix_mp.width = width;
@@ -194,13 +196,16 @@ static unsigned int setup_decoder(int video, uint32_t fourcc, unsigned int width
 	IOCTL(video, VIDIOC_S_FMT, &fmt);
 	if (fmt.fmt.pix_mp.pixelformat != fourcc)
 		fail("unexpected OUTPUT format");
+	if (sequence)
+		IOCTL(video, VIDIOC_S_EXT_CTRLS, sequence);
 	fmt.type = CAPTURE;
 	IOCTL(video, VIDIOC_G_FMT, &fmt);
 	if (fmt.fmt.pix_mp.width != width || fmt.fmt.pix_mp.height != height ||
-	    fmt.fmt.pix_mp.pixelformat != V4L2_PIX_FMT_NV21 ||
-	    fmt.fmt.pix_mp.plane_fmt[0].bytesperline != width ||
+	    fmt.fmt.pix_mp.pixelformat != pixel_format ||
+	    fmt.fmt.pix_mp.plane_fmt[0].bytesperline != stride ||
 	    fmt.fmt.pix_mp.plane_fmt[0].sizeimage != frame_size)
 		fail("unexpected CAPTURE dimensions or pixel layout");
+	IOCTL(video, VIDIOC_S_FMT, &fmt);
 	map_buffers(video, OUTPUT, 1, src);
 	map_buffers(video, CAPTURE, frames, dst);
 	IOCTL(video, VIDIOC_STREAMON, &output);
@@ -246,7 +251,7 @@ static void read_hevc_weights(FILE *manifest, unsigned int count,
 	}
 }
 
-static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *raw)
+static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *raw, bool main10)
 {
 	enum v4l2_buf_type output = OUTPUT, capture = CAPTURE;
 	struct v4l2_ctrl_hevc_sps sps = {};
@@ -267,12 +272,13 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 	};
 	struct v4l2_fmtdesc format = { .index = 1, .type = OUTPUT };
 	struct mapping src, dst[MAX_FRAMES];
+	uint32_t pixel_format = main10 ? V4L2_PIX_FMT_P010 : V4L2_PIX_FMT_NV21;
 	unsigned int width, height, frames, frame_size, i;
 	unsigned long long sps_flags, pps_flags;
 
 	if (fscanf(manifest, "%u%u%u", &width, &height, &frames) != 3 ||
 	    !frames || frames > MAX_FRAMES || !width || !height ||
-	    width % 8 || height % 8 || width > 1920 || height > 1088)
+	    width % 8 || height % 8 || width > 4096 || height > 2176)
 		fail("invalid HEVC fixture header");
 	if (fscanf(manifest, "%hhu%hhu%hhu%hhu%hhu%hhu%hhu%hhu%llu",
 		   &sps.log2_min_luma_coding_block_size_minus3,
@@ -292,6 +298,7 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 	sps.pic_width_in_luma_samples = width;
 	sps.pic_height_in_luma_samples = height;
 	sps.chroma_format_idc = 1;
+	sps.bit_depth_luma_minus8 = sps.bit_depth_chroma_minus8 = main10 ? 2 : 0;
 	sps.flags = sps_flags;
 	pps.flags = pps_flags;
 	if (pps.flags & V4L2_HEVC_PPS_FLAG_TILES_ENABLED) {
@@ -321,8 +328,8 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 	IOCTL(video, VIDIOC_ENUM_FMT, &format);
 	if (format.pixelformat != V4L2_PIX_FMT_HEVC_SLICE)
 		fail("missing HEVC OUTPUT format");
-	IOCTL(video, VIDIOC_S_EXT_CTRLS, &sequence);
-	frame_size = setup_decoder(video, V4L2_PIX_FMT_HEVC_SLICE, width, height, frames, &src, dst);
+	frame_size = setup_decoder(video, V4L2_PIX_FMT_HEVC_SLICE, width, height, frames,
+				   &src, dst, &sequence, pixel_format);
 
 	for (i = 0; i < frames;) {
 		struct v4l2_ctrl_hevc_slice_params slice = {};
@@ -403,8 +410,9 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 		index = dequeue(video, CAPTURE, i, frame_size);
 		if (index >= frames || fwrite(dst[index].addr, frame_size, 1, raw) != 1)
 			fail("cannot write HEVC frame");
-		printf("frame %u: POC %d, %ux%u NV21 %u bytes, CAPTURE index %u\n",
-		       i++, dec.pic_order_cnt_val, width, height, frame_size, index);
+		printf("frame %u: POC %d, %ux%u %s %u bytes, CAPTURE index %u\n",
+		       i++, dec.pic_order_cnt_val, width, height, main10 ? "P010" : "NV21",
+		       frame_size, index);
 	}
 	IOCTL(video, VIDIOC_STREAMOFF, &output);
 	IOCTL(video, VIDIOC_STREAMOFF, &capture);
@@ -439,7 +447,7 @@ int main(int argc, char **argv)
 	bool test_flush = getenv("VDEC_TEST_FLUSH") != NULL;
 
 	if (argc != 6)
-		fail("usage: vdec-request /dev/videoN /dev/mediaN manifest slices output.nv21");
+		fail("usage: vdec-request /dev/videoN /dev/mediaN manifest slices output.raw");
 
 	video = open_device(argv[1]);
 	media = open_device(argv[2]);
@@ -455,9 +463,10 @@ int main(int argc, char **argv)
 		char codec[16];
 
 		rewind(manifest);
-		if (fscanf(manifest, "%15s", codec) != 1 || strcmp(codec, "HEVC"))
+		if (fscanf(manifest, "%15s", codec) != 1 ||
+		    (strcmp(codec, "HEVC") && strcmp(codec, "HEVC10")))
 			fail("invalid codec in fixture");
-		run_hevc(video, media, manifest, stream, raw);
+		run_hevc(video, media, manifest, stream, raw, !strcmp(codec, "HEVC10"));
 		goto close_files;
 	}
 	rewind(manifest);
@@ -495,7 +504,8 @@ int main(int argc, char **argv)
 	if (nv21.pixelformat != V4L2_PIX_FMT_NV21)
 		fail("expected NV21 CAPTURE format");
 
-	frame_size = setup_decoder(video, V4L2_PIX_FMT_H264_SLICE, width, height, frames, &src, dst);
+	frame_size = setup_decoder(video, V4L2_PIX_FMT_H264_SLICE, width, height, frames,
+				   &src, dst, NULL, V4L2_PIX_FMT_NV21);
 
 	for (i = 0; i < frames;) {
 		struct v4l2_ctrl_h264_slice_params slice = {};
