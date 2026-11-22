@@ -1,5 +1,20 @@
 # HG680KD U-Boot USB Auto-Boot & Android Fallback
 
+## 2026-11-22 USB VDEC deployment
+
+The deployed kernel is `7.3.5-hg680kd-arm64-armbian-usb-vdec`. It uses the validated H.264 Direct fix and Cacheable + NEON detiling from `arm64-7.3.5-vdec-direct`. The legacy AArch64 uImage includes the board DTB and boots without an initrd. It retains `root=PARTLABEL=HG680KD_ROOT`, `rootfstype=f2fs` and the existing F2FS mount options, and adds `cma=384M`.
+
+The build on `hedc@ArchLinux-E5-Server` disables global dynamic debug to fit the existing U-Boot read window. The VDEC driver and media dependencies are installed under `/lib/modules/7.3.5-hg680kd-arm64-armbian-usb-vdec/`. The final file is padded to 15,245,384 bytes and written in place to preserve LBA `0x1028` and the existing `0x7451`-sector read. File and raw-sector readback matched the build after sync and unmount.
+
+| USB file | SHA256 |
+|---|---|
+| `/boot/boot.img` | `670b1de4ff0c95df9738d18b5f1128b2ce3d42b555c9f9d5a4c8ee5840d45790` |
+| `/boot/boot.img.bak-pre-vdec` | `f5e3173703253ff79cd4c9e329c9b57856a42e7cbdb745656c19ed8288f67b70` |
+
+The original `Image`, DTB and checksum manifest also have `.bak-pre-vdec` copies. Restore `boot.img` in place with `dd conv=notrunc,fsync` to preserve its sector mapping.
+
+Two COM4-triggered software reboots followed the normal USB path and reached the Armbian serial login. The root mounted from `/dev/sda3`, CMA reserved 384 MiB, and `/dev/video0` and `/dev/media0` registered. H.264 1080p with default Direct, HEVC 4K Main, and HEVC 4K Main10 each matched 240/240 software-decoded frame hashes, with 720 PXP interrupts and zero SMMU interrupts. The pre-existing `run-rpc_pipefs.mount` failure also appeared on the original USB kernel. eMMC stayed read-only and the deployment performed no OTP operation or `saveenv`.
+
 ## 1. Original Stock U-Boot Environment (`printenv` Snapshot)
 
 Captured unmodified from COM4 (`115200 8N1`) before any environment changes ([logs/370-uboot-printenv.txt](logs/370-uboot-printenv.txt) and [logs/387-uboot-usb-probe.txt](logs/387-uboot-usb-probe.txt)):
