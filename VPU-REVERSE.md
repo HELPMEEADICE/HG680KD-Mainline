@@ -248,7 +248,7 @@ sha256sum /tmp/ip32.nv21 /tmp/ip128.nv21
 
 驱动的 CABAC 初始化表可用 `python scripts/vdec_cabac_table.py artifacts/vpu-reverse-factory src/hi3798mv320-vdec-cabac.h` 从原厂内核重新生成。生成器在提取前核对原厂内核 SHA256。
 
-### 实机结果与支持范围
+### 初版实机结果
 
 最终 RAM 镜像 SHA256 为 `07a9b999c0061c2d0bd534676498e0b5150efc78f1ab881dcfff952fe83d9a50`，U-Boot TFTP 回读 CRC32 为 `59365333`。板端注册 `/dev/video0`、`/dev/media0`。正向测试完成 26 帧，INTID 169 从 0 增到 26，INTID 181 为 0。负向测试先解码 B 帧样本前两张参考图，PXP 总数增到 28，SMMU 仍为 0。
 
@@ -261,6 +261,34 @@ sha256sum /tmp/ip32.nv21 /tmp/ip128.nv21
 | 128×128 CABAC 双片并使用 `V4L2_DEC_CMD_FLUSH` | 4 | NV21 逐帧 SHA256 相等 |
 | 256×512、512×256、640×480、640×720、960×544 CABAC IDR/P | 各 2 | NV21 逐帧 SHA256 相等 |
 
-当前枚举宽 32–960、高 32–720，步进 16，支持逐行 8-bit 4:2:0 I/P。1024×512、1280×256 和 1280×720 探测首帧均报 PXP `0x60000`，SMMU 故障为 0。128×128 空间和时间直接预测 B 帧都完成硬件任务，输出与参考存在像素差异。当前驱动将 B picture 返回为错误缓冲。驱动包含 16 个 DPB 槽、L0/L1 和 ColMV 消息打包。16 个并发参考帧、自定义 scaling matrix 和加权预测未完成像素级板测。
+初版枚举宽 32–960、高 32–720，步进 16，支持逐行 8-bit 4:2:0 I/P。1024×512、1280×256 和 1280×720 探测首帧均报 PXP `0x60000`，SMMU 故障为 0。128×128 空间和时间直接预测 B 帧都完成硬件任务，输出与参考存在像素差异，因此初版驱动拒绝 B 帧。
 
 [构建日志](logs/433-vdec-build.txt) · [COM4 TFTP 日志](logs/434-vdec-tftp.txt) · [逐帧 SHA256 对照](logs/435-vdec-pixels.txt)
+
+### 720p、1080p 和 B 帧修复
+
+**PXP `0x60000`** 同时置位 PXP 状态 bit 17（任务完成）和 bit 18（解码错误）。原厂 `dec_hal_read_int_info` 分开提取这两位，`dec_hal_read_frm_msg` 把 UP_MSG 首字 bit 31 作为帧错误标志。实测 1280×720 首帧的帧和首 slice 回写状态分别为 `0x94210000`、`0x94230000`，`UP[2]` 为 `0x2f`，PXP `+0x20/+0x24/+0x28` 和 SMMU 状态均为零。驱动把包含 `00 00 03` 的 Annex B 字节序列直接交给了期望 RBSP 的熵解码器，导致其在防竞争字节处读错。驱动现将每个 NAL 转成 RBSP，再按其实际长度和 RBSP 位偏移提交 slice。保留原来的 stride、`pub[21]` 和工作缓冲配置，只改变这项输入处理，1024×512、1280×256 和 1280×720 即逐帧通过。原厂尺寸字段也能容纳 1920×1088，逐行路径在宏块宽度超过 256 时才请求外部行缓冲。[错误状态与 RBSP 对照](logs/438-vdec-hd-b-pixels.txt)
+
+**B 帧** 的 VDH slice 第 7 字原先把 SPS `direct_8x8_inference_flag` 直接写入 bit 14。只清除该位，两种既有逐行样本即从各 2/3 帧提高到各 3/3 帧匹配。当前帧和参考帧 PMV 地址、DPB 槽、顶底场 POC、L0/L1 以及控制空间直接预测的 bit 15 在该对照中用同样的值。另一个 720p 双 slice 时间直接预测样本也通过 3/3 帧。[B 帧逐位对照和逐帧 SHA256](logs/438-vdec-hd-b-pixels.txt)
+
+当前枚举为宽 32–1920、高 32–1088，步进 16，支持逐行 8-bit 4:2:0 I/P/B。SPS 指定 1080 行可视高度时，CAPTURE 返回 1088 行编码面，应用按 SPS 裁剪。以下向量使用现有的测试程序和 FFmpeg 生成器。[测试程序](src/vdec-request-test.c) · [样本生成器](scripts/vdec_request_fixture.py)
+
+```powershell
+$out = 'artifacts/arm64-7.3.5-vdec'
+ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc2=size=1920x1080:rate=4 -frames:v 4 -c:v libx264 -threads 1 -profile:v high -x264-params 'ref=1:bframes=0:weightp=0:slices=4:keyint=30:scenecut=0' -an -f h264 "$out/input1080-crop.264"
+python scripts/vdec_request_fixture.py "$out/input1080-crop.264" "$out/ip1080crop"
+ffmpeg -hide_banner -loglevel error -y -f lavfi -i 'testsrc2=size=128x128:rate=4,fade=t=in:st=0:d=1.0' -frames:v 5 -c:v libx264 -threads 1 -profile:v main -x264-params 'ref=1:bframes=0:weightp=2:slices=1:keyint=30:scenecut=0' -an -f h264 "$out/input128w.264"
+python scripts/vdec_request_fixture.py "$out/input128w.264" "$out/ip128w"
+```
+
+最终 RAM 镜像 SHA256 为 `c1048f4dd72b7cae84a11f7c2dd88edcb8b8990372c4f59bc29c91b67c22ae90`，TFTP 到 `0x01fdffc0` 后 U-Boot 回读 CRC32 为 `0574dfc3`。从启动到测试完成，PXP INTID 169 从 0 增至 52，SMMU INTID 181 始终为 0。U 盘未挂载，`mmcblk0/ro=1`。[构建日志](logs/436-vdec-hd-b-build.txt) · [COM4 TFTP 日志](logs/437-vdec-hd-b-tftp.txt) · [逐帧 SHA256 对照](logs/438-vdec-hd-b-pixels.txt)
+
+| 样本 | NV21 帧 SHA256 匹配 |
+| --- | ---: |
+| 32×32 CABAC IDR/P 和 CAVLC IDR | 3/3 |
+| 128×128 单片、双片、双片 Flush | 13/13 |
+| 960×544、1024×512、1280×256 | 6/6 |
+| 1280×720 单片、纯色、八片 | 12/12 |
+| 1080p 四片，1920×1088 编码面及 1920×1080 可视区域 | 各 4/4 |
+| 128×128 空间与时间直接预测 B 帧、720p 双片 B 帧 | 各 3/3 |
+| 128×128 加权 P，含非默认亮度与色度权值和偏移 | 5/5 |

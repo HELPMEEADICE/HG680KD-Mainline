@@ -274,15 +274,17 @@ int main(int argc, char **argv)
 	for (i = 0; i < frames;) {
 		struct v4l2_ctrl_h264_slice_params slice = {};
 		struct v4l2_ctrl_h264_decode_params dec = {};
+		struct v4l2_ctrl_h264_pred_weights weights = {};
 		struct v4l2_ext_control controls[] = {
 			{ .id = V4L2_CID_STATELESS_H264_SPS, .size = sizeof(sps), .ptr = &sps },
 			{ .id = V4L2_CID_STATELESS_H264_PPS, .size = sizeof(pps), .ptr = &pps },
 			{ .id = V4L2_CID_STATELESS_H264_SLICE_PARAMS, .size = sizeof(slice), .ptr = &slice },
 			{ .id = V4L2_CID_STATELESS_H264_DECODE_PARAMS, .size = sizeof(dec), .ptr = &dec },
+			{ .id = V4L2_CID_STATELESS_H264_PRED_WEIGHTS, .size = sizeof(weights), .ptr = &weights },
 		};
 		struct v4l2_ext_controls ext = {
 			.which = V4L2_CTRL_WHICH_REQUEST_VAL,
-			.count = sizeof(controls) / sizeof(controls[0]),
+			.count = sizeof(controls) / sizeof(controls[0]) - 1,
 			.controls = controls,
 		};
 		struct v4l2_plane plane = {};
@@ -294,6 +296,7 @@ int main(int argc, char **argv)
 		unsigned int bytes, bits, frame_num, type, idr, ref_idc, cabac_init, deblock;
 		unsigned int idx, first_mb, hold, direct_spatial;
 		int delta, poc, alpha, beta, req;
+		bool weighted;
 
 		if (fscanf(manifest, "%u%u%u%u%u%u%u%u%d%d%d%d%u%u%u",
 			   &bytes, &bits, &frame_num, &type, &idr, &ref_idc, &cabac_init,
@@ -321,12 +324,28 @@ int main(int argc, char **argv)
 		dec.flags = idr ? V4L2_H264_DECODE_PARAM_FLAG_IDR_PIC : 0;
 
 		set_references(&dec, &slice, pictures, i);
+		weighted = V4L2_H264_CTRL_PRED_WEIGHTS_REQUIRED(&pps, &slice);
+		if (weighted) {
+			struct v4l2_h264_weight_factors *l0 = &weights.weight_factors[0];
+
+			if (fscanf(manifest, "%hu%hu%hd%hd%hd%hd%hd%hd",
+				   &weights.luma_log2_weight_denom, &weights.chroma_log2_weight_denom,
+				   &l0->luma_weight[0], &l0->luma_offset[0],
+				   &l0->chroma_weight[0][0], &l0->chroma_offset[0][0],
+				   &l0->chroma_weight[0][1], &l0->chroma_offset[0][1]) != 8)
+				fail("invalid fixture prediction weights");
+			ext.count++;
+		}
 
 		IOCTL(media, MEDIA_IOC_REQUEST_ALLOC, &req);
 		ext.request_fd = req;
 		if (first_mb) {
 			ext.controls = &controls[2];
 			ext.count = 1;
+			if (weighted) {
+				controls[3] = controls[4];
+				ext.count++;
+			}
 		} else if (i) {
 			/* SPS is unchanged after the first picture. */
 			ext.controls++;

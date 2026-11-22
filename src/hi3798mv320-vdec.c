@@ -23,9 +23,8 @@
 
 #define VDEC_NAME		"hi3798mv320-vdec"
 #define VDEC_MIN_SIZE		32
-/* This message path fails before decoding at 1024 pixels and above. */
-#define VDEC_MAX_WIDTH		960
-#define VDEC_MAX_HEIGHT		720
+#define VDEC_MAX_WIDTH		1920
+#define VDEC_MAX_HEIGHT		1088 /* Coded height of a 1080-line H.264 picture. */
 #define VDEC_MAX_STREAM		SZ_8M
 #define VDEC_STREAM_PAD		256
 #define VDEC_PAGE		SZ_4K
@@ -270,7 +269,7 @@ static int vdec_reset(struct vdec_dev *vdec)
 	return 0;
 }
 
-static int vdec_submit(struct vdec_dev *vdec, u32 msg)
+static int vdec_submit(struct vdec_dev *vdec, const struct vdec_dma *work)
 {
 	void __iomem *slot = vdec->vdh + VDH_SLOT + vdec->slot * VDH_SLOT_STRIDE;
 	unsigned long done;
@@ -292,7 +291,7 @@ static int vdec_submit(struct vdec_dev *vdec, u32 msg)
 	writel(1, vdec->pxp + VDH_IRQ_MASK);
 	writel(0, vdec->pxp + VDH_IRQ_AUX_MASK);
 	writel(0x300, slot + 0x04);
-	writel(msg >> 4, slot + 0x08);
+	writel(work->iova >> 4, slot + 0x08);
 	dma_wmb();
 	vdec->tlb_dirty = true;
 	writel(1, slot);
@@ -313,10 +312,14 @@ static int vdec_submit(struct vdec_dev *vdec, u32 msg)
 		ret = -EIO;
 
 	if (ret) {
+		const __le32 *up = work->cpu + MSG_UP;
+
 		dev_err_ratelimited(vdec->dev,
-				    "slot %u: decode %d PXP %#x SMMU %#x mb %#x info %#x\n",
+				    "slot %u: decode %d PXP %#x SMMU %#x regs %08x/%08x/%08x UP %08x/%08x/%08x\n",
 				    vdec->slot, ret, status, fault, readl(vdec->pxp + 0x20),
-				    readl(vdec->pxp + 0x24));
+				    readl(vdec->pxp + 0x24), readl(vdec->pxp + 0x28),
+				    le32_to_cpu(up[0]), le32_to_cpu(up[2]),
+				    le32_to_cpu(up[0x80 / 4]));
 		vdec_reset(vdec);
 	} else if (vdec->slot == 1) {
 		/* The hardware cursor advances past our two slots. Rewind it. */
@@ -446,7 +449,6 @@ static int vdec_slice_message(struct vdec_ctx *ctx, __le32 *slice,
 			      const struct vdec_refs *refs, unsigned int data_bit,
 			      unsigned int data_bits, bool has_weights)
 {
-	const struct v4l2_ctrl_h264_sps *sps = &ctx->picture_sps;
 	const struct v4l2_ctrl_h264_slice_params *sp = ctx->slice->p_cur.p_h264_slice_params;
 	const struct v4l2_ctrl_h264_decode_params *dec = &ctx->picture_dec;
 	const struct v4l2_ctrl_h264_pps *pps = &ctx->picture_pps;
@@ -496,10 +498,9 @@ static int vdec_slice_message(struct vdec_ctx *ctx, __le32 *slice,
 	if (l1) {
 		struct vdec_buffer *col = refs->buffers[sp->ref_pic_list1[0].index];
 
-		if (sps->flags & V4L2_H264_SPS_FLAG_DIRECT_8X8_INFERENCE)
-			slice[7] |= cpu_to_le32(BIT(14));
+		/* Progressive ColMV uses the frame PMV layout with bit 14 clear. */
 		slice[8] = vdec_addr(col->surface.iova, ctx->pmv_offset);
-		}
+	}
 	slice[10] = cpu_to_le32(((pps->chroma_qp_index_offset & 31) << 5) |
 			       (pps->second_chroma_qp_index_offset & 31) |
 			       (weighted << 16));
@@ -624,28 +625,29 @@ static void vdec_detile_plane(u8 *dst, const u8 *src, unsigned int width,
 	}
 }
 
-static int vdec_nal_data_bit(const u8 *nal, unsigned int size, unsigned int header,
-			     bool cabac)
+static int vdec_copy_rbsp(u8 *dst, const u8 *src, unsigned int size,
+			  unsigned int prefix)
 {
-	unsigned int ebsp, rbsp = 1, zeroes = 0;
+	unsigned int i, length = prefix + 1, zeroes = 0;
 
-	if (header < 8 || header >= size * 8)
-		return -EINVAL;
-	if (cabac)
-		header = ALIGN(header, 8);
+	/* Keep the start code and NAL header ahead of the VDH's bit offset. */
+	memcpy(dst, src, length);
+	for (i = length; i < size; i++) {
+		u8 byte = src[i];
 
-	/* The control counts RBSP bits, but the DMA stream still has EPBs. */
-	for (ebsp = 1; ebsp < size; ebsp++) {
-		if (zeroes == 2 && nal[ebsp] == 3) {
-			zeroes = 0;
-			continue;
+		if (zeroes == 2) {
+			/* Slice mode accepts one VCL NAL per request. */
+			if (byte == 1)
+				return -EINVAL;
+			if (byte == 3) {
+				zeroes = 0;
+				continue;
+			}
 		}
-		if (rbsp == header / 8)
-			return ebsp * 8 + header % 8;
-		zeroes = nal[ebsp] ? 0 : min(zeroes + 1, 2U);
-		rbsp++;
+		dst[length++] = byte;
+		zeroes = byte ? 0 : min(zeroes + 1, 2U);
 	}
-	return -EINVAL;
+	return length;
 }
 
 static unsigned int vdec_slice_offset(unsigned int index)
@@ -672,7 +674,7 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 		return -EIO;
 
 	memset(out->surface.cpu, 0, out->surface.size);
-	ret = vdec_submit(ctx->vdec, ctx->workspace.iova);
+	ret = vdec_submit(ctx->vdec, &ctx->workspace);
 	if (ret)
 		return ret;
 
@@ -698,14 +700,14 @@ static int vdec_run(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
 	unsigned int mbs = (width / 16) * (height / 16);
 	unsigned int offset = src->planes[0].data_offset;
 	unsigned int bytes = vb2_get_plane_payload(&src->vb2_buf, 0) - offset;
-	unsigned int prefix, slice_offset;
+	unsigned int prefix, slice_offset, bit;
 	bool cabac;
 	bool hold = src->flags & V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF;
 	const u8 *input = vb2_plane_vaddr(&src->vb2_buf, 0);
 	u8 *output = vb2_plane_vaddr(&dst->vb2_buf, 0);
 	__le32 *slice;
 	u8 *stream;
-	int bit, ret;
+	int ret;
 
 	if (ctx->num_slices && (ctx->held != out || ctx->held_timestamp != src->vb2_buf.timestamp))
 		ctx->num_slices = 0;
@@ -754,14 +756,12 @@ static int vdec_run(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
 	if ((input[prefix] & 0x1f) !=
 	    (dec->flags & V4L2_H264_DECODE_PARAM_FLAG_IDR_PIC ? 5 : 1))
 		return -EINVAL;
-	bit = vdec_nal_data_bit(input + prefix, bytes - prefix, sp->header_bit_size, cabac);
-	if (bit < 0)
-		return bit;
+	if (sp->header_bit_size < 8 || sp->header_bit_size >= (bytes - prefix) * 8)
+		return -EINVAL;
+	bit = sp->header_bit_size;
+	if (cabac)
+		bit = ALIGN(bit, 8);
 	bit += prefix * 8;
-	/* Slice mode accepts one VCL NAL per request. */
-	for (offset = prefix + 1; offset + 2 < bytes; offset++)
-		if (!input[offset] && !input[offset + 1] && input[offset + 2] == 1)
-			return -EINVAL;
 
 	if (ctx->num_slices == VDEC_MAX_SLICES ||
 	    ctx->stream_used + bytes > ctx->output.plane_fmt[0].sizeimage)
@@ -783,7 +783,13 @@ static int vdec_run(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
 		vdec_picture_message(ctx, out, &refs);
 
 	stream = ctx->workspace.cpu + STREAM_OFFSET + ctx->stream_used;
-	memcpy(stream, input, bytes);
+	/* The VDH entropy decoder consumes RBSP at the slice data offset. */
+	ret = vdec_copy_rbsp(stream, input, bytes, prefix);
+	if (ret < 0)
+		return ret;
+	bytes = ret;
+	if (bit >= bytes * 8)
+		return -EINVAL;
 	memset(stream + bytes, 0, VDEC_STREAM_PAD);
 
 	slice_offset = vdec_slice_offset(ctx->num_slices);
@@ -793,11 +799,6 @@ static int vdec_run(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
 				  bytes * 8 - bit, controls & REQUEST_WEIGHTS);
 	if (ret)
 		return ret;
-	/* B pictures have not passed pixel validation on this VDH revision. */
-	if (sp->slice_type == V4L2_H264_SLICE_TYPE_B ||
-	    (dec->flags & V4L2_H264_DECODE_PARAM_FLAG_BFRAME))
-		return -EOPNOTSUPP;
-
 	if (ctx->num_slices) {
 		__le32 *prev = ctx->workspace.cpu + vdec_slice_offset(ctx->num_slices - 1);
 

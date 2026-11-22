@@ -4,7 +4,7 @@
 
 ## ARM64 Linux 7.3.5 H.264 Stateless 解码（TFTP RAM）
 
-`arm64-7.3.5-vdec` 在 HG680KD 上注册 `/dev/video0` 和 `/dev/media0`。应用使用 V4L2 Media Request API 提交 H.264 slice 和参数，从 CAPTURE 队列读取线性 NV21。COM4 板测覆盖 32×32 Main Profile CABAC IDR/P、32×32 CAVLC IDR、128×128 单 slice 与双 slice 多帧，以及最大已通过样本 960×544 IDR/P。全宽 720p 和 B 帧仍待完成。[驱动和复现步骤](VPU-REVERSE.md#9-linux-735-v4l2-stateless-驱动) · [构建日志](logs/433-vdec-build.txt) · [板测日志](logs/434-vdec-tftp.txt)
+`arm64-7.3.5-vdec` 在 HG680KD 上注册 `/dev/video0` 和 `/dev/media0`。应用使用 V4L2 Media Request API 提交 H.264 slice 和参数，从 CAPTURE 队列读取线性 NV21。COM4 板测中，32×32 与 128×128 回归、720p、1080p、空间与时间直接预测 B 帧及加权 P 帧共 52 帧，逐帧 SHA256 均与 FFmpeg 一致。PXP 收到 52 次完成中断，SMMU 故障为零。[驱动和复现步骤](VPU-REVERSE.md#9-linux-735-v4l2-stateless-驱动) · [构建日志](logs/436-vdec-hd-b-build.txt) · [逐帧 SHA256](logs/438-vdec-hd-b-pixels.txt)
 
 ## ARM64 Linux 7.3.5 VPU 探测（TFTP RAM）
 

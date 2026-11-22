@@ -65,15 +65,13 @@ def fixture(stream, out):
         raise ValueError("trace does not match the VCL NAL units")
     if (sps["pic_order_cnt_type"] not in (0, 2) or
             not sps["frame_mbs_only_flag"] or sps["max_num_ref_frames"] > 2 or
-            pps["weighted_pred_flag"] or pps["weighted_bipred_idc"] or
+            pps["weighted_bipred_idc"] or
             pps["num_ref_idx_l0_default_active_minus1"] or
             pps["num_ref_idx_l1_default_active_minus1"]):
-        raise ValueError("fixture requires progressive unweighted I/P/B with single-entry lists")
+        raise ValueError("fixture requires progressive I/P/B with single-entry lists and unweighted B")
 
     width = (sps["pic_width_in_mbs_minus1"] + 1) * 16
     height = (sps["pic_height_in_map_units_minus1"] + 1) * 16
-    if sps["frame_cropping_flag"]:
-        raise ValueError("fixtures must have uncropped macroblock-aligned dimensions")
     constraints = flags(sps, [f"constraint_set{i}_flag" for i in range(6)])
     sps_flags = flags(sps, [
         "separate_colour_plane_flag", "qpprime_y_zero_transform_bypass_flag",
@@ -119,18 +117,34 @@ def fixture(stream, out):
             fields.get("slice_beta_offset_div2", 0), fields["first_mb_in_slice"], int(hold),
             fields.get("direct_spatial_mv_pred_flag", 0),
         ])
+        if pps["weighted_pred_flag"] and fields["slice_type"] % 5 == 0:
+            luma_denom = fields["luma_log2_weight_denom"]
+            chroma_denom = fields["chroma_log2_weight_denom"]
+            rows[-1].extend([
+                luma_denom, chroma_denom,
+                fields.get("luma_weight_l0[0]", 1 << luma_denom),
+                fields.get("luma_offset_l0[0]", 0),
+                fields.get("chroma_weight_l0[0][0]", 1 << chroma_denom),
+                fields.get("chroma_offset_l0[0][0]", 0),
+                fields.get("chroma_weight_l0[0][1]", 1 << chroma_denom),
+                fields.get("chroma_offset_l0[0][1]", 0),
+            ])
     out.with_suffix(".txt").write_text(
         "".join(" ".join(map(str, row)) + "\n" for row in rows), encoding="ascii", newline="\n",
     )
     out.with_suffix(".264").write_bytes(b"".join(units))
     raw = out.with_suffix(".nv21")
-    ffmpeg("-loglevel", "error", "-i", stream, "-pix_fmt", "nv21", "-f", "rawvideo", raw)
+    # CAPTURE contains the coded picture, including any SPS crop margins.
+    ffmpeg("-loglevel", "error", "-apply_cropping", 0, "-i", stream,
+           "-pix_fmt", "nv21", "-f", "rawvideo", raw)
+    frame_size = width * height * 3 // 2
+    if raw.stat().st_size != len(pocs) * frame_size:
+        raise ValueError("software reference does not match the coded dimensions")
     if len(pocs) != len(set(pocs)):
         raise ValueError("reference fixture POCs must be unique")
     if pocs != sorted(pocs):
         # FFmpeg writes display order; the request tester writes decode order.
         display_index = {poc: i for i, poc in enumerate(sorted(pocs))}
-        frame_size = width * height * 3 // 2
         data = raw.read_bytes()
         raw.write_bytes(b"".join(
             data[i * frame_size:(i + 1) * frame_size]
