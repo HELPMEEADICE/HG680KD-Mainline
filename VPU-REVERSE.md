@@ -218,7 +218,7 @@ OUTPUT 和 CAPTURE 都使用 VB2 dma-contig。驱动为 CAPTURE 索引单独保�
 
 ### 构建与复现
 
-同一构建目录保留原有板级补丁和 ARM64 DVFS RAM 基线。通过 `scripts/remote.ps1` 把驱动、DTS、补丁和 C 测试程序同步到 `/home/hedc/hg680kd-mainline/inputs`，把更新的 `build_arm64.sh` 和 `pack_arm64.py` 同步到 `scripts/`。生产 RAM 镜像可直接构建。增加 `VDEC_TEST=1` 会将测试程序和 fixtures 一并放入 RAM initramfs。
+通过 `scripts/remote.ps1` 把驱动、DTS、补丁和 C 测试程序同步到 `/home/hedc/hg680kd-mainline/inputs`，把更新的 `build_arm64.sh` 和 `pack_arm64.py` 同步到 `scripts/`。驱动输入包括 `hi3798mv320-vdec.c`、`hi3798mv320-vdec-neon.S`、CABAC 头及 `0012`、`0013` 补丁。增加 `VDEC_TEST=1` 会将测试程序和 fixtures 一并放入 RAM initramfs。
 
 ```bash
 cd /home/hedc/hg680kd-mainline
@@ -336,7 +336,7 @@ python scripts/vdec_hevc_fixture.py "$out/input-h265ip64c32.265" "$out/h265ip64c
 
 1920×1080 源可用 `-vf pad=1920:1088:0:0` 编码为 1088 行，再用 `-bsf:v hevc_metadata=crop_bottom=8` 标出 1080 行可视区。Tile 样本用 libkvazaar 的 `tiles=2x2`，在第二个样本加入 `slices=tiles`。[Kvazaar 编码参数](https://github.com/ultravideo/kvazaar#command-line-options)
 
-通过 `scripts/remote.ps1` 同步驱动、CABAC 头、测试程序、`0012` 补丁和 fixture 的 `.txt` 与码流到 `inputs/`，同步 `build_arm64.sh` 到 `scripts/`。选择要嵌入的样本后打包并核对远端 SHA256。
+通过 `scripts/remote.ps1` 同步驱动、NEON 汇编、CABAC 头、测试程序、`0012` 和 `0013` 补丁以及 fixture 的 `.txt` 与码流到 `inputs/`，同步 `build_arm64.sh` 到 `scripts/`。选择要嵌入的样本后打包并核对远端 SHA256。
 已有 Linux 源树若应用过旧版 `0012`，将 `drivers/media/platform/Kconfig` 中该选项的帮助行同步至新版措辞，构建脚本即可识别补丁已应用。
 
 ```bash

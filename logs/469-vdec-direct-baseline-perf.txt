@@ -1,0 +1,88 @@
+
+# (dmesg | grep -E 'PXP 0x|SMMU fault|timing frames='); printf '\nEXIT=%s\n' $?
+<3>[    4.888871] hi3798mv320-vdec f8c30000.video-decoder: slot 0: decode -5 PXP 0x60000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/00000d08/94230000
+<3>[    7.579689] hi3798mv320-vdec f8c30000.video-decoder: slot 1: decode -5 PXP 0x1060000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/0000009e/94230000
+<3>[    7.632806] hi3798mv320-vdec f8c30000.video-decoder: slot 1: decode -5 PXP 0x1060000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/0000005e/94230000
+<3>[    7.679792] hi3798mv320-vdec f8c30000.video-decoder: slot 1: decode -5 PXP 0x1060000 SMMU 0x0 regs 00000000/00000000/00000000 UP 94210000/0000011e/94230000
+<6>[   10.211466] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=15 avg_ns/frame rbsp=261766 hw=4628405 detile=34012519 clear=592513
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh perf h264-1080p 1); printf '\nEXIT=%s\n' $?
+PERF START h264-1080p 1
+temp 56000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 58000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 80.01 80.98
+CPU BEFORE
+cpu  711 0 372 30814 5 0 70 0 0 0
+cpu0 61 0 143 7726 0 0 68 0 0 0
+cpu1 544 0 64 7370 0 0 0 0 0 0
+cpu2 56 0 59 7880 0 0 0 0 0 0
+cpu3 48 0 106 7837 5 0 0 0 0 0
+CPU AFTER
+cpu  734 0 456 31097 5 0 70 0 0 0
+cpu0 71 0 152 7804 0 0 69 0 0 0
+cpu1 549 0 102 7425 0 0 0 0 0 0
+cpu2 61 0 84 7948 0 0 0 0 0 0
+cpu3 52 0 118 7918 5 0 0 0 0 0
+IRQ BEFORE
+  19:         19          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:         38          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'h264-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9763 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080 [SAR 1:1 DAR 16:9], 9756 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx264
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffffaf419f10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S264
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffffaf419340] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=0.0 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=4.66x elapsed=0:00:00.85
+bench: utime=0.160s stime=0.217s rtime=0.860s
+bench: maxrss=40884KiB
+frame=120
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[   10.211466] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=15 avg_ns/frame rbsp=261766 hw=4628405 detile=34012519 clear=592513
+TIMING AFTER <6>[   81.093752] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=15 avg_ns/frame rbsp=284363 hw=4359511 detile=36049172 clear=629355
+PERF END h264-1080p 1 0
+
+EXIT=0
+#
+[host] valid baseline False

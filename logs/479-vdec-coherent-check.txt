@@ -1,0 +1,537 @@
+
+# reboot -f
+[  463.706843] reboot: Restarting system
+Systÿ
+Bootrom start
+Boot Media: EMMC
+Decrypt auxiliary code ...OK
+
+lsadc voltage min: 0000006C, max: 00000070, aver: 0000006D, index: 0000000B
+
+Enter boot auxiliary code
+
+Auxiliary code - v1.00
+DDR code - V2.2.4 20241026
+Build: Oct 26 2024 - 15:52:06
+
+Reg Version:  v2.2.3d
+Reg Time:     2024/11/27 15:19:10
+Reg Name:     hi3798mv320dma_Hi3798MV320_LPDDR4-2666-2rank_2GB_32bitx1_2layers.reg
+
+cpu_hpm_otp:
+00000125
+cpu_hpm:
+00000125
+cpu_otp_comp:
+0000002D
+cpu svb done!
+
+gpu_hpm_otp:
+0000011D
+gpu_hpm:
+00000113
+core_hpm_otp:
+0000017B
+core_hpm:
+0000016D
+gpu_otp_comp:
+0000002D
+gpu_otp_comp:
+0000002D
+core_otp_comp:
+0000002D
+training volt:
+0000036A
+DDR traning...done!
+
+core_otp_comp:
+0000002D
+core svb done:
+
+Boot auxiliary code success
+Bootrom success
+
+
+
+
+
+U-Boot 2022.07-g80522c56-dirty (Jun 05 2025 - 21:16:17 +0800), Build: jenkins-STB-git_FVOS_HISI_9_CTCGUANGDONG_p-hisi-iptv_fh_product_20240318-60
+
+
+CPU:		   HI3798MV320 ()
+Boot Media:	eMMC
+DDR Size:	  2 GiB (Boot:  2 GiB)
+
+
+WARNING: Caches not enabled
+[INFO][record_exce_type]:set reboot_reason is 0x43
+[INFO]last bootup_keypoint is [30]
+MMC:   MMC/SD Card:
+    MID:         0xf4
+    Read Block:  512 Bytes
+    Write Block: 512 Bytes
+    Chip Size:   7818182656 Bytes (High Capacity)
+    Name:        "B1003"
+    Chip Type:   MMC
+    Version:     5.1
+    Speed:       192000000Hz
+    Bus Width:   8bit
+    Mode:        HS400ES
+    Boot Mode:   normal(), 61 ms
+Loading Environment from MMC... OK
+LOGO Flag:00000000
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+Net:   gmac0
+
+SDK Version: HiHuanglong_V100R009C01SPC023_v2024111912
+
+jpgd_dfx_print_timestamp 69 cnt: 1, hard in 1280 720 out 1280 720  sample 1 fmt 17 17 total 8 alloc yuv 0 dec 4 csc 0
+hdmi select_channel:DISP_CLOCK_SOURCE_HD0
+get_devinfo_item_ptr: date_type 2 is null !!
+check remote recovery button begin
+ __recovery__into no IR KEY
+lsadc value 107
+already set hardwareid and boardid, skip!
+env not set emergency_log, skip!
+Reserve Memory
+    Start Addr:          0x7FFFE000
+    Bound Addr:          0x20000000
+    Free  Addr:          0x7F684000
+    Alloc Block:  Addr         Size
+                  0x17FFD000   0x2000
+                  0x17FFB000   0x1000
+                  0x17FF8000   0x2000
+                  0x7FEAB000   0x152000
+                  0x7F6C1000   0x7E9000
+                  0x7F6BF000   0x1000
+                  0x7F6B5000   0x9000
+                  0x7F684000   0x30000
+
+BBOX:
+[INFO][create_reboot_reason_cmdline][reboot_reason=AP_S_AWDT][exception_subtype=SUB_APWDT_AP]
+[INFO][record_exce_type]:set reboot_reason is 0xff
+Autobooting in 3 seconds, Press Ctrl+C to stop autoboot
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#setenv ipaddr 192.168.6.249
+fastboot#setenv serverip 192.168.6.172
+fastboot#setenv tftpdstp 1069
+fastboot#mmc read 0 0x8020000 0x10000 0x1000
+
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+
+172614144 Bytes/s
+fastboot#tftpboot 1fdffc0 coherent.img
+ETH0: PHY(phyaddr=1, mii) link UP: DUPLEX=FULL : SPEED=100M
+MAC:   54-0A-77-88-B7-2C
+Using gmac0 device
+TFTP from server 192.168.6.172; our IP address is 192.168.6.249
+Filename 'coherent.img'.
+Load address: 0x1fdffc0
+Loading: *#	[ Connected ]
+################################	[ 2.888 MB]
+################################	[ 5.752 MB]
+################################	[ 8.616 MB]
+################################	[11.480 MB]
+################################	[14.344 MB]
+#####
+	 3.1 MiB/s
+done
+Bytes transferred = 15534152 (ed0848 hex)
+fastboot#
+[host] boot.img SHA256 0ebaeb9492017805f689c7adba926b28c1a6c9645282abc12fb88a3a87e7cf16
+crc32 1fdffc0 ed0848
+CRC32 for 01fdffc0 ... 02eb0807 ==> 51e9c84b
+fastboot#
+[host] CRC32 matches local image: 51e9c84b
+bootm 1fdffc0
+## Booting kernel from Legacy Image at 01fdffc0 ...
+   Image Name:   Linux HG680KD ARM64
+   Image Type:   AArch64 Linux Kernel Image (uncompressed)
+   Data Size:    15534088 Bytes = 14.8 MiB
+   Load Address: 01fe0000
+   Entry Point:  01fe0000
+   XIP Kernel Image
+
+Starting kernel ...
+
+Start ATF with aarch64 kernel...
+bl33_ep->spsr = 0x3C5
+Start Warm Reseting
+[    8.421736][cpu0]NOTICE:  BL31: lts-v2.8.6(release):98d5f24
+[    8.425827][cpu0]NOTICE:  BL31: Built : 21:47:11, Jul 22 2024
+[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+[    0.000000] Linux version 7.3.5-hg680kd-arm64-vdec (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+[    0.000000] Machine model: FiberHome HG680KD (ARM64)
+[    0.000000] earlycon: pl11 MMIO32:0x00000000f8b00000 (options '')
+[    0.000000] printk: legacy bootconsole [pl11] enabled
+[    0.000000] printk: debug: ignoring loglevel setting.
+[    0.000000] OF: reserved mem: 0x00000000053e0000..0x0000000005bdffff (8192 KiB) nomap non-reusable firmware-log@53e0000
+[    0.000000] OF: reserved mem: 0x00000000063dc000..0x00000000063dffff (16 KiB) nomap non-reusable crash-log@63dc000
+[    0.000000] OF: reserved mem: 0x0000000008000000..0x00000000083fffff (4096 KiB) nomap non-reusable atf@8000000
+[    0.000000] OF: reserved mem: 0x0000000017ff8000..0x0000000017ffffff (32 KiB) nomap non-reusable uboot-resmem-low@17ff8000
+[    0.000000] OF: reserved mem: 0x000000007f67f000..0x000000007f6c0fff (264 KiB) nomap non-reusable uboot-resmem-high@7f67f000
+[    0.000000] OF: reserved mem: 0x000000007f6c1000..0x000000007fea9fff (8100 KiB) nomap non-reusable framebuffer@7f6c1000
+[    0.000000] OF: reserved mem: 0x000000007feaa000..0x000000007fffffff (1368 KiB) nomap non-reusable uboot-resmem-tail@7feaa000
+[    0.000000] cma: Reserved 384 MiB at 0x0000000067000000
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.2
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000000000000-0x000000007fffffff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000053dffff]
+[    0.000000]   node   0: [mem 0x00000000053e0000-0x0000000005bdffff]
+[    0.000000]   node   0: [mem 0x0000000005be0000-0x00000000063dbfff]
+[    0.000000]   node   0: [mem 0x00000000063dc000-0x00000000063dffff]
+[    0.000000]   node   0: [mem 0x00000000063e0000-0x0000000007ffffff]
+[    0.000000]   node   0: [mem 0x0000000008000000-0x00000000083fffff]
+[    0.000000]   node   0: [mem 0x0000000008400000-0x0000000017ff7fff]
+[    0.000000]   node   0: [mem 0x0000000017ff8000-0x0000000017ffffff]
+[    0.000000]   node   0: [mem 0x0000000018000000-0x000000007f67efff]
+[    0.000000]   node   0: [mem 0x000000007f67f000-0x000000007fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000007fffffff]
+[    0.000000] percpu: Embedded 15 pages/cpu s30232 r0 d31208 u61440
+[    0.000000] pcpu-alloc: s30232 r0 d31208 u61440 alloc=15*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3
+[    0.000000] Detected VIPT I-cache on CPU0
+[    0.000000] CPU features: detected: GICv3 CPU interface
+[    0.000000] alternatives: applying boot alternatives
+[    0.000000] Kernel command line: console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+[    0.000000] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+[    0.000000] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.000000] software IO TLB: SWIOTLB bounce buffer size adjusted to 2MB
+[    0.000000] software IO TLB: area num 4.
+[    0.000000] software IO TLB: mapped [mem 0x0000000064d00000-0x0000000064f00000] (2MB)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 524288
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] GICv3: 224 SPIs implemented
+[    0.000000] GICv3: 0 Extended SPIs implemented
+[    0.000000] Root IRQ handler: gic_handle_irq
+[    0.000000] GICv3: GICv3 features: 16 PPIs
+[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0x00000000f1040000
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.000000] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.008238] Console: colour dummy device 80x25
+[    0.012747] printk: legacy console [tty0] enabled
+[    0.017944] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+[    0.028349] pid_max: default: 32768 minimum: 301
+[    0.033269] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.040778] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.049019] VFS: Finished mounting rootfs on nullfs
+[    0.055173] rcu: Hierarchical SRCU implementation.
+[    0.060065] rcu: 	Max phase no-delay instances is 1000.
+[    0.065917] smp: Bringing up secondary CPUs ...
+[    0.070940] Detected VIPT I-cache on CPU1
+[    0.071008] GICv3: CPU1: found redistributor 100 region 0:0x00000000f1060000
+[    0.071046] CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
+[    0.071505] Detected VIPT I-cache on CPU2
+[    0.071553] GICv3: CPU2: found redistributor 200 region 0:0x00000000f1080000
+[    0.071576] CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
+[    0.071986] Detected VIPT I-cache on CPU3
+[    0.072025] GICv3: CPU3: found redistributor 300 region 0:0x00000000f10a0000
+[    0.072047] CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
+[    0.072117] smp: Brought up 1 node, 4 CPUs
+[    0.129680] SMP: Total of 4 processors activated.
+[    0.134445] CPU: All CPU(s) started at EL1
+[    0.138595] CPU features: detected: 32-bit EL0 Support
+[    0.143800] CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+[    0.152525] CPU features: detected: CRC32 instructions
+[    0.157733] CPU features: detected: RCpc load-acquire (LDAPR)
+[    0.163554] CPU features: detected: LSE atomic instructions
+[    0.169199] CPU features: detected: Privileged Access Never
+[    0.174845] CPU features: detected: XNX
+[    0.178725] CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+[    0.185804] alternatives: applying system-wide alternatives
+[    0.194176] Memory: 1620748K/2097152K available (7488K kernel code, 834K rwdata, 1828K rodata, 4736K init, 245K bss, 79852K reserved, 393216K cma-reserved)
+[    0.209002] devtmpfs: initialized
+[    0.214150] posixtimers hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    0.221746] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.234789] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.241540] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.249699] thermal_sys: Registered thermal governor 'step_wise'
+[    0.249770] ASID allocator initialised with 65536 entries
+[    0.261382] Serial: AMBA PL011 UART driver
+[    0.266919] f8b00000.serial: ttyAMA0 MMIO:0x00000000f8b00000 (irq = 13, base_baud = 0) is a PL011 rev2
+[    0.276419] printk: console [ttyAMA0] enabled
+[    0.276419] printk: console [ttyAMA0] enabled
+[    0.285203] printk: legacy bootconsole [pl11] disabled
+[    0.285203] printk: legacy bootconsole [pl11] disabled
+[    0.297143] f8b02000.serial: ttyAMA1 MMIO:0x00000000f8b02000 (irq = 14, base_baud = 0) is a PL011 rev2
+[    0.306621] serial serial0: tty port ttyAMA1 registered
+[    0.313862] SCSI subsystem initialized
+[    0.314016] usbcore: registered new interface driver usbfs
+[    0.314053] usbcore: registered new interface driver hub
+[    0.314089] usbcore: registered new device driver usb
+[    0.314121] mc: Linux media interface: v0.10
+[    0.314153] videodev: Linux video capture interface: v2.00
+[    0.314681] Bluetooth: Core ver 2.22
+[    0.314731] NET: Registered PF_BLUETOOTH protocol family
+[    0.314745] Bluetooth: HCI device and connection manager initialized
+[    0.314763] Bluetooth: HCI socket layer initialized
+[    0.314777] Bluetooth: L2CAP socket layer initialized
+[    0.314798] Bluetooth: SCO socket layer initialized
+[    0.314937] clocksource: Switched to clocksource arch_sys_counter
+[    0.321295] NET: Registered PF_INET protocol family
+[    0.321480] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    0.322848] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.322886] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.322918] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    0.323086] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+[    0.323478] TCP: Hash tables configured (established 16384 bind 16384)
+[    0.323595] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.340634] workingset: timestamp_bits=62 (anon: 57) max_order=19 bucket_order=0 (anon: 0)
+[    0.346101] pl061_gpio f8b24000.gpio: PL061 GPIO chip registered
+[    0.346749] dvdd: Voltage range but no REGULATOR_CHANGE_VOLTAGE
+[    0.348928] [drm] Initialized simpledrm 1.0.0 for 7f6c1000.framebuffer on minor 0
+[    0.368112] Console: switching to colour frame buffer device 240x67
+[    0.397612] simple-framebuffer 7f6c1000.framebuffer: [drm] fb0: simpledrmdrmfb frame buffer device
+[    0.407416] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+[    0.407512] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+[    0.407567] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+[    0.407625] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+[    0.407670] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+[    0.408996] lima f9200000.gpu: bus rate = 200000000
+[    0.409068] lima f9200000.gpu: mod rate = 200000000
+[    0.410023] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 1
+[    0.418818] zram: Added device: zram0
+[    0.420179] (unnamed net_device) (uninitialized): using random MAC address e2:6f:6d:ab:eb:e7
+[    0.455838] xhci-hi3798mv320 f98a0000.usb: xHCI Host Controller
+[    0.455928] xhci-hi3798mv320 f98a0000.usb: new USB bus registered, assigned bus number 1
+[    0.456086] xhci-hi3798mv320 f98a0000.usb: hcc params 0x0228fe6d hci version 0x110 quirks 0x0000000020000010
+[    0.456176] xhci-hi3798mv320 f98a0000.usb: irq 18, io mem 0xf98a0000
+[    0.456349] xhci-hi3798mv320 f98a0000.usb: xHCI Host Controller
+[    0.456391] xhci-hi3798mv320 f98a0000.usb: new USB bus registered, assigned bus number 2
+[    0.456437] xhci-hi3798mv320 f98a0000.usb: Host supports USB 3.0 SuperSpeed
+[    0.458144] hub 1-0:1.0: USB hub found
+[    0.458400] hub 1-0:1.0: 2 ports detected
+[    0.459034] usb usb2: We don't know the algorithms for LPM for this host, disabling LPM.
+[    0.459815] hub 2-0:1.0: USB hub found
+[    0.460008] hub 2-0:1.0: 1 port detected
+[    0.460548] usbcore: registered new interface driver usb-storage
+[    0.467964] hi3798mv320-vdec f8c30000.video-decoder: H.264 stateless decoder registered as video0, PXP IRQ 19 SMMU IRQ 20
+[    0.468505] Bluetooth: HCI UART driver ver 2.3
+[    0.468585] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[    0.473101] cpufreq: cpufreq_policy_online: CPU0: Running at unlisted initial frequency: 1250000 kHz, changing to: 1000000 kHz
+[    0.502953] mmc0: SDHCI controller on f9830000.mmc [f9830000.mmc] using ADMA
+[    0.503376] NET: Registered PF_PACKET protocol family
+[    0.518049] clk: Not disabling unused clocks
+[    0.655729] mmc0: new HS400 Enhanced strobe MMC card at address 0001
+[    0.656522] mmcblk0: mmc0:0001 B10030 7.28 GiB (ro)
+[    0.657294]  mmcblk0: p1(system) p2(vendor)
+[    0.657943] mmcblk0rpmb: mmc0:0001 B10030 4.00 MiB, chardev (252:0)
+[    0.702968] usb 1-2: new high-speed USB device number 2 using xhci-hi3798mv320
+[    0.843159] usb-storage 1-2:1.0: USB Mass Storage device detected
+[    0.844685] scsi host0: usb-storage 1-2:1.0
+[    1.086159] Freeing unused kernel memory: 4736K
+[    1.086671] Run /init as init process
+[    1.086748]   with arguments:
+[    1.086777]     /init
+[    1.090988]   with environment:
+[    1.093104]     HOME=/
+[    1.095202]     TERM=linux
+[    1.101256] Bluetooth: (null): Too short H5 packet
+
+HG680KD AArch64 RAM bring-up
+Linux hg680kd 7.3.5-hg680kd-arm64-vdec #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+Online CPUs: 0-3
+Clocksource: arch_sys_counter
+Timer interrupt counts before and after one second:
+            CPU0       CPU1       CPU2       CPU3
+  11:        268[    1.135575] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
+        205        262        240  GICv3      27 Level     arch_timer
+1.00 3.07
+[    1.157138] Bluetooth: hci0: RTL: rom_version status=0 version=3
+[    1.163006] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_fw.bin
+[    1.165389] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_config.bin
+[    1.191041] Bluetooth: hci0: RTL: cfg_sz 110, total sz 21738
+[    1.849156] scsi 0:0:0:0: Direct-Access      USB      SanDisk 3.2Gen1 1.00 PQ: 0 ANSI: 6
+[    1.879213] sd 0:0:0:0: [sda] 60125184 512-byte logical blocks: (30.8 GB/28.7 GiB)
+[    1.882569] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+[    1.883571] sd 0:0:0:0: [sda] Write Protect is off
+[    1.888590] sd 0:0:0:0: [sda] Mode Sense: 43 00 00 00
+[    1.891491] sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+[    1.936715]  sda: sda1 sda2 sda3
+[    1.943999] sd 0:0:0:0: [sda] Attached SCSI removable disk
+            CPU0       CPU1       CPU2       CPU3
+  11:        518        449        553        492  GICv3      27 Level     arch_timer
+2.00 6.74
+
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+# (uname -r; cat /proc/mounts; printf 'EMMC_RO='; cat /sys/block/mmcblk0/ro); printf '\nEXIT=%s\n' $?
+7.3.5-hg680kd-arm64-vdec
+rootfs / rootfs rw,size=812040k,nr_inodes=203010 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=812040k,nr_inodes=203010,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+EMMC_RO=1
+
+EXIT=0
+# (echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 3); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (cd /tmp && wget -q -O ffmpeg http://192.168.6.172:8098/ffmpeg && sha256sum ffmpeg); printf '\nEXIT=%s\n' $?
+501b35250c63b8ee23ff7a41a516381163f394caf3862a612e25dc413c404634  ffmpeg
+
+EXIT=0
+# (cd /tmp && wget -q -O ld-musl-aarch64.so.1 http://192.168.6.172:8098/ld-musl-aarch64.so.1 && sha256sum ld-musl-aarch64.so.1); printf '\nEXIT=%s\n' $?
+42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c  ld-musl-aarch64.so.1
+
+EXIT=0
+# (cd /tmp && wget -q -O libdrm.so.2 http://192.168.6.172:8098/libdrm.so.2 && sha256sum libdrm.so.2); printf '\nEXIT=%s\n' $?
+a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd  libdrm.so.2
+
+EXIT=0
+# (cd /tmp && wget -q -O libudev.so.1 http://192.168.6.172:8098/libudev.so.1 && sha256sum libudev.so.1); printf '\nEXIT=%s\n' $?
+ad842e6ba84b99bf3e0f1bdfee801798e6114c455d601845df7f5cff8854b10c  libudev.so.1
+
+EXIT=0
+# (cd /tmp && wget -q -O vdec_ffmpeg_board.sh http://192.168.6.172:8098/vdec_ffmpeg_board.sh && sha256sum vdec_ffmpeg_board.sh); printf '\nEXIT=%s\n' $?
+b0defbfc9f11cbafb1f2046cb7317cdc457e9a7cf68d0bcbaf1f495fb9d2cb08  vdec_ffmpeg_board.sh
+
+EXIT=0
+# (cd /tmp && wget -q -O h264-1080p.mp4 http://192.168.6.172:8098/h264-1080p.mp4 && sha256sum h264-1080p.mp4); printf '\nEXIT=%s\n' $?
+dbca2cd4ad1578460f62e246745dd236bfd13d71335c6e5b77b229bc1a709f2f  h264-1080p.mp4
+
+EXIT=0
+# (cd /tmp && chmod 755 ffmpeg ld-musl-aarch64.so.1); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh probe); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -version
+ffmpeg version b57fbbe Copyright (c) 2000-2026 the FFmpeg developers
+built with gcc 14.2.0 (GCC)
+configuration: --arch=aarch64 --target-os=linux --enable-cross-compile --cross-prefix=/home/hedc/hg680kd-mainline/source/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux- --cc=/home/hedc/hg680kd-mainline/out/musl-arm64/bin/musl-gcc --disable-autodetect --pkg-config=pkg-config --extra-cflags='-mno-outline-atomics -idirafter /home/hedc/hg680kd-mainline/out/headers-arm64/usr/include' --extra-ldflags='-L/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/lib -Wl,-rpath-link,/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/lib:/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/usr/lib' --extra-libs='-l:libc.musl-aarch64.so.1' --disable-doc --disable-debug --disable-ffplay --disable-ffprobe --disable-everything --disable-avdevice --enable-libdrm --enable-v4l2-request --enable-hwaccel='h264_v4l2request,hevc_v4l2request' --enable-decoder='h264,hevc' --enable-parser='h264,hevc' --enable-demuxer='mov,h264,hevc' --enable-protocol='file,pipe' --enable-encoder='wrapped_avframe,rawvideo' --enable-muxer='null,framemd5' --enable-filter='hwdownload,format,scale' --enable-bsf='h264_mp4toannexb,hevc_mp4toannexb'
+libavutil      60. 26.100 / 60. 26.100
+libavcodec     62. 28.100 / 62. 28.100
+libavformat    62. 12.100 / 62. 12.100
+libavfilter    11. 14.100 / 11. 14.100
+libswscale      9.  5.100 /  9.  5.100
+libswresample   6.  3.100 /  6.  3.100
+
+Exiting with exit code 0
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -hwaccels
+ffmpeg version b57fbbe Copyright (c) 2000-2026 the FFmpeg developers
+  built with gcc 14.2.0 (GCC)
+  configuration: --arch=aarch64 --target-os=linux --enable-cross-compile --cross-prefix=/home/hedc/hg680kd-mainline/source/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux- --cc=/home/hedc/hg680kd-mainline/out/musl-arm64/bin/musl-gcc --disable-autodetect --pkg-config=pkg-config --extra-cflags='-mno-outline-atomics -idirafter /home/hedc/hg680kd-mainline/out/headers-arm64/usr/include' --extra-ldflags='-L/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/lib -Wl,-rpath-link,/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/lib:/home/hedc/hg680kd-mainline/out/vdec-ffmpeg/alpine/usr/lib' --extra-libs='-l:libc.musl-aarch64.so.1' --disable-doc --disable-debug --disable-ffplay --disable-ffprobe --disable-everything --disable-avdevice --enable-libdrm --enable-v4l2-request --enable-hwaccel='h264_v4l2request,hevc_v4l2request' --enable-decoder='h264,hevc' --enable-parser='h264,hevc' --enable-demuxer='mov,h264,hevc' --enable-protocol='file,pipe' --enable-encoder='wrapped_avframe,rawvideo' --enable-muxer='null,framemd5' --enable-filter='hwdownload,format,scale' --enable-bsf='h264_mp4toannexb,hevc_mp4toannexb'
+  libavutil      60. 26.100 / 60. 26.100
+  libavcodec     62. 28.100 / 62. 28.100
+  libavformat    62. 12.100 / 62. 12.100
+  libavfilter    11. 14.100 / 11. 14.100
+  libswscale      9.  5.100 /  9.  5.100
+  libswresample   6.  3.100 /  6.  3.100
+Hardware acceleration methods:
+drm
+v4l2request
+
+crw-------    1   81,   0 /dev/video0
+crw-------    1  253,   0 /dev/media0
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh check h264-1080p nv21); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p.mp4 -map 0:v:0 -an -sn -dn -vf hwdownload,format=nv21 -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y h264-1080p.hw.framemd5
+[h264 @ 0xffffbb34e460] Reinit context to 1920x1088, pix_fmt: yuv420p
+[vist#0:0/h264 @ 0xffffbb34dcc0] Selecting decoder 'h264' because of requested hwaccel method v4l2request
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'h264-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9763 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High), 1 reference frame (avc1 / 0x31637661), yuv420p(progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], 9756 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx264
+[out#0/framemd5 @ 0xffffbb349830] Adding streams from explicit maps...
+[vost#0:0/rawvideo @ 0xffffbb34b030] Created video stream from input stream 0:0
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> rawvideo (native))
+[vost#0:0/rawvideo @ 0xffffbb34b030] Starting thread...
+[vf#0:0 @ 0xffffbb34a030] Starting thread...
+[vist#0:0/h264 @ 0xffffbb34dcc0] [dec:h264 @ 0xffffbb347030] Starting thread...
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffbb28f9e0] Starting thread...
+[AVHWFramesContext @ 0xffffbb345230] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S264
+[AVHWFramesContext @ 0xffffbb345230] Using CAPTURE buffer format NV21 (1920x1088)
+[h264 @ 0xffffbb345490] Reinit context to 1920x1088, pix_fmt: drm_prime
+[graph -1 input from stream 0:0 @ 0xffffbb1dc800] w:1920 h:1080 pixfmt:drm_prime tb:1/15360 fr:60/1 sar:1/1 csp:unknown range:unknown alpha:unspecified
+[graph -1 input from stream 0:0 @ 0xffffbb1dc800] video frame properties congruent with link at pts_time: 0
+Output #0, framemd5, to 'h264-1080p.hw.framemd5':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: rawvideo, 1 reference frame (NV21 / 0x3132564E), nv21(progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 1492992 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      handler_name    : GPAC ISO Video Handler
+[out#0/framemd5 @ 0xffffbb349830] Starting thread...
+frame=    6 fps=0.0 q=-0.0 size=       1KiB time=00:00:00.10 bitrate=  49.4kbits/s speed= 0.2x elapsed=0:00:00.50    frame=   21 fps= 21 q=-0.0 size=       2KiB time=00:00:00.35 bitrate=  41.5kbits/s speed=0.35x elapsed=0:00:01.00    frame=   33 fps= 22 q=-0.0 size=       3KiB time=00:00:00.55 bitrate=  40.4kbits/s speed=0.367x elapsed=0:00:01.50    frame=   46 fps= 23 q=-0.0 size=       4KiB time=00:00:00.76 bitrate=  39.8kbits/s speed=0.383x elapsed=0:00:02.00    frame=   59 fps= 24 q=-0.0 size=       5KiB time=00:00:00.98 bitrate=  39.5kbits/s speed=0.393x elapsed=0:00:02.50    frame=   72 fps= 24 q=-0.0 size=       6KiB time=00:00:01.20 bitrate=  39.3kbits/s speed= 0.4x elapsed=0:00:03.00    frame=   83 fps= 24 q=-0.0 size=       7KiB time=00:00:01.38 bitrate=  39.2kbits/s speed=0.395x elapsed=0:00:03.50    frame=   97 fps= 24 q=-0.0 size=       8KiB time=00:00:01.61 bitrate=  39.1kbits/s speed=0.404x elapsed=0:00:04.00    frame=  110 fps= 24 q=-0.0 size=       9KiB time=00:00:01.83 bitrate=  39.0kbits/s speed=0.407x elapsed=0:00:04.50    frame=  123 fps= 25 q=-0.0 size=      10KiB time=00:00:02.05 bitrate=  38.9kbits/s speed=0.41x elapsed=0:00:05.00    frame=  136 fps= 25 q=-0.0 size=      11KiB time=00:00:02.26 bitrate=  38.9kbits/s speed=0.411x elapsed=0:00:05.50    frame=  148 fps= 25 q=-0.0 size=      12KiB time=00:00:02.46 bitrate=  38.8kbits/s speed=0.41x elapsed=0:00:06.00    frame=  160 fps= 25 q=-0.0 size=      13KiB time=00:00:02.66 bitrate=  38.8kbits/s speed=0.41x elapsed=0:00:06.50    frame=  173 fps= 25 q=-0.0 size=      14KiB time=00:00:02.88 bitrate=  38.8kbits/s speed=0.411x elapsed=0:00:07.00    frame=  186 fps= 25 q=-0.0 size=      15KiB time=00:00:03.10 bitrate=  38.8kbits/s speed=0.413x elapsed=0:00:07.51    frame=  200 fps= 25 q=-0.0 size=      16KiB time=00:00:03.33 bitrate=  38.7kbits/s speed=0.416x elapsed=0:00:08.01    frame=  213 fps= 25 q=-0.0 size=      17KiB time=00:00:03.53 bitrate=  38.9kbits/s speed=0.415x elapsed=0:00:08.51    [in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffbb28f9e0] EOF while reading input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffbb28f9e0] Terminating thread with return code 0 (success)
+frame=  225 fps= 25 q=-0.0 size=      18KiB time=00:00:03.76 bitrate=  38.5kbits/s speed=0.418x elapsed=0:00:09.01    [vist#0:0/h264 @ 0xffffbb34dcc0] [dec:h264 @ 0xffffbb347030] Decoder thread received EOF packet
+[vist#0:0/h264 @ 0xffffbb34dcc0] [dec:h264 @ 0xffffbb347030] Decoder returned EOF, finishing
+[vf#0:0 @ 0xffffbb34a030] Filtergraph returned EOF, finishing
+[vf#0:0 @ 0xffffbb34a030] All consumers returned EOF
+[vost#0:0/rawvideo @ 0xffffbb34b030] [enc:rawvideo @ 0xffffbb34ef10] Encoder thread received EOF
+[vost#0:0/rawvideo @ 0xffffbb34b030] Terminating thread with return code 0 (success)
+[vf#0:0 @ 0xffffbb34a030] Terminating thread with return code 0 (success)
+[vist#0:0/h264 @ 0xffffbb34dcc0] [dec:h264 @ 0xffffbb347030] Terminating thread with return code 0 (success)
+[out#0/framemd5 @ 0xffffbb349830] All streams finished
+[out#0/framemd5 @ 0xffffbb349830] Terminating thread with return code 0 (success)
+[AVIOContext @ 0xffffbb3472b0] Statistics: 19417 bytes written, 0 seeks, 1 writeouts
+[out#0/framemd5 @ 0xffffbb349830] Output file #0 (h264-1080p.hw.framemd5):
+[out#0/framemd5 @ 0xffffbb349830]   Output stream #0:0 (video): 240 frames encoded; 240 packets muxed (746496000 bytes);
+[out#0/framemd5 @ 0xffffbb349830]   Total: 240 packets (746496000 bytes) muxed
+[out#0/framemd5 @ 0xffffbb349830] video:729000KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 25 q=-0.0 Lsize=      19KiB time=00:00:04.00 bitrate=  38.8kbits/s speed=0.421x elapsed=0:00:09.50
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffbb28f9e0] Input file #0 (h264-1080p.mp4):
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffbb28f9e0]   Input stream #0:0 (video): 240 packets read (4878452 bytes); 240 frames decoded; 0 decode errors;
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffbb28f9e0]   Total: 240 packets (4878452 bytes) demuxed
+[AVIOContext @ 0xffffbb28fb30] Statistics: 4881999 bytes read, 0 seeks
+
+Exiting with exit code 0
+  19:          0          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  19:        240          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+/tmp/vdec_ffmpeg_board.sh: line 53: [: not found
+HASH FRAMES 240
+fa9bec434bf726d39941e865fc1c5f000f07e2939e6e6a54fd2084da9215d262  -
+
+EXIT=0
+#
+[host] h264-1080p pixels MATCH

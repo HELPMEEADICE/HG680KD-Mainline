@@ -1,0 +1,127 @@
+
+# (uname -r; cat /proc/mounts; printf 'EMMC_RO='; cat /sys/block/mmcblk0/ro; grep hi3798mv320-vdec /proc/interrupts); printf '\nEXIT=%s\n' $?
+7.3.5-hg680kd-arm64-vdec
+rootfs / rootfs rw,size=812040k,nr_inodes=203010 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=812040k,nr_inodes=203010,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+EMMC_RO=1
+  19:       5040          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+EXIT=0
+# (ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (cd /tmp && wget -q -O ffmpeg http://192.168.6.172:8098/ffmpeg && sha256sum ffmpeg); printf '\nEXIT=%s\n' $?
+501b35250c63b8ee23ff7a41a516381163f394caf3862a612e25dc413c404634  ffmpeg
+
+EXIT=0
+# (cd /tmp && wget -q -O ld-musl-aarch64.so.1 http://192.168.6.172:8098/ld-musl-aarch64.so.1 && sha256sum ld-musl-aarch64.so.1); printf '\nEXIT=%s\n' $?
+42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c  ld-musl-aarch64.so.1
+
+EXIT=0
+# (cd /tmp && wget -q -O libdrm.so.2 http://192.168.6.172:8098/libdrm.so.2 && sha256sum libdrm.so.2); printf '\nEXIT=%s\n' $?
+a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd  libdrm.so.2
+
+EXIT=0
+# (cd /tmp && wget -q -O libudev.so.1 http://192.168.6.172:8098/libudev.so.1 && sha256sum libudev.so.1); printf '\nEXIT=%s\n' $?
+ad842e6ba84b99bf3e0f1bdfee801798e6114c455d601845df7f5cff8854b10c  libudev.so.1
+
+EXIT=0
+# (cd /tmp && wget -q -O vdec_ffmpeg_board.sh http://192.168.6.172:8098/vdec_ffmpeg_board.sh && sha256sum vdec_ffmpeg_board.sh); printf '\nEXIT=%s\n' $?
+8c07c587d079e05ad5e60f17d5f2ee607f594749c874f30cb8bb8f4e3ec2d703  vdec_ffmpeg_board.sh
+
+EXIT=0
+# (cd /tmp && wget -q -O hevc10-edge.mp4 http://192.168.6.172:8098/hevc10-edge.mp4 && sha256sum hevc10-edge.mp4); printf '\nEXIT=%s\n' $?
+fcc8772db527daf9fe20252adec82587798f899e0a95705c02ecef3fe9ab42a5  hevc10-edge.mp4
+
+EXIT=0
+# (cd /tmp && chmod 755 ffmpeg ld-musl-aarch64.so.1); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh check hevc10-edge p010le); printf '\nEXIT=%s\n' $?
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc10-edge.mp4 -map 0:v:0 -an -sn -dn -vf hwdownload,format=p010le -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y hevc10-edge.hw.framemd5
+[vist#0:0/hevc @ 0xffffaba19cc0] Selecting decoder 'hevc' because of requested hwaccel method v4l2request
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc10-edge.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    encoder         : Lavf62.1.103
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 391 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main 10), 1 reference frame (hev1 / 0x31766568), yuv420p10le(tv, progressive, left), 520x280 [SAR 1:1 DAR 13:7], 379 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.6.100 libx265
+[out#0/framemd5 @ 0xffffaba1a840] Adding streams from explicit maps...
+[vost#0:0/rawvideo @ 0xffffaba14020] Created video stream from input stream 0:0
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> rawvideo (native))
+[vost#0:0/rawvideo @ 0xffffaba14020] Starting thread...
+[vf#0:0 @ 0xffffaba0e060] Starting thread...
+[vist#0:0/hevc @ 0xffffaba19cc0] [dec:hevc @ 0xffffaba1ae90] Starting thread...
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffab94f9e0] Starting thread...
+[AVHWFramesContext @ 0xffffaba0ae90] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+[AVHWFramesContext @ 0xffffaba0ae90] Using CAPTURE buffer format P010 (520x280)
+[V4L2RequestContext @ 0xffffaba0bcf0] slice-based decoder with SLICE_PARAMS=1, ENTRY_POINT_OFFSETS=0 and SCALING_MATRIX=1 controls
+[graph -1 input from stream 0:0 @ 0xffffab6e47d0] w:520 h:280 pixfmt:drm_prime tb:1/15360 fr:60/1 sar:1/1 csp:unknown range:tv alpha:unspecified
+[graph -1 input from stream 0:0 @ 0xffffab6e47d0] video frame properties congruent with link at pts_time: 0
+Output #0, framemd5, to 'hevc10-edge.hw.framemd5':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: rawvideo, 1 reference frame, p010le(tv, progressive, left), 520x280 [SAR 1:1 DAR 13:7], q=2-31, 131040 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      handler_name    : VideoHandler
+[out#0/framemd5 @ 0xffffaba1a840] Starting thread...
+frame=  132 fps=0.0 q=-0.0 size=      10KiB time=00:00:02.33 bitrate=  36.7kbits/s speed=4.67x elapsed=0:00:00.50    [in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffab94f9e0] EOF while reading input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffab94f9e0] Terminating thread with return code 0 (success)
+[vist#0:0/hevc @ 0xffffaba19cc0] [dec:hevc @ 0xffffaba1ae90] Decoder thread received EOF packet
+[vist#0:0/hevc @ 0xffffaba19cc0] [dec:hevc @ 0xffffaba1ae90] Decoder returned EOF, finishing
+[vist#0:0/hevc @ 0xffffaba19cc0] [dec:hevc @ 0xffffaba1ae90] Terminating thread with return code 0 (success)
+[vf#0:0 @ 0xffffaba0e060] Filtergraph returned EOF, finishing
+[vf#0:0 @ 0xffffaba0e060] All consumers returned EOF
+[vf#0:0 @ 0xffffaba0e060] Terminating thread with return code 0 (success)
+[vost#0:0/rawvideo @ 0xffffaba14020] [enc:rawvideo @ 0xffffaba0ac90] Encoder thread received EOF
+[vost#0:0/rawvideo @ 0xffffaba14020] Terminating thread with return code 0 (success)
+[out#0/framemd5 @ 0xffffaba1a840] All streams finished
+[out#0/framemd5 @ 0xffffaba1a840] Terminating thread with return code 0 (success)
+[AVIOContext @ 0xffffab798040] Statistics: 19415 bytes written, 0 seeks, 1 writeouts
+[out#0/framemd5 @ 0xffffaba1a840] Output file #0 (hevc10-edge.hw.framemd5):
+[out#0/framemd5 @ 0xffffaba1a840]   Output stream #0:0 (video): 240 frames encoded; 240 packets muxed (104832000 bytes);
+[out#0/framemd5 @ 0xffffaba1a840]   Total: 240 packets (104832000 bytes) muxed
+[out#0/framemd5 @ 0xffffaba1a840] video:102375KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=0.0 q=-0.0 Lsize=      19KiB time=00:00:04.00 bitrate=  38.8kbits/s speed=4.51x elapsed=0:00:00.88
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffab94f9e0] Input file #0 (hevc10-edge.mp4):
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffab94f9e0]   Input stream #0:0 (video): 240 packets read (189922 bytes); 240 frames decoded; 0 decode errors;
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0xffffab94f9e0]   Total: 240 packets (189922 bytes) demuxed
+[AVIOContext @ 0xffffab94fb30] Statistics: 234718 bytes read, 2 seeks
+
+Exiting with exit code 0
+  19:       5040          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  19:       5280          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+HASH FRAMES 240
+68abe5842193f7a9452ee6df8178aa5069414a79ca53772e04f7c88bc41e9dc8  -
+
+EXIT=0
+#
+[host] hevc10-edge pixels MATCH
+(ls /bin/vdec-request); printf '\nEXIT=%s\n' $?
+ls: /bin/vdec-request: No such file or directory
+
+EXIT=1
+# (grep hi3798mv320-vdec /proc/interrupts; grep Cma /proc/meminfo; dmesg | grep -E 'PXP 0x|SMMU fault' || :); printf '\nEXIT=%s\n' $?
+  19:       5280          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+CmaTotal:         393216 kB
+CmaFree:          387856 kB
+
+EXIT=0
+#
+[host] finished with no PXP decode errors or SMMU faults

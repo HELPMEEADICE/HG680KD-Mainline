@@ -11,7 +11,9 @@
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/platform_device.h>
+#include <linux/ratelimit.h>
 #include <linux/sizes.h>
+#include <linux/unaligned.h>
 #include <linux/workqueue.h>
 #include <media/media-device.h>
 #include <media/v4l2-ctrls.h>
@@ -19,6 +21,8 @@
 #include <media/v4l2-ioctl.h>
 #include <media/v4l2-mem2mem.h>
 #include <media/videobuf2-vmalloc.h>
+
+#include <asm/simd.h>
 
 #include "hi3798mv320-vdec-cabac.h"
 #include "hi3798mv320-vdh.h"
@@ -87,6 +91,8 @@ struct vdec_dma {
 	dma_addr_t dma;
 	u32 iova;
 	size_t size;
+	bool cached;
+	bool device_owned;
 };
 
 struct vdec_buffer {
@@ -145,7 +151,7 @@ struct vdec_hevc_tiles {
 };
 
 struct vdec_timing {
-	u64 rbsp_ns, hw_ns, detile_ns, clear_ns;
+	u64 rbsp_ns, hw_ns, detile_ns, clear_ns, sync_ns;
 	u32 frames;
 };
 
@@ -161,7 +167,7 @@ struct vdec_ctx {
 	unsigned int stride, y_size, vu_size, tail_size, pmv_offset, pmv_size;
 	unsigned int sequence_out, sequence_cap;
 	unsigned int num_slices, stream_used, last_mb;
-	u64 picture_rbsp_ns;
+	u64 picture_rbsp_ns, picture_sync_ns;
 	struct vdec_timing timing;
 	struct vdec_buffer *held;
 	u64 held_timestamp;
@@ -188,8 +194,19 @@ static struct vdec_buffer *to_vdec_buffer(struct vb2_buffer *vb)
 
 static int vdec_reset(struct vdec_dev *vdec);
 
+static void vdec_dma_release(struct vdec_dev *vdec, struct vdec_dma *buf)
+{
+	if (buf->cached)
+		dma_free_noncoherent(vdec->dev, buf->size, buf->cpu, buf->dma,
+				     DMA_BIDIRECTIONAL);
+	else
+		dma_free_coherent(vdec->dev, buf->size, buf->cpu, buf->dma);
+	buf->cpu = NULL;
+}
+
 /* The flat page table is private to the decoder and uses 4 KiB PTEs. */
-static int vdec_dma_alloc(struct vdec_dev *vdec, struct vdec_dma *buf, size_t size)
+static int vdec_dma_alloc(struct vdec_dev *vdec, struct vdec_dma *buf, size_t size,
+			  bool cached)
 {
 	unsigned int pte, i;
 
@@ -202,15 +219,20 @@ static int vdec_dma_alloc(struct vdec_dev *vdec, struct vdec_dma *buf, size_t si
 	if (!buf->iova)
 		return -ENOMEM;
 
-	buf->cpu = dma_alloc_coherent(vdec->dev, buf->size, &buf->dma, GFP_KERNEL);
+	buf->cached = cached;
+	buf->device_owned = false;
+	if (cached)
+		buf->cpu = dma_alloc_noncoherent(vdec->dev, buf->size, &buf->dma,
+						DMA_BIDIRECTIONAL, GFP_KERNEL);
+	else
+		buf->cpu = dma_alloc_coherent(vdec->dev, buf->size, &buf->dma, GFP_KERNEL);
 	if (!buf->cpu) {
 		gen_pool_free(vdec->iova_pool, buf->iova, buf->size);
 		return -ENOMEM;
 	}
 	if (!IS_ALIGNED(buf->dma, VDEC_PAGE)) {
-		dma_free_coherent(vdec->dev, buf->size, buf->cpu, buf->dma);
+		vdec_dma_release(vdec, buf);
 		gen_pool_free(vdec->iova_pool, buf->iova, buf->size);
-		buf->cpu = NULL;
 		return -EFAULT;
 	}
 
@@ -236,9 +258,27 @@ static void vdec_dma_free(struct vdec_dev *vdec, struct vdec_dma *buf)
 	/* Quiesce the walker and reload TTBR before handing out the IOVA again. */
 	if (vdec->tlb_dirty && vdec_reset(vdec))
 		return;
-	dma_free_coherent(vdec->dev, buf->size, buf->cpu, buf->dma);
+	vdec_dma_release(vdec, buf);
 	gen_pool_free(vdec->iova_pool, buf->iova, buf->size);
-	buf->cpu = NULL;
+}
+
+static void vdec_surface_sync(struct vdec_ctx *ctx, struct vdec_dma *surface,
+			      bool for_device)
+{
+	ktime_t start;
+
+	if (surface->device_owned == for_device)
+		return;
+
+	start = ktime_get();
+	if (for_device)
+		dma_sync_single_for_device(ctx->vdec->dev, surface->dma, surface->size,
+					   DMA_BIDIRECTIONAL);
+	else
+		dma_sync_single_for_cpu(ctx->vdec->dev, surface->dma, surface->size,
+					DMA_BIDIRECTIONAL);
+	surface->device_owned = for_device;
+	ctx->picture_sync_ns += ktime_sub(ktime_get(), start);
 }
 
 static __le32 vdec_addr(u32 base, unsigned int offset)
@@ -327,8 +367,45 @@ static int vdec_reset(struct vdec_dev *vdec)
 	return 0;
 }
 
-static int vdec_submit(struct vdec_dev *vdec, const struct vdec_dma *work, u64 *hw_ns)
+static unsigned int vdec_slice_offset(unsigned int index)
 {
+	return index ? SLICE_POOL + (index - 1) * SLICE_MSG_SIZE : MSG_SLICE;
+}
+
+static void vdec_h264_dump_task(struct vdec_ctx *ctx)
+{
+	static DEFINE_RATELIMIT_STATE(dump_limit, DEFAULT_RATELIMIT_INTERVAL, 1);
+	const void *work = ctx->workspace.cpu;
+	const __le32 *pub = work, *pic = work + MSG_PICTURE;
+	unsigned int i;
+
+	if (!__ratelimit(&dump_limit))
+		return;
+
+	dev_err(ctx->vdec->dev, "H.264 task: pic[0..2]=%08x/%08x/%08x pub[3,23]=%08x/%08x slices=%u\n",
+		le32_to_cpu(pic[0]), le32_to_cpu(pic[1]), le32_to_cpu(pic[2]),
+		le32_to_cpu(pub[3]), le32_to_cpu(pub[23]), ctx->num_slices);
+	print_hex_dump(KERN_ERR, "H.264 task: UP[0..7] ", DUMP_PREFIX_OFFSET,
+		       32, 4, work + MSG_UP, 32, false);
+	print_hex_dump(KERN_ERR, "H.264 task: UP[32..39] ", DUMP_PREFIX_OFFSET,
+		       32, 4, work + HEVC_SLICE_UP, 32, false);
+	print_hex_dump(KERN_ERR, "H.264 task: pic[10..25] ", DUMP_PREFIX_OFFSET,
+		       32, 4, pic + 10, 16 * sizeof(*pic), false);
+	print_hex_dump(KERN_ERR, "H.264 task: pic[27..58] ", DUMP_PREFIX_OFFSET,
+		       32, 4, pic + 27, 32 * sizeof(*pic), false);
+	for (i = 0; i < min(ctx->num_slices, 4U); i++) {
+		const __le32 *slice = work + vdec_slice_offset(i);
+
+		dev_err(ctx->vdec->dev, "H.264 task: slice %u\n", i);
+		print_hex_dump(KERN_ERR, "H.264 task: slice[0..43] ", DUMP_PREFIX_OFFSET,
+			       32, 4, slice, 44 * sizeof(*slice), false);
+	}
+}
+
+static int vdec_submit(struct vdec_ctx *ctx, u64 *hw_ns)
+{
+	struct vdec_dev *vdec = ctx->vdec;
+	const struct vdec_dma *work = &ctx->workspace;
 	void __iomem *slot = vdec->vdh + VDH_SLOT + vdec->slot * VDH_SLOT_STRIDE;
 	unsigned long done;
 	ktime_t submitted_at;
@@ -384,6 +461,8 @@ static int vdec_submit(struct vdec_dev *vdec, const struct vdec_dma *work, u64 *
 				    le32_to_cpu(up[0]), le32_to_cpu(up[2]),
 				    le32_to_cpu(up[0x80 / 4]));
 		vdec_reset(vdec);
+		if (!vdec->dead && ctx->output.pixelformat == V4L2_PIX_FMT_H264_SLICE)
+			vdec_h264_dump_task(ctx);
 	} else if (vdec->slot == 1) {
 		/* The hardware cursor advances past our two slots. Rewind it. */
 		ret = vdec_reset(vdec);
@@ -406,8 +485,11 @@ static struct vdec_buffer *vdec_find_buffer(struct vdec_ctx *ctx,
 		if (!vb)
 			continue;
 		ref = to_vdec_buffer(vb);
-		if (ref != dst && ref->decoded && ref->timestamp == timestamp)
+		if (ref != dst && ref->decoded && ref->timestamp == timestamp) {
+			/* The CPU has finished reading the tiled surface. */
+			vdec_surface_sync(ctx, &ref->surface, true);
 			return ref;
+		}
 	}
 	return NULL;
 }
@@ -468,6 +550,7 @@ static int vdec_ref_list(__le32 *slice, unsigned int list,
 			 const struct v4l2_ctrl_h264_decode_params *dec)
 {
 	unsigned int i, idx, slot;
+	u32 mapped = 0;
 
 	if (count > V4L2_H264_NUM_DPB_ENTRIES)
 		return -EINVAL;
@@ -482,8 +565,11 @@ static int vdec_ref_list(__le32 *slice, unsigned int list,
 			slice[12 + 4 * list + i / 8] |= cpu_to_le32(8U << (4 * (i % 8)));
 		slot = refs->index[idx];
 		slice[20 + 8 * list + i / 4] |= cpu_to_le32((2 * slot) << (5 * (i % 4)));
-		if (!list)
-			slice[36 + slot / 2] |= cpu_to_le32(i << (10 * (slot % 2)));
+		if (!list && !(mapped & BIT(slot))) {
+			/* Map both frame entries back to the first matching L0 index. */
+			slice[36 + slot / 2] |= cpu_to_le32((i | i << 5) << (10 * (slot % 2)));
+			mapped |= BIT(slot);
+		}
 	}
 	return 0;
 }
@@ -519,6 +605,7 @@ static int vdec_slice_message(struct vdec_ctx *ctx, __le32 *slice,
 			      unsigned int data_bits, bool has_weights)
 {
 	const struct v4l2_ctrl_h264_slice_params *sp = ctx->slice->p_cur.p_h264_slice_params;
+	const struct v4l2_ctrl_h264_sps *sps = &ctx->picture_sps;
 	const struct v4l2_ctrl_h264_decode_params *dec = &ctx->picture_dec;
 	const struct v4l2_ctrl_h264_pps *pps = &ctx->picture_pps;
 	unsigned int type, l0 = 0, l1 = 0, weighted = 0;
@@ -560,14 +647,15 @@ static int vdec_slice_message(struct vdec_ctx *ctx, __le32 *slice,
 	slice[2] = cpu_to_le32(data_bits);
 	slice[6] = cpu_to_le32((u32)qp << 26 | (u32)sp->cabac_init_idc << 24 |
 			      sp->first_mb_in_slice);
+	/* Configure the PMV layout on producers as well as ColMV readers. */
 	slice[7] = cpu_to_le32(type | l0 << 2 | l1 << 8 | (l0 ? (l0 - 1) << 16 : 0) |
 			      (l1 ? (l1 - 1) << 21 : 0) |
+			      (sps->flags & V4L2_H264_SPS_FLAG_DIRECT_8X8_INFERENCE ? BIT(14) : 0) |
 			      (sp->flags & V4L2_H264_SLICE_FLAG_DIRECT_SPATIAL_MV_PRED ?
 			       BIT(15) : 0));
 	if (l1) {
 		struct vdec_buffer *col = refs->buffers[sp->ref_pic_list1[0].index];
 
-		/* Progressive ColMV uses the frame PMV layout with bit 14 clear. */
 		slice[8] = vdec_addr(col->surface.iova, ctx->pmv_offset);
 	}
 	slice[10] = cpu_to_le32(((pps->chroma_qp_index_offset & 31) << 5) |
@@ -676,56 +764,96 @@ static void vdec_detile_plane(u8 *dst, const u8 *src, unsigned int width,
 			      unsigned int height, unsigned int stride,
 			      unsigned int tile_height)
 {
-	unsigned int row, col;
+	unsigned int band_row, col;
+	unsigned int mask = tile_height / 4 - 1;
 
-	for (row = 0; row < height; row++) {
-		const u8 *band = src + row / tile_height * stride * tile_height;
+	for (band_row = 0; band_row < height; band_row += tile_height) {
+		const u8 *tile = src + band_row * stride;
+		u8 *band = dst + band_row * width;
+		unsigned int rows = min(tile_height, height - band_row);
 
-		for (col = 0; col < width; col += 64) {
-			unsigned int tile = col / 64;
-			unsigned int mask = tile_height == 16 ? 3 : 1;
-			unsigned int swizzle = (tile & mask) * 4;
-			unsigned int y = (row % tile_height) ^ swizzle;
+		for (col = 0; col < width; col += 64, tile += 64 * tile_height) {
+			unsigned int swizzle = (col / 64 & mask) * 4;
+			unsigned int row;
 
-			memcpy(dst + row * width + col,
-			       band + tile * 64 * tile_height + y * 64,
-			       min(64U, width - col));
+			for (row = 0; row < rows; row++) {
+				const u8 *in = tile + (row ^ swizzle) * 64;
+				u8 *out = band + row * width + col;
+
+				if (col + 64 <= width)
+					memcpy(out, in, 64);
+				else
+					memcpy(out, in, width - col);
+			}
 		}
 	}
 }
+
+static void vdec_p010_row(__le16 *dst, const u8 *high, const u8 *low,
+			  unsigned int count, bool chroma)
+{
+	unsigned int i;
+
+	/* Expand four high bytes and four packed low pairs into 16-bit lanes. */
+	for (i = 0; i < count; i += 4) {
+		/* Copy the packed byte at shifts 0, 14, 28 and 42. */
+		u64 msb = get_unaligned_le32(high + i);
+		u64 lsb = (u64)low[i / 4] * 0x0000040010004001ULL;
+		u64 samples;
+
+		msb = (msb | msb << 16) & 0x0000ffff0000ffffULL;
+		msb = (msb | msb << 8) & 0x00ff00ff00ff00ffULL;
+		samples = msb << 8 | (lsb & 0x0003000300030003ULL) << 6;
+		/* VDH stores VU, while P010 uses UV. */
+		if (chroma)
+			samples = (samples & 0x0000ffff0000ffffULL) << 16 |
+				  (samples & 0xffff0000ffff0000ULL) >> 16;
+		put_unaligned_le64(samples, dst + i);
+	}
+}
+
+void vdec_p010_pack_neon(__le16 *dst, const u8 *high, const u8 *low,
+			unsigned int count, bool chroma);
 
 static void vdec_detile_p010(__le16 *dst, const u8 *src, const u8 *tail,
 			    unsigned int width, unsigned int height,
 			    unsigned int stride, unsigned int tile_height)
 {
-	unsigned int row, col;
-	unsigned int mask = tile_height == 16 ? 3 : 1;
-	unsigned int chroma = tile_height == 8;
+	unsigned int band_row, col;
+	unsigned int mask = tile_height / 4 - 1;
+	bool chroma = tile_height == 8;
+	bool simd = may_use_simd();
+	struct user_fpsimd_state neon_state;
 
-	for (row = 0; row < height; row++) {
-		const u8 *band = src + row / tile_height * stride * tile_height;
-		const u8 *low = tail + (row & ~1U) * (stride / 4) + (row & 1) * 16;
+	for (band_row = 0; band_row < height; band_row += tile_height) {
+		const u8 *tile = src + band_row * stride;
+		const u8 *low = tail + band_row * (stride / 4);
+		__le16 *band = dst + band_row * width;
+		unsigned int rows = min(tile_height, height - band_row);
 
-		for (col = 0; col < width; col += 64) {
-			unsigned int tile = col / 64;
-			unsigned int y = (row % tile_height) ^ ((tile & mask) * 4);
-			const u8 *high = band + tile * 64 * tile_height + y * 64;
-			const u8 *packed = low + tile * 32;
+		if (simd)
+			kernel_neon_begin(&neon_state);
+		for (col = 0; col < width; col += 64, tile += 64 * tile_height, low += 32) {
+			unsigned int swizzle = (col / 64 & mask) * 4;
 			unsigned int count = min(64U, width - col);
-			u8 high_row[64], low_row[16];
-			unsigned int i;
+			unsigned int vector_count = simd ? round_down(count, 16U) : 0;
+			unsigned int row;
 
-			/* Copy each row from coherent DMA memory with wide loads. */
-			memcpy(high_row, high, sizeof(high_row));
-			memcpy(low_row, packed, sizeof(low_row));
-			/* The hardware stores VU. P010 uses UV in LE16 words. */
-			for (i = 0; i < count; i++) {
-				unsigned int lsb = (low_row[i / 4] >> (2 * (i % 4))) & 3;
+			for (row = 0; row < rows; row++) {
+				const u8 *high = tile + (row ^ swizzle) * 64;
+				const u8 *packed = low + (row & ~1U) * (stride / 4) + (row & 1) * 16;
+				__le16 *out = band + row * width + col;
 
-				dst[col + (i ^ chroma)] = cpu_to_le16(high_row[i] << 8 | lsb << 6);
+				if (vector_count)
+					vdec_p010_pack_neon(out, high, packed, vector_count, chroma);
+				if (vector_count < count)
+					vdec_p010_row(out + vector_count, high + vector_count,
+						      packed + vector_count / 4,
+						      count - vector_count, chroma);
 			}
 		}
-		dst += width;
+		if (simd)
+			kernel_neon_end(&neon_state);
 	}
 }
 
@@ -756,11 +884,6 @@ static int vdec_copy_rbsp(struct vdec_ctx *ctx, u8 *dst, const u8 *src, unsigned
 	return length;
 }
 
-static unsigned int vdec_slice_offset(unsigned int index)
-{
-	return index ? SLICE_POOL + (index - 1) * SLICE_MSG_SIZE : MSG_SLICE;
-}
-
 #define REQUEST_PICTURE		BIT(0)
 #define REQUEST_SCALING		BIT(1)
 #define REQUEST_WEIGHTS		BIT(2)
@@ -776,17 +899,20 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 	int ret;
 
 	ctx->codec->end_picture(ctx);
-	ctx->num_slices = 0;
 	if (ctx->vdec->dead)
 		return -EIO;
 
+	vdec_surface_sync(ctx, &out->surface, false);
 	start = ktime_get();
 	memset(out->surface.cpu, 0, out->surface.size);
 	clear_ns = ktime_sub(ktime_get(), start);
-	ret = vdec_submit(ctx->vdec, &ctx->workspace, &hw_ns);
+	vdec_surface_sync(ctx, &out->surface, true);
+	ret = vdec_submit(ctx, &hw_ns);
+	ctx->num_slices = 0;
 	if (ret)
 		return ret;
 
+	vdec_surface_sync(ctx, &out->surface, false);
 	start = ktime_get();
 	if (ctx->tail_size) {
 		const u8 *tail = out->surface.cpu + ctx->y_size + ctx->vu_size;
@@ -805,8 +931,10 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 	timing->rbsp_ns += ctx->picture_rbsp_ns;
 	timing->hw_ns += hw_ns;
 	timing->clear_ns += clear_ns;
+	timing->sync_ns += ctx->picture_sync_ns;
 	timing->frames++;
 	ctx->picture_rbsp_ns = 0;
+	ctx->picture_sync_ns = 0;
 	out->decoded = true;
 	out->timestamp = ctx->held_timestamp;
 	vb2_set_plane_payload(&dst->vb2_buf, 0, ctx->capture.plane_fmt[0].sizeimage);
@@ -827,7 +955,7 @@ static int vdec_h264_prepare_workspace(struct vdec_ctx *ctx)
 
 	ret = vdec_dma_alloc(ctx->vdec, &ctx->workspace,
 			     STREAM_OFFSET + ctx->output.plane_fmt[0].sizeimage +
-			     VDEC_STREAM_PAD);
+			     VDEC_STREAM_PAD, false);
 	if (!ret)
 		memcpy(ctx->workspace.cpu + CABAC_TABLE, h264_cabac_init,
 		       sizeof(h264_cabac_init));
@@ -865,6 +993,7 @@ static int vdec_h264_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *
 		ctx->held = out;
 		ctx->held_timestamp = src->vb2_buf.timestamp;
 		ctx->picture_rbsp_ns = 0;
+		ctx->picture_sync_ns = 0;
 		ctx->stream_used = 0;
 		ctx->picture_sps = *sps;
 		ctx->picture_pps = *pps;
@@ -960,7 +1089,7 @@ static int vdec_hevc_prepare_workspace(struct vdec_ctx *ctx)
 
 	ret = vdec_dma_alloc(ctx->vdec, &ctx->workspace,
 			     HEVC_STREAM_OFFSET + ctx->output.plane_fmt[0].sizeimage +
-			     VDEC_STREAM_PAD);
+			     VDEC_STREAM_PAD, false);
 	if (!ret)
 		memcpy(ctx->workspace.cpu + CABAC_TABLE, hevc_cabac_init,
 		       sizeof(hevc_cabac_init));
@@ -1408,6 +1537,7 @@ static int vdec_hevc_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *
 		ctx->held = out;
 		ctx->held_timestamp = src->vb2_buf.timestamp;
 		ctx->picture_rbsp_ns = 0;
+		ctx->picture_sync_ns = 0;
 		ctx->stream_used = 0;
 		ctx->hevc_picture_sps = *sps;
 		ctx->hevc_picture_pps = *pps;
@@ -1600,6 +1730,7 @@ static void vdec_worker(struct work_struct *work)
 	if (ret) {
 		ctx->num_slices = 0;
 		ctx->picture_rbsp_ns = 0;
+		ctx->picture_sync_ns = 0;
 		src->flags &= ~V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF;
 		dev_dbg(vdec->dev, "request decode returned %d\n", ret);
 	}
@@ -1650,7 +1781,7 @@ static int vdec_buf_init(struct vb2_buffer *vb)
 
 	/* A surface and its motion vectors live as long as the CAPTURE index. */
 	mutex_lock(&ctx->vdec->hw_lock);
-	ret = vdec_dma_alloc(ctx->vdec, &buf->surface, ctx->pmv_offset + ctx->pmv_size);
+	ret = vdec_dma_alloc(ctx->vdec, &buf->surface, ctx->pmv_offset + ctx->pmv_size, true);
 	mutex_unlock(&ctx->vdec->hw_lock);
 	return ret;
 }
@@ -1736,15 +1867,17 @@ static void vdec_stop_streaming(struct vb2_queue *vq)
 	}
 	ctx->num_slices = 0;
 	ctx->picture_rbsp_ns = 0;
+	ctx->picture_sync_ns = 0;
 	if (timing->frames) {
 		dev_info(ctx->vdec->dev,
-			 "%p4cc -> %p4cc %ux%u timing frames=%u avg_ns/frame rbsp=%llu hw=%llu detile=%llu clear=%llu\n",
+			 "%p4cc -> %p4cc %ux%u timing frames=%u avg_ns/frame rbsp=%llu hw=%llu detile=%llu clear=%llu sync=%llu\n",
 			 &ctx->output.pixelformat, &ctx->capture.pixelformat,
 			 ctx->output.width, ctx->output.height, timing->frames,
 			 div_u64(timing->rbsp_ns, timing->frames),
 			 div_u64(timing->hw_ns, timing->frames),
 			 div_u64(timing->detile_ns, timing->frames),
-			 div_u64(timing->clear_ns, timing->frames));
+			 div_u64(timing->clear_ns, timing->frames),
+			 div_u64(timing->sync_ns, timing->frames));
 		*timing = (struct vdec_timing) {};
 	}
 	if (output)

@@ -16,6 +16,7 @@ from vdec_ram_test import boot
 
 
 CLIPS = {
+    "h264-1080p": "nv21",
     "h264-1080p-no-direct": "nv21",
     "hevc-1080p": "nv21",
     "hevc-2160p": "nv21",
@@ -119,7 +120,7 @@ def main():
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("clips", nargs="*")
     args = parser.parse_args()
-    clips = args.clips or list(CLIPS)
+    clips = args.clips or [clip for clip in CLIPS if clip != "h264-1080p-no-direct"]
     references = args.references or args.payload
     if args.runs < 1 or any(clip not in CLIPS for clip in clips):
         parser.error("supply a positive run count and known clip names")

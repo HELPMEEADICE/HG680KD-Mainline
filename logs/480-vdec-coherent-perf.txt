@@ -1,0 +1,2567 @@
+
+# (uname -r; cat /proc/mounts; printf 'EMMC_RO='; cat /sys/block/mmcblk0/ro); printf '\nEXIT=%s\n' $?
+7.3.5-hg680kd-arm64-vdec
+rootfs / rootfs rw,size=812040k,nr_inodes=203010 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=812040k,nr_inodes=203010,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+EMMC_RO=1
+
+EXIT=0
+# (echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 3); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (cd /tmp && wget -q -O ffmpeg http://192.168.6.172:8098/ffmpeg && sha256sum ffmpeg); printf '\nEXIT=%s\n' $?
+501b35250c63b8ee23ff7a41a516381163f394caf3862a612e25dc413c404634  ffmpeg
+
+EXIT=0
+# (cd /tmp && wget -q -O ld-musl-aarch64.so.1 http://192.168.6.172:8098/ld-musl-aarch64.so.1 && sha256sum ld-musl-aarch64.so.1); printf '\nEXIT=%s\n' $?
+42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c  ld-musl-aarch64.so.1
+
+EXIT=0
+# (cd /tmp && wget -q -O libdrm.so.2 http://192.168.6.172:8098/libdrm.so.2 && sha256sum libdrm.so.2); printf '\nEXIT=%s\n' $?
+a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd  libdrm.so.2
+
+EXIT=0
+# (cd /tmp && wget -q -O libudev.so.1 http://192.168.6.172:8098/libudev.so.1 && sha256sum libudev.so.1); printf '\nEXIT=%s\n' $?
+ad842e6ba84b99bf3e0f1bdfee801798e6114c455d601845df7f5cff8854b10c  libudev.so.1
+
+EXIT=0
+# (cd /tmp && wget -q -O vdec_ffmpeg_board.sh http://192.168.6.172:8098/vdec_ffmpeg_board.sh && sha256sum vdec_ffmpeg_board.sh); printf '\nEXIT=%s\n' $?
+b0defbfc9f11cbafb1f2046cb7317cdc457e9a7cf68d0bcbaf1f495fb9d2cb08  vdec_ffmpeg_board.sh
+
+EXIT=0
+# (cd /tmp && wget -q -O h264-1080p.mp4 http://192.168.6.172:8098/h264-1080p.mp4 && sha256sum h264-1080p.mp4); printf '\nEXIT=%s\n' $?
+dbca2cd4ad1578460f62e246745dd236bfd13d71335c6e5b77b229bc1a709f2f  h264-1080p.mp4
+
+EXIT=0
+# (cd /tmp && wget -q -O hevc-1080p.mp4 http://192.168.6.172:8098/hevc-1080p.mp4 && sha256sum hevc-1080p.mp4); printf '\nEXIT=%s\n' $?
+a660d5262f738e3b7d8b20026e70c54196e6f1bd722df8632567c28c97dc2113  hevc-1080p.mp4
+
+EXIT=0
+# (cd /tmp && wget -q -O hevc-2160p.mp4 http://192.168.6.172:8098/hevc-2160p.mp4 && sha256sum hevc-2160p.mp4); printf '\nEXIT=%s\n' $?
+ecf5506f772c07df4db8d76eff89459a0bfacf3db6ec800840e115d6fbccb874  hevc-2160p.mp4
+
+EXIT=0
+# (cd /tmp && wget -q -O hevc10-2160p.mp4 http://192.168.6.172:8098/hevc10-2160p.mp4 && sha256sum hevc10-2160p.mp4); printf '\nEXIT=%s\n' $?
+d81c699d4179c88dc9e6fea073490867ccbd85795d6417f5b70ca7cc98704323  hevc10-2160p.mp4
+
+EXIT=0
+# (cd /tmp && chmod 755 ffmpeg ld-musl-aarch64.so.1); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (sh /tmp/vdec_ffmpeg_board.sh perf h264-1080p 1); printf '\nEXIT=%s\n' $?
+PERF START h264-1080p 1
+temp 61000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 61000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 19.50 31.59
+CPU BEFORE
+cpu  841 0 1270 5355 2 0 299 0 0 0
+cpu0 128 0 343 1177 0 0 298 0 0 0
+cpu1 141 0 220 1566 0 0 0 0 0 0
+cpu2 232 0 378 1334 1 0 0 0 0 0
+cpu3 339 0 328 1276 1 0 0 0 0 0
+CPU AFTER
+cpu  870 0 2412 9024 2 0 300 0 0 0
+cpu0 136 0 625 2095 0 0 300 0 0 0
+cpu1 145 0 520 2473 0 0 0 0 0 0
+cpu2 238 0 734 2181 1 0 0 0 0 0
+cpu3 349 0 530 2274 1 0 0 0 0 0
+IRQ BEFORE
+  19:        240          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:        480          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'h264-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9763 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080 [SAR 1:1 DAR 16:9], 9756 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx264
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffffa1717f10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S264
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffffa1717340] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 20 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.334x elapsed=0:00:11.96
+bench: utime=0.221s stime=0.494s rtime=11.970s
+bench: maxrss=40992KiB
+frame=7
+progress=continue
+frame=16
+progress=continue
+frame=26
+progress=continue
+frame=35
+progress=continue
+frame=45
+progress=continue
+frame=56
+progress=continue
+frame=65
+progress=continue
+frame=76
+progress=continue
+frame=87
+progress=continue
+frame=99
+progress=continue
+frame=107
+progress=continue
+frame=117
+progress=continue
+frame=127
+progress=continue
+frame=136
+progress=continue
+frame=146
+progress=continue
+frame=155
+progress=continue
+frame=164
+progress=continue
+frame=174
+progress=continue
+frame=184
+progress=continue
+frame=195
+progress=continue
+frame=207
+progress=continue
+frame=218
+progress=continue
+frame=227
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[   14.069723] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=240 avg_ns/frame rbsp=109380 hw=4226095 detile=33214598 clear=619407
+TIMING AFTER <6>[   31.691587] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=240 avg_ns/frame rbsp=169351 hw=3744469 detile=44210988 clear=853821
+PERF END h264-1080p 1 0
+
+EXIT=0
+#
+[host] h264-1080p run 1 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf h264-1080p 2); printf '\nEXIT=%s\n' $?
+PERF START h264-1080p 2
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 32.03 44.56
+CPU BEFORE
+cpu  871 0 2417 9188 2 0 300 0 0 0
+cpu0 137 0 627 2136 0 0 300 0 0 0
+cpu1 145 0 522 2514 0 0 0 0 0 0
+cpu2 238 0 735 2223 1 0 0 0 0 0
+cpu3 350 0 532 2314 1 0 0 0 0 0
+CPU AFTER
+cpu  909 0 3609 12972 2 0 300 0 0 0
+cpu0 143 0 900 3110 0 0 300 0 0 0
+cpu1 161 0 817 3457 0 0 0 0 0 0
+cpu2 246 0 1038 3165 1 0 0 0 0 0
+cpu3 358 0 852 3239 1 0 0 0 0 0
+IRQ BEFORE
+  19:        480          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:        720          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'h264-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9763 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080 [SAR 1:1 DAR 16:9], 9756 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx264
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff9edc4f10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S264
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff9edc4340] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 19 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.322x elapsed=0:00:12.40
+bench: utime=0.267s stime=0.472s rtime=12.409s
+bench: maxrss=40852KiB
+frame=6
+progress=continue
+frame=16
+progress=continue
+frame=25
+progress=continue
+frame=34
+progress=continue
+frame=45
+progress=continue
+frame=55
+progress=continue
+frame=65
+progress=continue
+frame=75
+progress=continue
+frame=84
+progress=continue
+frame=94
+progress=continue
+frame=103
+progress=continue
+frame=113
+progress=continue
+frame=122
+progress=continue
+frame=132
+progress=continue
+frame=142
+progress=continue
+frame=151
+progress=continue
+frame=161
+progress=continue
+frame=171
+progress=continue
+frame=180
+progress=continue
+frame=190
+progress=continue
+frame=199
+progress=continue
+frame=209
+progress=continue
+frame=220
+progress=continue
+frame=229
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[   31.691587] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=240 avg_ns/frame rbsp=169351 hw=3744469 detile=44210988 clear=853821
+TIMING AFTER <6>[   44.663134] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=240 avg_ns/frame rbsp=184351 hw=3745221 detile=45990253 clear=918440
+PERF END h264-1080p 2 0
+
+EXIT=0
+#
+[host] h264-1080p run 2 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf h264-1080p 3); printf '\nEXIT=%s\n' $?
+PERF START h264-1080p 3
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 45.00 57.18
+CPU BEFORE
+cpu  910 0 3615 13138 2 0 300 0 0 0
+cpu0 143 0 900 3153 0 0 300 0 0 0
+cpu1 161 0 819 3498 0 0 0 0 0 0
+cpu2 246 0 1041 3206 1 0 0 0 0 0
+cpu3 359 0 854 3280 1 0 0 0 0 0
+CPU AFTER
+cpu  938 0 4763 16837 2 0 301 0 0 0
+cpu0 154 0 1248 4013 0 0 300 0 0 0
+cpu1 171 0 914 4611 0 0 0 0 0 0
+cpu2 251 0 1427 4033 1 0 0 0 0 0
+cpu3 361 0 1172 4179 1 0 0 0 0 0
+IRQ BEFORE
+  19:        720          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:        960          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i h264-1080p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'h264-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9763 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080 [SAR 1:1 DAR 16:9], 9756 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx264
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff93045f10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S264
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff93045340] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 20 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.332x elapsed=0:00:12.05
+bench: utime=0.224s stime=0.458s rtime=12.058s
+bench: maxrss=40892KiB
+frame=6
+progress=continue
+frame=16
+progress=continue
+frame=25
+progress=continue
+frame=35
+progress=continue
+frame=45
+progress=continue
+frame=55
+progress=continue
+frame=66
+progress=continue
+frame=76
+progress=continue
+frame=87
+progress=continue
+frame=96
+progress=continue
+frame=106
+progress=continue
+frame=116
+progress=continue
+frame=129
+progress=continue
+frame=138
+progress=continue
+frame=148
+progress=continue
+frame=158
+progress=continue
+frame=168
+progress=continue
+frame=177
+progress=continue
+frame=188
+progress=continue
+frame=197
+progress=continue
+frame=207
+progress=continue
+frame=216
+progress=continue
+frame=226
+progress=continue
+frame=239
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[   44.663134] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=240 avg_ns/frame rbsp=184351 hw=3745221 detile=45990253 clear=918440
+TIMING AFTER <6>[   57.276352] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=240 avg_ns/frame rbsp=178429 hw=3744817 detile=44631883 clear=844213
+PERF END h264-1080p 3 0
+
+EXIT=0
+#
+[host] h264-1080p run 3 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc-1080p 1); printf '\nEXIT=%s\n' $?
+PERF START hevc-1080p 1
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 400000
+scaling_max_freq 1000000
+WALL 57.61 69.70
+CPU BEFORE
+cpu  939 0 4768 17002 2 0 301 0 0 0
+cpu0 154 0 1249 4054 0 0 300 0 0 0
+cpu1 172 0 915 4652 0 0 0 0 0 0
+cpu2 251 0 1429 4074 1 0 0 0 0 0
+cpu3 361 0 1174 4219 1 0 0 0 0 0
+CPU AFTER
+cpu  970 0 5973 20602 2 0 301 0 0 0
+cpu0 161 0 1542 4963 0 0 300 0 0 0
+cpu1 181 0 1189 5578 0 0 0 0 0 0
+cpu2 259 0 1760 4944 1 0 0 0 0 0
+cpu3 367 0 1480 5116 1 0 0 0 0 0
+IRQ BEFORE
+  19:        960          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       1200          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc-1080p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9376 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 9362 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff9753aaa0] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff97553320] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 20 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.332x elapsed=0:00:12.04
+bench: utime=0.301s stime=0.682s rtime=12.041s
+bench: maxrss=50684KiB
+frame=7
+progress=continue
+frame=18
+progress=continue
+frame=29
+progress=continue
+frame=39
+progress=continue
+frame=50
+progress=continue
+frame=59
+progress=continue
+frame=69
+progress=continue
+frame=78
+progress=continue
+frame=88
+progress=continue
+frame=98
+progress=continue
+frame=106
+progress=continue
+frame=116
+progress=continue
+frame=128
+progress=continue
+frame=137
+progress=continue
+frame=147
+progress=continue
+frame=157
+progress=continue
+frame=166
+progress=continue
+frame=176
+progress=continue
+frame=186
+progress=continue
+frame=196
+progress=continue
+frame=206
+progress=continue
+frame=216
+progress=continue
+frame=226
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[   57.276352] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> NV21 little-endian (0x3132564e) 1920x1088 timing frames=240 avg_ns/frame rbsp=178429 hw=3744817 detile=44631883 clear=844213
+TIMING AFTER <6>[   69.792530] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 1920x1080 timing frames=240 avg_ns/frame rbsp=181447 hw=2490524 detile=45727002 clear=970480
+PERF END hevc-1080p 1 0
+
+EXIT=0
+#
+[host] hevc-1080p run 1 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc-1080p 2); printf '\nEXIT=%s\n' $?
+PERF START hevc-1080p 2
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 70.13 81.99
+CPU BEFORE
+cpu  972 0 5978 20766 2 0 301 0 0 0
+cpu0 162 0 1544 5004 0 0 300 0 0 0
+cpu1 182 0 1191 5618 0 0 0 0 0 0
+cpu2 260 0 1760 4986 1 0 0 0 0 0
+cpu3 368 0 1482 5156 1 0 0 0 0 0
+CPU AFTER
+cpu  1012 0 7152 24299 2 0 301 0 0 0
+cpu0 170 0 1772 5953 0 0 301 0 0 0
+cpu1 192 0 1536 6450 0 0 0 0 0 0
+cpu2 273 0 2080 5840 1 0 0 0 0 0
+cpu3 376 0 1762 6055 1 0 0 0 0 0
+IRQ BEFORE
+  19:       1200          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       1440          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc-1080p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9376 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 9362 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff9a0a5aa0] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff9a0c3320] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 20 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.338x elapsed=0:00:11.82
+bench: utime=0.357s stime=0.569s rtime=11.825s
+bench: maxrss=50648KiB
+frame=7
+progress=continue
+frame=18
+progress=continue
+frame=28
+progress=continue
+frame=38
+progress=continue
+frame=47
+progress=continue
+frame=57
+progress=continue
+frame=67
+progress=continue
+frame=77
+progress=continue
+frame=88
+progress=continue
+frame=99
+progress=continue
+frame=109
+progress=continue
+frame=120
+progress=continue
+frame=131
+progress=continue
+frame=141
+progress=continue
+frame=152
+progress=continue
+frame=161
+progress=continue
+frame=170
+progress=continue
+frame=180
+progress=continue
+frame=190
+progress=continue
+frame=200
+progress=continue
+frame=210
+progress=continue
+frame=221
+progress=continue
+frame=231
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[   69.792530] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 1920x1080 timing frames=240 avg_ns/frame rbsp=181447 hw=2490524 detile=45727002 clear=970480
+TIMING AFTER <6>[   82.091096] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 1920x1080 timing frames=240 avg_ns/frame rbsp=162456 hw=2490571 detile=44859701 clear=940817
+PERF END hevc-1080p 2 0
+
+EXIT=0
+#
+[host] hevc-1080p run 2 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc-1080p 3); printf '\nEXIT=%s\n' $?
+PERF START hevc-1080p 3
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 82.42 94.46
+CPU BEFORE
+cpu  1014 0 7158 24460 2 0 302 0 0 0
+cpu0 170 0 1772 5995 0 0 301 0 0 0
+cpu1 192 0 1540 6488 0 0 0 0 0 0
+cpu2 273 0 2082 5880 1 0 0 0 0 0
+cpu3 377 0 1762 6096 1 0 0 0 0 0
+CPU AFTER
+cpu  1040 0 8332 28079 2 0 302 0 0 0
+cpu0 176 0 2043 6923 0 0 301 0 0 0
+cpu1 199 0 1785 7441 0 0 0 0 0 0
+cpu2 281 0 2464 6696 1 0 0 0 0 0
+cpu3 383 0 2039 7018 1 0 0 0 0 0
+IRQ BEFORE
+  19:       1440          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       1680          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc-1080p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc-1080p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 9376 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 9362 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff85126aa0] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff85144320] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps= 20 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.333x elapsed=0:00:12.00
+bench: utime=0.279s stime=0.562s rtime=12.009s
+bench: maxrss=50616KiB
+frame=6
+progress=continue
+frame=16
+progress=continue
+frame=27
+progress=continue
+frame=37
+progress=continue
+frame=48
+progress=continue
+frame=58
+progress=continue
+frame=68
+progress=continue
+frame=78
+progress=continue
+frame=88
+progress=continue
+frame=98
+progress=continue
+frame=108
+progress=continue
+frame=118
+progress=continue
+frame=126
+progress=continue
+frame=137
+progress=continue
+frame=148
+progress=continue
+frame=158
+progress=continue
+frame=168
+progress=continue
+frame=178
+progress=continue
+frame=188
+progress=continue
+frame=197
+progress=continue
+frame=207
+progress=continue
+frame=217
+progress=continue
+frame=227
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[   82.091096] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 1920x1080 timing frames=240 avg_ns/frame rbsp=162456 hw=2490571 detile=44859701 clear=940817
+TIMING AFTER <6>[   94.569548] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 1920x1080 timing frames=240 avg_ns/frame rbsp=177781 hw=2490982 detile=45652334 clear=961100
+PERF END hevc-1080p 3 0
+
+EXIT=0
+#
+[host] hevc-1080p run 3 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc-2160p 1); printf '\nEXIT=%s\n' $?
+PERF START hevc-2160p 1
+temp 60000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 62000
+scaling_governor schedutil
+scaling_cur_freq 1000000
+scaling_max_freq 1000000
+WALL 94.90 129.09
+CPU BEFORE
+cpu  1041 0 8338 28242 2 0 302 0 0 0
+cpu0 176 0 2044 6966 0 0 301 0 0 0
+cpu1 199 0 1788 7481 0 0 0 0 0 0
+cpu2 282 0 2465 6736 1 0 0 0 0 0
+cpu3 384 0 2041 7058 1 0 0 0 0 0
+CPU AFTER
+cpu  1090 0 11587 38625 2 0 302 0 0 0
+cpu0 188 0 2818 9598 0 0 301 0 0 0
+cpu1 212 0 2716 9960 0 0 0 0 0 0
+cpu2 291 0 3236 9376 1 0 0 0 0 0
+cpu3 397 0 2816 9690 1 0 0 0 0 0
+IRQ BEFORE
+  19:       1680          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       1920          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc-2160p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc-2160p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 22646 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], 22632 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff80b76b20] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff80b94320] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=7.0 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.117x elapsed=0:00:34.14
+bench: utime=0.467s stime=0.800s rtime=34.150s
+bench: maxrss=186776KiB
+frame=1
+progress=continue
+frame=2
+progress=continue
+frame=5
+progress=continue
+frame=9
+progress=continue
+frame=13
+progress=continue
+frame=16
+progress=continue
+frame=19
+progress=continue
+frame=23
+progress=continue
+frame=27
+progress=continue
+frame=30
+progress=continue
+frame=34
+progress=continue
+frame=37
+progress=continue
+frame=41
+progress=continue
+frame=44
+progress=continue
+frame=48
+progress=continue
+frame=52
+progress=continue
+frame=55
+progress=continue
+frame=59
+progress=continue
+frame=62
+progress=continue
+frame=66
+progress=continue
+frame=69
+progress=continue
+frame=73
+progress=continue
+frame=75
+progress=continue
+frame=80
+progress=continue
+frame=84
+progress=continue
+frame=87
+progress=continue
+frame=91
+progress=continue
+frame=95
+progress=continue
+frame=97
+progress=continue
+frame=101
+progress=continue
+frame=105
+progress=continue
+frame=108
+progress=continue
+frame=111
+progress=continue
+frame=115
+progress=continue
+frame=118
+progress=continue
+frame=122
+progress=continue
+frame=126
+progress=continue
+frame=129
+progress=continue
+frame=133
+progress=continue
+frame=136
+progress=continue
+frame=140
+progress=continue
+frame=143
+progress=continue
+frame=146
+progress=continue
+frame=150
+progress=continue
+frame=154
+progress=continue
+frame=158
+progress=continue
+frame=161
+progress=continue
+frame=165
+progress=continue
+frame=168
+progress=continue
+frame=171
+progress=continue
+frame=175
+progress=continue
+frame=179
+progress=continue
+frame=182
+progress=continue
+frame=186
+progress=continue
+frame=189
+progress=continue
+frame=193
+progress=continue
+frame=197
+progress=continue
+frame=200
+progress=continue
+frame=204
+progress=continue
+frame=207
+progress=continue
+frame=212
+progress=continue
+frame=214
+progress=continue
+frame=218
+progress=continue
+frame=221
+progress=continue
+frame=225
+progress=continue
+frame=228
+progress=continue
+frame=232
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[   94.569548] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 1920x1080 timing frames=240 avg_ns/frame rbsp=177781 hw=2490982 detile=45652334 clear=961100
+TIMING AFTER <6>[  129.178609] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 3840x2160 timing frames=240 avg_ns/frame rbsp=244353 hw=9512460 detile=129006141 clear=2438581
+PERF END hevc-2160p 1 0
+
+EXIT=0
+#
+[host] hevc-2160p run 1 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc-2160p 2); printf '\nEXIT=%s\n' $?
+PERF START hevc-2160p 2
+temp 61000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 63000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 129.65 163.87
+CPU BEFORE
+cpu  1092 0 11594 38834 2 0 302 0 0 0
+cpu0 189 0 2819 9652 0 0 301 0 0 0
+cpu1 212 0 2720 10010 0 0 0 0 0 0
+cpu2 292 0 3236 9429 1 0 0 0 0 0
+cpu3 398 0 2818 9742 1 0 0 0 0 0
+CPU AFTER
+cpu  1132 0 14843 49241 2 0 302 0 0 0
+cpu0 199 0 3724 12160 0 0 301 0 0 0
+cpu1 223 0 3502 12641 0 0 0 0 0 0
+cpu2 301 0 4047 12033 1 0 0 0 0 0
+cpu3 407 0 3568 12406 1 0 0 0 0 0
+IRQ BEFORE
+  19:       1920          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       2160          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc-2160p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc-2160p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 22646 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], 22632 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff82ff9b20] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff83009320] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=7.0 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.117x elapsed=0:00:34.16
+bench: utime=0.420s stime=0.813s rtime=34.167s
+bench: maxrss=186776KiB
+frame=1
+progress=continue
+frame=2
+progress=continue
+frame=5
+progress=continue
+frame=9
+progress=continue
+frame=12
+progress=continue
+frame=16
+progress=continue
+frame=19
+progress=continue
+frame=23
+progress=continue
+frame=27
+progress=continue
+frame=30
+progress=continue
+frame=34
+progress=continue
+frame=37
+progress=continue
+frame=41
+progress=continue
+frame=44
+progress=continue
+frame=48
+progress=continue
+frame=51
+progress=continue
+frame=55
+progress=continue
+frame=58
+progress=continue
+frame=62
+progress=continue
+frame=65
+progress=continue
+frame=69
+progress=continue
+frame=73
+progress=continue
+frame=76
+progress=continue
+frame=80
+progress=continue
+frame=83
+progress=continue
+frame=87
+progress=continue
+frame=90
+progress=continue
+frame=95
+progress=continue
+frame=97
+progress=continue
+frame=101
+progress=continue
+frame=104
+progress=continue
+frame=108
+progress=continue
+frame=111
+progress=continue
+frame=115
+progress=continue
+frame=118
+progress=continue
+frame=123
+progress=continue
+frame=125
+progress=continue
+frame=129
+progress=continue
+frame=132
+progress=continue
+frame=136
+progress=continue
+frame=139
+progress=continue
+frame=143
+progress=continue
+frame=147
+progress=continue
+frame=150
+progress=continue
+frame=154
+progress=continue
+frame=157
+progress=continue
+frame=161
+progress=continue
+frame=164
+progress=continue
+frame=168
+progress=continue
+frame=172
+progress=continue
+frame=175
+progress=continue
+frame=178
+progress=continue
+frame=181
+progress=continue
+frame=185
+progress=continue
+frame=189
+progress=continue
+frame=194
+progress=continue
+frame=197
+progress=continue
+frame=200
+progress=continue
+frame=203
+progress=continue
+frame=207
+progress=continue
+frame=210
+progress=continue
+frame=214
+progress=continue
+frame=217
+progress=continue
+frame=221
+progress=continue
+frame=224
+progress=continue
+frame=228
+progress=continue
+frame=231
+progress=continue
+frame=238
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[  129.178609] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 3840x2160 timing frames=240 avg_ns/frame rbsp=244353 hw=9512460 detile=129006141 clear=2438581
+TIMING AFTER <6>[  163.947081] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 3840x2160 timing frames=240 avg_ns/frame rbsp=247627 hw=9512314 detile=129119714 clear=2424628
+PERF END hevc-2160p 2 0
+
+EXIT=0
+#
+[host] hevc-2160p run 2 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc-2160p 3); printf '\nEXIT=%s\n' $?
+PERF START hevc-2160p 3
+temp 62000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 62000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 164.43 198.54
+CPU BEFORE
+cpu  1134 0 14848 49453 2 0 302 0 0 0
+cpu0 200 0 3724 12214 0 0 301 0 0 0
+cpu1 223 0 3503 12694 0 0 0 0 0 0
+cpu2 302 0 4049 12085 1 0 0 0 0 0
+cpu3 408 0 3570 12458 1 0 0 0 0 0
+CPU AFTER
+cpu  1174 0 18112 59793 2 0 302 0 0 0
+cpu0 211 0 4494 14844 0 0 302 0 0 0
+cpu1 234 0 4467 15131 0 0 0 0 0 0
+cpu2 310 0 4858 14679 1 0 0 0 0 0
+cpu3 417 0 4292 15138 1 0 0 0 0 0
+IRQ BEFORE
+  19:       2160          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       2400          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc-2160p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc-2160p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 22646 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], 22632 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff937b9b20] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff937c9320] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=7.0 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.117x elapsed=0:00:34.05
+bench: utime=0.389s stime=1.054s rtime=34.059s
+bench: maxrss=186880KiB
+frame=1
+progress=continue
+frame=2
+progress=continue
+frame=4
+progress=continue
+frame=9
+progress=continue
+frame=13
+progress=continue
+frame=16
+progress=continue
+frame=21
+progress=continue
+frame=23
+progress=continue
+frame=27
+progress=continue
+frame=30
+progress=continue
+frame=34
+progress=continue
+frame=37
+progress=continue
+frame=41
+progress=continue
+frame=44
+progress=continue
+frame=48
+progress=continue
+frame=52
+progress=continue
+frame=56
+progress=continue
+frame=59
+progress=continue
+frame=62
+progress=continue
+frame=66
+progress=continue
+frame=69
+progress=continue
+frame=73
+progress=continue
+frame=76
+progress=continue
+frame=80
+progress=continue
+frame=84
+progress=continue
+frame=87
+progress=continue
+frame=91
+progress=continue
+frame=94
+progress=continue
+frame=99
+progress=continue
+frame=101
+progress=continue
+frame=105
+progress=continue
+frame=108
+progress=continue
+frame=112
+progress=continue
+frame=116
+progress=continue
+frame=120
+progress=continue
+frame=122
+progress=continue
+frame=126
+progress=continue
+frame=130
+progress=continue
+frame=133
+progress=continue
+frame=137
+progress=continue
+frame=140
+progress=continue
+frame=144
+progress=continue
+frame=147
+progress=continue
+frame=152
+progress=continue
+frame=154
+progress=continue
+frame=158
+progress=continue
+frame=161
+progress=continue
+frame=165
+progress=continue
+frame=169
+progress=continue
+frame=172
+progress=continue
+frame=176
+progress=continue
+frame=179
+progress=continue
+frame=183
+progress=continue
+frame=186
+progress=continue
+frame=189
+progress=continue
+frame=193
+progress=continue
+frame=197
+progress=continue
+frame=201
+progress=continue
+frame=204
+progress=continue
+frame=208
+progress=continue
+frame=211
+progress=continue
+frame=215
+progress=continue
+frame=218
+progress=continue
+frame=222
+progress=continue
+frame=225
+progress=continue
+frame=229
+progress=continue
+frame=232
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[  163.947081] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 3840x2160 timing frames=240 avg_ns/frame rbsp=247627 hw=9512314 detile=129119714 clear=2424628
+TIMING AFTER <6>[  198.620019] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 3840x2160 timing frames=240 avg_ns/frame rbsp=244471 hw=9512498 detile=128632117 clear=2433557
+PERF END hevc-2160p 3 0
+
+EXIT=0
+#
+[host] hevc-2160p run 3 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc10-2160p 1); printf '\nEXIT=%s\n' $?
+PERF START hevc10-2160p 1
+temp 62000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 64000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 199.09 275.65
+CPU BEFORE
+cpu  1176 0 18120 60006 2 0 302 0 0 0
+cpu0 211 0 4496 14898 0 0 302 0 0 0
+cpu1 234 0 4467 15186 0 0 0 0 0 0
+cpu2 312 0 4862 14730 1 0 0 0 0 0
+cpu3 418 0 4294 15191 1 0 0 0 0 0
+CPU AFTER
+cpu  1213 0 25702 83010 2 0 303 0 0 0
+cpu0 223 0 6044 20994 0 0 302 0 0 0
+cpu1 244 0 6224 21076 0 0 0 0 0 0
+cpu2 319 0 6714 20526 1 0 0 0 0 0
+cpu3 427 0 6719 20413 1 0 0 0 0 0
+IRQ BEFORE
+  19:       2400          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       2640          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc10-2160p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc10-2160p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 22317 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main 10) (hvc1 / 0x31637668), yuv420p10le(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], 22303 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff89b37f10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff89b37340] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=3.1 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.0523x elapsed=0:01:16.48
+bench: utime=0.378s stime=1.772s rtime=76.488s
+bench: maxrss=191804KiB
+frame=1
+progress=continue
+frame=1
+progress=continue
+frame=1
+progress=continue
+frame=3
+progress=continue
+frame=5
+progress=continue
+frame=6
+progress=continue
+frame=8
+progress=continue
+frame=9
+progress=continue
+frame=11
+progress=continue
+frame=12
+progress=continue
+frame=14
+progress=continue
+frame=16
+progress=continue
+frame=17
+progress=continue
+frame=20
+progress=continue
+frame=20
+progress=continue
+frame=22
+progress=continue
+frame=23
+progress=continue
+frame=25
+progress=continue
+frame=27
+progress=continue
+frame=28
+progress=continue
+frame=31
+progress=continue
+frame=31
+progress=continue
+frame=34
+progress=continue
+frame=35
+progress=continue
+frame=37
+progress=continue
+frame=38
+progress=continue
+frame=39
+progress=continue
+frame=41
+progress=continue
+frame=42
+progress=continue
+frame=45
+progress=continue
+frame=46
+progress=continue
+frame=47
+progress=continue
+frame=49
+progress=continue
+frame=50
+progress=continue
+frame=52
+progress=continue
+frame=53
+progress=continue
+frame=55
+progress=continue
+frame=57
+progress=continue
+frame=58
+progress=continue
+frame=60
+progress=continue
+frame=61
+progress=continue
+frame=63
+progress=continue
+frame=65
+progress=continue
+frame=66
+progress=continue
+frame=68
+progress=continue
+frame=70
+progress=continue
+frame=71
+progress=continue
+frame=72
+progress=continue
+frame=75
+progress=continue
+frame=75
+progress=continue
+frame=77
+progress=continue
+frame=79
+progress=continue
+frame=80
+progress=continue
+frame=82
+progress=continue
+frame=83
+progress=continue
+frame=85
+progress=continue
+frame=86
+progress=continue
+frame=88
+progress=continue
+frame=90
+progress=continue
+frame=91
+progress=continue
+frame=93
+progress=continue
+frame=95
+progress=continue
+frame=96
+progress=continue
+frame=97
+progress=continue
+frame=99
+progress=continue
+frame=101
+progress=continue
+frame=103
+progress=continue
+frame=104
+progress=continue
+frame=105
+progress=continue
+frame=107
+progress=continue
+frame=108
+progress=continue
+frame=110
+progress=continue
+frame=112
+progress=continue
+frame=113
+progress=continue
+frame=115
+progress=continue
+frame=116
+progress=continue
+frame=118
+progress=continue
+frame=120
+progress=continue
+frame=121
+progress=continue
+frame=123
+progress=continue
+frame=124
+progress=continue
+frame=126
+progress=continue
+frame=127
+progress=continue
+frame=129
+progress=continue
+frame=131
+progress=continue
+frame=132
+progress=continue
+frame=134
+progress=continue
+frame=135
+progress=continue
+frame=137
+progress=continue
+frame=138
+progress=continue
+frame=140
+progress=continue
+frame=142
+progress=continue
+frame=143
+progress=continue
+frame=145
+progress=continue
+frame=146
+progress=continue
+frame=148
+progress=continue
+frame=150
+progress=continue
+frame=151
+progress=continue
+frame=153
+progress=continue
+frame=154
+progress=continue
+frame=156
+progress=continue
+frame=157
+progress=continue
+frame=159
+progress=continue
+frame=160
+progress=continue
+frame=162
+progress=continue
+frame=164
+progress=continue
+frame=165
+progress=continue
+frame=167
+progress=continue
+frame=168
+progress=continue
+frame=170
+progress=continue
+frame=173
+progress=continue
+frame=173
+progress=continue
+frame=175
+progress=continue
+frame=176
+progress=continue
+frame=178
+progress=continue
+frame=179
+progress=continue
+frame=181
+progress=continue
+frame=183
+progress=continue
+frame=184
+progress=continue
+frame=186
+progress=continue
+frame=187
+progress=continue
+frame=189
+progress=continue
+frame=190
+progress=continue
+frame=192
+progress=continue
+frame=194
+progress=continue
+frame=195
+progress=continue
+frame=197
+progress=continue
+frame=199
+progress=continue
+frame=200
+progress=continue
+frame=202
+progress=continue
+frame=203
+progress=continue
+frame=205
+progress=continue
+frame=206
+progress=continue
+frame=208
+progress=continue
+frame=210
+progress=continue
+frame=211
+progress=continue
+frame=213
+progress=continue
+frame=214
+progress=continue
+frame=216
+progress=continue
+frame=217
+progress=continue
+frame=219
+progress=continue
+frame=221
+progress=continue
+frame=222
+progress=continue
+frame=224
+progress=continue
+frame=225
+progress=continue
+frame=227
+progress=continue
+frame=228
+progress=continue
+frame=231
+progress=continue
+frame=232
+progress=continue
+frame=233
+progress=continue
+frame=238
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[  198.620019] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> NV21 little-endian (0x3132564e) 3840x2160 timing frames=240 avg_ns/frame rbsp=244471 hw=9512498 detile=128632117 clear=2433557
+TIMING AFTER <6>[  275.715756] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> P010 little-endian (0x30313050) 3840x2160 timing frames=240 avg_ns/frame rbsp=239940 hw=9539306 detile=304783160 clear=2890445
+PERF END hevc10-2160p 1 0
+
+EXIT=0
+#
+[host] hevc10-2160p run 1 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc10-2160p 2); printf '\nEXIT=%s\n' $?
+PERF START hevc10-2160p 2
+temp 63000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 64000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 276.42 352.69
+CPU BEFORE
+cpu  1216 0 25708 83306 2 0 303 0 0 0
+cpu0 224 0 6044 21068 0 0 302 0 0 0
+cpu1 244 0 6226 21151 0 0 0 0 0 0
+cpu2 320 0 6714 20601 1 0 0 0 0 0
+cpu3 427 0 6723 20486 1 0 0 0 0 0
+CPU AFTER
+cpu  1255 0 33266 106220 2 0 303 0 0 0
+cpu0 234 0 8377 26353 0 0 302 0 0 0
+cpu1 253 0 7804 27190 0 0 0 0 0 0
+cpu2 334 0 8500 26429 1 0 0 0 0 0
+cpu3 432 0 8584 26247 1 0 0 0 0 0
+IRQ BEFORE
+  19:       2640          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       2880          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc10-2160p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc10-2160p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 22317 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main 10) (hvc1 / 0x31637668), yuv420p10le(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], 22303 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff8d37ef10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff8d37e340] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=3.1 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.0525x elapsed=0:01:16.20
+bench: utime=0.382s stime=1.771s rtime=76.202s
+bench: maxrss=191672KiB
+frame=1
+progress=continue
+frame=1
+progress=continue
+frame=1
+progress=continue
+frame=3
+progress=continue
+frame=5
+progress=continue
+frame=6
+progress=continue
+frame=8
+progress=continue
+frame=9
+progress=continue
+frame=11
+progress=continue
+frame=12
+progress=continue
+frame=14
+progress=continue
+frame=16
+progress=continue
+frame=17
+progress=continue
+frame=20
+progress=continue
+frame=21
+progress=continue
+frame=23
+progress=continue
+frame=25
+progress=continue
+frame=26
+progress=continue
+frame=28
+progress=continue
+frame=28
+progress=continue
+frame=32
+progress=continue
+frame=34
+progress=continue
+frame=35
+progress=continue
+frame=36
+progress=continue
+frame=37
+progress=continue
+frame=39
+progress=continue
+frame=41
+progress=continue
+frame=42
+progress=continue
+frame=44
+progress=continue
+frame=45
+progress=continue
+frame=47
+progress=continue
+frame=49
+progress=continue
+frame=50
+progress=continue
+frame=52
+progress=continue
+frame=53
+progress=continue
+frame=55
+progress=continue
+frame=56
+progress=continue
+frame=57
+progress=continue
+frame=59
+progress=continue
+frame=60
+progress=continue
+frame=62
+progress=continue
+frame=64
+progress=continue
+frame=65
+progress=continue
+frame=67
+progress=continue
+frame=68
+progress=continue
+frame=70
+progress=continue
+frame=72
+progress=continue
+frame=73
+progress=continue
+frame=75
+progress=continue
+frame=77
+progress=continue
+frame=78
+progress=continue
+frame=79
+progress=continue
+frame=81
+progress=continue
+frame=84
+progress=continue
+frame=84
+progress=continue
+frame=86
+progress=continue
+frame=87
+progress=continue
+frame=89
+progress=continue
+frame=91
+progress=continue
+frame=92
+progress=continue
+frame=94
+progress=continue
+frame=95
+progress=continue
+frame=97
+progress=continue
+frame=99
+progress=continue
+frame=100
+progress=continue
+frame=101
+progress=continue
+frame=104
+progress=continue
+frame=105
+progress=continue
+frame=107
+progress=continue
+frame=108
+progress=continue
+frame=109
+progress=continue
+frame=112
+progress=continue
+frame=112
+progress=continue
+frame=114
+progress=continue
+frame=116
+progress=continue
+frame=117
+progress=continue
+frame=120
+progress=continue
+frame=120
+progress=continue
+frame=122
+progress=continue
+frame=123
+progress=continue
+frame=125
+progress=continue
+frame=127
+progress=continue
+frame=128
+progress=continue
+frame=130
+progress=continue
+frame=131
+progress=continue
+frame=133
+progress=continue
+frame=134
+progress=continue
+frame=136
+progress=continue
+frame=138
+progress=continue
+frame=139
+progress=continue
+frame=141
+progress=continue
+frame=142
+progress=continue
+frame=144
+progress=continue
+frame=146
+progress=continue
+frame=147
+progress=continue
+frame=150
+progress=continue
+frame=150
+progress=continue
+frame=152
+progress=continue
+frame=153
+progress=continue
+frame=155
+progress=continue
+frame=158
+progress=continue
+frame=158
+progress=continue
+frame=160
+progress=continue
+frame=161
+progress=continue
+frame=163
+progress=continue
+frame=164
+progress=continue
+frame=166
+progress=continue
+frame=168
+progress=continue
+frame=169
+progress=continue
+frame=171
+progress=continue
+frame=171
+progress=continue
+frame=174
+progress=continue
+frame=176
+progress=continue
+frame=177
+progress=continue
+frame=179
+progress=continue
+frame=180
+progress=continue
+frame=182
+progress=continue
+frame=184
+progress=continue
+frame=185
+progress=continue
+frame=187
+progress=continue
+frame=188
+progress=continue
+frame=190
+progress=continue
+frame=191
+progress=continue
+frame=193
+progress=continue
+frame=195
+progress=continue
+frame=196
+progress=continue
+frame=198
+progress=continue
+frame=199
+progress=continue
+frame=201
+progress=continue
+frame=203
+progress=continue
+frame=204
+progress=continue
+frame=206
+progress=continue
+frame=207
+progress=continue
+frame=209
+progress=continue
+frame=210
+progress=continue
+frame=212
+progress=continue
+frame=213
+progress=continue
+frame=215
+progress=continue
+frame=217
+progress=continue
+frame=218
+progress=continue
+frame=220
+progress=continue
+frame=221
+progress=continue
+frame=223
+progress=continue
+frame=224
+progress=continue
+frame=226
+progress=continue
+frame=228
+progress=continue
+frame=229
+progress=continue
+frame=231
+progress=continue
+frame=232
+progress=continue
+frame=234
+progress=continue
+frame=238
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[  275.715756] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> P010 little-endian (0x30313050) 3840x2160 timing frames=240 avg_ns/frame rbsp=239940 hw=9539306 detile=304783160 clear=2890445
+TIMING AFTER <6>[  352.758565] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> P010 little-endian (0x30313050) 3840x2160 timing frames=240 avg_ns/frame rbsp=242514 hw=9536872 detile=303641090 clear=2884174
+PERF END hevc10-2160p 2 0
+
+EXIT=0
+#
+[host] hevc10-2160p run 2 VALID
+(sh /tmp/vdec_ffmpeg_board.sh perf hevc10-2160p 3); printf '\nEXIT=%s\n' $?
+PERF START hevc10-2160p 3
+temp 63000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+temp 64000
+scaling_governor schedutil
+scaling_cur_freq 800000
+scaling_max_freq 1000000
+WALL 353.46 429.32
+CPU BEFORE
+cpu  1258 0 33272 106517 2 0 303 0 0 0
+cpu0 235 0 8379 26427 0 0 302 0 0 0
+cpu1 253 0 7807 27264 0 0 0 0 0 0
+cpu2 334 0 8501 26504 1 0 0 0 0 0
+cpu3 434 0 8584 26321 1 0 0 0 0 0
+CPU AFTER
+cpu  1305 0 40770 129315 2 0 304 0 0 0
+cpu0 246 0 13039 29341 0 0 303 0 0 0
+cpu1 265 0 8828 33818 0 0 0 0 0 0
+cpu2 349 0 9243 33333 1 0 0 0 0 0
+cpu3 444 0 9659 32822 1 0 0 0 0 0
+IRQ BEFORE
+  19:       2880          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+IRQ AFTER
+  19:       3120          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
++ /tmp/ld-musl-aarch64.so.1 --library-path /tmp /tmp/ffmpeg -nostdin -hide_banner -nostats -benchmark -xerror -max_error_rate 0 -hwaccel v4l2request -hwaccel_output_format drm_prime -i hevc10-2160p.mp4 -map 0:v:0 -an -sn -dn -fps_mode passthrough -c:v wrapped_avframe -progress perf.progress -f null -
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'hevc10-2160p.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    encoder         : Lavf63.16.100
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    genre           : Animation
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 22317 kb/s
+  Stream #0:0[0x1](und): Video: hevc (Main 10) (hvc1 / 0x31637668), yuv420p10le(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], 22303 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : GPAC ISO Video Handler
+      encoder         : Lavc63.24.100 libx265
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> wrapped_avframe (native))
+[AVHWFramesContext @ 0xffff97e34f10] Using V4L2 media driver hi3798mv320-vde (7.3.5) for S265
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Big Buck Bunny, Sunflower version
+    artist          : Blender Foundation 2008, Janus Bager Kristensen 2013
+    composer        : Jan Morgenstern;Sacha Goedegebure
+    genre           : Animation
+    comment         : Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net
+    encoder         : Lavf62.12.100
+  Stream #0:0(und): Video: wrapped_avframe, drm_prime(tv, progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+      handler_name    : GPAC ISO Video Handler
+[out#0/null @ 0xffff97e34340] video:99KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  240 fps=3.2 q=-0.0 Lsize=N/A time=00:00:04.00 bitrate=N/A speed=0.0528x elapsed=0:01:15.77
+bench: utime=0.474s stime=1.632s rtime=75.779s
+bench: maxrss=191640KiB
+frame=1
+progress=continue
+frame=1
+progress=continue
+frame=1
+progress=continue
+frame=3
+progress=continue
+frame=5
+progress=continue
+frame=6
+progress=continue
+frame=8
+progress=continue
+frame=9
+progress=continue
+frame=11
+progress=continue
+frame=12
+progress=continue
+frame=14
+progress=continue
+frame=16
+progress=continue
+frame=17
+progress=continue
+frame=19
+progress=continue
+frame=20
+progress=continue
+frame=22
+progress=continue
+frame=24
+progress=continue
+frame=25
+progress=continue
+frame=27
+progress=continue
+frame=28
+progress=continue
+frame=31
+progress=continue
+frame=31
+progress=continue
+frame=33
+progress=continue
+frame=35
+progress=continue
+frame=36
+progress=continue
+frame=38
+progress=continue
+frame=39
+progress=continue
+frame=41
+progress=continue
+frame=42
+progress=continue
+frame=44
+progress=continue
+frame=46
+progress=continue
+frame=47
+progress=continue
+frame=49
+progress=continue
+frame=50
+progress=continue
+frame=52
+progress=continue
+frame=53
+progress=continue
+frame=55
+progress=continue
+frame=57
+progress=continue
+frame=58
+progress=continue
+frame=60
+progress=continue
+frame=61
+progress=continue
+frame=63
+progress=continue
+frame=64
+progress=continue
+frame=66
+progress=continue
+frame=68
+progress=continue
+frame=70
+progress=continue
+frame=71
+progress=continue
+frame=72
+progress=continue
+frame=74
+progress=continue
+frame=75
+progress=continue
+frame=77
+progress=continue
+frame=79
+progress=continue
+frame=80
+progress=continue
+frame=82
+progress=continue
+frame=83
+progress=continue
+frame=85
+progress=continue
+frame=86
+progress=continue
+frame=88
+progress=continue
+frame=91
+progress=continue
+frame=91
+progress=continue
+frame=93
+progress=continue
+frame=94
+progress=continue
+frame=96
+progress=continue
+frame=97
+progress=continue
+frame=99
+progress=continue
+frame=101
+progress=continue
+frame=103
+progress=continue
+frame=104
+progress=continue
+frame=106
+progress=continue
+frame=107
+progress=continue
+frame=108
+progress=continue
+frame=111
+progress=continue
+frame=112
+progress=continue
+frame=113
+progress=continue
+frame=116
+progress=continue
+frame=117
+progress=continue
+frame=120
+progress=continue
+frame=120
+progress=continue
+frame=122
+progress=continue
+frame=124
+progress=continue
+frame=125
+progress=continue
+frame=127
+progress=continue
+frame=129
+progress=continue
+frame=130
+progress=continue
+frame=132
+progress=continue
+frame=133
+progress=continue
+frame=135
+progress=continue
+frame=137
+progress=continue
+frame=138
+progress=continue
+frame=140
+progress=continue
+frame=141
+progress=continue
+frame=143
+progress=continue
+frame=145
+progress=continue
+frame=146
+progress=continue
+frame=148
+progress=continue
+frame=149
+progress=continue
+frame=151
+progress=continue
+frame=153
+progress=continue
+frame=154
+progress=continue
+frame=156
+progress=continue
+frame=157
+progress=continue
+frame=159
+progress=continue
+frame=161
+progress=continue
+frame=163
+progress=continue
+frame=164
+progress=continue
+frame=165
+progress=continue
+frame=168
+progress=continue
+frame=169
+progress=continue
+frame=170
+progress=continue
+frame=172
+progress=continue
+frame=173
+progress=continue
+frame=175
+progress=continue
+frame=177
+progress=continue
+frame=178
+progress=continue
+frame=180
+progress=continue
+frame=182
+progress=continue
+frame=183
+progress=continue
+frame=185
+progress=continue
+frame=186
+progress=continue
+frame=188
+progress=continue
+frame=190
+progress=continue
+frame=191
+progress=continue
+frame=193
+progress=continue
+frame=194
+progress=continue
+frame=196
+progress=continue
+frame=198
+progress=continue
+frame=199
+progress=continue
+frame=201
+progress=continue
+frame=203
+progress=continue
+frame=204
+progress=continue
+frame=206
+progress=continue
+frame=207
+progress=continue
+frame=209
+progress=continue
+frame=210
+progress=continue
+frame=212
+progress=continue
+frame=214
+progress=continue
+frame=215
+progress=continue
+frame=217
+progress=continue
+frame=218
+progress=continue
+frame=220
+progress=continue
+frame=222
+progress=continue
+frame=223
+progress=continue
+frame=225
+progress=continue
+frame=226
+progress=continue
+frame=228
+progress=continue
+frame=230
+progress=continue
+frame=231
+progress=continue
+frame=233
+progress=continue
+frame=236
+progress=continue
+frame=238
+progress=continue
+frame=240
+progress=end
+TIMING BEFORE <6>[  352.758565] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> P010 little-endian (0x30313050) 3840x2160 timing frames=240 avg_ns/frame rbsp=242514 hw=9536872 detile=303641090 clear=2884174
+TIMING AFTER <6>[  429.372748] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> P010 little-endian (0x30313050) 3840x2160 timing frames=240 avg_ns/frame rbsp=243529 hw=9535291 detile=301887659 clear=2900881
+PERF END hevc10-2160p 3 0
+
+EXIT=0
+#
+[host] hevc10-2160p run 3 VALID

@@ -171,7 +171,9 @@ fi
 if [[ $vdec ]]; then
     variant_key+=" VIDEO_HI3798MV320_VDEC V4L2_MEM2MEM_DEV MEDIA_CONTROLLER VIDEOBUF2_VMALLOC CMA DMA_CMA"
     apply_board_patch "$inputs/0012-media-add-Hi3798MV320-vdec.patch"
-    install -m644 "$inputs/hi3798mv320-vdec.c" "$inputs/hi3798mv320-vdec-cabac.h" \
+    apply_board_patch "$inputs/0013-media-add-Hi3798MV320-vdec-NEON.patch"
+    install -m644 "$inputs/hi3798mv320-vdec.c" "$linux/drivers/media/platform/hi3798mv320-vdec-core.c"
+    install -m644 "$inputs/hi3798mv320-vdec-neon.S" "$inputs/hi3798mv320-vdec-cabac.h" \
         "$inputs/hi3798mv320-vdh.h" "$linux/drivers/media/platform/"
     board=hi3798mv320-fiberhome-hg680kd-arm64-vdec
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"

@@ -1,0 +1,2 @@
+Listening on UDP 192.168.6.172:1069 for 192.168.6.249
+Sent 15534152 bytes of diagnostic.img to 192.168.6.249

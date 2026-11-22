@@ -1,0 +1,43 @@
+HG680KD H.264 Direct, COM4 115200 8N1, experimental RAM image
+First baseline uses original slice[7] bit 14 clear. See 469-vdec-direct-baseline-perf.txt.
+Temporary matrix uses the cacheable allocations and scalar P010 path. Each check decodes 240 frames.
+PXP and SMMU IRQ fields list the cumulative counts before and after each run.
+4: slice[7] bit 14 on B slices only.
+256: slice[7] bit 14 on every I/P/B slice (both test SPSes have direct_8x8_inference_flag=1).
+5: 4 + pub[3] bit 14. 6: 4 + both inverse L0 entries. 7: both changes.
+12: 4 + alternative frame reference field nibble. This rejected setting triggered SMMU faults.
+20: 4 + second ColMV address. 36: 4 + pub[21]. 68: 4 + flip spatial flag.
+132: 4 + normalize POCs. 260: 256 + 4. 516: 4 + clear inverse L0 table.
+31: 4 + pub[3] bit 14 + both inverse L0 entries + alternative field nibble + second ColMV address.
+The clean production verification starts with a fresh RAM boot and zero IRQ counters.
+
+[host] h264-1080p-no-direct pixels MATCH
+[host] hevc-1080p pixels MATCH
+[host] hevc-2160p pixels MATCH
+[host] hevc10-2160p pixels MATCH
+[host] trial 4 h264-1080p match=40/240 {'I': 2, 'P': 36, 'B': 2} irq={169: [960, 1200], 181: [0, 0]} rc=0
+[host] trial 4 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [1200, 1440], 181: [0, 0]} rc=0
+[host] trial 5 h264-1080p match=40/240 {'I': 2, 'P': 36, 'B': 2} irq={169: [1440, 1680], 181: [0, 0]} rc=0
+[host] trial 5 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [1680, 1920], 181: [0, 0]} rc=0
+[host] trial 6 h264-1080p match=40/240 {'I': 2, 'P': 36, 'B': 2} irq={169: [1920, 2160], 181: [0, 0]} rc=0
+[host] trial 6 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [2160, 2400], 181: [0, 0]} rc=0
+[host] trial 7 h264-1080p match=40/240 {'I': 2, 'P': 36, 'B': 2} irq={169: [2400, 2640], 181: [0, 0]} rc=0
+[host] trial 7 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [2640, 2880], 181: [0, 0]} rc=0
+[host] trial 31 h264-1080p match=38/240 {'I': 2, 'P': 36} irq={169: [2880, 3120], 181: [0, 0]} rc=0
+[host] trial 31 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [3120, 3360], 181: [0, 0]} rc=0
+[host] trial 12 h264-1080p match=14/240 {'I': 2, 'P': 12} irq={169: [3360, 3374], 181: [0, 278]} rc=0
+[host] trial 12 h264-1080p-single-ref match=82/240 {'I': 2, 'P': 80} irq={169: [3374, 3461], 181: [278, 20627]} rc=0
+[host] trial 20 h264-1080p match=40/240 {'I': 2, 'P': 36, 'B': 2} irq={169: [3461, 3701], 181: [20627, 20627]} rc=0
+[host] trial 20 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [3701, 3941], 181: [20627, 20627]} rc=0
+[host] trial 36 h264-1080p match=40/240 {'I': 2, 'P': 36, 'B': 2} irq={169: [3941, 4181], 181: [20627, 20627]} rc=0
+[host] trial 36 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [4181, 4421], 181: [20627, 20627]} rc=0
+[host] trial 68 h264-1080p match=14/240 {'I': 2, 'P': 12} irq={169: [4421, 4661], 181: [20627, 20627]} rc=0
+[host] trial 68 h264-1080p-single-ref match=82/240 {'I': 2, 'P': 80} irq={169: [4661, 4901], 181: [20627, 20627]} rc=0
+[host] trial 132 h264-1080p match=40/240 {'I': 2, 'P': 36, 'B': 2} irq={169: [4901, 5141], 181: [20627, 20627]} rc=0
+[host] trial 132 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [5141, 5381], 181: [20627, 20627]} rc=0
+[host] trial 256 h264-1080p match=240/240 {'I': 2, 'B': 113, 'P': 125} irq={169: [5381, 5621], 181: [20627, 20627]} rc=0
+[host] trial 256 h264-1080p-single-ref match=240/240 {'I': 2, 'B': 158, 'P': 80} irq={169: [5621, 5861], 181: [20627, 20627]} rc=0
+[host] trial 260 h264-1080p match=240/240 {'I': 2, 'B': 113, 'P': 125} irq={169: [5861, 6101], 181: [20627, 20627]} rc=0
+[host] trial 260 h264-1080p-single-ref match=240/240 {'I': 2, 'B': 158, 'P': 80} irq={169: [6101, 6341], 181: [20627, 20627]} rc=0
+[host] trial 516 h264-1080p match=40/240 {'I': 2, 'P': 36, 'B': 2} irq={169: [6341, 6581], 181: [20627, 20627]} rc=0
+[host] trial 516 h264-1080p-single-ref match=102/240 {'I': 2, 'P': 80, 'B': 20} irq={169: [6581, 6821], 181: [20627, 20627]} rc=0

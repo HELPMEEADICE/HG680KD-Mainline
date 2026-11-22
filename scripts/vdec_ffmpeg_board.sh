@@ -43,15 +43,23 @@ case "$1" in
         pixels=$3
         output="$name.hw.framemd5"
         snapshot before
+        ret=0
         run_ffmpeg -nostdin -hide_banner -loglevel verbose -xerror -max_error_rate 0 \
             -hwaccel v4l2request -hwaccel_output_format drm_prime -i "$name.mp4" \
             -map 0:v:0 -an -sn -dn -vf "hwdownload,format=$pixels" \
-            -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y "$output"
+            -fps_mode passthrough -threads:v 1 -c:v rawvideo -f framemd5 -y "$output" || ret=$?
         snapshot after
+        cat before.irq after.irq
+        case "$ret" in
+            0) ;;
+            *)
+                dmesg | grep -E 'PXP 0x|SMMU fault|H\.264 task' || :
+                exit "$ret"
+                ;;
+        esac
         printf 'HASH FRAMES '
         grep -vc '^#' "$output"
         grep -v '^#' "$output" | cut -d ',' -f 6 | sha256sum
-        cat before.irq after.irq
         ;;
     perf)
         name=$2
