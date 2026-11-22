@@ -1,6 +1,6 @@
 # HG680KD Hi3798MV320 视频解码逆向
 
-2026-11-22，烽火 HG680KD 板型 4，2 GiB LPDDR4。Linux 7.3.5 诊断镜像经 TFTP 纯 RAM 启动。VDH PXP 的复位请求和应答均可控制，SCD 和 VDH 私有 SMMU 的空闲寄存器可稳定读取。当前阶段止于探测与复位，H.264 硬解完成中断和像素回读待验证。[最终串口](logs/411-mainline-arm64-7.3.5-vpu-final-boot.txt) · [外设回归](logs/413-vpu-final-regression.txt) · [重复探测](logs/414-vpu-repeat-mmio-and-storage-hdmi.txt)
+2026-11-22，烽火 HG680KD 板型 4，2 GiB LPDDR4。Linux 7.3.5 经 TFTP 纯 RAM 启动，已验证 32×32 CAVLC IDR 和 Main Profile CABAC IDR/P 的 VDH 硬解。两种码流按 tiled VU 布局回读，转换为 I420 后逐字节匹配。原厂线性请求及实测见第 8 节。[解码串口](logs/431-vpu-h264-final-serial.txt) · [外设回归](logs/413-vpu-final-regression.txt) · [重复探测](logs/414-vpu-repeat-mmio-and-storage-hdmi.txt)
 
 ## 1. 原厂材料
 
@@ -154,3 +154,56 @@ COM4 使用 115200 8N1。运行项目的 TFTP 服务，U-Boot 通过 RAM 会话�
 | USB 和 HDMI | 只读挂载 USB 启动分区，`boot.img` SHA256 与实验前相同，USB 链路 480 Mb/s。1080p fbdev 回读 1080 行，采集卡 24/24 个 RGB 采样点匹配。[只读校验和 fbdev](logs/415-vpu-usb-and-fbdev.txt) · [采集日志](logs/416-vpu-hdmi-capture.txt) · [采集图](artifacts/arm64-7.3.5-vpu-probe/hdmi-color-bars.png) |
 
 测试结束后重启，按原有 U-Boot 启动策略恢复 USB Armbian，并进入登录流程。[恢复串口](logs/417-vpu-return-to-usb.txt)
+
+## 8. H.264 输出布局与 CABAC IDR/P 实测
+
+### VDH 线性请求
+
+原厂 `vfmw_com` 的 `linear <0/1>` 由 `vct_log_set_2d_en`（`0xc0787788`）写入默认通道配置。线性配置经 `dec_hal_calc_mem_param` 写任务字节 `+0x98`。该字节的 bit 0 由 `hal_h264_write_pub_msg`（`0xc07a8f18/0xc07a8f2c`）送入 `pub[3][29]`。同一任务字节决定 `dec_hal_calc_dec_mem_param` 采用实际高度还是对齐高度计算 Y 平面字节数，并经 `dec_chan_set_image_param`、`fsp_set_image` 写入图像描述符 `+0x294`。原厂 `pdt_get_y8b_data` 的 `0xc081d6b0` 和 `pdt_get_c8b_data` 的 `0xc081d7a4` 是按行 stride 的 CPU 读取分支。两条色度读取分支都按 VU 取样。[原厂反编译](artifacts/vpu-reverse-factory/arm32-result.txt) · [布局指令](artifacts/vpu-reverse-factory/vdh-layout-extra.txt)
+
+| 字段 | 32×32 输出配置 |
+| --- | --- |
+| `pub[3]` | tiled 为 `0x00030000`，设置原厂 2D 请求后为 `0x20030000` |
+| `pub[9]/[10]/[12]/[20]` | 输出基址除以 16、256 B stride、Y 平面长度、YUV 结束地址除以 16 |
+| `core+0x5c0/0x5c4/0x5c8/0x620` | 原厂在任务 `+0x98` 非零时写图片描述符 `+0x20` 左移 16 位的值。本向量无裁剪，保持为 0 |
+| `core+0x5cc..0x610` | 三组宽高 `0x00200020`、Y 平面长度、压缩及扩展平面参数、stride |
+| `core+0x614/0x618/0x61c` | 当前帧 YUV 结束地址、压缩区长度参数、附加平面地址。8-bit 无压缩模式下后者等于输出基址 |
+| VDH `+0x14` 与任务槽 `+0x04` | `dec_hal_write_reg` 分别从任务 `+0x88` 和 `+0x8a`、`+0x0e` 取值。两个寄存器写入均无 `+0x98` 或已识别的 UV 顺序字段 |
+
+板测沿用同一 CAVLC IDR，先用 tiled 模式的 256 B stride 和 16,384 B Y 平面，再设置 bit 29 和 8,192 B Y 平面。两次均各完成一次 PXP IRQ，SMMU 零故障。两次按线性 stride 回读都只匹配 384/1,536 B，按 64 B×16 的 Y tile 与 64 B×8 的 VU tile 回读均匹配 1,536/1,536 B。已确认这组原厂线性请求与缓冲参数在本板 VDH 路径上仍直出 tiled VU。独立 NV12 顺序控制及其他使线性直出的配置尚无板测证据。[最终串口](logs/431-vpu-h264-final-serial.txt) · [像素校验](logs/432-vpu-h264-pixel-check.txt)
+
+### CABAC 和参考帧
+
+固定向量为 32×32、8-bit、Main Profile，IDR 和 P 各有一个 slice，P 只有一个 L0 参考。输入第 0 帧为原 CAVLC 参考图像，第 1 帧的右下宏块在 Y、U、V 上各增加 36 并限制到 235。FFmpeg/libx264 使用 `-preset medium -qp 24 -x264-params cabac=1:bframes=0:ref=1:keyint=30:scenecut=0:weightp=0:threads=1:slices=1`，用 `filter_units=remove_types=6` 移除 SEI。编码器报告 P 帧四个宏块中的三个为 P-skip，软件解码结果相差 400 B。[码流](artifacts/vpu-reverse-factory/h264-ip-cabac-32x32.264) · [头字段](artifacts/vpu-reverse-factory/h264-ip-cabac-32x32-trace.txt) · [编码器参数](https://ffmpeg.org/ffmpeg-codecs.html#libx264_002c-libx264rgb)
+
+| 原厂路径 | 本次写入 |
+| --- | --- |
+| `hal_h264_write_pub_msg` | `pub[6]` 指向两帧共用的 Annex B DMA 缓冲，`pub[23]` 指向当前帧独立 PMV，`pub[25]` 指向 CABAC 初始化表 |
+| `hal_h264_write_pic_msg` | `pic[0][27]` 置位，`pic[2]` 的当前 POC 分别为 0 和 2。P 帧 `pic[10]` 为 `OUTPUT_0` 的 IOVA 除以 16，`pic[27]/[28]` 为参考 IDR 的 top/bottom POC 0。core 的三组参考地址从 `+0x500/+0x540/+0x580` 开始 |
+| `hal_h264_write_slice_msg` | IDR/P 的 CABAC 数据分别从 Annex B 字节 41、67 开始。slice `+0x18[31:26]` 为 QP 21/24，`[25:24]` 为 CABAC init 0。P slice `+0x1c` 的类型为 1，L0 数量减一为 0，`+0x30/+0x50` 选逐行 DPB 槽 0 |
+| ColMV / PMV | 保留 `PMV_0`，第 1 帧写 `PMV_1`。原厂仅在 B slice 分支给 `slice+0x20/+0x24` 填 ColMV 读取地址，逐行 P slice 使用空间 MV 预测 |
+| VDH 槽和 SMMU | 第 0 帧使用 `VDH+0x100`，第 1 帧使用 `VDH+0x120`。两个任务独立消息和回写区，引用面和 PMV 保持驻留。固定页表在提交前一次性写好，帧间无需重设页表、刷新 TLB 或复位 PXP |
+
+首轮复用 `VDH+0x100` 时第 1 帧超时，UP_MSG 写回区保留填充值。原厂 `dec_dev_acquire_reg`（`0xc07773ac–0xc07773bc`）按槽数循环推进。换到下一槽后，PXP 中断状态从 `0x00020000`（槽 0）到 `0x01020000`（槽 1），INTID 169 在一次双帧命令中增加 2，INTID 181 保持 0。[复用超时](logs/425-vpu-h264-cabac-serial.txt) · [切换槽验证](logs/427-vpu-h264-cabac-slots-serial.txt)
+
+| 帧 | PXP 完成 | SMMU 故障 | I420 匹配 | 板端和参考 SHA256 |
+| --- | ---: | ---: | ---: | --- |
+| 0 CABAC IDR | 1 | 0 | 1,536/1,536 B | `ffcb5e22013d3f42d9260f7c1e54f2bb082876dda77c7231c6088f331139f186` |
+| 1 CABAC P | 1 | 0 | 1,536/1,536 B | `b784494112741557444cec4efc50d15fefe5e7949b14e44625836982eeacbf2c` |
+
+生成头由 `python scripts/vpu_h264_data.py artifacts/vpu-reverse-factory src/hi3798mv320-vpu-h264-data.h` 生成。通过 `scripts/remote.ps1` 同步两个头至构建服务器 `inputs/`，用第 6 节的命令将目标改为 `arm64-7.3.5-vpu-h264-poc`。最终 `boot.img` SHA256 为 `a9cf3c034c3c23591c1971de109f99755317f0e4093a27c9d570453f98d7485c`，U-Boot 实测 TFTP CRC32 为 `46e656d6`。[构建及镜像校验](logs/430-vpu-h264-final-build.txt) · [RAM 镜像](artifacts/arm64-7.3.5-vpu-h264-final/boot.img)
+
+从 COM4 以 115200 8N1 独占连接，经 TFTP 把 `boot.img` 传到 `0x01fdffc0`，用 U-Boot `crc32` 校验后执行 `bootm`。下列 sysfs 读回为十六进制 I420，每行 3,072 个十六进制字符。其中 `linear_frame` 使用行 stride 读取，`frame` 与 `frame1` 使用 tile 寻址。[最终串口](logs/431-vpu-h264-final-serial.txt) · [IDR 参考](artifacts/vpu-reverse-factory/h264-ip-cabac-32x32-frame0.i420) · [P 帧参考](artifacts/vpu-reverse-factory/h264-ip-cabac-32x32-frame1.i420)
+
+```sh
+cd /sys/devices/platform/soc/f8c30000.video-decoder
+echo cavlc > decode
+cat frame linear_frame
+echo probe-linear > decode
+cat frame linear_frame
+echo 1 > decode
+cat frame frame1
+grep hg680kd /proc/interrupts
+```
+
+同一次 RAM 启动内复跑双帧命令，INTID 169 从 4 增至 6，INTID 181 保持 0，两个输出哈希与首轮一致。USB 未挂载，`mmcblk0/ro=1`，U-Boot 环境变量仅在本次会话内设置。[复跑串口](artifacts/arm64-7.3.5-vpu-h264-final/repeat-serial.txt) · [像素校验](logs/432-vpu-h264-pixel-check.txt)
