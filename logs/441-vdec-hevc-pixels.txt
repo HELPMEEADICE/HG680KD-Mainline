@@ -1,0 +1,84 @@
+[host] boot.img SHA256 b13e4218b67343a10fce90ee0229ebd7cabdff5177d1027edfca080366044fb2
+[host] CRC32 matches local image: 9690610d
+[host] h265idr64c32 frame 0 board=c9ab658ca14ef9ad0ebc371f11f524f62e986fa7be0da6ba460b8f971e9d7bf8 FFmpeg=c9ab658ca14ef9ad0ebc371f11f524f62e986fa7be0da6ba460b8f971e9d7bf8 MATCH
+[host] RESULT h265idr64c32 1/1
+[host] h265ip64c32 frame 0 board=f26be521f5b8863e74e8e2ff2996d9b9a941cb704a9a3febb68370aac1c502c7 FFmpeg=f26be521f5b8863e74e8e2ff2996d9b9a941cb704a9a3febb68370aac1c502c7 MATCH
+[host] h265ip64c32 frame 1 board=ac3315f1b3ff946229338065bdfd341dfe6f4dec0e70011de7448c45d7434ac4 FFmpeg=ac3315f1b3ff946229338065bdfd341dfe6f4dec0e70011de7448c45d7434ac4 MATCH
+[host] RESULT h265ip64c32 2/2
+[host] h265b128 frame 0 board=b498937fa17bca6ddeb7ae8e279381e02c92c7a7f88843cb80ff011dcb7bf598 FFmpeg=b498937fa17bca6ddeb7ae8e279381e02c92c7a7f88843cb80ff011dcb7bf598 MATCH
+[host] h265b128 frame 1 board=d38d4b9574b47240a874d79b78cf626d869afb50ffad4fa07a9173882f1955db FFmpeg=d38d4b9574b47240a874d79b78cf626d869afb50ffad4fa07a9173882f1955db MATCH
+[host] h265b128 frame 2 board=a13d63f291b47d6c3c6c40ebd388ded30bde9002ccabe642aff9722c1acf5e34 FFmpeg=a13d63f291b47d6c3c6c40ebd388ded30bde9002ccabe642aff9722c1acf5e34 MATCH
+[host] h265b128 frame 3 board=9463fcd0a184c4ce01ccbe902620097aff1fcbb01e0a4f1169bc7d4cc1acbd35 FFmpeg=9463fcd0a184c4ce01ccbe902620097aff1fcbb01e0a4f1169bc7d4cc1acbd35 MATCH
+[host] RESULT h265b128 4/4
+[host] h265ip720 frame 0 board=ccb7d6a8dd62e83ffc33adbf96efb6b64f4739ccbdd380c66ad09d68e6e07f0a FFmpeg=ccb7d6a8dd62e83ffc33adbf96efb6b64f4739ccbdd380c66ad09d68e6e07f0a MATCH
+[host] h265ip720 frame 1 board=26b27d0c83cec548ac1f6e58530a4927bce6a13ee7a3722931fbfc13c3b7c375 FFmpeg=26b27d0c83cec548ac1f6e58530a4927bce6a13ee7a3722931fbfc13c3b7c375 MATCH
+[host] h265ip720 frame 2 board=803975fd9db572244db2695aac3dff82f6709f64aa4a4dbeb516482d5f11686e FFmpeg=803975fd9db572244db2695aac3dff82f6709f64aa4a4dbeb516482d5f11686e MATCH
+[host] RESULT h265ip720 3/3
+[host] h265ip1080 frame 0 board=baf03ab84f83d6087021541221bc3d91c2b924eb580ef8bea013f7a313086ad8 FFmpeg=baf03ab84f83d6087021541221bc3d91c2b924eb580ef8bea013f7a313086ad8 MATCH
+[host] h265ip1080 frame 1 board=535be5f835c92c7831d34286b77850be844ca154725659fc61965366792b5485 FFmpeg=535be5f835c92c7831d34286b77850be844ca154725659fc61965366792b5485 MATCH
+[host] h265ip1080 frame 2 board=a9267674531f5a889b791d31e792382eb97e2258c13b3833d9592fa827a19ec3 FFmpeg=a9267674531f5a889b791d31e792382eb97e2258c13b3833d9592fa827a19ec3 MATCH
+[host] RESULT h265ip1080 3/3
+[host] h265crop1080 frame 0 board=dd5ef874817a5305d47a0e8e6672d7a20e62e3768b8590f50884bc518dd2f8c6 FFmpeg=dd5ef874817a5305d47a0e8e6672d7a20e62e3768b8590f50884bc518dd2f8c6 MATCH
+[host] h265crop1080 frame 1 board=a3d95cd3c7250848ceec4d21f998c5825caa911758847bfac920671693e8ad3a FFmpeg=a3d95cd3c7250848ceec4d21f998c5825caa911758847bfac920671693e8ad3a MATCH
+[host] h265crop1080 frame 2 board=8b8d98c31804ac7d18fab7a099ad2664365842ffbf0912d5099efccfac5249fe FFmpeg=8b8d98c31804ac7d18fab7a099ad2664365842ffbf0912d5099efccfac5249fe MATCH
+[host] RESULT h265crop1080 3/3
+[host] h265crop1080-visible frame 0 board=b34fc663900b173ac991927d8bdcc195537466ded8ffa814404df0ec17595a38 FFmpeg=b34fc663900b173ac991927d8bdcc195537466ded8ffa814404df0ec17595a38 MATCH
+[host] h265crop1080-visible frame 1 board=a6c4fab3190653b4ea52ebdcdb9ea5758f1c456838640ecb02aba86da1712819 FFmpeg=a6c4fab3190653b4ea52ebdcdb9ea5758f1c456838640ecb02aba86da1712819 MATCH
+[host] h265crop1080-visible frame 2 board=aa3f5ccad10fadec8daa27ee22401d07c7ec6eef2f7796e0a22a5e04eb2e7a52 FFmpeg=aa3f5ccad10fadec8daa27ee22401d07c7ec6eef2f7796e0a22a5e04eb2e7a52 MATCH
+[host] RESULT h265crop1080-visible 3/3
+[host] h265scale frame 0 board=6527cbe9556387a11ff265628752d424a7db1082ac161c7ec9c5984ec434f37b FFmpeg=6527cbe9556387a11ff265628752d424a7db1082ac161c7ec9c5984ec434f37b MATCH
+[host] h265scale frame 1 board=3d042e19be2134b7aa8ec0cfaefd8927d030e082833e011c5d06e8a324a3c7ea FFmpeg=3d042e19be2134b7aa8ec0cfaefd8927d030e082833e011c5d06e8a324a3c7ea MATCH
+[host] h265scale frame 2 board=9692d6e49bc9713bf8d720d54a90e659cdeaab7afd3621095b05e816def39294 FFmpeg=9692d6e49bc9713bf8d720d54a90e659cdeaab7afd3621095b05e816def39294 MATCH
+[host] RESULT h265scale 3/3
+[host] h265weight frame 0 board=0563c942328f8ded8ed3f256f2490a255c7fd9df8e88f67a805710f1ad1dcb7a FFmpeg=0563c942328f8ded8ed3f256f2490a255c7fd9df8e88f67a805710f1ad1dcb7a MATCH
+[host] h265weight frame 1 board=209a85b16b0ca69482a354ceef141c477bbf7f375eaba9394a80fd5e25ad4664 FFmpeg=209a85b16b0ca69482a354ceef141c477bbf7f375eaba9394a80fd5e25ad4664 MATCH
+[host] h265weight frame 2 board=971bac4e7ad1b778efac914211d88e65f020235b4d81f1e35cfb97aafc2e1ceb FFmpeg=971bac4e7ad1b778efac914211d88e65f020235b4d81f1e35cfb97aafc2e1ceb MATCH
+[host] h265weight frame 3 board=7c93d420ddb1fdca9615e0b13d82378942446240978fa9a316a0dcc0cc3becd1 FFmpeg=7c93d420ddb1fdca9615e0b13d82378942446240978fa9a316a0dcc0cc3becd1 MATCH
+[host] h265weight frame 4 board=c51dbffdadc6a108d026d7e15b3649822f51f170ceecdfdad90ff8f7db2fadf8 FFmpeg=c51dbffdadc6a108d026d7e15b3649822f51f170ceecdfdad90ff8f7db2fadf8 MATCH
+[host] h265weight frame 5 board=162931d3fa196141c518c2e2488564f4a854e33f608394855b81cec0cdf4c048 FFmpeg=162931d3fa196141c518c2e2488564f4a854e33f608394855b81cec0cdf4c048 MATCH
+[host] RESULT h265weight 6/6
+[host] h265wpp720 frame 0 board=323f2f4f9d43dbdf0179ad1bc4575898aa49e289291f0d0c1427fb7a2b2e90d8 FFmpeg=323f2f4f9d43dbdf0179ad1bc4575898aa49e289291f0d0c1427fb7a2b2e90d8 MATCH
+[host] h265wpp720 frame 1 board=09167ab693741f60e432df3e6a4de6e36fec1e30901c23cbde7840f21d273ac8 FFmpeg=09167ab693741f60e432df3e6a4de6e36fec1e30901c23cbde7840f21d273ac8 MATCH
+[host] h265wpp720 frame 2 board=805d312891d6f8dd16ce9077a8eb6df965ed352be2fbc128e791661bbcf81d52 FFmpeg=805d312891d6f8dd16ce9077a8eb6df965ed352be2fbc128e791661bbcf81d52 MATCH
+[host] RESULT h265wpp720 3/3
+[host] h265s2 frame 0 board=097b4f869d4b0a43ad9b5276f5d562bb9740b0251eb3d300af4de177ad936989 FFmpeg=097b4f869d4b0a43ad9b5276f5d562bb9740b0251eb3d300af4de177ad936989 MATCH
+[host] h265s2 frame 1 board=dd80e8bbd79dbcde270695023ca9434830623068d1962c70643a6cfa1b3ac90c FFmpeg=dd80e8bbd79dbcde270695023ca9434830623068d1962c70643a6cfa1b3ac90c MATCH
+[host] h265s2 frame 2 board=62b3bd6ccd8fe5967a85dd38f864fd1f739ccf3b29e974c051d402d12fca8368 FFmpeg=62b3bd6ccd8fe5967a85dd38f864fd1f739ccf3b29e974c051d402d12fca8368 MATCH
+[host] RESULT h265s2 3/3
+[host] h265tiles frame 0 board=0976dcf522646ad09e469640caa36beb89334c4e40fde558a8962a8a1063fcbf FFmpeg=0976dcf522646ad09e469640caa36beb89334c4e40fde558a8962a8a1063fcbf MATCH
+[host] h265tiles frame 1 board=d24cc4f108bdbed4de73f43b2beb865a579d60562e85f4255726924c75cc29db FFmpeg=d24cc4f108bdbed4de73f43b2beb865a579d60562e85f4255726924c75cc29db MATCH
+[host] RESULT h265tiles 2/2
+[host] h265tileslices frame 0 board=0976dcf522646ad09e469640caa36beb89334c4e40fde558a8962a8a1063fcbf FFmpeg=0976dcf522646ad09e469640caa36beb89334c4e40fde558a8962a8a1063fcbf MATCH
+[host] h265tileslices frame 1 board=d24cc4f108bdbed4de73f43b2beb865a579d60562e85f4255726924c75cc29db FFmpeg=d24cc4f108bdbed4de73f43b2beb865a579d60562e85f4255726924c75cc29db MATCH
+[host] RESULT h265tileslices 2/2
+[host] ip32 frame 0 board=d4068cd101163ced7076bdd65a5fea9a96231d4bdcd4d6852ea41ed778c205fe FFmpeg=d4068cd101163ced7076bdd65a5fea9a96231d4bdcd4d6852ea41ed778c205fe MATCH
+[host] ip32 frame 1 board=4a91cbdd96c2fa9c6f77b513133aaf0435f6c55386a39c884452a8e0f95e8000 FFmpeg=4a91cbdd96c2fa9c6f77b513133aaf0435f6c55386a39c884452a8e0f95e8000 MATCH
+[host] RESULT ip32 2/2
+[host] ip1080crop frame 0 board=25cdeb4d771640cc697782f15192cc42787eb8849e44a3bb8add32ec419c4552 FFmpeg=25cdeb4d771640cc697782f15192cc42787eb8849e44a3bb8add32ec419c4552 MATCH
+[host] ip1080crop frame 1 board=548cb592bc67e1f4c8ea1bdc1586dcf383f2fcaf68051fad4c3c90b9c5b94f88 FFmpeg=548cb592bc67e1f4c8ea1bdc1586dcf383f2fcaf68051fad4c3c90b9c5b94f88 MATCH
+[host] ip1080crop frame 2 board=880915311317f586b676284c8b66cd8a52175fded3f729753495bee3c072f624 FFmpeg=880915311317f586b676284c8b66cd8a52175fded3f729753495bee3c072f624 MATCH
+[host] ip1080crop frame 3 board=7f7dc31f0048264eeb9ee49419c108a604116143628ac5fa65d7d624504ab799 FFmpeg=7f7dc31f0048264eeb9ee49419c108a604116143628ac5fa65d7d624504ab799 MATCH
+[host] RESULT ip1080crop 4/4
+[host] ip1080crop-visible frame 0 board=3d5801f831882229347abfd73028bd24e977b2d8b9c9a35e3a38dab8eccaa535 FFmpeg=3d5801f831882229347abfd73028bd24e977b2d8b9c9a35e3a38dab8eccaa535 MATCH
+[host] ip1080crop-visible frame 1 board=47fd8d81d3a565d4b3efd2411ef37e313241fa2c13363397b24fd22c333adfaa FFmpeg=47fd8d81d3a565d4b3efd2411ef37e313241fa2c13363397b24fd22c333adfaa MATCH
+[host] ip1080crop-visible frame 2 board=7a0795d5963a6ef95799214e58ed450c76afb2888022403f28cc89860185b0a8 FFmpeg=7a0795d5963a6ef95799214e58ed450c76afb2888022403f28cc89860185b0a8 MATCH
+[host] ip1080crop-visible frame 3 board=60d8252cb1468870ed26f969a866ebea2090cc5f8809878cebc05d276edef0a2 FFmpeg=60d8252cb1468870ed26f969a866ebea2090cc5f8809878cebc05d276edef0a2 MATCH
+[host] RESULT ip1080crop-visible 4/4
+[host] ip128b frame 0 board=ea003ba392fc443b9f4f40da212044295e768255bcf270e228aa8eaeedc22025 FFmpeg=ea003ba392fc443b9f4f40da212044295e768255bcf270e228aa8eaeedc22025 MATCH
+[host] ip128b frame 1 board=675785205d257a10d921c1d618734f8904c636883742ba2ef4cacf12a32c89a4 FFmpeg=675785205d257a10d921c1d618734f8904c636883742ba2ef4cacf12a32c89a4 MATCH
+[host] ip128b frame 2 board=79ea6746fd6c9c25ec8f47894f09d7e9ff9ca45db0ff49bf319b9236ffa687d4 FFmpeg=79ea6746fd6c9c25ec8f47894f09d7e9ff9ca45db0ff49bf319b9236ffa687d4 MATCH
+[host] RESULT ip128b 3/3
+
+Final /proc/interrupts:
+  19:         44          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+Single CTU row rejection on the same RAM boot:
+  19:         44          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+frame 0 queue 10 returned ERROR
+request-exit=1
+  19:         44          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+<7>[    7.513856] hi3798mv320-vdec f8c30000.video-decoder: request decode returned -95
+# 

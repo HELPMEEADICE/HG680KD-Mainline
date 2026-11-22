@@ -32,13 +32,14 @@ class Console:
         deadline = time.monotonic() + timeout
         received = bytearray()
         boot_interrupted = False
+        search = pattern.search if isinstance(pattern, re.Pattern) else None
         while time.monotonic() < deadline:
             data = self.port.read(1)
             if not data:
                 continue
             received.extend(data)
             self.record(data)
-            if pattern in received:
+            if search(received) if search else pattern in received:
                 return bytes(received)
             if not boot_interrupted and received.endswith((b"Autobooting in", b"stop autoboot")):
                 self.interrupt_autoboot()

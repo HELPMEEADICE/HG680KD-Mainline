@@ -2,9 +2,11 @@
 
 本项目最初以 Linux 6.18.64 为基线、后经 Linux 7.2.5 验证全硬件并在最新阶段通过 GCC 14.2.0 升级至 **Linux 7.3.5**，可从原厂 U-Boot 2022.07 和 BL31 直接冷启动 U 盘 **Armbian (Trixie arm64) + Xfce 桌面**（亦保留各版本 RAM 镜像作回退）。设备为海思 Hi3798MV320，四核 Cortex-A55，实装 2 GiB LPDDR4，板载 eMMC 始终强制只读（`ro=1`）。
 
-## ARM64 Linux 7.3.5 H.264 Stateless 解码（TFTP RAM）
+## ARM64 Linux 7.3.5 H.264 / HEVC Stateless 解码（TFTP RAM）
 
-`arm64-7.3.5-vdec` 在 HG680KD 上注册 `/dev/video0` 和 `/dev/media0`。应用使用 V4L2 Media Request API 提交 H.264 slice 和参数，从 CAPTURE 队列读取线性 NV21。COM4 板测中，32×32 与 128×128 回归、720p、1080p、空间与时间直接预测 B 帧及加权 P 帧共 52 帧，逐帧 SHA256 均与 FFmpeg 一致。PXP 收到 52 次完成中断，SMMU 故障为零。[驱动和复现步骤](VPU-REVERSE.md#9-linux-735-v4l2-stateless-驱动) · [构建日志](logs/436-vdec-hd-b-build.txt) · [逐帧 SHA256](logs/438-vdec-hd-b-pixels.txt)
+当前 `arm64-7.3.5-vdec` 支持 H.264 与 HEVC Main 8-bit，两个后端共用 V4L2 Media Request 和 NV21 CAPTURE。最终 COM4 RAM 镜像通过 35 帧 HEVC 与 9 帧 H.264 回归的逐帧 FFmpeg 哈希比对，覆盖 64×64 IDR/I+P、B 帧、720p、1080p 及 1088→1080 裁剪。PXP 完成中断 44 次，SMMU 为 0。64×64 样本使用 32×32 CTU，驱动会拒绝只有一行 CTU 的 HEVC 图像。[HEVC 消息与复现](VPU-REVERSE.md#10-linux-735-v4l2-stateless-hevc-main-8-bit) · [最终镜像](artifacts/arm64-7.3.5-vdec-hevc/final/boot.img) · [逐帧 SHA256](logs/441-vdec-hevc-pixels.txt)
+
+此前的 H.264 基线在同一 `/dev/video0` 和 `/dev/media0` 接口验证了 52 帧，覆盖空间与时间直接预测 B 帧及加权 P 帧。[H.264 驱动和复现步骤](VPU-REVERSE.md#9-linux-735-v4l2-stateless-驱动) · [基线逐帧 SHA256](logs/438-vdec-hd-b-pixels.txt)
 
 ## ARM64 Linux 7.3.5 VPU 探测（TFTP RAM）
 

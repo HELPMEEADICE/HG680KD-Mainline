@@ -329,7 +329,12 @@ if [[ $vdec && ${VDEC_TEST:-0} == 1 ]]; then
     printf 'dir /etc/vdec-test 0755 0 0\n' >>"$list"
     read -r -a fixtures <<< "${VDEC_FIXTURES:-ip32 ip128}"
     for fixture in "${fixtures[@]}"; do
-        for ext in txt 264; do
+        read -r codec _ <"$inputs/$fixture.txt"
+        stream_ext=264
+        if [[ $codec == HEVC ]]; then
+            stream_ext=265
+        fi
+        for ext in txt "$stream_ext"; do
             file="$fixture.$ext"
             printf 'file /etc/vdec-test/%s %s/%s 0644 0 0\n' "$file" "$inputs" "$file" >>"$list"
         done

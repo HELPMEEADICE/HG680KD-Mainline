@@ -283,6 +283,103 @@ python scripts/vdec_request_fixture.py "$out/input128w.264" "$out/ip128w"
 
 最终 RAM 镜像 SHA256 为 `c1048f4dd72b7cae84a11f7c2dd88edcb8b8990372c4f59bc29c91b67c22ae90`，TFTP 到 `0x01fdffc0` 后 U-Boot 回读 CRC32 为 `0574dfc3`。从启动到测试完成，PXP INTID 169 从 0 增至 52，SMMU INTID 181 始终为 0。U 盘未挂载，`mmcblk0/ro=1`。[构建日志](logs/436-vdec-hd-b-build.txt) · [COM4 TFTP 日志](logs/437-vdec-hd-b-tftp.txt) · [逐帧 SHA256 对照](logs/438-vdec-hd-b-pixels.txt)
 
+## 10. Linux 7.3.5 V4L2 Stateless HEVC Main 8-bit
+
+`hi3798mv320-vdec` 按 OUTPUT 格式选取 `vdec_codec_ops`。后端决定工作区分配、PMV 大小及请求消息，每个上下文持有各自的 CAPTURE 参考图。时钟、复位、私有 SMMU 动态映射、VDH 两槽、PXP IRQ、VB2 和 NV21 解排布共用。HEVC OUTPUT 接收 `V4L2_PIX_FMT_HEVC_SLICE` 的 Annex B VCL NAL，每个请求一片。SPS 可设在当前控件值，首片请求带 PPS、DECODE_PARAMS 和有效的 Scaling Matrix，后续片可用 HOLD 保留 CAPTURE 缓冲。应用按 SPS conformance window 裁剪。标准控件的位流范围和偏移采用 Annex B 输入的约定。[驱动](src/hi3798mv320-vdec.c) · [Linux Stateless Codec Controls](https://docs.kernel.org/userspace-api/media/v4l/ext-ctrls-codec-stateless.html) · [GStreamer HEVC 控件填充](https://raw.githubusercontent.com/GStreamer/gstreamer/main/subprojects/gst-plugins-bad/sys/v4l2codecs/gstv4l2codech265dec.c)
+
+### 原厂消息核对
+
+`arm32-result.txt` 已覆盖 `dec_hal_write_pub_msg`（`c077b140`）、`dec_hal_write_core_msg`（`c077b3e0`）及任务区分配。原始导出筛选偏向 H.264。用同一份原厂内核、kallsyms 和 IDA 数据库补导 `hevc_*`、`dps_h265_*`、`hal_h265_*`。在 `s_dec_hal_ops`（`c176bbf0`）中，第二项的第一个回调是 `hal_h265_write_msg`（`c07c6b8c`），末字为原厂软件协议号 `0x11`。[原始导出](artifacts/vpu-reverse-factory/arm32-result.txt) · [HEVC 补充导出](artifacts/vpu-reverse-factory/arm32-hevc-result.txt)
+
+| 区域 | 字段及来源 |
+|---|---|
+| `pub[2..3]` | `hal_h265_write_pub_msg`（`c07c5a4c`）写入正常解码高字节 `0x01`，启用 Scaling List 时再置 bit 30。低 20 位为 CTU 总数减一。硬件协议号 `13` 写在 `pub[3]` 的低字节。8-bit、非压缩且有 PMV 的常规任务使用 `0x0003c00d`。 |
+| 尺寸 | `log2_ctu = log2_min_luma_coding_block_size_minus3 + 3 + log2_diff_max_min_luma_coding_block_size`。CTU 网格宽高各按 CTU 尺寸向上取整，减一后存入 `pub[31]` 低、高半字。`pic[0]` 中宽高减一分别从 bit 0、9 起。实际编码像素宽高写入 `pic[54]` 与 `core+0x5cc`。 |
+| `pic[0..3]`、`pic[60..61]` | `hal_h265_write_pic_msg`（`c07c5bf4`）打包 SPS/PPS。含 AMP、SAO、temporal MVP、编码及变换块尺寸、变换层级、加权预测、色度 QP、CU QP delta、WPP、Tile 和环路滤波控制。当前 POC 写入 `pic[1]`。 |
+| Scaling List | `dps_h265_write_qmatrix_8x8` 与 `dps_h265_write_qmatrix_16x16` 将光栅顺序改为按 4 个系数打包。快照从 `pic+0x200` 起，偏移 `0x000`、`0x180`、`0x300`、`0x380` 分别为 8×8、16×16、32×32、4×4，`0x3e0` 起为 8 个 DC 系数。 |
+| DPB / RPS | `pic[8..23]` 是 16 个参考图地址，`pic[26..41]` 是对应 POC。参考地址与 POC 顺序一致，V4L2 以 CAPTURE 时间戳查找图像。原厂 `hal_h265_make_slice_ref`（`c07c6ac4`）将两个列表转为硬件 DPB 索引。每片的长期参考位图位于 `slice[13..14]`，4-bit 索引位于 `slice[15..18]`。共位参考索引在 `slice[7]` 的高 4 位，`slice[23]` 指向对应 CAPTURE 的 PMV。 |
+| Tile 信息 | `pub[32]` 与 `pic[61]` 携带 Tile 列数和行数减一。`pic[55]` 指向任务基址 `+0x33c00`。前两个 512 B 分别映射 X/Y 方向的 16 像素单位到 Tile 索引，后接 20 对列边界和 22 对行边界，每对为两个 LE16 CTU 索引，结束索引包含在内。 |
+| Slice / core | `core[28]` 指向首片，`core[32]` 指向首片 UP，`core[36]` 为片数。`hal_h265_write_slice_msg`（`c07c5f30`）在 `slice[0..5]` 写入两个环形流段的 128-bit 单位偏移、段内 bit 偏移及 bit 数。驱动使用连续工作区，因此只用第一段。 `slice[8..10]` 包含 CTU 起点的光栅索引、X/Y 坐标和 Tile 顺序索引，`slice[43..44]` 是对应的结束索引，`slice[63]` 是下一条消息的地址，最后一条为零。 |
+
+地址字段以 16 B 为单位。任务区的 core、picture、首条 slice 分别位于 `+0x100`、`+0x800`、`+0xe00`。HEVC 原厂允许 200 条 0x400 B 消息，恰好到 `+0x32e00` 的 picture UP 区。首条 slice UP 位于 `+0x32e80`。WPP 的 720p 板测使用单个连续 RBSP 流段。
+
+### 缓冲布局与 RBSP
+
+`hal_h265_fill_ext_mem`（`c07c57f8`）以 1024 B 对齐工作区基址并返回包含对齐补差的 `0x38100` B 大小。用于行缓冲和中间数据的原厂地址槽如下。区间大小按相邻子区起点和总长度核对，区间用途尚未逐个定位到硬件单元。
+
+| `pub[]` | 相对于 HEVC `ext_work` | 区间大小 |
+|---:|---:|---:|
+| 21 | `0x00000` | `0x1000` |
+| 22 | `0x01000` | `0x3000` |
+| 26 | `0x04000` | `0x3000` |
+| 24 | `0x07000` | `0x2800` |
+| 30 | `0x09800` | `0xb100` |
+| 28 | `0x14900` | `0xb000` |
+| 29 | `0x1f900` | `0x3800` |
+| 27 | `0x23100` | `0x15000` |
+
+`pub[21]` 在当前最大宽度下跟随原厂窄画面分支清零。`pub[25]` 指向单独的 HEVC CABAC 初始化表。从原厂 `c10b1220` 取三组初始化值并生成 928 B 的有符号 `(m,n)` 对。表生成命令与第 9 节相同。PMV 随解码面保留，尺寸按原厂 `pdt_get_slot_wh` / `pdt_get_pmv_size` 使用 `ALIGN(width,64) * ALIGN(height,64) / 4 + 256`。Y stride 按 256 B 对齐，Y 区占 `stride * ALIGN(height,64)`，VU 紧随其后且为 Y 区一半。驱动将 PMV 起点页对齐，Y 和 VU 用共用的 tiled 解排布写为紧凑 NV21。
+
+OUTPUT 保留 Annex B 起始码与 2 B NAL 头。驱动复制 VCL NAL 时剥离 `00 00 03` 中的防竞争字节，按 RBSP 的 CABAC 数据位置填充消息。GStreamer 的 `data_byte_offset` 含起始码与 NAL 头，并已扣除 slice header 内的防竞争字节。720p 对照实验的 VCL 含 15 个 `00 00 03`，原样送 EBSP 时首帧报 PXP `0x60000`，剥离后 3 帧像素哈希全部一致。两轮 SMMU 故障数均为 0。[EBSP/RBSP 对照串口](artifacts/arm64-7.3.5-vdec-hevc/diag/serial.txt)
+
+### 构建与 RAM 板测
+
+测试生成器读 FFmpeg 的 `trace_headers`，产出 `.txt` 请求参数、`.265` Annex B VCL 和 `.nv21` 软件参考。它按 POC 将 FFmpeg 的显示顺序转换到请求的解码顺序。带 conformance window 的样本另生成 `.visible.nv21`。下面创建 64×64 I+P 样本，帧数改为 1 即为 IDR 样本。[样本生成器](scripts/vdec_hevc_fixture.py) · [Media Request 测试程序](src/vdec-request-test.c)
+
+```powershell
+$out = 'artifacts/arm64-7.3.5-vdec-hevc'
+New-Item -ItemType Directory -Force $out | Out-Null
+$x265 = 'pools=1:frame-threads=1:wpp=0:repeat-headers=1:weightp=0:weightb=0:ref=1:keyint=30:scenecut=0:open-gop=0:b-pyramid=0'
+ffmpeg -y -f lavfi -i 'testsrc2=size=64x64:rate=4' -frames:v 2 -pix_fmt yuv420p -c:v libx265 -profile:v main -x265-params "${x265}:ctu=32:bframes=0" -f hevc "$out/input-h265ip64c32.265"
+python scripts/vdec_hevc_fixture.py "$out/input-h265ip64c32.265" "$out/h265ip64c32"
+```
+
+1920×1080 源可用 `-vf pad=1920:1088:0:0` 编码为 1088 行，再用 `-bsf:v hevc_metadata=crop_bottom=8` 标出 1080 行可视区。Tile 样本用 libkvazaar 的 `tiles=2x2`，在第二个样本加入 `slices=tiles`。[Kvazaar 编码参数](https://github.com/ultravideo/kvazaar#command-line-options)
+
+通过 `scripts/remote.ps1` 同步驱动、CABAC 头、测试程序、`0012` 补丁和 fixture 的 `.txt` 与码流到 `inputs/`，同步 `build_arm64.sh` 到 `scripts/`。选择要嵌入的样本后打包并核对远端 SHA256。
+已有 Linux 源树若应用过旧版 `0012`，将 `drivers/media/platform/Kconfig` 中该选项的帮助行同步至新版措辞，构建脚本即可识别补丁已应用。
+
+```bash
+cd /home/hedc/hg680kd-mainline
+JOBS=36 VDEC_TEST=1 VDEC_FIXTURES="h265ip64c32 h265crop1080 ip32 ip1080crop ip128b" \
+  bash scripts/build.sh full "$PWD" "$PWD/inputs" arm64-7.3.5-vdec
+cd out/release-arm64-7.3.5-vdec
+sha256sum -c BOOT-SHA256SUMS
+```
+
+下载 `boot.img` 后，用主机测试脚本独占 COM4。脚本在 U-Boot 中进行 TFTP、核对 CRC32，再从 RAM 执行 `bootm`。Linux 输出写进 RAM 的 `/tmp`。脚本从板端逐帧读取 SHA256 并与主机 FFmpeg 参考比对。
+
+```powershell
+python scripts/vdec_ram_test.py --image "$out/final/boot.img" `
+  --log "$out/final/serial.txt" --crop h265crop1080=1080 `
+  "$out/h265ip64c32" "$out/h265crop1080"
+```
+
+### 实机结果
+
+在同一次 COM4 115200 8N1 TFTP RAM 启动中，HEVC 35 帧和 H.264 9 帧的 NV21 哈希逐帧与 FFmpeg 一致。1088 行编码面及其 1080 行可视区分别核对，裁剪比对不重复计入解码帧总数。[构建日志](logs/439-vdec-hevc-build.txt) · [COM4 日志](logs/440-vdec-hevc-tftp.txt) · [逐帧 SHA256](logs/441-vdec-hevc-pixels.txt)
+
+| 格式 | 样本 | 匹配 |
+|---|---|---:|
+| HEVC | 64×64 IDR，32×32 CTU | 1/1 |
+| HEVC | 64×64 I+P，32×32 CTU | 2/2 |
+| HEVC | 128×128，含 B 帧，解码顺序 POC 0、2、1、3 | 4/4 |
+| HEVC | 1280×720 I/P | 3/3 |
+| HEVC | 1920×1080 I/P | 3/3 |
+| HEVC | 1920×1088 编码面及 1920×1080 裁剪 | 各 3/3 |
+| HEVC | 128×128 默认 Scaling List | 3/3 |
+| HEVC | 128×128 加权 P | 6/6 |
+| HEVC | 1280×720 WPP | 3/3 |
+| HEVC | 256×256 双 slice | 3/3 |
+| HEVC | 256×256 2×2 Tile，单 slice / 分 Tile 多 slice | 各 2/2 |
+| H.264 | 32×32 Main CABAC I+P | 2/2 |
+| H.264 | 1920×1088 编码面及 1920×1080 裁剪 | 各 4/4 |
+| H.264 | 128×128，含 B 帧 | 3/3 |
+
+镜像 SHA256 为 `b13e4218b67343a10fce90ee0229ebd7cabdff5177d1027edfca080366044fb2`。U-Boot 从 `0x01fdffc0` 读回 16,644,168 B，CRC32 为 `9690610d`。PXP INTID 169 从 0 增至 44，SMMU INTID 181 全程为 0。U 盘未挂载，`mmcblk0/ro=1`。U-Boot 只读取原厂 ATF 并设置临时会话变量，镜像通过 TFTP 写入 RAM。[最终 boot.img](artifacts/arm64-7.3.5-vdec-hevc/final/boot.img)
+
+单 CTU 行的 HEVC 图像在探测镜像中有 slice UP 更新，但 PXP 不完成。实测包括使用 64×64 CTU 的 64×64 与 128×64，以及使用 32×32 CTU 的 128×32。最终驱动在硬件提交前以 `-EOPNOTSUPP` 拒绝此组合，负向测试中两个中断计数均未增加。当前解码路径限于逐行 8-bit 4:2:0，PCM 与 Main10 留待后续。长期参考地址和索引已按原厂布局映射，本轮的 I/P/B 向量验证了短期参考。[单 CTU 行日志](logs/441-vdec-hevc-pixels.txt)
+
 | 样本 | NV21 帧 SHA256 匹配 |
 | --- | ---: |
 | 32×32 CABAC IDR/P 和 CAVLC IDR | 3/3 |

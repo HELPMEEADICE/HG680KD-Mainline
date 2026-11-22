@@ -61,6 +61,21 @@
 #define VDEC_MAX_SLICES		136
 #define STREAM_OFFSET		ALIGN(SLICE_POOL + (VDEC_MAX_SLICES - 1) * SLICE_MSG_SIZE, VDEC_PAGE)
 
+#define HEVC_SLICE_UP		(MSG_UP + 0x80)
+#define HEVC_TILE_INFO		0x33c00
+#define HEVC_TILE_MAP_SIZE	512
+#define HEVC_EXT_WORK		(CABAC_TABLE + 0x400)
+#define HEVC_EXT_WORK_SIZE	0x38100
+#define HEVC_STREAM_OFFSET	ALIGN(HEVC_EXT_WORK + HEVC_EXT_WORK_SIZE, VDEC_PAGE)
+#define HEVC_MAX_SLICES		200
+#define HEVC_MAX_TILE_COLUMNS	20
+#define HEVC_MAX_TILE_ROWS	22
+#define HEVC_TILE_INFO_SIZE	(2 * HEVC_TILE_MAP_SIZE + 4 * (HEVC_MAX_TILE_COLUMNS + HEVC_MAX_TILE_ROWS))
+
+static_assert(MSG_SLICE + HEVC_MAX_SLICES * SLICE_MSG_SIZE <= MSG_UP);
+static_assert(HEVC_TILE_INFO + HEVC_TILE_INFO_SIZE <= CABAC_TABLE);
+static_assert(sizeof(hevc_cabac_init) <= HEVC_EXT_WORK - CABAC_TABLE);
+
 struct vdec_dma {
 	void *cpu;
 	dma_addr_t dma;
@@ -103,11 +118,32 @@ struct vdec_dev {
 	struct v4l2_m2m_dev *m2m;
 };
 
+struct vdec_ctx;
+
+struct vdec_codec_ops {
+	u32 pixelformat;
+	u32 slice_control;
+	void (*surface_layout)(struct vdec_ctx *ctx);
+	int (*prepare_workspace)(struct vdec_ctx *ctx);
+	int (*pack_request)(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
+			    struct vb2_v4l2_buffer *dst, unsigned int controls);
+	void (*end_picture)(struct vdec_ctx *ctx);
+	unsigned int (*request_controls)(struct v4l2_ctrl_handler *hdl);
+};
+
+struct vdec_hevc_tiles {
+	u16 col[HEVC_MAX_TILE_COLUMNS + 1];
+	u16 row[HEVC_MAX_TILE_ROWS + 1];
+	unsigned int cols, rows;
+};
+
 struct vdec_ctx {
 	struct vdec_dev *vdec;
+	const struct vdec_codec_ops *codec;
 	struct v4l2_fh fh;
 	struct v4l2_ctrl_handler controls;
 	struct v4l2_ctrl *sps, *pps, *scaling, *slice, *decode, *weights;
+	struct v4l2_ctrl *hevc_sps, *hevc_pps, *hevc_scaling, *hevc_slice, *hevc_decode;
 	struct v4l2_pix_format_mplane output, capture;
 	struct vdec_dma workspace;
 	unsigned int stride, y_size, vu_size, pmv_offset, pmv_size;
@@ -118,6 +154,10 @@ struct vdec_ctx {
 	struct v4l2_ctrl_h264_sps picture_sps;
 	struct v4l2_ctrl_h264_pps picture_pps;
 	struct v4l2_ctrl_h264_decode_params picture_dec;
+	struct v4l2_ctrl_hevc_sps hevc_picture_sps;
+	struct v4l2_ctrl_hevc_pps hevc_picture_pps;
+	struct v4l2_ctrl_hevc_decode_params hevc_picture_dec;
+	struct vdec_hevc_tiles hevc_tiles;
 };
 
 static struct vdec_ctx *file_to_ctx(struct file *file)
@@ -330,12 +370,30 @@ static int vdec_submit(struct vdec_dev *vdec, const struct vdec_dma *work)
 	return ret;
 }
 
-static int vdec_find_refs(struct vdec_ctx *ctx, struct vdec_buffer *dst,
+static struct vdec_buffer *vdec_find_buffer(struct vdec_ctx *ctx,
+					   const struct vdec_buffer *dst, u64 timestamp)
+{
+	struct vb2_queue *vq = v4l2_m2m_get_dst_vq(ctx->fh.m2m_ctx);
+	unsigned int i;
+
+	for (i = 0; i < vq->max_num_buffers; i++) {
+		struct vb2_buffer *vb = vb2_get_buffer(vq, i);
+		struct vdec_buffer *ref;
+
+		if (!vb)
+			continue;
+		ref = to_vdec_buffer(vb);
+		if (ref != dst && ref->decoded && ref->timestamp == timestamp)
+			return ref;
+	}
+	return NULL;
+}
+
+static int vdec_h264_find_refs(struct vdec_ctx *ctx, struct vdec_buffer *dst,
 			  const struct v4l2_ctrl_h264_decode_params *dec,
 			  struct vdec_refs *refs)
 {
-	struct vb2_queue *vq = v4l2_m2m_get_dst_vq(ctx->fh.m2m_ctx);
-	unsigned int i, j, index = 0;
+	unsigned int i, index = 0;
 
 	for (i = 0; i < V4L2_H264_NUM_DPB_ENTRIES; i++) {
 		if (!(dec->dpb[i].flags & V4L2_H264_DPB_ENTRY_FLAG_ACTIVE))
@@ -344,22 +402,10 @@ static int vdec_find_refs(struct vdec_ctx *ctx, struct vdec_buffer *dst,
 		    dec->dpb[i].fields != V4L2_H264_FRAME_REF)
 			return -EINVAL;
 
-		for (j = 0; j < vq->max_num_buffers; j++) {
-			struct vb2_buffer *vb = vb2_get_buffer(vq, j);
-			struct vdec_buffer *ref;
-
-			if (!vb)
-				continue;
-			ref = to_vdec_buffer(vb);
-			if (ref != dst && ref->decoded &&
-			    ref->timestamp == dec->dpb[i].reference_ts) {
-				refs->buffers[i] = ref;
-				refs->index[i] = index++;
-				break;
-			}
-		}
+		refs->buffers[i] = vdec_find_buffer(ctx, dst, dec->dpb[i].reference_ts);
 		if (!refs->buffers[i])
 			return -ENOENT;
+		refs->index[i] = index++;
 	}
 	return 0;
 }
@@ -555,7 +601,7 @@ static void vdec_picture_message(struct vdec_ctx *ctx, struct vdec_buffer *dst,
 	pub[31] = cpu_to_le32(geometry);
 
 	core[28] = vdec_addr(base, MSG_SLICE);
-	core[32] = vdec_addr(base, MSG_UP + 0x80);
+	core[32] = vdec_addr(base, HEVC_SLICE_UP);
 	core[36] = cpu_to_le32(1);
 
 	pic[0] = cpu_to_le32(geometry | BIT(25) | (dec->nal_ref_idc ? BIT(31) : 0) |
@@ -626,9 +672,9 @@ static void vdec_detile_plane(u8 *dst, const u8 *src, unsigned int width,
 }
 
 static int vdec_copy_rbsp(u8 *dst, const u8 *src, unsigned int size,
-			  unsigned int prefix)
+			  unsigned int header)
 {
-	unsigned int i, length = prefix + 1, zeroes = 0;
+	unsigned int i, length = header, zeroes = 0;
 
 	/* Keep the start code and NAL header ahead of the VDH's bit offset. */
 	memcpy(dst, src, length);
@@ -663,12 +709,10 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 {
 	struct vdec_buffer *out = to_vdec_buffer(&dst->vb2_buf);
 	unsigned int width = ctx->output.width, height = ctx->output.height;
-	unsigned int mb_width = width / 16;
-	__le32 *slice = ctx->workspace.cpu + vdec_slice_offset(ctx->num_slices - 1);
 	u8 *output = vb2_plane_vaddr(&dst->vb2_buf, 0);
 	int ret;
 
-	vdec_slice_end(slice, mb_width * (height / 16) - 1, mb_width);
+	ctx->codec->end_picture(ctx);
 	ctx->num_slices = 0;
 	if (ctx->vdec->dead)
 		return -EIO;
@@ -687,8 +731,29 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 	return 0;
 }
 
-static int vdec_run(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
-		    struct vb2_v4l2_buffer *dst, unsigned int controls)
+static void vdec_h264_end_picture(struct vdec_ctx *ctx)
+{
+	unsigned int mb_width = ctx->output.width / 16;
+	__le32 *slice = ctx->workspace.cpu + vdec_slice_offset(ctx->num_slices - 1);
+
+	vdec_slice_end(slice, mb_width * (ctx->output.height / 16) - 1, mb_width);
+}
+
+static int vdec_h264_prepare_workspace(struct vdec_ctx *ctx)
+{
+	int ret;
+
+	ret = vdec_dma_alloc(ctx->vdec, &ctx->workspace,
+			     STREAM_OFFSET + ctx->output.plane_fmt[0].sizeimage +
+			     VDEC_STREAM_PAD);
+	if (!ret)
+		memcpy(ctx->workspace.cpu + CABAC_TABLE, h264_cabac_init,
+		       sizeof(h264_cabac_init));
+	return ret;
+}
+
+static int vdec_h264_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
+				 struct vb2_v4l2_buffer *dst, unsigned int controls)
 {
 	const struct v4l2_ctrl_h264_sps *sps = ctx->sps->p_cur.p_h264_sps;
 	const struct v4l2_ctrl_h264_pps *pps = ctx->pps->p_cur.p_h264_pps;
@@ -702,7 +767,6 @@ static int vdec_run(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
 	unsigned int bytes = vb2_get_plane_payload(&src->vb2_buf, 0) - offset;
 	unsigned int prefix, slice_offset, bit;
 	bool cabac;
-	bool hold = src->flags & V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF;
 	const u8 *input = vb2_plane_vaddr(&src->vb2_buf, 0);
 	u8 *output = vb2_plane_vaddr(&dst->vb2_buf, 0);
 	__le32 *slice;
@@ -767,24 +831,20 @@ static int vdec_run(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
 	    ctx->stream_used + bytes > ctx->output.plane_fmt[0].sizeimage)
 		return -ENOSPC;
 
-	ret = vdec_find_refs(ctx, out, dec, &refs);
+	ret = vdec_h264_find_refs(ctx, out, dec, &refs);
 	if (ret)
 		return ret;
 	if (!ctx->workspace.cpu) {
-		ret = vdec_dma_alloc(ctx->vdec, &ctx->workspace,
-				    STREAM_OFFSET + ctx->output.plane_fmt[0].sizeimage +
-				    VDEC_STREAM_PAD);
+		ret = ctx->codec->prepare_workspace(ctx);
 		if (ret)
 			return ret;
-		memcpy(ctx->workspace.cpu + CABAC_TABLE, h264_cabac_init,
-		       sizeof(h264_cabac_init));
 	}
 	if (!ctx->num_slices)
 		vdec_picture_message(ctx, out, &refs);
 
 	stream = ctx->workspace.cpu + STREAM_OFFSET + ctx->stream_used;
 	/* The VDH entropy decoder consumes RBSP at the slice data offset. */
-	ret = vdec_copy_rbsp(stream, input, bytes, prefix);
+	ret = vdec_copy_rbsp(stream, input, bytes, prefix + 1);
 	if (ret < 0)
 		return ret;
 	bytes = ret;
@@ -808,19 +868,587 @@ static int vdec_run(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
 	ctx->num_slices++;
 	ctx->stream_used = ALIGN(ctx->stream_used + bytes, 16);
 	ctx->last_mb = sp->first_mb_in_slice;
-	if (hold)
-		return 0;
-
-	return vdec_finish_picture(ctx, dst);
+	return 0;
 }
 
-static unsigned int vdec_request_controls(struct vdec_ctx *ctx, struct media_request *req)
+static int vdec_hevc_prepare_workspace(struct vdec_ctx *ctx)
 {
-	struct v4l2_ctrl_handler *hdl = v4l2_ctrl_request_hdl_find(req, &ctx->controls);
+	int ret;
+
+	ret = vdec_dma_alloc(ctx->vdec, &ctx->workspace,
+			     HEVC_STREAM_OFFSET + ctx->output.plane_fmt[0].sizeimage +
+			     VDEC_STREAM_PAD);
+	if (!ret)
+		memcpy(ctx->workspace.cpu + CABAC_TABLE, hevc_cabac_init,
+		       sizeof(hevc_cabac_init));
+	return ret;
+}
+
+static int vdec_hevc_tile_boundaries(u16 *start, const u8 *sizes, unsigned int count,
+				    unsigned int ctus, bool uniform)
+{
+	unsigned int i;
+
+	if (count > ctus)
+		return -EINVAL;
+	start[0] = 0;
+	for (i = 1; i < count; i++) {
+		start[i] = uniform ? i * ctus / count : start[i - 1] + sizes[i - 1] + 1;
+		if (start[i] >= ctus)
+			return -EINVAL;
+	}
+	start[count] = ctus;
+	return 0;
+}
+
+static int vdec_hevc_tile_layout(struct vdec_ctx *ctx, unsigned int width, unsigned int height)
+{
+	const struct v4l2_ctrl_hevc_pps *pps = &ctx->hevc_picture_pps;
+	struct vdec_hevc_tiles *tiles = &ctx->hevc_tiles;
+	bool enabled = pps->flags & V4L2_HEVC_PPS_FLAG_TILES_ENABLED;
+	bool uniform = pps->flags & V4L2_HEVC_PPS_FLAG_UNIFORM_SPACING;
+	int ret;
+
+	tiles->cols = enabled ? pps->num_tile_columns_minus1 + 1 : 1;
+	tiles->rows = enabled ? pps->num_tile_rows_minus1 + 1 : 1;
+	if (tiles->cols > HEVC_MAX_TILE_COLUMNS || tiles->rows > HEVC_MAX_TILE_ROWS)
+		return -EINVAL;
+	ret = vdec_hevc_tile_boundaries(tiles->col, pps->column_width_minus1,
+					tiles->cols, width, uniform);
+	if (ret)
+		return ret;
+	return vdec_hevc_tile_boundaries(tiles->row, pps->row_height_minus1,
+					 tiles->rows, height, uniform);
+}
+
+static void vdec_hevc_tile_axis(u8 *map, __le16 *bounds, const u16 *start,
+			       unsigned int count, unsigned int units)
+{
+	unsigned int i;
+
+	for (i = 0; i < count; i++) {
+		memset(map + start[i] * units, i, (start[i + 1] - start[i]) * units);
+		bounds[2 * i] = cpu_to_le16(start[i]);
+		bounds[2 * i + 1] = cpu_to_le16(start[i + 1] - 1);
+	}
+}
+
+static unsigned int vdec_hevc_to_tile_scan(const struct vdec_hevc_tiles *tiles,
+					  unsigned int addr)
+{
+	unsigned int width = tiles->col[tiles->cols];
+	unsigned int x = addr % width, y = addr / width;
+	unsigned int col = 0, row = 0, w, h;
+
+	while (x >= tiles->col[col + 1])
+		col++;
+	while (y >= tiles->row[row + 1])
+		row++;
+	w = tiles->col[col + 1] - tiles->col[col];
+	h = tiles->row[row + 1] - tiles->row[row];
+	return width * tiles->row[row] + h * tiles->col[col] +
+	       w * (y - tiles->row[row]) + x - tiles->col[col];
+}
+
+static unsigned int vdec_hevc_to_raster(const struct vdec_hevc_tiles *tiles,
+					unsigned int addr)
+{
+	unsigned int width = tiles->col[tiles->cols];
+	unsigned int col = 0, row = 0, w, h;
+
+	while (addr >= width * tiles->row[row + 1])
+		row++;
+	addr -= width * tiles->row[row];
+	h = tiles->row[row + 1] - tiles->row[row];
+	while (addr >= h * tiles->col[col + 1])
+		col++;
+	addr -= h * tiles->col[col];
+	w = tiles->col[col + 1] - tiles->col[col];
+	return (tiles->row[row] + addr / w) * width + tiles->col[col] + addr % w;
+}
+
+static void vdec_hevc_end_slice(struct vdec_ctx *ctx, __le32 *slice, unsigned int end,
+			       bool last_independent)
+{
+	const struct vdec_hevc_tiles *tiles = &ctx->hevc_tiles;
+	unsigned int raster = vdec_hevc_to_raster(tiles, end);
+	unsigned int row = raster / tiles->col[tiles->cols];
+
+	slice[43] = cpu_to_le32(raster);
+	slice[44] = cpu_to_le32(end);
+	slice[62] = cpu_to_le32(row | row << 16 | (last_independent ? BIT(31) : 0));
+}
+
+static void vdec_hevc_end_picture(struct vdec_ctx *ctx)
+{
+	const struct vdec_hevc_tiles *tiles = &ctx->hevc_tiles;
+	__le32 *core = ctx->workspace.cpu + MSG_CORE;
+	unsigned int width = tiles->col[tiles->cols];
+	unsigned int height = tiles->row[tiles->rows];
+	__le32 *slice = ctx->workspace.cpu + MSG_SLICE +
+			(ctx->num_slices - 1) * SLICE_MSG_SIZE;
+
+	vdec_hevc_end_slice(ctx, slice, width * height - 1, true);
+	core[36] = cpu_to_le32(ctx->num_slices);
+}
+
+static int vdec_hevc_find_refs(struct vdec_ctx *ctx, struct vdec_buffer *dst,
+			      const struct v4l2_ctrl_hevc_decode_params *dec,
+			      struct vdec_buffer **refs)
+{
+	unsigned int i;
+
+	if (dec->num_active_dpb_entries > V4L2_HEVC_DPB_ENTRIES_NUM_MAX)
+		return -EINVAL;
+	for (i = 0; i < dec->num_active_dpb_entries; i++) {
+		if (dec->dpb[i].field_pic)
+			return -EINVAL;
+		refs[i] = vdec_find_buffer(ctx, dst, dec->dpb[i].timestamp);
+		if (!refs[i])
+			return -ENOENT;
+	}
+	return 0;
+}
+
+static void vdec_hevc_scaling_list(u8 *dst, const struct v4l2_ctrl_hevc_scaling_matrix *matrix)
+{
+	unsigned int i, x, y;
+
+	/* The VDH reads four coefficients per word, vertically within a tile. */
+	for (i = 0; i < 6; i++) {
+		for (y = 0; y < 8; y++) {
+			for (x = 0; x < 8; x++) {
+				unsigned int column = x / 4 * 32 + x % 4 * 8;
+				unsigned int c = y * 8 + x;
+
+				dst[i * 64 + column + y % 2 * 4 + y / 2] =
+					matrix->scaling_list_8x8[i][c];
+				dst[0x180 + i * 64 + column + y / 4 * 4 + y % 4] =
+					matrix->scaling_list_16x16[i][c];
+				if (i < 2)
+					dst[0x300 + i * 64 + column + y / 4 * 4 + y % 4] =
+						matrix->scaling_list_32x32[i][c];
+			}
+		}
+		for (y = 0; y < 4; y++)
+			for (x = 0; x < 4; x++)
+				dst[0x380 + i * 16 + x * 4 + y % 2 * 2 + y / 2] =
+					matrix->scaling_list_4x4[i][y * 4 + x];
+	}
+	memcpy(dst + 0x3e0, matrix->scaling_list_dc_coef_16x16, 6);
+	memcpy(dst + 0x3e6, matrix->scaling_list_dc_coef_32x32, 2);
+}
+
+static void vdec_hevc_picture_message(struct vdec_ctx *ctx, struct vdec_buffer *dst,
+				      struct vdec_buffer **refs, unsigned int log2_ctu,
+				      unsigned int ctu_width, unsigned int ctu_height)
+{
+	const struct v4l2_ctrl_hevc_sps *sps = &ctx->hevc_picture_sps;
+	const struct v4l2_ctrl_hevc_pps *pps = &ctx->hevc_picture_pps;
+	const struct v4l2_ctrl_hevc_decode_params *dec = &ctx->hevc_picture_dec;
+	void *work = ctx->workspace.cpu;
+	__le32 *pub = work, *core = work + MSG_CORE, *pic = work + MSG_PICTURE;
+	u32 base = ctx->workspace.iova, out = dst->surface.iova;
+	unsigned int surface_size = ctx->y_size + ctx->vu_size;
+	unsigned int min_cb = sps->log2_min_luma_coding_block_size_minus3 + 3;
+	unsigned int min_tb = sps->log2_min_luma_transform_block_size_minus2 + 2;
+	unsigned int width = sps->pic_width_in_luma_samples, height = sps->pic_height_in_luma_samples;
+	unsigned int ctu_count = ctu_width * ctu_height;
+	u32 geometry = (ctu_height - 1) << 16 | (ctu_width - 1);
+	bool scaling = sps->flags & V4L2_HEVC_SPS_FLAG_SCALING_LIST_ENABLED;
+	bool tiled = pps->flags & V4L2_HEVC_PPS_FLAG_TILES_ENABLED;
+	const struct vdec_hevc_tiles *tiles = &ctx->hevc_tiles;
+	unsigned int units = 1U << (log2_ctu - 4);
+	unsigned int i;
+
+	memset(work, 0, MSG_SLICE);
+	memset(work + MSG_UP, 0, MSG_UP_SIZE);
+
+	pub[2] = cpu_to_le32(BIT(24) | (scaling ? BIT(30) : 0) | (ctu_count - 1));
+	pub[3] = cpu_to_le32(0x3c00d);
+	pub[4] = vdec_addr(base, MSG_PICTURE);
+	pub[5] = vdec_addr(base, MSG_UP);
+	pub[6] = vdec_addr(base, HEVC_STREAM_OFFSET);
+	pub[8] = cpu_to_le32(1);
+	pub[9] = vdec_addr(out, 0);
+	pub[10] = cpu_to_le32(ctx->stride);
+	pub[12] = cpu_to_le32(ctx->y_size);
+	pub[20] = vdec_addr(out, surface_size);
+	pub[22] = vdec_addr(base, HEVC_EXT_WORK + 0x1000);
+	pub[23] = vdec_addr(out, ctx->pmv_offset);
+	pub[24] = vdec_addr(base, HEVC_EXT_WORK + 0x7000);
+	pub[25] = vdec_addr(base, CABAC_TABLE);
+	pub[26] = vdec_addr(base, HEVC_EXT_WORK + 0x4000);
+	pub[27] = vdec_addr(base, HEVC_EXT_WORK + 0x23100);
+	pub[28] = vdec_addr(base, HEVC_EXT_WORK + 0x14900);
+	pub[29] = vdec_addr(base, HEVC_EXT_WORK + 0x1f900);
+	pub[30] = vdec_addr(base, HEVC_EXT_WORK + 0x9800);
+	pub[31] = cpu_to_le32(geometry);
+	pub[32] = cpu_to_le32((tiles->cols - 1) | (tiles->rows - 1) << 16);
+
+	core[28] = vdec_addr(base, MSG_SLICE);
+	core[32] = vdec_addr(base, MSG_UP + 0x80);
+	core[36] = cpu_to_le32(1);
+	for (i = 0; i < V4L2_HEVC_DPB_ENTRIES_NUM_MAX; i++) {
+		struct vdec_buffer *ref = refs[i] ?: refs[0] ?: dst;
+		u32 addr = ref->surface.iova;
+
+		if (refs[i]) {
+			pic[8 + i] = vdec_addr(addr, 0);
+			pic[26 + i] = cpu_to_le32(dec->dpb[i].pic_order_cnt_val);
+		}
+		core[0x500 / 4 + i] = vdec_addr(addr, 0);
+		core[0x540 / 4 + i] = vdec_addr(addr, surface_size);
+		core[0x580 / 4 + i] = vdec_addr(addr, 0);
+	}
+	for (i = 0; i < 3; i++) {
+		core[0x5cc / 4 + i] = cpu_to_le32(width | height << 16);
+		core[0x5d8 / 4 + i] = cpu_to_le32(ctx->y_size);
+		core[0x5fc / 4 + i] = cpu_to_le32(ctx->stride);
+	}
+	core[0x614 / 4] = vdec_addr(out, surface_size);
+	core[0x61c / 4] = vdec_addr(out, 0);
+
+	pic[0] = cpu_to_le32((ctu_width - 1) | (ctu_height - 1) << 9 | BIT(19) |
+			     (sps->flags & V4L2_HEVC_SPS_FLAG_AMP_ENABLED ? BIT(21) : 0) |
+			     (sps->flags & V4L2_HEVC_SPS_FLAG_SAMPLE_ADAPTIVE_OFFSET ? BIT(22) : 0) |
+			     (scaling ? BIT(24) : 0) |
+			     (sps->flags & V4L2_HEVC_SPS_FLAG_SPS_TEMPORAL_MVP_ENABLED ? BIT(25) : 0));
+	pic[1] = cpu_to_le32(dec->pic_order_cnt_val);
+	pic[2] = cpu_to_le32(log2_ctu | min_cb << 3 |
+			     2 * (log2_ctu - min_cb) << 6 |
+			     (min_tb + sps->log2_diff_max_min_luma_transform_block_size) << 9 |
+			     min_tb << 12 | (u32)sps->max_transform_hierarchy_depth_intra << 21 |
+			     (u32)sps->max_transform_hierarchy_depth_inter << 24 |
+			     (pps->flags & V4L2_HEVC_PPS_FLAG_WEIGHTED_PRED ? BIT(27) : 0) |
+			     (pps->flags & V4L2_HEVC_PPS_FLAG_WEIGHTED_BIPRED ? BIT(28) : 0) |
+			     (u32)pps->log2_parallel_merge_level_minus2 << 29);
+	pic[3] = cpu_to_le32(0x88);
+	pic[54] = cpu_to_le32(width | height << 16);
+	pic[55] = vdec_addr(base, HEVC_TILE_INFO);
+	pic[60] = cpu_to_le32((pps->pps_cr_qp_offset & 31) | (pps->pps_cb_qp_offset & 31) << 5 |
+			      (pps->flags & V4L2_HEVC_PPS_FLAG_CONSTRAINED_INTRA_PRED ? BIT(10) : 0) |
+			      (pps->flags & V4L2_HEVC_PPS_FLAG_TRANSQUANT_BYPASS_ENABLED ? BIT(11) : 0) |
+			      (pps->flags & V4L2_HEVC_PPS_FLAG_CU_QP_DELTA_ENABLED ? BIT(12) : 0) |
+			      (u32)pps->diff_cu_qp_delta_depth << 13 |
+			      (log2_ctu - pps->diff_cu_qp_delta_depth) << 16 |
+			      (tiled ? BIT(19) : 0) |
+			      (pps->flags & V4L2_HEVC_PPS_FLAG_ENTROPY_CODING_SYNC_ENABLED ? BIT(21) : 0) |
+			      (pps->flags & V4L2_HEVC_PPS_FLAG_SIGN_DATA_HIDING_ENABLED ? BIT(22) : 0) |
+			      (pps->flags & V4L2_HEVC_PPS_FLAG_TRANSFORM_SKIP_ENABLED ? BIT(23) : 0) |
+			      (pps->flags & V4L2_HEVC_PPS_FLAG_LOOP_FILTER_ACROSS_TILES_ENABLED ? BIT(24) : 0));
+	pic[61] = pub[32];
+	pic[64] = cpu_to_le32(0x40000000);
+	pic[76] = cpu_to_le32(0x08000000);
+	if (scaling)
+		vdec_hevc_scaling_list((u8 *)(pic + 128), ctx->hevc_scaling->p_cur.p);
+	if (tiled) {
+		u8 *info = work + HEVC_TILE_INFO;
+		__le16 *bounds = (__le16 *)(info + 2 * HEVC_TILE_MAP_SIZE);
+
+		memset(info, 0, HEVC_TILE_INFO_SIZE);
+		vdec_hevc_tile_axis(info, bounds, tiles->col, tiles->cols, units);
+		vdec_hevc_tile_axis(info + HEVC_TILE_MAP_SIZE, bounds + 2 * HEVC_MAX_TILE_COLUMNS,
+				    tiles->row, tiles->rows, units);
+	}
+}
+
+static int vdec_hevc_ref_list(__le32 *slice, const struct v4l2_ctrl_hevc_decode_params *dec,
+			     unsigned int list, const u8 *indices, unsigned int count)
+{
+	unsigned int i;
+	u32 long_term = 0, slots[2] = {};
+
+	if (count > 15)
+		return -EINVAL;
+	for (i = 0; i < count; i++) {
+		unsigned int index = indices[i];
+
+		if (index >= dec->num_active_dpb_entries)
+			return -EINVAL;
+		if (dec->dpb[index].flags & V4L2_HEVC_DPB_ENTRY_LONG_TERM_REFERENCE)
+			long_term |= BIT(i);
+		slots[i / 8] |= index << (i % 8 * 4);
+	}
+	slice[13 + list] = cpu_to_le32(long_term);
+	slice[15 + 2 * list] = cpu_to_le32(slots[0]);
+	slice[16 + 2 * list] = cpu_to_le32(slots[1]);
+	return 0;
+}
+
+static void vdec_hevc_weights(__le32 *slice, unsigned int count,
+			      unsigned int luma_denom, unsigned int chroma_denom,
+			      const s8 *luma_weight, const s8 *luma_offset,
+			      const s8 (*chroma_weight)[2], const s8 (*chroma_offset)[2])
+{
+	unsigned int i;
+
+	for (i = 0; i < count; i++) {
+		int y = (1 << luma_denom) + luma_weight[i];
+		int cb = (1 << chroma_denom) + chroma_weight[i][0];
+		int cr = (1 << chroma_denom) + chroma_weight[i][1];
+
+		slice[64 + i] = cpu_to_le32(luma_denom | (y & 511) << 3 |
+					    (u32)(u8)luma_offset[i] << 12);
+		slice[128 + i] = cpu_to_le32(chroma_denom | (cb & 511) << 3 |
+					     (u32)(u8)chroma_offset[i][0] << 12);
+		slice[160 + i] = cpu_to_le32((cr & 511) | (u32)(u8)chroma_offset[i][1] << 9 |
+					     chroma_denom << 17);
+	}
+}
+
+static int vdec_hevc_slice_message(struct vdec_ctx *ctx, __le32 *slice,
+				  const struct v4l2_ctrl_hevc_slice_params *sp,
+				  struct vdec_buffer **refs, struct vdec_buffer *out,
+				  unsigned int tile_start, unsigned int data_bit,
+				  unsigned int data_bits)
+{
+	const struct v4l2_ctrl_hevc_pps *pps = &ctx->hevc_picture_pps;
+	const struct v4l2_ctrl_hevc_decode_params *dec = &ctx->hevc_picture_dec;
+	bool intra = sp->slice_type == V4L2_HEVC_SLICE_TYPE_I;
+	bool bipred = sp->slice_type == V4L2_HEVC_SLICE_TYPE_B;
+	bool temporal = sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_SLICE_TEMPORAL_MVP_ENABLED;
+	bool from_l0 = !bipred || sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_COLLOCATED_FROM_L0;
+	unsigned int l0 = intra ? 0 : sp->num_ref_idx_l0_active_minus1 + 1;
+	unsigned int l1 = bipred ? sp->num_ref_idx_l1_active_minus1 + 1 : 0;
+	unsigned int first = sp->slice_segment_addr, col_index = 0;
+	unsigned int ctu_width = ctx->hevc_tiles.col[ctx->hevc_tiles.cols];
+	bool no_future = true;
+	struct vdec_buffer *col = out;
+	int qp = 26 + pps->init_qp_minus26 + sp->slice_qp_delta;
+	unsigned int i;
+	int ret;
+
+	if (qp < 0 || qp > 51 || sp->five_minus_max_num_merge_cand > 4)
+		return -EINVAL;
+	ret = vdec_hevc_ref_list(slice, dec, 0, sp->ref_idx_l0, l0);
+	if (ret)
+		return ret;
+	ret = vdec_hevc_ref_list(slice, dec, 1, sp->ref_idx_l1, l1);
+	if (ret)
+		return ret;
+	for (i = 0; i < l0; i++)
+		no_future &= dec->dpb[sp->ref_idx_l0[i]].pic_order_cnt_val <= dec->pic_order_cnt_val;
+	for (i = 0; i < l1; i++)
+		no_future &= dec->dpb[sp->ref_idx_l1[i]].pic_order_cnt_val <= dec->pic_order_cnt_val;
+	if (temporal && !intra) {
+		if (sp->collocated_ref_idx >= (from_l0 ? l0 : l1))
+			return -EINVAL;
+		col_index = from_l0 ? sp->ref_idx_l0[sp->collocated_ref_idx] :
+				      sp->ref_idx_l1[sp->collocated_ref_idx];
+		col = refs[col_index];
+	}
+
+	slice[0] = cpu_to_le32(data_bit / 128);
+	slice[1] = cpu_to_le32(data_bit % 128);
+	slice[2] = cpu_to_le32(data_bits);
+	slice[6] = cpu_to_le32(first | (u32)qp << 19 | (no_future ? BIT(27) : 0) |
+			       (sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_CABAC_INIT ? BIT(18) : 0) |
+			       (sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_DEPENDENT_SLICE_SEGMENT ?
+				BIT(26) : 0));
+	slice[7] = cpu_to_le32((V4L2_HEVC_SLICE_TYPE_I - sp->slice_type) | l0 << 2 | l1 << 8 |
+			       (temporal ? BIT(15) : 0) | (from_l0 ? BIT(27) : 0) |
+			       (sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_MVD_L1_ZERO ? BIT(14) : 0) |
+			       (intra ? 0 : (5U - sp->five_minus_max_num_merge_cand) << 24) |
+			       (l0 ? (l0 - 1) << 16 : 0) | (l1 ? (l1 - 1) << 20 : 0) |
+			       col_index << 28);
+	slice[8] = cpu_to_le32(first);
+	slice[9] = cpu_to_le32(first % ctu_width | (first / ctu_width) << 16);
+	slice[10] = cpu_to_le32(tile_start);
+	slice[11] = cpu_to_le32((sp->slice_cb_qp_offset & 31) << 8 |
+				(sp->slice_cr_qp_offset & 31));
+	slice[12] = cpu_to_le32((sp->slice_beta_offset_div2 & 15) << 8 |
+				(sp->slice_tc_offset_div2 & 15) << 16 |
+				(sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_SLICE_SAO_LUMA ? BIT(3) : 0) |
+				(sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_SLICE_SAO_CHROMA ? BIT(2) : 0) |
+				(sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_SLICE_DEBLOCKING_FILTER_DISABLED ?
+				 BIT(1) : 0) |
+				(sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_SLICE_LOOP_FILTER_ACROSS_SLICES_ENABLED ?
+				 BIT(0) : 0));
+	slice[23] = vdec_addr(col->surface.iova, ctx->pmv_offset);
+	slice[24] = cpu_to_le32(0x400a);
+	if (!intra &&
+	    (pps->flags & (bipred ? V4L2_HEVC_PPS_FLAG_WEIGHTED_BIPRED :
+				  V4L2_HEVC_PPS_FLAG_WEIGHTED_PRED))) {
+		const struct v4l2_hevc_pred_weight_table *weights = &sp->pred_weight_table;
+		int luma_denom = weights->luma_log2_weight_denom;
+		int chroma_denom = luma_denom + weights->delta_chroma_log2_weight_denom;
+
+		if (luma_denom > 7 || chroma_denom < 0 || chroma_denom > 7)
+			return -EINVAL;
+		vdec_hevc_weights(slice, l0, luma_denom, chroma_denom,
+				  weights->delta_luma_weight_l0, weights->luma_offset_l0,
+				  weights->delta_chroma_weight_l0, weights->chroma_offset_l0);
+		vdec_hevc_weights(slice + 16, l1, luma_denom, chroma_denom,
+				  weights->delta_luma_weight_l1, weights->luma_offset_l1,
+				  weights->delta_chroma_weight_l1, weights->chroma_offset_l1);
+	}
+	return 0;
+}
+
+static int vdec_hevc_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
+				 struct vb2_v4l2_buffer *dst, unsigned int controls)
+{
+	const struct v4l2_ctrl_hevc_sps *sps = ctx->hevc_sps->p_cur.p_hevc_sps;
+	const struct v4l2_ctrl_hevc_pps *pps = ctx->hevc_pps->p_cur.p_hevc_pps;
+	const struct v4l2_ctrl_hevc_decode_params *dec = ctx->hevc_decode->p_cur.p;
+	const struct v4l2_ctrl_hevc_slice_params *sp = ctx->hevc_slice->p_cur.p_hevc_slice_params;
+	struct vdec_buffer *out = to_vdec_buffer(&dst->vb2_buf);
+	struct vdec_buffer *refs[V4L2_HEVC_DPB_ENTRIES_NUM_MAX] = {};
+	unsigned int offset = src->planes[0].data_offset;
+	unsigned int bytes = vb2_get_plane_payload(&src->vb2_buf, 0) - offset;
+	unsigned int prefix, ctu_width, ctu_height, log2_ctu, bit, slice_offset, tile_start;
+	const u8 *input = vb2_plane_vaddr(&src->vb2_buf, 0);
+	__le32 *slice;
+	u8 *stream;
+	int ret;
+
+	if (ctx->num_slices && (ctx->held != out || ctx->held_timestamp != src->vb2_buf.timestamp))
+		ctx->num_slices = 0;
+	if (!ctx->num_slices) {
+		if (sp->slice_segment_addr || !(controls & REQUEST_PICTURE) ||
+		    sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_DEPENDENT_SLICE_SEGMENT)
+			return -EINVAL;
+		ctx->held = out;
+		ctx->held_timestamp = src->vb2_buf.timestamp;
+		ctx->stream_used = 0;
+		ctx->hevc_picture_sps = *sps;
+		ctx->hevc_picture_pps = *pps;
+		ctx->hevc_picture_dec = *dec;
+	} else if ((controls & REQUEST_PICTURE) &&
+		    (memcmp(sps, &ctx->hevc_picture_sps, sizeof(*sps)) ||
+		     memcmp(pps, &ctx->hevc_picture_pps, sizeof(*pps)) ||
+		     memcmp(dec, &ctx->hevc_picture_dec, sizeof(*dec)))) {
+		return -EINVAL;
+	}
+	sps = &ctx->hevc_picture_sps;
+	pps = &ctx->hevc_picture_pps;
+	dec = &ctx->hevc_picture_dec;
+	out->decoded = false;
+	if (ctx->vdec->dead)
+		return -EIO;
+	if (!input || !vb2_plane_vaddr(&dst->vb2_buf, 0) || !out->surface.cpu || bytes < 6 ||
+	    ctx->hevc_slice->elems != 1 ||
+	    sps->pic_width_in_luma_samples != ctx->output.width ||
+	    sps->pic_height_in_luma_samples != ctx->output.height ||
+	    sps->chroma_format_idc != 1 || sps->bit_depth_luma_minus8 || sps->bit_depth_chroma_minus8 ||
+	    (sps->flags & (V4L2_HEVC_SPS_FLAG_PCM_ENABLED | V4L2_HEVC_SPS_FLAG_SEPARATE_COLOUR_PLANE)) ||
+	    (sp->num_entry_point_offsets &&
+	     !(pps->flags & (V4L2_HEVC_PPS_FLAG_ENTROPY_CODING_SYNC_ENABLED |
+			    V4L2_HEVC_PPS_FLAG_TILES_ENABLED))) ||
+	    sp->slice_type > V4L2_HEVC_SLICE_TYPE_I ||
+	    sp->colour_plane_id || sp->pic_struct || sp->slice_pic_order_cnt != dec->pic_order_cnt_val ||
+	    sp->nal_unit_type > 31 || !sp->nuh_temporal_id_plus1 ||
+	    sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_USE_INTEGER_MV)
+		return -EINVAL;
+	if (!ctx->num_slices && sps->flags & V4L2_HEVC_SPS_FLAG_SCALING_LIST_ENABLED &&
+	    !(controls & REQUEST_SCALING))
+		return -ENOENT;
+	if (sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_DEPENDENT_SLICE_SEGMENT &&
+	    !(pps->flags & V4L2_HEVC_PPS_FLAG_DEPENDENT_SLICE_SEGMENT_ENABLED))
+		return -EINVAL;
+
+	log2_ctu = sps->log2_min_luma_coding_block_size_minus3 + 3 +
+		   sps->log2_diff_max_min_luma_coding_block_size;
+	if (log2_ctu < 4 || log2_ctu > 6 ||
+	    sps->log2_min_luma_transform_block_size_minus2 + 2 >=
+	    sps->log2_min_luma_coding_block_size_minus3 + 3 ||
+	    sps->log2_min_luma_transform_block_size_minus2 + 2 +
+	    sps->log2_diff_max_min_luma_transform_block_size > min(log2_ctu, 5U) ||
+	    sps->max_transform_hierarchy_depth_inter > 4 ||
+	    sps->max_transform_hierarchy_depth_intra > 4 ||
+	    pps->diff_cu_qp_delta_depth > log2_ctu - 3 ||
+	    pps->log2_parallel_merge_level_minus2 > log2_ctu - 2)
+		return -EINVAL;
+	ctu_width = DIV_ROUND_UP(ctx->output.width, 1U << log2_ctu);
+	ctu_height = DIV_ROUND_UP(ctx->output.height, 1U << log2_ctu);
+	/* The PXP does not complete a picture with only one CTU row. */
+	if (ctu_height < 2)
+		return -EOPNOTSUPP;
+	if (sp->slice_segment_addr >= ctu_width * ctu_height ||
+	    sp->num_entry_point_offsets >= ctu_width * ctu_height)
+		return -EINVAL;
+	if (!ctx->num_slices) {
+		ret = vdec_hevc_tile_layout(ctx, ctu_width, ctu_height);
+		if (ret)
+			return ret;
+	}
+	tile_start = vdec_hevc_to_tile_scan(&ctx->hevc_tiles, sp->slice_segment_addr);
+	if (ctx->num_slices && tile_start <= ctx->last_mb)
+		return -EINVAL;
+
+	input += offset;
+	if (!memcmp(input, "\x00\x00\x01", 3))
+		prefix = 3;
+	else if (!memcmp(input, "\x00\x00\x00\x01", 4))
+		prefix = 4;
+	else
+		return -EINVAL;
+	if (input[prefix] != sp->nal_unit_type << 1 || input[prefix + 1] != sp->nuh_temporal_id_plus1 ||
+	    sp->data_byte_offset < prefix + 2 || sp->data_byte_offset >= bytes ||
+	    sp->bit_size != bytes * 8)
+		return -EINVAL;
+	/* Annex B data_byte_offset includes the prefix and the RBSP header. */
+	bit = sp->data_byte_offset * 8;
+	if (ctx->num_slices == HEVC_MAX_SLICES ||
+	    ctx->stream_used + bytes > ctx->output.plane_fmt[0].sizeimage)
+		return -ENOSPC;
+	ret = vdec_hevc_find_refs(ctx, out, dec, refs);
+	if (ret)
+		return ret;
+	if (!ctx->workspace.cpu) {
+		ret = ctx->codec->prepare_workspace(ctx);
+		if (ret)
+			return ret;
+	}
+	if (!ctx->num_slices)
+		vdec_hevc_picture_message(ctx, out, refs, log2_ctu, ctu_width, ctu_height);
+
+	stream = ctx->workspace.cpu + HEVC_STREAM_OFFSET + ctx->stream_used;
+	ret = vdec_copy_rbsp(stream, input, bytes, prefix + 2);
+	if (ret < 0)
+		return ret;
+	bytes = ret;
+	if (bit >= bytes * 8)
+		return -EINVAL;
+	memset(stream + bytes, 0, VDEC_STREAM_PAD);
+
+	slice_offset = MSG_SLICE + ctx->num_slices * SLICE_MSG_SIZE;
+	slice = ctx->workspace.cpu + slice_offset;
+	memset(slice, 0, SLICE_MSG_SIZE);
+	ret = vdec_hevc_slice_message(ctx, slice, sp, refs, out, tile_start,
+				      ctx->stream_used * 8 + bit, bytes * 8 - bit);
+	if (ret)
+		return ret;
+	if (ctx->num_slices) {
+		__le32 *prev = slice - SLICE_MSG_SIZE / sizeof(*slice);
+
+		vdec_hevc_end_slice(ctx, prev, tile_start - 1,
+				    !(sp->flags & V4L2_HEVC_SLICE_PARAMS_FLAG_DEPENDENT_SLICE_SEGMENT));
+		prev[63] = vdec_addr(ctx->workspace.iova, slice_offset);
+	}
+	ctx->num_slices++;
+	ctx->stream_used = ALIGN(ctx->stream_used + bytes, 16);
+	ctx->last_mb = tile_start;
+	return 0;
+}
+
+static unsigned int vdec_hevc_request_controls(struct v4l2_ctrl_handler *hdl)
+{
 	unsigned int controls = 0;
 
-	if (!hdl)
-		return 0;
+	if (v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_PPS) &&
+	    v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_DECODE_PARAMS))
+		controls |= REQUEST_PICTURE;
+	if (v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_SCALING_MATRIX))
+		controls |= REQUEST_SCALING;
+	return controls;
+}
+
+static unsigned int vdec_h264_request_controls(struct v4l2_ctrl_handler *hdl)
+{
+	unsigned int controls = 0;
+
 	if (v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_H264_PPS) &&
 	    v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_H264_DECODE_PARAMS))
 		controls |= REQUEST_PICTURE;
@@ -828,6 +1456,17 @@ static unsigned int vdec_request_controls(struct vdec_ctx *ctx, struct media_req
 		controls |= REQUEST_SCALING;
 	if (v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_H264_PRED_WEIGHTS))
 		controls |= REQUEST_WEIGHTS;
+	return controls;
+}
+
+static unsigned int vdec_request_controls(struct vdec_ctx *ctx, struct media_request *req)
+{
+	struct v4l2_ctrl_handler *hdl = v4l2_ctrl_request_hdl_find(req, &ctx->controls);
+	unsigned int controls;
+
+	if (!hdl)
+		return 0;
+	controls = ctx->codec->request_controls(hdl);
 	v4l2_ctrl_request_hdl_put(hdl);
 	return controls;
 }
@@ -852,7 +1491,9 @@ static void vdec_worker(struct work_struct *work)
 	ret = v4l2_ctrl_request_setup(req, &ctx->controls);
 	if (!ret) {
 		mutex_lock(ctx->controls.lock);
-		ret = vdec_run(ctx, src, dst, controls);
+		ret = ctx->codec->pack_request(ctx, src, dst, controls);
+		if (!ret && !(src->flags & V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF))
+			ret = vdec_finish_picture(ctx, dst);
 		mutex_unlock(ctx->controls.lock);
 	}
 	if (ret) {
@@ -1059,6 +1700,26 @@ static const struct v4l2_ctrl_config vdec_ctrls[] = {
 		.max = V4L2_STATELESS_H264_START_CODE_ANNEX_B,
 		.def = V4L2_STATELESS_H264_START_CODE_ANNEX_B,
 	},
+	{ .id = V4L2_CID_STATELESS_HEVC_SPS },
+	{ .id = V4L2_CID_STATELESS_HEVC_PPS },
+	{ .id = V4L2_CID_STATELESS_HEVC_SCALING_MATRIX },
+	{
+		.id = V4L2_CID_STATELESS_HEVC_SLICE_PARAMS,
+		.flags = V4L2_CTRL_FLAG_DYNAMIC_ARRAY,
+		.dims = { 1 },
+	},
+	{ .id = V4L2_CID_STATELESS_HEVC_DECODE_PARAMS },
+	{
+		.id = V4L2_CID_STATELESS_HEVC_DECODE_MODE,
+		.min = V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED,
+		.max = V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED,
+		.def = V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED,
+	}, {
+		.id = V4L2_CID_STATELESS_HEVC_START_CODE,
+		.min = V4L2_STATELESS_HEVC_START_CODE_ANNEX_B,
+		.max = V4L2_STATELESS_HEVC_START_CODE_ANNEX_B,
+		.def = V4L2_STATELESS_HEVC_START_CODE_ANNEX_B,
+	},
 };
 
 static int vdec_init_ctrls(struct vdec_ctx *ctx)
@@ -1081,6 +1742,11 @@ static int vdec_init_ctrls(struct vdec_ctx *ctx)
 	ctx->slice = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_H264_SLICE_PARAMS);
 	ctx->decode = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_H264_DECODE_PARAMS);
 	ctx->weights = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_H264_PRED_WEIGHTS);
+	ctx->hevc_sps = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_SPS);
+	ctx->hevc_pps = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_PPS);
+	ctx->hevc_scaling = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_SCALING_MATRIX);
+	ctx->hevc_slice = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_SLICE_PARAMS);
+	ctx->hevc_decode = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_DECODE_PARAMS);
 	ctx->fh.ctrl_handler = hdl;
 	return 0;
 }
@@ -1110,7 +1776,7 @@ static int vdec_request_validate(struct media_request *req)
 		return -ENOENT;
 
 	ret = 0;
-	if (!v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_H264_SLICE_PARAMS))
+	if (!v4l2_ctrl_request_hdl_ctrl_find(hdl, ctx->codec->slice_control))
 		ret = -ENOENT;
 
 	v4l2_ctrl_request_hdl_put(hdl);
@@ -1135,10 +1801,12 @@ static int vdec_querycap(struct file *file, void *priv, struct v4l2_capability *
 static void vdec_fill_output(struct v4l2_pix_format_mplane *pix)
 {
 	unsigned int size = pix->plane_fmt[0].sizeimage;
+	unsigned int step = pix->pixelformat == V4L2_PIX_FMT_HEVC_SLICE ? 8 : 16;
 
-	pix->width = ALIGN(clamp(pix->width, VDEC_MIN_SIZE, VDEC_MAX_WIDTH), 16);
-	pix->height = ALIGN(clamp(pix->height, VDEC_MIN_SIZE, VDEC_MAX_HEIGHT), 16);
-	pix->pixelformat = V4L2_PIX_FMT_H264_SLICE;
+	pix->width = ALIGN(clamp(pix->width, VDEC_MIN_SIZE, VDEC_MAX_WIDTH), step);
+	pix->height = ALIGN(clamp(pix->height, VDEC_MIN_SIZE, VDEC_MAX_HEIGHT), step);
+	if (pix->pixelformat != V4L2_PIX_FMT_HEVC_SLICE)
+		pix->pixelformat = V4L2_PIX_FMT_H264_SLICE;
 	pix->field = V4L2_FIELD_NONE;
 	pix->num_planes = 1;
 	pix->flags = 0;
@@ -1159,38 +1827,84 @@ static void vdec_fill_capture(const struct v4l2_pix_format_mplane *out,
 	cap->plane_fmt[0].sizeimage = cap->width * cap->height * 3 / 2;
 }
 
+static void vdec_h264_surface_layout(struct vdec_ctx *ctx)
+{
+	ctx->pmv_offset = ALIGN(ctx->y_size + ctx->vu_size + 1024, VDEC_PAGE);
+	ctx->pmv_size = ctx->output.width * ctx->output.height / 4 + 256;
+}
+
+static const struct vdec_codec_ops vdec_h264_ops = {
+	.pixelformat = V4L2_PIX_FMT_H264_SLICE,
+	.slice_control = V4L2_CID_STATELESS_H264_SLICE_PARAMS,
+	.surface_layout = vdec_h264_surface_layout,
+	.prepare_workspace = vdec_h264_prepare_workspace,
+	.pack_request = vdec_h264_pack_request,
+	.end_picture = vdec_h264_end_picture,
+	.request_controls = vdec_h264_request_controls,
+};
+
+static void vdec_hevc_surface_layout(struct vdec_ctx *ctx)
+{
+	ctx->pmv_offset = ALIGN(ctx->y_size + ctx->vu_size + 1024, VDEC_PAGE);
+	ctx->pmv_size = ALIGN(ctx->output.width, 64) * ALIGN(ctx->output.height, 64) / 4 + 256;
+}
+
+static const struct vdec_codec_ops vdec_hevc_ops = {
+	.pixelformat = V4L2_PIX_FMT_HEVC_SLICE,
+	.slice_control = V4L2_CID_STATELESS_HEVC_SLICE_PARAMS,
+	.surface_layout = vdec_hevc_surface_layout,
+	.prepare_workspace = vdec_hevc_prepare_workspace,
+	.pack_request = vdec_hevc_pack_request,
+	.end_picture = vdec_hevc_end_picture,
+	.request_controls = vdec_hevc_request_controls,
+};
+
+static const struct vdec_codec_ops * const vdec_codecs[] = {
+	&vdec_h264_ops, &vdec_hevc_ops,
+};
+
 static void vdec_set_output(struct vdec_ctx *ctx, struct v4l2_pix_format_mplane *pix)
 {
+	ctx->codec = pix->pixelformat == V4L2_PIX_FMT_HEVC_SLICE ? &vdec_hevc_ops : &vdec_h264_ops;
 	ctx->output = *pix;
 	vdec_fill_capture(&ctx->output, &ctx->capture);
 	ctx->stride = ALIGN(pix->width, 256);
 	ctx->y_size = ctx->stride * ALIGN(pix->height, 64);
 	ctx->vu_size = ctx->y_size / 2;
-	ctx->pmv_offset = ALIGN(ctx->y_size + ctx->vu_size + 1024, VDEC_PAGE);
-	ctx->pmv_size = pix->width * pix->height / 4 + 256;
+	ctx->codec->surface_layout(ctx);
 }
 
 static int vdec_enum_fmt(struct file *file, void *priv, struct v4l2_fmtdesc *f)
 {
-	if (f->index)
+	if (V4L2_TYPE_IS_OUTPUT(f->type)) {
+		if (f->index >= ARRAY_SIZE(vdec_codecs))
+			return -EINVAL;
+		f->pixelformat = vdec_codecs[f->index]->pixelformat;
+	} else if (!f->index) {
+		f->pixelformat = V4L2_PIX_FMT_NV21;
+	} else {
 		return -EINVAL;
-	f->pixelformat = V4L2_TYPE_IS_OUTPUT(f->type) ?
-			 V4L2_PIX_FMT_H264_SLICE : V4L2_PIX_FMT_NV21;
+	}
 	return 0;
 }
 
 static int vdec_enum_framesizes(struct file *file, void *priv, struct v4l2_frmsizeenum *f)
 {
+	struct vdec_ctx *ctx = file_to_ctx(file);
+	u32 format = f->pixel_format == V4L2_PIX_FMT_NV21 ? ctx->codec->pixelformat : f->pixel_format;
+	unsigned int step = format == V4L2_PIX_FMT_HEVC_SLICE ? 8 : 16;
+
 	if (f->index || (f->pixel_format != V4L2_PIX_FMT_H264_SLICE &&
+			 f->pixel_format != V4L2_PIX_FMT_HEVC_SLICE &&
 			 f->pixel_format != V4L2_PIX_FMT_NV21))
 		return -EINVAL;
 	f->type = V4L2_FRMSIZE_TYPE_STEPWISE;
 	f->stepwise.min_width = VDEC_MIN_SIZE;
 	f->stepwise.max_width = VDEC_MAX_WIDTH;
-	f->stepwise.step_width = 16;
+	f->stepwise.step_width = step;
 	f->stepwise.min_height = VDEC_MIN_SIZE;
 	f->stepwise.max_height = VDEC_MAX_HEIGHT;
-	f->stepwise.step_height = 16;
+	f->stepwise.step_height = step;
 	return 0;
 }
 
@@ -1521,5 +2235,5 @@ static struct platform_driver vdec_driver = {
 };
 module_platform_driver(vdec_driver);
 
-MODULE_DESCRIPTION("HiSilicon Hi3798MV320 stateless H.264 decoder");
+MODULE_DESCRIPTION("HiSilicon Hi3798MV320 stateless H.264 and HEVC decoder");
 MODULE_LICENSE("GPL");

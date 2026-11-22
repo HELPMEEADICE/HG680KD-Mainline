@@ -14,7 +14,7 @@
 +	select VIDEOBUF2_DMA_CONTIG
 +	select V4L2_MEM2MEM_DEV
 +	help
-+	  Enable the H.264 V4L2 stateless decoder on Hi3798MV320.
++	  Enable the H.264 and HEVC V4L2 stateless decoder on Hi3798MV320.
 +	  Applications submit parsed slices using the Media Request API.
 +
  # Ancillary drivers
