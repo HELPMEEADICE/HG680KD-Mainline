@@ -2,6 +2,10 @@
 
 本项目最初以 Linux 6.18.64 为基线、后经 Linux 7.2.5 验证全硬件并在最新阶段通过 GCC 14.2.0 升级至 **Linux 7.3.5**，可从原厂 U-Boot 2022.07 和 BL31 直接冷启动 U 盘 **Armbian (Trixie arm64) + Xfce 桌面**（亦保留各版本 RAM 镜像作回退）。设备为海思 Hi3798MV320，四核 Cortex-A55，实装 2 GiB LPDDR4，板载 eMMC 始终强制只读（`ro=1`）。
 
+## ARM64 Linux 7.3.5 H.264 Stateless 解码（TFTP RAM）
+
+`arm64-7.3.5-vdec` 在 HG680KD 上注册 `/dev/video0` 和 `/dev/media0`。应用使用 V4L2 Media Request API 提交 H.264 slice 和参数，从 CAPTURE 队列读取线性 NV21。COM4 板测覆盖 32×32 Main Profile CABAC IDR/P、32×32 CAVLC IDR、128×128 单 slice 与双 slice 多帧，以及最大已通过样本 960×544 IDR/P。全宽 720p 和 B 帧仍待完成。[驱动和复现步骤](VPU-REVERSE.md#9-linux-735-v4l2-stateless-驱动) · [构建日志](logs/433-vdec-build.txt) · [板测日志](logs/434-vdec-tftp.txt)
+
 ## ARM64 Linux 7.3.5 VPU 探测（TFTP RAM）
 
 `arm64-7.3.5-vpu-probe` 使用 GCC 14.2.0 构建，继承现役 HDMI、蓝牙、DVFS 和 eMMC HS400ES 只读基线。实机通过 VDEC 时钟启用、VDH PXP 复位握手和重复绑定。复位请求期间 ACK 为 `0x2`，释放后回落为 `0x0`，VDH、SCD、SMMU 状态均可稳定读取。四核、HDMI 1080p、Lima、蓝牙、CPU/GPU DVFS、温控、GMAC、USB 和 eMMC 只读回归通过。[VPU 逆向与构建复现](VPU-REVERSE.md) · [TFTP 启动串口](logs/411-mainline-arm64-7.3.5-vpu-final-boot.txt) · [外设回归](logs/413-vpu-final-regression.txt) · [重复复位](logs/414-vpu-repeat-mmio-and-storage-hdmi.txt)
@@ -11,7 +15,7 @@
 | VPU 探测 | [arm64-7.3.5-vpu-probe/boot.img](artifacts/arm64-7.3.5-vpu-probe/boot.img) | `555e2875db0eb4833129a8087fedf6c3b4f82541e8c19754836daf998c1390b9` |
 | 现役 RAM 回退 | [arm64-7.3.5-all-2g-hdmi-bt-dvfs/boot.img](artifacts/arm64-7.3.5-all-2g-hdmi-bt-dvfs/boot.img) | `3c8cb9aab2c60da79206d043067ab23bbe7b9bb1643996d3c5e6b668ca017811` |
 
-本轮交付探测镜像。H.264 单帧硬解、VDH/SCD 独立版本号及 SMMU DMA 旁路仍待验证。文档列有下一轮所需的寄存器、H.264 消息与 I420 参考帧。该镜像通过 `bootm 0x1fdffc0` 从 RAM 启动。
+探测镜像通过 `bootm 0x1fdffc0` 从 RAM 启动。H.264 硬解使用上述 Stateless 镜像。
 
 ## ARM64 Linux 7.3.5 + Armbian Xfce（U 盘冷启动，F2FS zstd + ZRAM）
 

@@ -1,0 +1,29 @@
+--- a/drivers/media/platform/Kconfig
++++ b/drivers/media/platform/Kconfig
+@@ -36,6 +36,18 @@
+ 	  use system memory for both source and destination buffers, as opposed
+ 	  to capture and output drivers, which use memory buffers for just
+ 	  one of those.
+
++config VIDEO_HI3798MV320_VDEC
++	tristate "HiSilicon Hi3798MV320 stateless video decoder"
++	depends on ARM64 && OF && COMMON_CLK_HI3798MV320_RESET
++	depends on V4L_MEM2MEM_DRIVERS
++	select GENERIC_ALLOCATOR
++	select MEDIA_CONTROLLER
++	select VIDEOBUF2_DMA_CONTIG
++	select V4L2_MEM2MEM_DEV
++	help
++	  Enable the H.264 V4L2 stateless decoder on Hi3798MV320.
++	  Applications submit parsed slices using the Media Request API.
++
+ # Ancillary drivers
+
+ config VIDEO_MEM2MEM_DEINTERLACE
+--- a/drivers/media/platform/Makefile
++++ b/drivers/media/platform/Makefile
+@@ -42,3 +42,4 @@
+ # Please keep it alphabetically sorted by Kconfig name
+ obj-$(CONFIG_VIDEO_MEM2MEM_DEINTERLACE)	+= m2m-deinterlace.o
+ obj-$(CONFIG_VIDEO_MUX)			+= video-mux.o
++obj-$(CONFIG_VIDEO_HI3798MV320_VDEC)	+= hi3798mv320-vdec.o

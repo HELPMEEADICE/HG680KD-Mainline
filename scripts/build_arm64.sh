@@ -15,14 +15,11 @@ elif [[ $variant == 7.3.5-* ]]; then
     base_variant=${variant#7.3.5-}
 fi
 vpu_probe=
-vpu_h264_poc=
-if [[ $variant == 7.3.5-vpu-probe || $variant == 7.3.5-vpu-h264-poc ]]; then
-    base_variant=all-2g-hdmi-bt-dvfs
-    vpu_probe=y
-fi
-if [[ $variant == 7.3.5-vpu-h264-poc ]]; then
-    vpu_h264_poc=y
-fi
+vdec=
+case "$variant" in
+    7.3.5-vpu-probe) base_variant=all-2g-hdmi-bt-dvfs; vpu_probe=y ;;
+    7.3.5-vdec) base_variant=all-2g-hdmi-bt-dvfs; vdec=y ;;
+esac
 linux="$root/source/linux-$linux_ver"
 busybox="$root/source/busybox-1.37.0"
 musl="$root/source/musl-1.2.5"
@@ -161,19 +158,22 @@ if [[ $dvfs ]]; then
         install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
     fi
 fi
-if [[ $vpu_probe ]]; then
-    variant_key+=" HI3798MV320_VPU_PROBE"
+if [[ $vpu_probe || $vdec ]]; then
     apply_board_patch "$inputs/0010-SOC-hisilicon-add-Hi3798MV320-VPU-probe.patch"
-    install -m644 "$inputs/hi3798mv320-vpu-probe.c" "$linux/drivers/soc/hisilicon/"
+    install -m644 "$inputs/hi3798mv320-vpu-probe.c" "$inputs/hi3798mv320-vdh.h" \
+        "$linux/drivers/soc/hisilicon/"
     board=hi3798mv320-fiberhome-hg680kd-arm64-vpu-probe
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
-if [[ $vpu_h264_poc ]]; then
-    variant_key+=" HI3798MV320_VPU_H264_POC"
-    apply_board_patch "$inputs/0011-SOC-hisilicon-add-Hi3798MV320-H264-poc.patch"
-    install -m644 "$inputs/hi3798mv320-vpu-h264-poc.h" \
-        "$inputs/hi3798mv320-vpu-h264-data.h" "$linux/drivers/soc/hisilicon/"
-    board=hi3798mv320-fiberhome-hg680kd-arm64-vpu-h264-poc
+if [[ $vpu_probe ]]; then
+    variant_key+=" HI3798MV320_VPU_PROBE"
+fi
+if [[ $vdec ]]; then
+    variant_key+=" VIDEO_HI3798MV320_VDEC V4L2_MEM2MEM_DEV MEDIA_CONTROLLER VIDEOBUF2_DMA_CONTIG"
+    apply_board_patch "$inputs/0012-media-add-Hi3798MV320-vdec.patch"
+    install -m644 "$inputs/hi3798mv320-vdec.c" "$inputs/hi3798mv320-vdec-cabac.h" \
+        "$inputs/hi3798mv320-vdh.h" "$linux/drivers/media/platform/"
+    board=hi3798mv320-fiberhome-hg680kd-arm64-vdec
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
 if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
@@ -209,6 +209,9 @@ if [[ $base_variant != core ]]; then
 fi
 if [[ $hdmi ]]; then
     printf 'CONFIG_CHMOD=y\n' >>"$busybox_config"
+fi
+if [[ $vdec && ${VDEC_TEST:-0} == 1 ]]; then
+    printf 'CONFIG_BASE64=y\n' >>"$busybox_config"
 fi
 "${bb[@]}" allnoconfig >"$root/out/busybox-arm64-config.log"
 while IFS='=' read -r key value; do
@@ -318,6 +321,20 @@ file /lib/firmware/rtl_bt/rtl8761btv_vat_fw.bin $inputs/rtl8761btv_vat_fw 0644 0
 file /lib/firmware/rtl_bt/rtl8761btv_vat_config.bin $inputs/rtl8761btv_vat_config 0644 0 0
 EOF
 fi
+if [[ $vdec && ${VDEC_TEST:-0} == 1 ]]; then
+    "$sysroot/bin/musl-gcc" -O2 -static -Wall -Wextra -Werror \
+        -o "$out/vdec-request" "$inputs/vdec-request-test.c"
+    applets+=(base64)
+    printf 'file /bin/vdec-request %s/vdec-request 0755 0 0\n' "$out" >>"$list"
+    printf 'dir /etc/vdec-test 0755 0 0\n' >>"$list"
+    read -r -a fixtures <<< "${VDEC_FIXTURES:-ip32 ip128}"
+    for fixture in "${fixtures[@]}"; do
+        for ext in txt 264; do
+            file="$fixture.$ext"
+            printf 'file /etc/vdec-test/%s %s/%s 0644 0 0\n' "$file" "$inputs" "$file" >>"$list"
+        done
+    done
+fi
 for applet in "${applets[@]}"; do
     printf 'slink /bin/%s busybox 0777 0 0\n' "$applet" >>"$list"
 done
@@ -369,8 +386,14 @@ if [[ $vpu_probe ]]; then
     "$linux/scripts/config" --file "$out/.config" --enable HI3798MV320_VPU_PROBE \
         --set-str LOCALVERSION "-hg680kd-arm64-${variant#7.3.5-}"
 fi
-if [[ $vpu_h264_poc ]]; then
-    "$linux/scripts/config" --file "$out/.config" --enable HI3798MV320_VPU_H264_POC
+if [[ $vdec ]]; then
+    "$linux/scripts/config" --file "$out/.config" --enable MEDIA_SUPPORT \
+        --enable MEDIA_PLATFORM_SUPPORT --enable MEDIA_PLATFORM_DRIVERS --enable VIDEO_DEV \
+        --enable V4L_MEM2MEM_DRIVERS --enable VIDEO_HI3798MV320_VDEC \
+        --set-str LOCALVERSION "-hg680kd-arm64-${variant#7.3.5-}"
+    if [[ ${VDEC_TEST:-0} == 1 ]]; then
+        "$linux/scripts/config" --file "$out/.config" --enable DYNAMIC_DEBUG
+    fi
 fi
 if [[ -z $usb_root ]]; then
     "$linux/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/initramfs.cpio"
@@ -401,5 +424,9 @@ install -m644 "$out/arch/arm64/boot/dts/hisilicon/$board.dtb" "$release/$board.d
 install -m644 "$out/.config" "$release/kernel.config"
 install -m644 "$out/System.map" "$out/vmlinux" "$release"
 (cd "$release" && sha256sum Image ./*.dtb ./*.config System.map vmlinux $([[ -z $usb_root ]] && echo initramfs.cpio) > SHA256SUMS)
+if [[ $vdec ]]; then
+    python3 "$(dirname "$0")/pack_arm64.py" --image "$release/Image" \
+        --dtb "$release/$board.dtb" --out "$release" --name boot.img
+fi
 tar -C "$release" -czf "$release.tar.gz" .
 ls -lh "$release/Image" "$release/$board.dtb" "$release.tar.gz"

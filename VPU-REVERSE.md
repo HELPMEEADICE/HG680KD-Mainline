@@ -157,6 +157,8 @@ COM4 使用 115200 8N1。运行项目的 TFTP 服务，U-Boot 通过 RAM 会话�
 
 ## 8. H.264 输出布局与 CABAC IDR/P 实测
 
+本节记录提交 `943f430` 的历史原型实验。当前构建目标和用户态 API 见第 9 节。
+
 ### VDH 线性请求
 
 原厂 `vfmw_com` 的 `linear <0/1>` 由 `vct_log_set_2d_en`（`0xc0787788`）写入默认通道配置。线性配置经 `dec_hal_calc_mem_param` 写任务字节 `+0x98`。该字节的 bit 0 由 `hal_h264_write_pub_msg`（`0xc07a8f18/0xc07a8f2c`）送入 `pub[3][29]`。同一任务字节决定 `dec_hal_calc_dec_mem_param` 采用实际高度还是对齐高度计算 Y 平面字节数，并经 `dec_chan_set_image_param`、`fsp_set_image` 写入图像描述符 `+0x294`。原厂 `pdt_get_y8b_data` 的 `0xc081d6b0` 和 `pdt_get_c8b_data` 的 `0xc081d7a4` 是按行 stride 的 CPU 读取分支。两条色度读取分支都按 VU 取样。[原厂反编译](artifacts/vpu-reverse-factory/arm32-result.txt) · [布局指令](artifacts/vpu-reverse-factory/vdh-layout-extra.txt)
@@ -207,3 +209,58 @@ grep hg680kd /proc/interrupts
 ```
 
 同一次 RAM 启动内复跑双帧命令，INTID 169 从 4 增至 6，INTID 181 保持 0，两个输出哈希与首轮一致。USB 未挂载，`mmcblk0/ro=1`，U-Boot 环境变量仅在本次会话内设置。[复跑串口](artifacts/arm64-7.3.5-vpu-h264-final/repeat-serial.txt) · [像素校验](logs/432-vpu-h264-pixel-check.txt)
+
+## 9. Linux 7.3.5 V4L2 Stateless 驱动
+
+`arm64-7.3.5-vdec` 使用 `hi3798mv320-vdec` 平台驱动，注册 Media Controller 和 V4L2 多平面 M2M 设备。OUTPUT 接收带 Annex B 起始码的 `V4L2_PIX_FMT_H264_SLICE`，每个 Media Request 绑定一个 OUTPUT 缓冲。CAPTURE 接收由驱动解排布的线性 `V4L2_PIX_FMT_NV21`，一块缓冲依次存放 Y、VU。驱动按 CAPTURE 时间戳查找用户态提供的 DPB 引用。一个画面含多片时，请求使用 `V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF` 保留同一 CAPTURE 缓冲，最后一片提交完整的 VDH slice 链。相关 UAPI 见 [Linux Stateless Decoder Interface](https://docs.kernel.org/userspace-api/media/v4l/dev-stateless-decoder.html)。
+
+OUTPUT 和 CAPTURE 都使用 VB2 dma-contig。驱动为 CAPTURE 索引单独保留 tiled 解码面和 PMV 区，亮度 stride 对齐 256 B，高度对齐 64 行。运动向量区域按宏块尺寸计算。硬件缓冲经 4 KiB 页的私有 SMMU 表映射。PXP 停机并应答复位后重载表基址，再交还待复用的 IOVA。板测记录显示 `0x10000000` 先后映射到不同的 DMA 地址，解码结果保持一致。PXP 在 `VDH+0x100`、`VDH+0x120` 完成两次任务后复位游标，DPB 表面和 PMV 保留在 DMA 内存中。
+
+### 构建与复现
+
+同一构建目录保留原有板级补丁和 ARM64 DVFS RAM 基线。通过 `scripts/remote.ps1` 把驱动、DTS、补丁和 C 测试程序同步到 `/home/hedc/hg680kd-mainline/inputs`，把更新的 `build_arm64.sh` 和 `pack_arm64.py` 同步到 `scripts/`。生产 RAM 镜像可直接构建。增加 `VDEC_TEST=1` 会将测试程序和 fixtures 一并放入 RAM initramfs。
+
+```bash
+cd /home/hedc/hg680kd-mainline
+JOBS=36 bash scripts/build.sh full "$PWD" "$PWD/inputs" arm64-7.3.5-vdec
+cd out/release-arm64-7.3.5-vdec
+sha256sum -c BOOT-SHA256SUMS
+```
+
+用下面的命令准备两个基本测试向量，并将生成的 `.txt`、`.264` 放入远端 `inputs/`。软件参考 `.nv21` 留在主机用于比较。构建测试镜像时传入 `VDEC_TEST=1`。通过 `VDEC_FIXTURES` 可以指定其他同格式样本。
+
+```powershell
+$out = 'artifacts/arm64-7.3.5-vdec'
+New-Item -ItemType Directory -Force $out | Out-Null
+python scripts/vdec_request_fixture.py artifacts/vpu-reverse-factory/h264-ip-cabac-32x32.264 "$out/ip32"
+ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc2=size=128x128:rate=4 -frames:v 5 -c:v libx264 -threads 1 -profile:v main -x264-params 'ref=1:bframes=0:weightp=0:slices=1:keyint=30:scenecut=0' -an -f h264 "$out/input128.264"
+python scripts/vdec_request_fixture.py "$out/input128.264" "$out/ip128"
+```
+
+COM4 以 115200 8N1 独占打开。U-Boot 通过 TFTP 将镜像放入 `0x01fdffc0`，板端 CRC32 与本地一致后运行 `bootm 0x1fdffc0`。板上只读准备固件，测试输出写入 RAM 中的 `/tmp`。eMMC 保持 `ro=1`，U 盘未挂载，OTP 与持久 U-Boot 环境保持原样。
+
+```sh
+vdec-request /dev/video0 /dev/media0 /etc/vdec-test/ip32.txt /etc/vdec-test/ip32.264 /tmp/ip32.nv21
+vdec-request /dev/video0 /dev/media0 /etc/vdec-test/ip128.txt /etc/vdec-test/ip128.264 /tmp/ip128.nv21
+grep hi3798mv320-vdec /proc/interrupts
+sha256sum /tmp/ip32.nv21 /tmp/ip128.nv21
+```
+
+驱动的 CABAC 初始化表可用 `python scripts/vdec_cabac_table.py artifacts/vpu-reverse-factory src/hi3798mv320-vdec-cabac.h` 从原厂内核重新生成。生成器在提取前核对原厂内核 SHA256。
+
+### 实机结果与支持范围
+
+最终 RAM 镜像 SHA256 为 `07a9b999c0061c2d0bd534676498e0b5150efc78f1ab881dcfff952fe83d9a50`，U-Boot TFTP 回读 CRC32 为 `59365333`。板端注册 `/dev/video0`、`/dev/media0`。正向测试完成 26 帧，INTID 169 从 0 增到 26，INTID 181 为 0。负向测试先解码 B 帧样本前两张参考图，PXP 总数增到 28，SMMU 仍为 0。
+
+| 样本 | 通过帧数 | 软件参考 |
+|---|---:|---|
+| 32×32 Main CABAC IDR/P | 2 | NV21 与 I420 两种布局逐字节相等 |
+| 32×32 CAVLC IDR | 1 | NV21 逐字节相等 |
+| 128×128 CABAC 单片 | 5 | NV21 逐字节相等 |
+| 128×128 CABAC 双片 | 4 | NV21 逐字节相等 |
+| 128×128 CABAC 双片并使用 `V4L2_DEC_CMD_FLUSH` | 4 | NV21 逐帧 SHA256 相等 |
+| 256×512、512×256、640×480、640×720、960×544 CABAC IDR/P | 各 2 | NV21 逐帧 SHA256 相等 |
+
+当前枚举宽 32–960、高 32–720，步进 16，支持逐行 8-bit 4:2:0 I/P。1024×512、1280×256 和 1280×720 探测首帧均报 PXP `0x60000`，SMMU 故障为 0。128×128 空间和时间直接预测 B 帧都完成硬件任务，输出与参考存在像素差异。当前驱动将 B picture 返回为错误缓冲。驱动包含 16 个 DPB 槽、L0/L1 和 ColMV 消息打包。16 个并发参考帧、自定义 scaling matrix 和加权预测未完成像素级板测。
+
+[构建日志](logs/433-vdec-build.txt) · [COM4 TFTP 日志](logs/434-vdec-tftp.txt) · [逐帧 SHA256 对照](logs/435-vdec-pixels.txt)
