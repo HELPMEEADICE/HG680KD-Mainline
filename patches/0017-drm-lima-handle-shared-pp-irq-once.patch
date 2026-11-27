@@ -1,0 +1,56 @@
+--- a/drivers/gpu/drm/lima/lima_pp.c
++++ b/drivers/gpu/drm/lima/lima_pp.c
+@@ -43,8 +43,13 @@
+ 	struct lima_ip *ip = data;
+ 	struct lima_device *dev = ip->dev;
+ 	struct lima_sched_pipe *pipe = dev->pipe + lima_pipe_pp;
+-	u32 state = pp_read(LIMA_PP_INT_STATUS);
+-
++	u32 state;
++
++	/* The broadcast handler owns PP completion on the same IRQ line. */
++	if (pipe->bcast_processor && irq == pipe->bcast_processor->irq)
++		return IRQ_NONE;
++
++	state = pp_read(LIMA_PP_INT_STATUS);
+ 	/* for shared irq case */
+ 	if (!state)
+ 		return IRQ_NONE;
+@@ -67,8 +72,24 @@
+ 	struct drm_lima_m450_pp_frame *frame;
+ 
+ 	/* for shared irq case */
+-	if (!pipe->current_task)
++	if (atomic_read(&pipe->task) <= 0 || !pipe->current_task)
+ 		return IRQ_NONE;
++
++	if (pipe->processor[0]->irq == irq) {
++		/*
++		 * On the shared line, GP and MMU IRQs can arrive before the
++		 * PPs start. Wait for a PP IRQ before counting any idle
++		 * cores. Some of those cores may have received no tiles.
++		 */
++		for (i = 0; i < pipe->num_processor; i++) {
++			struct lima_ip *ip = pipe->processor[i];
++
++			if (pp_read(LIMA_PP_INT_STATUS))
++				break;
++		}
++		if (i == pipe->num_processor)
++			return IRQ_NONE;
++	}
+ 
+ 	frame = pipe->current_task->frame;
+ 
+@@ -94,8 +115,10 @@
+ 		}
+ 
+ 		pipe->done |= (1 << i);
+-		if (atomic_dec_and_test(&pipe->task))
++		if (atomic_dec_and_test(&pipe->task)) {
+ 			lima_sched_pipe_task_done(pipe);
++			break;
++		}
+ 	}
+ 
+ 	return ret;

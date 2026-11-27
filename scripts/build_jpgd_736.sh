@@ -25,14 +25,15 @@ fi
 test ! -e "$linux/drivers/soc/hisilicon/hi3798-codec-probe.c"
 dts="$linux/arch/arm64/boot/dts/hisilicon"
 patchfile="$inputs/0016-media-add-Hi3798MV320-jpgd.patch"
-if ! patch -d "$linux" -p1 --reverse --dry-run --silent --batch <"$patchfile" >/dev/null 2>&1; then
+if ! patch -d "$linux" -p1 --reverse --force --dry-run --silent <"$patchfile" >/dev/null 2>&1; then
     patch -d "$linux" -p1 --forward --batch <"$patchfile"
 fi
 install -m644 "$inputs/hi3798mv320-jpgd.c" "$linux/drivers/media/platform/"
 install -m644 "$inputs/crg-hi3798mv320-reset.c" "$linux/drivers/clk/hisilicon/"
 install -m644 "$inputs/hisilicon,hi3798mv320-jpgd.h" "$linux/include/dt-bindings/clock/"
 install -m644 "$inputs/hisilicon,hi3798mv320-jpgd.yaml" "$linux/Documentation/devicetree/bindings/media/"
-install -m644 "$inputs/hi3798mv320-fiberhome-hg680kd-arm64.dts" "$inputs/$board.dts" "$dts/"
+install -m644 "$inputs/hi3798mv320-fiberhome-hg680kd-arm64.dts" "$inputs/$board.dts" \
+    "$inputs/hi3798mv320-jpgd.dtsi" "$dts/"
 if ! grep -Fq " $board.dtb" "$dts/Makefile"; then
     printf 'dtb-y += %s.dtb\n' "$board" >>"$dts/Makefile"
 fi

@@ -1,0 +1,44 @@
+HG680KD USB display acceptance, 2026-11-28
+
+GCC 14.2.0 clean build, zero warnings
+  Image SHA256 ab0fafd074121fbd5ae642598de1e8ea4729d4dd9e6a551191f0387560631173
+  boot.img SHA256 d298dcf14df298f0bd44dd4efd6efa07f5d343ebe31c754603cb8ea5e7f047b4
+  boot.img.bak SHA256 401fcc8c363c3640f172f5754cbe56698c30519fc85f69cff7a2c474708541e5
+  LBA 4136 through 33912 SHA256 4c45429bb4bd678f2233663923735d9d49e106565131802bdeb4425c564f7940
+
+Pure RAM acceptance
+  Lima params: gpu_id=2 num_pp=1 gp_ver=0x0d070000 pp_ver=0xcf070000
+  GP + PP offscreen render, 4096/4096 pixels matched in both samples
+  2160p60 Main10, 1080/1080 displayed, zero drops and missed vblanks
+  G0 Coverage OSD, 100 updates
+  SMMU INTID 181 = 0
+
+Physical power cycle, COM4 115200 8N1
+  Bootrom start
+  usb read: device 0 block # 4136, count 29777 ... 29777 blocks read: OK
+  VFS: Mounted root (f2fs filesystem) readonly on device 8:3.
+  /dev/sda3 f2fs
+  /dev/sda1 vfat
+  CmaTotal: 393216 kB
+  /dev/fb0 and /dev/dri/card0: hi3798mv320-vdp
+  /dev/dri/renderD128: lima
+  HDMI capture showed Linux fbcon, Xfce with glxgears, and G0 OSD over tiled 4K60 video
+  firmware HD0 3840x2160 totals 4400x2250
+  HDMI-1 connected primary 1920x1080 at 60 Hz in KMS
+  Xorg: glamor X acceleration enabled on Mali450
+  glxinfo: Accelerated: yes
+  glxinfo: OpenGL renderer string: Mali450
+  es2_info: GL_RENDERER: Mali450
+  glmark2: Mali450, 1920x1080, build and texture completed
+
+Media regression after physical cold boot
+  /dev/video0: HEVC Main10 H0TV, modifier 0xfe00000000000320, one DMA-BUF, four planes
+  /dev/video1: 1080p JPEG decoded to NV12, capture 1920x1088, stride 1920
+  PLAY decoded=1080 displayed=1080 dropped=0 eos=1 missed_vblanks=0 fps=60.000
+  G0 progress flips=100
+  /dev/snd/pcmC0D0p: ALSA played=864000 frames rate=48000 xruns=0
+  VDEC PXP INTID 169: 0 to 1080
+  JPGD INTID 129: 0 to 1
+  VDEC SMMU INTID 181: 0 before and after media and desktop loads
+  VDP underflow_irqs 0, fetch_underflow 00000000
+  No Lima, VDP, or SMMU faults during the acceptance workloads

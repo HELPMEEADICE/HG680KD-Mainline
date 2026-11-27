@@ -55,6 +55,7 @@ struct display {
 	unsigned int av_samples;
 	struct player_audio *audio;
 	bool audio_started;
+	bool show_osd;
 	bool active;
 };
 
@@ -228,6 +229,7 @@ static void open_display(struct display *d, const char *path, bool show_osd)
 	uint64_t clock_type;
 
 	d->front = d->pending_overlay = d->progress = -1;
+	d->show_osd = show_osd;
 	d->fd = open(path, O_RDWR | O_CLOEXEC);
 	check_drm(d->fd, path);
 	check_drm(drmSetClientCap(d->fd, DRM_CLIENT_CAP_ATOMIC, 1), "enable atomic KMS");
@@ -251,14 +253,17 @@ static void open_display(struct display *d, const char *path, bool show_osd)
 	if (!planes)
 		fail("cannot enumerate KMS planes");
 	for (uint32_t i = 0; i < planes->count_planes; i++) {
-		uint32_t id = planes->planes[i];
-		uint64_t type;
+		drmModePlane *plane = drmModeGetPlane(d->fd, planes->planes[i]);
 
-		property(d->fd, id, DRM_MODE_OBJECT_PLANE, "type", &type);
-		if (type == DRM_PLANE_TYPE_PRIMARY)
-			d->v0 = id;
-		if (type == DRM_PLANE_TYPE_OVERLAY)
-			d->g0 = id;
+		if (!plane)
+			fail("cannot query KMS plane formats");
+		for (uint32_t j = 0; j < plane->count_formats; j++) {
+			if (plane->formats[j] == MV320_TILED_10)
+				d->v0 = plane->plane_id;
+			if (plane->formats[j] == DRM_FORMAT_ARGB8888)
+				d->g0 = plane->plane_id;
+		}
+		drmModeFreePlane(plane);
 	}
 	drmModeFreePlaneResources(planes);
 	if (!d->v0 || (show_osd && !d->g0) || !d->mode.vrefresh)
@@ -277,16 +282,19 @@ static void open_display(struct display *d, const char *path, bool show_osd)
 	d->full = enum_value(d->fd, d->range, "YCbCr full range");
 	printf("KMS connector=%u CRTC=%u V0=%u mode=%ux%u@%u\n", d->connector, d->crtc,
 	       d->v0, d->mode.hdisplay, d->mode.vdisplay, d->mode.vrefresh);
-	if (show_osd) {
-		if (d->mode.hdisplay != 3840 || d->mode.vdisplay != 2160)
-			fail("G0 OSD requires the 3840x2160 firmware mode");
+	if (d->g0)
 		for (int i = 0; i < PLANE_PROPS; i++)
 			d->osd[i] = property(d->fd, d->g0, DRM_MODE_OBJECT_PLANE, plane_props[i], NULL);
+	if (show_osd) {
+		if (!((d->mode.hdisplay == 3840 && d->mode.vdisplay == 2160) ||
+		      (d->mode.hdisplay == 1920 && d->mode.vdisplay == 1080)))
+			fail("G0 OSD requires a supported firmware mode");
 		d->blend = property(d->fd, d->g0, DRM_MODE_OBJECT_PLANE, "pixel blend mode", NULL);
 		d->coverage = enum_value(d->fd, d->blend, "Coverage");
 		for (int i = 0; i < 2; i++)
 			create_overlay(d, &d->overlays[i]);
-		printf("G0 plane=%u ARGB8888 1920x1080 -> 3840x2160 blend=Coverage\n", d->g0);
+		printf("G0 plane=%u ARGB8888 1920x1080 -> %ux%u blend=Coverage\n", d->g0,
+		       d->mode.hdisplay, d->mode.vdisplay);
 	}
 }
 
@@ -376,11 +384,12 @@ static void submit_frame(struct display *d, AVFrame *frame, const struct input *
 		d->active_encoding = encoding;
 		d->active_range = kms_range;
 	}
-	if (d->osd[FB] && (d->progress < 0 || abs(progress - d->progress) >= 10)) {
+	if (d->show_osd && (d->progress < 0 || abs(progress - d->progress) >= 10)) {
 		int index = d->front == 0 ? 1 : 0;
 		struct overlay *osd = &d->overlays[index];
 		uint64_t osd_values[PLANE_PROPS] = {
-			osd->fb, d->crtc, 0, 0, 1920U << 16, 1080U << 16, 0, 0, 3840, 2160,
+			osd->fb, d->crtc, 0, 0, 1920U << 16, 1080U << 16, 0, 0,
+			d->mode.hdisplay, d->mode.vdisplay,
 		};
 
 		draw_progress(osd, progress);
@@ -396,6 +405,10 @@ static void submit_frame(struct display *d, AVFrame *frame, const struct input *
 	if (!d->active) {
 		const AVDRMLayerDescriptor *layer = &desc->layers[0];
 
+		if (d->g0 && !d->show_osd) {
+			atomic_add(req, d->g0, d->osd[FB], 0);
+			atomic_add(req, d->g0, d->osd[CRTC], 0);
+		}
 		flags |= DRM_MODE_ATOMIC_ALLOW_MODESET;
 		atomic_add(req, d->connector, d->conn_crtc, d->crtc);
 		atomic_add(req, d->crtc, d->crtc_mode, d->mode_blob);
@@ -511,7 +524,7 @@ static void close_display(struct display *d)
 		drmModeAtomicFree(req);
 		check_drm(drmModeRmFB(d->fd, d->current_fb), "remove last V0 framebuffer");
 	}
-	for (int i = 0; i < 2 && d->osd[FB]; i++) {
+	for (int i = 0; i < 2 && d->show_osd; i++) {
 		struct overlay *osd = &d->overlays[i];
 		struct drm_mode_destroy_dumb destroy = { .handle = osd->dumb.handle };
 

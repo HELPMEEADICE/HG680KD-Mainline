@@ -46,7 +46,7 @@ CAPTURE 支持单平面 `NV12` 和 `NV21`，可 MMAP 或使用 DMA-BUF。用 `G_
 
 ## 复现
 
-在远端准备已经应用仓库板级补丁的 7.3.6 源码树、通过验收的 AIAO RAM 发布目录及 AArch64 musl 工具链。向远端输入目录上传 `src/`、`patches/` 中 JPGD 相关文件及基础 DTS、CRG 源码，使用以下目标构建。
+在远端准备已经应用仓库板级补丁的 7.3.6 源码树、通过验收的 AIAO RAM 发布目录及 AArch64 musl 工具链。向远端输入目录上传 `src/`、`patches/` 中 JPGD 相关文件（含 `hi3798mv320-jpgd.dtsi`）及基础 DTS、CRG 源码，使用以下目标构建。
 
 ```sh
 bash scripts/build_arm64.sh /home/hedc/hg680kd-mainline inputs 7.3.6-jpgd

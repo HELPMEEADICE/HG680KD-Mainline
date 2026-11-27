@@ -13,6 +13,7 @@
 #include <linux/regmap.h>
 #include <linux/scatterlist.h>
 
+#include <drm/clients/drm_client_setup.h>
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_blend.h>
@@ -22,6 +23,7 @@
 #include <drm/drm_drv.h>
 #include <drm/drm_dumb_buffers.h>
 #include <drm/drm_encoder.h>
+#include <drm/drm_fbdev_dma.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
@@ -30,6 +32,7 @@
 #include <drm/drm_modeset_helper_vtables.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_print.h>
+#include <drm/drm_rect.h>
 #include <drm/drm_vblank.h>
 
 #include "hi3798mv320-tiled.h"
@@ -185,7 +188,10 @@ struct mv320_vdp {
 	struct drm_encoder encoder;
 	struct drm_connector connector;
 	struct drm_display_mode mode;
+	struct drm_display_mode scanout_mode;
 	unsigned int g0_scale_x, g0_scale_y;
+	unsigned int v0_scale_x, v0_scale_y;
+	bool g0_primary;
 	dma_addr_t zme_coeff_dma;
 	bool zme_coeff_loaded;
 	bool csc_dirty;
@@ -314,9 +320,11 @@ static const struct drm_mode_config_helper_funcs mv320_mode_helpers = {
 
 static int mv320_plane_check(struct drm_plane *plane, struct drm_atomic_commit *state)
 {
+	struct mv320_vdp *vdp = to_vdp(plane->dev);
 	struct drm_plane_state *p = drm_atomic_get_new_plane_state(state, plane);
 	struct drm_crtc_state *crtc_state;
 	const struct drm_display_mode *m;
+	struct drm_rect src, dst;
 
 	if (!p->crtc || !p->fb)
 		return 0;
@@ -324,12 +332,18 @@ static int mv320_plane_check(struct drm_plane *plane, struct drm_atomic_commit *
 	m = &crtc_state->mode;
 	if (p->src_x || p->src_y || p->src_w != p->fb->width << 16 ||
 	    p->src_h != p->fb->height << 16 || p->crtc_x < 0 || p->crtc_y < 0 ||
-	    ((p->crtc_x | p->crtc_y | p->crtc_w | p->crtc_h) & 1) || p->crtc_w > m->hdisplay ||
+	    (((p->crtc_x | p->crtc_w) * vdp->v0_scale_x |
+	      (p->crtc_y | p->crtc_h) * vdp->v0_scale_y) & 1) || p->crtc_w > m->hdisplay ||
 	    p->crtc_h > m->vdisplay || p->crtc_x > m->hdisplay - p->crtc_w ||
 	    p->crtc_y > m->vdisplay - p->crtc_h)
 		return -EINVAL;
-	return drm_atomic_helper_check_plane_state(p, crtc_state, V0_MIN_SCALE,
-						   V0_MAX_SCALE, true, false);
+	src = drm_plane_state_src(p);
+	dst = DRM_RECT_INIT(0, 0, p->crtc_w * vdp->v0_scale_x, p->crtc_h * vdp->v0_scale_y);
+	if (drm_rect_calc_hscale(&src, &dst, V0_MIN_SCALE, V0_MAX_SCALE) < 0 ||
+	    drm_rect_calc_vscale(&src, &dst, V0_MIN_SCALE, V0_MAX_SCALE) < 0)
+		return -ERANGE;
+
+	return drm_atomic_helper_check_plane_state(p, crtc_state, 0, INT_MAX, true, false);
 }
 
 static void mv320_zme_linear_coefficients(u8 *table, unsigned int taps)
@@ -354,10 +368,11 @@ static void mv320_zme_linear_coefficients(u8 *table, unsigned int taps)
 	}
 }
 
-static void mv320_v0_scale(struct mv320_vdp *vdp, const struct drm_plane_state *p)
+static void mv320_v0_scale(struct mv320_vdp *vdp, const struct drm_framebuffer *fb,
+			  unsigned int width, unsigned int height)
 {
-	u32 hr = div_u64((u64)p->fb->width * V0_ZME_H_UNITY, p->crtc_w);
-	u32 vr = p->fb->height * V0_ZME_V_UNITY / p->crtc_h;
+	u32 hr = div_u64((u64)fb->width * V0_ZME_H_UNITY, width);
+	u32 vr = fb->height * V0_ZME_V_UNITY / height;
 	u32 hc = hr | (hr != V0_ZME_H_UNITY ? V0_ZME_H_ENABLE : 0);
 	u32 vc = V0_ZME_V_LUMA_ENABLE | V0_ZME_V_CHROMA_ENABLE |
 		 V0_ZME_V_INPUT_420 | V0_ZME_V_CLOCK;
@@ -385,7 +400,7 @@ static void mv320_v0_scale(struct mv320_vdp *vdp, const struct drm_plane_state *
 	writel(vr, vdp->regs + V0_ZME1_VRATIO);
 	writel((u16)-512, vdp->regs + V0_ZME1_VPHASE);
 	writel((u16)-512, vdp->regs + V0_ZME1_VPHASE_BOTTOM);
-	writel(((p->crtc_h - 1) << 16) | (p->crtc_w - 1), vdp->regs + V0_OUT_SIZE);
+	writel(((height - 1) << 16) | (width - 1), vdp->regs + V0_OUT_SIZE);
 }
 
 static void mv320_v0_color(struct mv320_vdp *vdp, const struct drm_plane_state *p)
@@ -444,8 +459,10 @@ static void mv320_plane_update(struct drm_plane *plane, struct drm_atomic_commit
 	bool main10 = fb->format->format == DRM_FORMAT_HI3798MV320_TILED10;
 	dma_addr_t dma = to_drm_gem_dma_obj(drm_gem_fb_get_obj(fb, 0))->dma_addr;
 	u32 size = ((fb->height - 1) << 16) | (fb->width - 1);
-	u32 start = (p->crtc_y << 16) | p->crtc_x;
-	u32 end = ((p->crtc_y + p->crtc_h - 1) << 16) | (p->crtc_x + p->crtc_w - 1);
+	u32 x = p->crtc_x * vdp->v0_scale_x, y = p->crtc_y * vdp->v0_scale_y;
+	u32 width = p->crtc_w * vdp->v0_scale_x, height = p->crtc_h * vdp->v0_scale_y;
+	u32 start = (y << 16) | x;
+	u32 end = ((y + height - 1) << 16) | (x + width - 1);
 
 	mv320_update_bits(vdp, V0_FDR_CTRL, V0_FDR_MRG | V0_FDR_IS_MUTED | V0_FDR_CHROMA_COPY, 0);
 	mv320_update_bits(vdp, V0_FDR_ORDER, BIT(4), 0);
@@ -469,7 +486,7 @@ static void mv320_plane_update(struct drm_plane *plane, struct drm_atomic_commit
 	writel(end, vdp->regs + V0_DISP_LAST);
 	writel(start, vdp->regs + V0_VIDEO_FIRST);
 	writel(end, vdp->regs + V0_VIDEO_LAST);
-	mv320_v0_scale(vdp, p);
+	mv320_v0_scale(vdp, fb, width, height);
 	if (!old->visible || old->color_encoding != p->color_encoding ||
 	    old->color_range != p->color_range ||
 	    drm_atomic_crtc_needs_modeset(drm_atomic_get_new_crtc_state(state, p->crtc)))
@@ -650,7 +667,7 @@ static void mv320_crtc_enable(struct drm_crtc *crtc, struct drm_atomic_commit *s
 {
 	static const s16 ifir_coefficients[] = { -7, 12, -17, 25, -38, 58, -105, 328 };
 	struct mv320_vdp *vdp = to_vdp(crtc->dev);
-	u32 size = ((vdp->mode.vdisplay - 1) << 16) | (vdp->mode.hdisplay - 1);
+	u32 size = ((vdp->scanout_mode.vdisplay - 1) << 16) | (vdp->scanout_mode.hdisplay - 1);
 	unsigned int i;
 
 	/* Factory V0 IFIR mode and coefficients restore chroma ahead of ZME. */
@@ -747,8 +764,17 @@ static enum drm_mode_status mv320_mode_valid(struct drm_crtc *crtc,
 	return drm_mode_equal(mode, &to_vdp(crtc->dev)->mode) ? MODE_OK : MODE_BAD;
 }
 
+static bool mv320_mode_fixup(struct drm_crtc *crtc, const struct drm_display_mode *mode,
+			     struct drm_display_mode *adjusted_mode)
+{
+	drm_mode_copy(adjusted_mode, &to_vdp(crtc->dev)->scanout_mode);
+	drm_mode_set_crtcinfo(adjusted_mode, 0);
+	return true;
+}
+
 static const struct drm_crtc_helper_funcs mv320_crtc_helpers = {
 	.mode_valid = mv320_mode_valid,
+	.mode_fixup = mv320_mode_fixup,
 	.atomic_enable = mv320_crtc_enable,
 	.atomic_disable = mv320_crtc_disable,
 	.atomic_flush = mv320_crtc_flush,
@@ -831,7 +857,7 @@ static int mv320_firmware_mode(struct mv320_vdp *vdp, struct device *dev)
 
 		/* Hardware back porch includes the sync pulse. */
 		if (m->hdisplay == w && m->vdisplay == h && m->htotal == ht && m->vtotal == vt) {
-			drm_mode_copy(&vdp->mode, m);
+			drm_mode_copy(&vdp->scanout_mode, m);
 			dev_info(dev, "firmware HD0 %ux%u totals %ux%u CRG %08x/%08x sync %08x VT %08x\n",
 				 w, h, ht, vt, clk, work, sync, readl(vdp->regs + HD0_VT));
 			return 0;
@@ -898,6 +924,7 @@ static const struct drm_driver mv320_drm_driver = {
 	.major = 1,
 	.dumb_create = mv320_dumb_create,
 	.gem_prime_import_sg_table = mv320_import,
+	DRM_FBDEV_DMA_DRIVER_OPS,
 };
 
 static int mv320_probe(struct platform_device *pdev)
@@ -929,6 +956,10 @@ static int mv320_probe(struct platform_device *pdev)
 	ret = mv320_firmware_mode(vdp, dev);
 	if (ret)
 		return ret;
+	drm_mode_copy(&vdp->mode, &vdp->scanout_mode);
+	vdp->v0_scale_x = 1;
+	vdp->v0_scale_y = 1;
+	vdp->g0_primary = of_property_read_bool(dev->of_node, "hisilicon,g0-primary");
 	gp_size = readl(vdp->regs + GP0_IN_SIZE);
 	gp_width = (gp_size & U16_MAX) + 1;
 	gp_height = (gp_size >> 16) + 1;
@@ -936,6 +967,21 @@ static int mv320_probe(struct platform_device *pdev)
 		vdp->g0_scale_x = vdp->mode.hdisplay / gp_width;
 	if (gp_height == vdp->mode.vdisplay || gp_height * 2 == vdp->mode.vdisplay)
 		vdp->g0_scale_y = vdp->mode.vdisplay / gp_height;
+	if (vdp->g0_primary) {
+		/*
+		 * Keep the firmware GP0 scaler and publish its input size to
+		 * fbdev and desktop clients. V0 still uses physical HD0 pixels.
+		 */
+		if (gp_width != mv320_modes[0].hdisplay || gp_height != mv320_modes[0].vdisplay ||
+		    !vdp->g0_scale_x || !vdp->g0_scale_y)
+			return dev_err_probe(dev, -EINVAL, "unsupported firmware GP0 %ux%u\n",
+					     gp_width, gp_height);
+		drm_mode_copy(&vdp->mode, &mv320_modes[0]);
+		vdp->v0_scale_x = vdp->g0_scale_x;
+		vdp->v0_scale_y = vdp->g0_scale_y;
+		vdp->g0_scale_x = 1;
+		vdp->g0_scale_y = 1;
+	}
 	coefficients = dmam_alloc_coherent(dev, 4 * V0_ZME_TABLE_BYTES, &vdp->zme_coeff_dma,
 					  GFP_KERNEL);
 	if (!coefficients)
@@ -955,7 +1001,9 @@ static int mv320_probe(struct platform_device *pdev)
 	drm->mode_config.max_width = 4096;
 	drm->mode_config.max_height = 2176;
 	ret = drm_universal_plane_init(drm, &vdp->v0, BIT(0), &mv320_plane_funcs,
-				       formats, ARRAY_SIZE(formats), modifiers, DRM_PLANE_TYPE_PRIMARY, "V0");
+				       formats, ARRAY_SIZE(formats), modifiers,
+				       vdp->g0_primary ? DRM_PLANE_TYPE_OVERLAY : DRM_PLANE_TYPE_PRIMARY,
+				       "V0");
 	if (ret)
 		return ret;
 	drm_plane_helper_add(&vdp->v0, &mv320_plane_helpers);
@@ -971,7 +1019,8 @@ static int mv320_probe(struct platform_device *pdev)
 		return ret;
 	ret = drm_universal_plane_init(drm, &vdp->g0, BIT(0), &mv320_plane_funcs,
 				       gfx_formats, ARRAY_SIZE(gfx_formats), gfx_modifiers,
-				       DRM_PLANE_TYPE_OVERLAY, "G0");
+				       vdp->g0_primary ? DRM_PLANE_TYPE_PRIMARY : DRM_PLANE_TYPE_OVERLAY,
+				       "G0");
 	if (ret)
 		return ret;
 	drm_plane_helper_add(&vdp->g0, &mv320_g0_helpers);
@@ -986,7 +1035,8 @@ static int mv320_probe(struct platform_device *pdev)
 						   BIT(DRM_MODE_BLEND_PIXEL_NONE));
 	if (ret)
 		return ret;
-	ret = drm_crtc_init_with_planes(drm, &vdp->crtc, &vdp->v0, NULL, &mv320_crtc_funcs, "HD0");
+	ret = drm_crtc_init_with_planes(drm, &vdp->crtc, vdp->g0_primary ? &vdp->g0 : &vdp->v0,
+					NULL, &mv320_crtc_funcs, "HD0");
 	if (ret)
 		return ret;
 	drm_crtc_helper_add(&vdp->crtc, &mv320_crtc_helpers);
@@ -1024,9 +1074,13 @@ static int mv320_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 	ret = drm_dev_register(drm, 0);
-	if (ret)
+	if (ret) {
 		device_remove_file(dev, &dev_attr_scanout);
-	return ret;
+		return ret;
+	}
+	if (vdp->g0_primary)
+		drm_client_setup_with_fourcc(drm, DRM_FORMAT_XRGB8888);
+	return 0;
 }
 
 static void mv320_remove(struct platform_device *pdev)
