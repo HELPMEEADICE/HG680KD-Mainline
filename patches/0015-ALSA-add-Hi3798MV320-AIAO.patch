@@ -1,0 +1,21 @@
+--- a/sound/drivers/Kconfig
++++ b/sound/drivers/Kconfig
+@@ -1,2 +1,10 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++config SND_HI3798MV320_AIAO
++	tristate "Hi3798MV320 AIAO HDMI playback"
++	depends on ARCH_HISI && OF && MFD_SYSCON
++	select SND_PCM
++	help
++	  Play stereo 48 kHz LPCM through the HDMI link initialized by
++	  firmware on the Hisilicon Hi3798MV320.
++
+ config SND_MPU401_UART
+--- a/sound/drivers/Makefile
++++ b/sound/drivers/Makefile
+@@ -1,3 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
++
++obj-$(CONFIG_SND_HI3798MV320_AIAO) += hi3798mv320-aiao.o
+ #
+ # Makefile for ALSA

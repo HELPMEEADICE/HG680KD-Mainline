@@ -4,9 +4,13 @@ set -euo pipefail
 root=${1:-"$HOME/hg680kd-mainline"}
 work="$root/out/vdec-ffmpeg"
 mode=${2:-decode}
+audio_decoders=
 case "$mode" in
     decode) ;;
-    player) work="$root/out/vdp-player" ;;
+    player)
+        work="$root/out/vdp-player"
+        audio_decoders=,aac,pcm_s16le,pcm_s16be,pcm_s24le,pcm_s32le,pcm_f32le
+        ;;
     *) printf 'usage: %s [build-root] [decode|player]\n' "$0" >&2; exit 2 ;;
 esac
 src="$root/source/ffmpeg-v4l2request"
@@ -58,7 +62,7 @@ export PKG_CONFIG_SYSROOT_DIR="$deps"
     --disable-everything --disable-avdevice \
     --enable-libdrm --enable-v4l2-request \
     --enable-hwaccel=h264_v4l2request,hevc_v4l2request \
-    --enable-decoder=h264,hevc --enable-parser=h264,hevc \
+    --enable-decoder="h264,hevc$audio_decoders" --enable-parser=h264,hevc \
     --enable-demuxer=mov,matroska,h264,hevc --enable-protocol=file,pipe \
     --enable-encoder=wrapped_avframe,rawvideo --enable-muxer=null,framemd5 \
     --enable-filter=hwdownload,format,scale \
@@ -70,7 +74,7 @@ if [[ $mode == player ]]; then
     "$cc" -std=gnu11 -O2 -Wall -Wextra -Werror -mno-outline-atomics \
         -I "$work/ffmpeg-build" -I "$src" -I "$deps/usr/include" \
         -I "$deps/usr/include/libdrm" -idirafter "$headers" \
-        "$root/src/vdp-player.c" -o "$out/vdp-player" \
+        "$root/src/vdp-player.c" "$root/src/vdp-player-audio.c" -o "$out/vdp-player" \
         libavformat/libavformat.a libavcodec/libavcodec.a libswresample/libswresample.a \
         libavutil/libavutil.a -L"$deps/usr/lib" -L"$deps/lib" \
         -Wl,-rpath-link,"$deps/lib:$deps/usr/lib" -ldrm -ludev -lm -pthread \

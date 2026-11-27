@@ -23,6 +23,7 @@
 #include <libavutil/hwcontext_drm.h>
 
 #include "hi3798mv320-tiled.h"
+#include "vdp-player-audio.h"
 
 enum { FB, CRTC, SX, SY, SW, SH, DX, DY, DW, DH, PLANE_PROPS };
 static const char *const plane_props[] = {
@@ -50,10 +51,16 @@ struct display {
 	uint64_t first_us, last_us, segment_us;
 	unsigned int shown, segment_shown, osd_flips;
 	int64_t base_pts;
+	int64_t pending_pts, audio_adjust, av_sum, av_min, av_max;
+	unsigned int av_samples;
+	struct player_audio *audio;
+	bool audio_started;
 	bool active;
 };
 
 enum { DECODE_AHEAD = 5 };
+/* Feed valid silent HDMI samples while the receiver reacquires after DROP. */
+enum { HDMI_AUDIO_RESTART_VBLANKS = 15 };
 
 struct input {
 	AVFormatContext *format;
@@ -436,6 +443,27 @@ static void complete_flip(struct display *d)
 	d->last_us = us;
 	d->shown++;
 	d->segment_shown++;
+	if (d->audio_started) {
+		uint64_t before = now_us(), after;
+		int64_t audio_pts, error, phase;
+
+		check_av(player_audio_clock(d->audio, &audio_pts), "read ALSA playback clock");
+		after = now_us();
+		error = d->pending_pts - (audio_pts + (int64_t)us - (int64_t)((before + after) / 2));
+		d->av_sum += error;
+		if (!d->av_samples || error < d->av_min)
+			d->av_min = error;
+		if (!d->av_samples || error > d->av_max)
+			d->av_max = error;
+		d->av_samples++;
+		/* Filter the audio clock's anchor on the monotonic timeline. A fixed
+		 * sub-vblank error must not accumulate until it costs a refresh.
+		 */
+		phase = (int64_t)us + error - (int64_t)d->segment_us -
+			(d->pending_pts - d->base_pts);
+		phase = (phase - d->audio_adjust) / 8;
+		d->audio_adjust += phase < -500 ? -500 : phase > 500 ? 500 : phase;
+	}
 	if (d->pending_overlay >= 0) {
 		d->front = d->pending_overlay;
 		d->pending_overlay = -1;
@@ -448,6 +476,18 @@ static void complete_flip(struct display *d)
 	av_frame_move_ref(d->current, d->pending);
 	d->current_fb = d->pending_fb;
 	d->pending_fb = 0;
+}
+
+static void start_seek_audio(struct display *d, int64_t lead_us, uint64_t refresh)
+{
+	drmVBlank vblank = { .request = { .type = DRM_VBLANK_RELATIVE, .sequence = 1 } };
+	uint64_t vblank_us;
+
+	check_drm(drmWaitVBlank(d->fd, &vblank), "wait for HDMI audio preroll vblank");
+	vblank_us = vblank.reply.tval_sec * 1000000ULL + vblank.reply.tval_usec;
+	check_av(player_audio_start(d->audio), "start HDMI audio preroll");
+	d->audio_started = true;
+	sleep_until(vblank_us + lead_us - refresh * 3 / 4);
 }
 
 static void close_display(struct display *d)
@@ -667,17 +707,29 @@ static int64_t parse_seconds(const char *arg, char **end)
 	return seconds * 1000000 + .5;
 }
 
-static void cpu_sample(uint64_t sample[8])
+enum { CPU_ROWS = 5, CPU_FIELDS = 8 };
+
+static void cpu_sample(uint64_t sample[CPU_ROWS][CPU_FIELDS])
 {
 	FILE *file = fopen("/proc/stat", "r");
+	char row[256], label[8];
 
 	if (!file)
 		fail("cannot open /proc/stat");
-	if (fscanf(file, "cpu %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64
-		   " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
-		   &sample[0], &sample[1], &sample[2], &sample[3], &sample[4],
-		   &sample[5], &sample[6], &sample[7]) != 8)
-		fail("cannot read aggregate CPU counters");
+	for (int i = 0; i < CPU_ROWS; i++) {
+		uint64_t *s = sample[i];
+
+		if (!fgets(row, sizeof(row), file) ||
+		    sscanf(row, "%7s %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64
+			   " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
+			   label, &s[0], &s[1], &s[2], &s[3], &s[4], &s[5], &s[6], &s[7]) != 9 ||
+		    strncmp(label, "cpu", 3)) {
+			if (!i)
+				fail("cannot read aggregate CPU counters");
+			memset(s, 0, sizeof(sample[0]));
+			break;
+		}
+	}
 	fclose(file);
 }
 
@@ -687,25 +739,33 @@ int main(int argc, char **argv)
 	struct display d = {};
 	struct seek seeks[16];
 	unsigned int nseeks = 0, seek_index = 0, decoded = 0, dropped = 0, preroll = 0;
-	int64_t first = 0, stop_at = -1, discard_until = 0, hold = 0, duration;
-	uint64_t cpu_before[8], cpu_after[8], total = 0, started, elapsed, refresh;
+	int64_t first = 0, stop_at = -1, discard_until = 0, hold = 0, duration, tone = 0;
+	uint64_t cpu_before[CPU_ROWS][CPU_FIELDS] = {}, cpu_after[CPU_ROWS][CPU_FIELDS] = {};
+	uint64_t total[CPU_ROWS] = {}, started, elapsed, refresh;
 	const char *card = "/dev/dri/card0", *path = NULL;
-	bool osd = false, eos = false, buffering = true;
+	const char *pcm = "/dev/snd/pcmC0D0p";
+	bool osd = false, eos = false, buffering = true, no_audio = false, restart_audio = false;
 	struct rusage usage;
 	AVFrame *frame;
 
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "--help")) {
 			puts("Usage: vdp-player [--osd] [--card PATH] [--start SEC] [--stop-at SEC]"
-			     " [--seek AT:TO]... [--hold-first SEC] FILE.mp4|FILE.mkv");
+			     " [--seek AT:TO]... [--hold-first SEC] [--pcm PATH] [--no-audio] FILE.mp4|FILE.mkv\n"
+			     "       vdp-player [--pcm PATH] --tone SEC");
 			return EXIT_SUCCESS;
 		}
 		if (!strcmp(argv[i], "--osd")) {
 			osd = true;
+		} else if (!strcmp(argv[i], "--no-audio")) {
+			no_audio = true;
+		} else if (!strcmp(argv[i], "--pcm") && i + 1 < argc) {
+			pcm = argv[++i];
 		} else if (!strcmp(argv[i], "--card") && i + 1 < argc) {
 			card = argv[++i];
 		} else if ((!strcmp(argv[i], "--start") || !strcmp(argv[i], "--stop-at") ||
-			    !strcmp(argv[i], "--hold-first") || !strcmp(argv[i], "--seek")) &&
+			    !strcmp(argv[i], "--hold-first") || !strcmp(argv[i], "--seek") ||
+			    !strcmp(argv[i], "--tone")) &&
 			   i + 1 < argc) {
 			const char *option = argv[i++];
 			char *end;
@@ -719,6 +779,10 @@ int main(int argc, char **argv)
 				first = time;
 			} else if (!strcmp(option, "--stop-at")) {
 				stop_at = time;
+			} else if (!strcmp(option, "--tone")) {
+				if (!time)
+					fail("expected a positive tone duration");
+				tone = time;
 			} else {
 				hold = time;
 			}
@@ -730,19 +794,35 @@ int main(int argc, char **argv)
 			fail("invalid argument, see --help");
 		}
 	}
-	if (!path)
-		fail("supply an MP4 or MKV file, see --help");
 	setvbuf(stdout, NULL, _IOLBF, 0);
 	signal(SIGINT, interrupt);
 	signal(SIGTERM, interrupt);
+	if (tone) {
+		if (path || no_audio || nseeks || first || stop_at >= 0 || hold || osd)
+			fail("--tone plays only the standalone HDMI test tone");
+		check_av(player_audio_tone(&d.audio, pcm, tone), "configure ALSA test tone");
+		check_av(player_audio_prime(d.audio, 0, 0, &stopped), "prime ALSA test tone");
+		if (!stopped) {
+			check_av(player_audio_start(d.audio), "start ALSA test tone");
+			check_av(player_audio_finish(d.audio, &stopped), "play ALSA test tone");
+		}
+		player_audio_close(&d.audio);
+		return EXIT_SUCCESS;
+	}
+	if (!path)
+		fail("supply an MP4 or MKV file, see --help");
 	open_input(&in, path);
+	in.start = in.video->start_time == AV_NOPTS_VALUE ? 0 : in.video->start_time;
+	if (!no_audio && !hold)
+		check_av(player_audio_open(&d.audio, path, pcm,
+					 av_rescale_q(in.start, in.time_base, AV_TIME_BASE_Q)),
+			 "open audio decoder and ALSA PCM");
 	open_display(&d, card, osd);
 	frame = av_frame_alloc();
 	d.current = av_frame_alloc();
 	d.pending = av_frame_alloc();
 	if (!frame || !d.current || !d.pending)
 		fail("cannot allocate frame references");
-	in.start = in.video->start_time == AV_NOPTS_VALUE ? 0 : in.video->start_time;
 	duration = in.format->duration;
 	if (in.video->duration > 0)
 		duration = av_rescale_q(in.video->duration, in.time_base, AV_TIME_BASE_Q);
@@ -778,6 +858,12 @@ int main(int argc, char **argv)
 		if (seek_index < nseeks && pts >= seeks[seek_index].at) {
 			discard_until = seeks[seek_index++].to;
 			av_frame_unref(frame);
+			if (d.audio) {
+				restart_audio |= d.audio_started;
+				player_audio_flush(d.audio);
+				d.audio_started = false;
+				d.audio_adjust = 0;
+			}
 			queue_seek(&in, discard_until);
 			buffering = true;
 			d.segment_shown = 0;
@@ -790,8 +876,17 @@ int main(int argc, char **argv)
 		if (!d.segment_shown) {
 			d.base_pts = pts;
 			printf("SEGMENT pts=%.3f\n", pts / 1e6);
+			if (d.audio) {
+				int64_t lead = restart_audio ? HDMI_AUDIO_RESTART_VBLANKS * 1000000LL /
+							      d.mode.vrefresh : 0;
+
+				check_av(player_audio_prime(d.audio, pts, lead, &stopped), "prime HDMI audio");
+				restart_audio = false;
+				if (lead && !stopped)
+					start_seek_audio(&d, lead, refresh);
+			}
 		} else {
-			target = (int64_t)d.segment_us + pts - d.base_pts;
+			target = (int64_t)d.segment_us + pts - d.base_pts + d.audio_adjust;
 			if (target <= (int64_t)d.last_us + (int64_t)refresh / 2 ||
 			    target + (int64_t)refresh < (int64_t)now_us()) {
 				dropped++;
@@ -806,7 +901,13 @@ int main(int argc, char **argv)
 			progress = pts >= duration ? 1000 : av_rescale(pts, 1000, duration);
 		if (stopped)
 			break;
+		d.pending_pts = pts;
 		submit_frame(&d, frame, &in, progress);
+		if (d.audio && !d.audio_started) {
+			complete_flip(&d);
+			check_av(player_audio_start(d.audio), "start HDMI audio");
+			d.audio_started = true;
+		}
 		if (hold) {
 			complete_flip(&d);
 			printf("HOLD first frame pts=%.3f duration=%.3f\n", pts / 1e6, hold / 1e6);
@@ -816,25 +917,40 @@ int main(int argc, char **argv)
 	}
 	complete_flip(&d);
 	stop_decoder(&in);
+	if (d.audio && eos)
+		check_av(player_audio_finish(d.audio, &stopped), "drain HDMI audio");
+	player_audio_close(&d.audio);
 	elapsed = now_us() - started;
 	cpu_sample(cpu_after);
 	getrusage(RUSAGE_SELF, &usage);
-	for (int i = 0; i < 8; i++) {
-		cpu_after[i] -= cpu_before[i];
-		total += cpu_after[i];
-	}
+	for (int i = 0; i < CPU_ROWS && cpu_after[i][3] >= cpu_before[i][3]; i++)
+		for (int j = 0; j < CPU_FIELDS; j++) {
+			uint64_t before = cpu_before[i][j], after = cpu_after[i][j];
+
+			cpu_after[i][j] = after >= before ? after - before : 0;
+			total[i] += cpu_after[i][j];
+		}
 	printf("PLAY decoded=%u displayed=%u dropped=%u preroll=%u seeks=%u eos=%d "
 	       "missed_vblanks=%u fps=%.3f wall_fps=%.3f seconds=%.3f "
 	       "usr=%.2f%% sys=%.2f%% idle=%.2f%% peak_rss_kib=%ld\n",
 	       decoded, d.shown, dropped, preroll, seek_index, eos, d.missed,
 	       d.shown > 1 ? (d.shown - 1) * 1e6 / (d.last_us - d.first_us) : 0,
 	       elapsed ? d.shown * 1e6 / elapsed : 0, elapsed / 1e6,
-	       (cpu_after[0] + cpu_after[1]) * 100.0 / (total ? total : 1),
-	       (cpu_after[2] + cpu_after[5] + cpu_after[6]) * 100.0 / (total ? total : 1),
-	       cpu_after[3] * 100.0 / (total ? total : 1), usage.ru_maxrss);
+	       (cpu_after[0][0] + cpu_after[0][1]) * 100.0 / (total[0] ? total[0] : 1),
+	       (cpu_after[0][2] + cpu_after[0][5] + cpu_after[0][6]) * 100.0 / (total[0] ? total[0] : 1),
+	       cpu_after[0][3] * 100.0 / (total[0] ? total[0] : 1), usage.ru_maxrss);
+	printf("CPU active");
+	for (int i = 1; i < CPU_ROWS && total[i]; i++)
+		printf(" cpu%d=%.2f%%", i - 1,
+		       (total[i] - cpu_after[i][3] - cpu_after[i][4]) * 100.0 / total[i]);
+	putchar('\n');
 	if (osd)
 		printf("G0 progress flips=%u permille=%d duration=%.3f\n",
 		       d.osd_flips, d.progress, duration > 0 ? duration / 1e6 : 0.);
+	if (d.av_samples)
+		printf("AVSYNC samples=%u mean_ms=%.3f min_ms=%.3f max_ms=%.3f\n",
+		       d.av_samples, d.av_sum / (1000.0 * d.av_samples),
+		       d.av_min / 1000.0, d.av_max / 1000.0);
 	close_display(&d);
 	av_frame_free(&frame);
 	avcodec_free_context(&in.decoder);

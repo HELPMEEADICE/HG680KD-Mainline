@@ -13,17 +13,19 @@ if [[ $variant == 7.2.5-* ]]; then
 elif [[ $variant == 7.3.5-* ]]; then
     linux_ver=7.3.5
     base_variant=${variant#7.3.5-}
-elif [[ $variant == 7.3.6-vdp ]]; then
+elif [[ $variant == 7.3.6-vdp || $variant == 7.3.6-aiao ]]; then
     linux_ver=7.3.6
 fi
 vpu_probe=
 vdec=
 vdp=
+aiao=
 kernel_config_seed=
 case "$variant" in
     7.3.5-vpu-probe) base_variant=all-2g-hdmi-bt-dvfs; vpu_probe=y ;;
     7.3.5-vdec) base_variant=all-2g-hdmi-bt-dvfs; vdec=y ;;
     7.3.5-vdp|7.3.6-vdp) base_variant=all-2g-hdmi-bt-dvfs; vdec=y; vdp=y ;;
+    7.3.6-aiao) base_variant=all-2g-hdmi-bt-dvfs; vdec=y; vdp=y; aiao=y ;;
 esac
 if [[ $variant == 7.3.6-vdp ]]; then
     kernel_config_seed="$root/out/release-arm64-7.3.5-vdp/kernel.config"
@@ -31,6 +33,10 @@ if [[ $variant == 7.3.6-vdp ]]; then
         echo "Missing the accepted 7.3.5 VDP configuration: $kernel_config_seed" >&2
         exit 1
     fi
+fi
+if [[ $aiao ]]; then
+    kernel_config_seed="$root/out/release-arm64-7.3.6-vdp/kernel.config"
+    test -s "$kernel_config_seed"
 fi
 linux="$root/source/linux-$linux_ver"
 busybox="$root/source/busybox-1.37.0"
@@ -195,6 +201,13 @@ if [[ $vdp ]]; then
     apply_board_patch "$inputs/0014-drm-add-Hi3798MV320-vdp.patch"
     install -m644 "$inputs/hi3798mv320-vdp.c" "$inputs/hi3798mv320-tiled.h" "$linux/drivers/gpu/drm/"
     board=hi3798mv320-fiberhome-hg680kd-arm64-vdp
+    install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
+fi
+if [[ $aiao ]]; then
+    variant_key+=" SOUND SND SND_PCM SND_HI3798MV320_AIAO"
+    apply_board_patch "$inputs/0015-ALSA-add-Hi3798MV320-AIAO.patch"
+    install -m644 "$inputs/hi3798mv320-aiao.c" "$linux/sound/drivers/"
+    board=hi3798mv320-fiberhome-hg680kd-arm64-aiao
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
 if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
@@ -431,6 +444,11 @@ if [[ $vdec && -z $kernel_config_seed ]]; then
 fi
 if [[ $vdp ]]; then
     "$linux/scripts/config" --file "$out/.config" --enable DRM_HI3798MV320_VDP
+fi
+if [[ $aiao ]]; then
+    "$linux/scripts/config" --file "$out/.config" --enable SOUND --enable SND \
+        --enable SND_DRIVERS --enable SND_HI3798MV320_AIAO \
+        --set-str LOCALVERSION "-hg680kd-arm64-aiao"
 fi
 if [[ -z $usb_root ]]; then
     "$linux/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/initramfs.cpio"

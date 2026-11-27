@@ -20,12 +20,16 @@ from vdp_ram_test import IRQ, SCANOUT, count_irq
 
 
 FILES = ("main10-2160p60.mkv", "main-2160p60.mp4", "h264-1080p60.mp4")
+AV_FILES = ("main10-av.mkv", "h264-av.mp4")
 BINARIES = ("vdp-player", "ld-musl-aarch64.so.1", "libdrm.so.2", "libudev.so.1")
 RAM = "/tmp"
 PLAYER = "./ld-musl-aarch64.so.1 --library-path . ./vdp-player"
 SNAPSHOT = ("grep -E '^(MemAvailable|Shmem|CmaTotal|CmaFree):' /proc/meminfo; " + IRQ + "; "
             f"grep -E '^(vblank_irqs|fetch_underflow|0208|2004|2018|2088|208c|22c0|22dc|22e8|"
             f"5004|5018|8240|8254|825c|8284|828c|8294|8338|8a08|8a54|8b38|b000|b050)' {SCANOUT}")
+AV_SNAPSHOT = ("; grep -E 'GICv3 +116 ' /proc/interrupts; "
+               "grep '^Total [0-9].* objects' /sys/kernel/debug/dma_buf/bufinfo; "
+               "cat /proc/asound/card0/pcm0p/sub0/status")
 
 
 def load_payload(console, args):
@@ -37,7 +41,8 @@ def load_payload(console, args):
             status, _ = shell(console, f"ifconfig eth0 {args.peer} netmask 255.255.255.0 up")
             if status:
                 raise RuntimeError("cannot configure board Ethernet")
-            for name in (*BINARIES, *FILES, *(("color-switch.mkv",) if args.color_switch else ())):
+            files = AV_FILES if args.av else FILES
+            for name in (*BINARIES, *files, *(("color-switch.mkv",) if args.color_switch else ())):
                 with (args.payload / name).open("rb") as data:
                     digest = hashlib.file_digest(data, "sha256").hexdigest()
                 status, output = shell(console, f"cd {RAM} && wget -q -O {name} "
@@ -59,13 +64,18 @@ def capture_hdmi(args, label, still):
     directory = args.log.parent
     output = (["-vf", r"select=gte(t\,4)", "-frames:v", "1", "-threads", "2",
                "-update", "1", str(directory / f"{label}.png")] if still else
-              ["-t", "10", "-c:v", "copy", str(directory / f"{label}.mkv")])
+              ["-t", "21" if args.av else "10", "-c", "copy", str(directory / f"{label}.mkv")])
+    inputs = f"video={args.capture_device}"
+    audio = []
+    if args.capture_audio and not still:
+        inputs += f":audio={args.capture_audio}"
+        audio = ["-sample_rate", "48000", "-channels", "2", "-audio_buffer_size", "40"]
     errors = (directory / f"{label}.capture.txt").open("wb")
     with errors:
         capture = subprocess.Popen([
-            "ffmpeg", "-hide_banner", "-loglevel", "warning", "-y", "-f", "dshow",
+            "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "warning", "-y", "-f", "dshow",
             "-rtbufsize", "64M", "-video_size", "1920x1080", "-framerate", "30", "-vcodec", "mjpeg",
-            "-i", f"video={args.capture_device}", *output,
+            *audio, "-i", inputs, *output,
         ], stderr=errors)
     time.sleep(0.8)
     return capture
@@ -78,8 +88,9 @@ def run(console, args, label, filename, expected=None, options="", seeks=0, capt
     extra_snapshots = ("sleep 2; snap; sleep 2; snap; sleep 2; snap; " if color_switch else
                        "sleep 8; snap; " if expected else "")
     console.record(f"\n[host] {label}: cd {RAM} && {command}\n".encode())
+    snapshot = SNAPSHOT + (AV_SNAPSHOT if args.av else "")
     try:
-        status, output = shell(console, f"cd {RAM} && {{ snap() {{ {SNAPSHOT}; }}; echo BEFORE; snap; "
+        status, output = shell(console, f"cd {RAM} && {{ snap() {{ {snapshot}; }}; echo BEFORE; snap; "
                                "printf 'TIMINGS_BEFORE='; dmesg | grep -c 'timing frames='; "
                                f"{command} > playback.log 2>&1 & p=$!; sleep 1; echo DURING; "
                                f"snap; {extra_snapshots}"
@@ -130,11 +141,51 @@ def run(console, args, label, filename, expected=None, options="", seeks=0, capt
         valid &= (properties == [(b"1", b"0"), (b"0", b"1"), (b"2", b"0"), (b"1", b"0")] and
                   len(csc) == 4 and csc[0][0] == csc[3][0] == b"00000002" and
                   csc[1:3] == [(b"00000013", b"00000000"), (b"00000013", b"000007c0")])
+    if args.av:
+        audio_irq = count_irq(output, 116)
+        sync = re.search(rb"AVSYNC samples=([1-9]\d*) .*min_ms=(-?[\d.]+) max_ms=(-?[\d.]+)", output)
+        dma = re.findall(rb"(?m)^Total (\d+) objects, (\d+) bytes", output)
+        valid &= (len(audio_irq) >= 2 and audio_irq[-1] > audio_irq[0] and
+                  bool(sync and max(abs(float(sync[2])), abs(float(sync[3]))) <= 16.667) and
+                  len(dma) >= 3 and dma[0] == dma[-1] == (b"0", b"0") and int(dma[1][0]) > 0 and
+                  len(re.findall(rb"(?m)^closed\r?$", output)) >= 2 and
+                  (not expected or b"xruns=0" in output))
+        console.record(f"[host] {label} AIAO IRQ {audio_irq}, DMA-BUF {dma}\n".encode())
     returned = cma[-1] - cma[0] if len(cma) >= 2 else None
     console.record(f"[host] {label} VDP IRQ +{vdp_delta}, PXP IRQ +{pxp_delta}, "
                    f"SMMU 181 +{smmu_delta}, CMA free change {returned} KiB "
                    f"{'PASS' if valid else 'FAIL'}\n".encode())
     return bool(valid)
+
+
+def run_tone(console, args):
+    capture = None
+    if args.capture_audio:
+        with args.log.with_name("tone.capture.txt").open("wb") as errors:
+            capture = subprocess.Popen([
+                "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "warning", "-y", "-f", "dshow",
+                "-sample_rate", "48000", "-channels", "2", "-audio_buffer_size", "40",
+                "-i", f"audio={args.capture_audio}", "-t", "8", "-c:a", "pcm_s16le",
+                str(args.log.with_name("tone.wav")),
+            ], stderr=errors)
+        time.sleep(1.3)
+    try:
+        status, out = shell(console, f"cd {RAM} && {{ grep -E 'GICv3 +116 ' /proc/interrupts; "
+                            f"{PLAYER} --tone 5; result=$?; grep -E 'GICv3 +116 ' /proc/interrupts; "
+                            "cat /proc/asound/card0/pcm0p/sub0/status; (exit $result); }", timeout=20)
+    finally:
+        if capture:
+            try:
+                capture.wait(timeout=12)
+            except subprocess.TimeoutExpired:
+                capture.kill()
+                capture.wait()
+    counts = count_irq(out, 116)
+    passed = (not status and b"ALSA played=240000 frames rate=48000 xruns=0" in out and
+              bool(re.search(rb"(?m)^closed\r?$", out)) and len(counts) == 2 and
+              counts[1] - counts[0] >= 500 and (not capture or capture.returncode == 0))
+    console.record(f"[host] standalone tone AIAO IRQ {counts} {'PASS' if passed else 'FAIL'}\n".encode())
+    return passed
 
 
 def main():
@@ -143,7 +194,7 @@ def main():
     source.add_argument("--image", type=Path, help="TFTP boot this VDP RAM image")
     source.add_argument("--running-ram", action="store_true",
                         help="reuse the VDP image already TFTP-booted on the target")
-    parser.add_argument("--kernel-release", default="7.3.5-hg680kd-arm64-vdp",
+    parser.add_argument("--kernel-release",
                         help="exact kernel release expected on the board")
     parser.add_argument("--log", type=Path, required=True)
     parser.add_argument("--payload", type=Path, required=True)
@@ -152,9 +203,15 @@ def main():
     parser.add_argument("--peer", type=IPv4Address, default="192.168.6.249")
     parser.add_argument("--http-port", type=int, default=8098)
     parser.add_argument("--capture-device", help="DirectShow HDMI capture device")
+    parser.add_argument("--capture-audio", help="DirectShow HDMI audio capture device")
+    parser.add_argument("--av", action="store_true", help="test the AIAO image and audio/video fixtures")
     parser.add_argument("--color-switch", action="store_true", help="also run color-switch.mkv")
     parser.add_argument("--smoke", action="store_true", help="run only a short Main10 playback")
     args = parser.parse_args()
+    if args.av and (args.smoke or args.color_switch):
+        parser.error("--av uses its own fixtures and checks")
+    if not args.kernel_release:
+        args.kernel_release = "7.3.6-hg680kd-arm64-aiao" if args.av else "7.3.5-hg680kd-arm64-vdp"
 
     port = serial.Serial(baudrate=115200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE,
                          stopbits=serial.STOPBITS_ONE, timeout=.08, write_timeout=3)
@@ -167,6 +224,10 @@ def main():
         else:
             port.write(b"\r")
             console.expect(SHELL_PROMPT)
+        # The Bluetooth firmware message can interleave with serial command I/O.
+        time.sleep(2)
+        if shell(console, "echo N > /sys/module/printk/parameters/ignore_loglevel && dmesg -n 3")[0]:
+            raise RuntimeError("cannot quiet kernel console")
         status, output = shell(console, "uname -a; cat /proc/mounts; "
                                "printf EMMC_RO=; cat /sys/block/mmcblk0/ro")
         release = re.escape(args.kernel_release.encode())
@@ -183,8 +244,24 @@ def main():
                 not re.search(rb"(?m)^CmaTotal:\s+393216 kB\r?$", output) or
                 not all(device in character_devices for device in devices)):
             raise RuntimeError("expected 384 MiB CMA and the VDEC, media and DRM character devices")
-        shell(console, "echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 3")
         load_payload(console, args)
+        if args.av:
+            status, output = shell(console, "mount -t debugfs debugfs /sys/kernel/debug 2>/dev/null; "
+                                   "ls -l /dev/snd/pcmC0D0p && cat /sys/kernel/debug/dma_buf/bufinfo")
+            if status or not re.search(rb"(?m)^c[^\r\n]* /dev/snd/pcmC0D0p\r?$", output):
+                raise RuntimeError("expected the AIAO PCM device and DMA-BUF debugfs")
+            passed = run_tone(console, args)
+            passed &= run(console, args, "main10-av", AV_FILES[0], expected=1080, capture=True)
+            passed &= run(console, args, "h264-av-osd", AV_FILES[1], expected=1080,
+                          options="--osd", capture=True)
+            passed &= run(console, args, "main10-av-seek", AV_FILES[0],
+                          options="--seek 2:9 --seek 11:3 --seek 5:16", seeks=3, capture=True)
+            for i in range(3):
+                passed &= run(console, args, f"main10-av-restart-{i + 1}", AV_FILES[0],
+                              options="--start 2 --stop-at 4")
+            _, faults = shell(console, "dmesg | grep -Ei 'SMMU fault|underflow|stop timed out|WARNING:|Oops:'")
+            passed &= not re.search(rb"(?m)^<\d+>", faults)
+            return 0 if passed else 1
         if args.smoke:
             return 0 if run(console, args, "main10-smoke", FILES[0], options="--stop-at 2") else 1
         passed = run(console, args, "main10-eos", FILES[0], expected=1080)

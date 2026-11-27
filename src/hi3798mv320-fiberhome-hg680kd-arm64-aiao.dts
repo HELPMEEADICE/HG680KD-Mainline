@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: GPL-2.0-only
+#include "hi3798mv320-fiberhome-hg680kd-arm64-vdp.dts"
+
+&{/soc/display-controller@f8cc0000} {
+	/* VDP ends at the beginning of the AIAO aperture. */
+	reg = <0x0 0xf8cc0000 0x0 0x10000>;
+};
+
+&{/soc} {
+	audio-controller@f8cd0000 {
+		compatible = "hisilicon,hi3798mv320-aiao";
+		reg = <0x0 0xf8cd0000 0x0 0x10000>,
+		      <0x0 0xf8ce0010 0x0 0x4>,
+		      <0x0 0xf8ce1000 0x0 0x54>,
+		      <0x0 0xf8ce1800 0x0 0x284>;
+		reg-names = "aiao", "hdmi-audio-reset", "hdmi-audio", "hdmi-packets";
+		interrupts = <GIC_SPI 84 IRQ_TYPE_LEVEL_HIGH>;
+		hisilicon,crg = <&crg>;
+	};
+};
