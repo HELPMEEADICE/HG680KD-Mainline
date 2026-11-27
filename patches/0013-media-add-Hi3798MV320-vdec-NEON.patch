@@ -1,8 +1,8 @@
 --- a/drivers/media/platform/Makefile
 +++ b/drivers/media/platform/Makefile
-@@ -43,3 +43,5 @@
+@@ -43,2 +43,5 @@
  obj-$(CONFIG_VIDEO_MEM2MEM_DEINTERLACE)	+= m2m-deinterlace.o
  obj-$(CONFIG_VIDEO_MUX)			+= video-mux.o
- obj-$(CONFIG_VIDEO_HI3798MV320_VDEC)	+= hi3798mv320-vdec.o
++obj-$(CONFIG_VIDEO_HI3798MV320_VDEC)	+= hi3798mv320-vdec.o
 +hi3798mv320-vdec-y			:= hi3798mv320-vdec-core.o
 +hi3798mv320-vdec-$(CONFIG_KERNEL_MODE_NEON)	+= hi3798mv320-vdec-neon.o

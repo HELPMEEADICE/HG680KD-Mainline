@@ -1,0 +1,52 @@
+--- a/drivers/gpu/drm/Kconfig
++++ b/drivers/gpu/drm/Kconfig
+@@ -486,6 +486,15 @@
+ source "drivers/gpu/drm/xen/Kconfig"
+ source "drivers/gpu/drm/xlnx/Kconfig"
+ 
++config DRM_HI3798MV320_VDP
++	tristate "HiSilicon Hi3798MV320 VDP firmware handoff"
++	depends on ARM64 && OF
++	select DRM_KMS_HELPER
++	select DRM_GEM_DMA_HELPER
++	help
++	  Enable the V0 video plane and DRM/KMS on the bootloader's HD0 link.
++	  Supports the native Hi3798MV320 tiled video layouts via DMA-BUF.
++
+ endif
+ 
+ # Separate option because drm_panel_orientation_quirks.c is shared with fbdev
+--- a/drivers/gpu/drm/Makefile
++++ b/drivers/gpu/drm/Makefile
+@@ -218,6 +218,7 @@
+ obj-$(CONFIG_DRM_LOONGSON) += loongson/
+ obj-$(CONFIG_DRM_POWERVR) += imagination/
+ obj-$(CONFIG_DRM_VERISILICON_DC) += verisilicon/
++obj-$(CONFIG_DRM_HI3798MV320_VDP) += hi3798mv320-vdp.o
+ 
+ # Ensure drm headers are self-contained and pass kernel-doc
+ hdrtest-files := \
+--- a/include/uapi/drm/drm_fourcc.h
++++ b/include/uapi/drm/drm_fourcc.h
+@@ -291,6 +291,9 @@
+ #define DRM_FORMAT_YUV420_8BIT	fourcc_code('Y', 'U', '0', '8')
+ #define DRM_FORMAT_YUV420_10BIT	fourcc_code('Y', 'U', '1', '0')
+ 
++/* Private Hi3798MV320 VU layout. Requires the driver's tiled modifier. */
++#define DRM_FORMAT_HI3798MV320_TILED10	fourcc_code('H', '0', 'T', 'V')
++
+ /*
+  * 2 plane RGB + A
+  * index 0 = RGB plane, same format as the corresponding non _A8 format has
+--- a/drivers/gpu/drm/drm_fourcc.c
++++ b/drivers/gpu/drm/drm_fourcc.c
+@@ -333,6 +333,9 @@
+ 		{ .format = DRM_FORMAT_YUV420_10BIT,    .depth = 0,
+ 		  .num_planes = 1, .cpp = { 0, 0, 0 }, .hsub = 2, .vsub = 2,
+ 		  .is_yuv = true },
++		{ .format = DRM_FORMAT_HI3798MV320_TILED10,
++		  .num_planes = 4, .hsub = 2, .vsub = 2,
++		  .is_yuv = true },
+ 		{ .format = DRM_FORMAT_NV15,		.depth = 0,
+ 		  .num_planes = 2, .char_per_block = { 5, 5, 0 },
+ 		  .block_w = { 4, 2, 0 }, .block_h = { 1, 1, 0 },

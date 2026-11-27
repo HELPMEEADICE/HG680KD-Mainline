@@ -2,6 +2,7 @@
 
 #include <linux/clk.h>
 #include <linux/completion.h>
+#include <linux/dma-buf.h>
 #include <linux/dma-mapping.h>
 #include <linux/genalloc.h>
 #include <linux/interrupt.h>
@@ -20,12 +21,14 @@
 #include <media/v4l2-device.h>
 #include <media/v4l2-ioctl.h>
 #include <media/v4l2-mem2mem.h>
+#include <media/videobuf2-dma-contig.h>
 #include <media/videobuf2-vmalloc.h>
 
 #include <asm/simd.h>
 
 #include "hi3798mv320-vdec-cabac.h"
 #include "hi3798mv320-vdh.h"
+#include "hi3798mv320-tiled.h"
 
 #define VDEC_NAME		"hi3798mv320-vdec"
 #define VDEC_MIN_SIZE		32
@@ -98,6 +101,7 @@ struct vdec_dma {
 struct vdec_buffer {
 	struct v4l2_m2m_buffer m2m;
 	struct vdec_dma surface;
+	struct dma_buf *native_pin;
 	u64 timestamp;
 	bool decoded;
 };
@@ -194,6 +198,19 @@ static struct vdec_buffer *to_vdec_buffer(struct vb2_buffer *vb)
 
 static int vdec_reset(struct vdec_dev *vdec);
 
+static bool vdec_is_tiled(u32 fourcc)
+{
+	return fourcc == MV320_TILED_8 || fourcc == MV320_TILED_10;
+}
+
+static void vdec_map_pages(struct vdec_dev *vdec, u32 iova, dma_addr_t dma, size_t size)
+{
+	unsigned int pte = iova / VDEC_PAGE, i;
+
+	for (i = 0; i < size / VDEC_PAGE; i++)
+		vdec->table[pte + i] = cpu_to_le32((dma + i * VDEC_PAGE) | 1);
+}
+
 static void vdec_dma_release(struct vdec_dev *vdec, struct vdec_dma *buf)
 {
 	if (buf->cached)
@@ -208,8 +225,6 @@ static void vdec_dma_release(struct vdec_dev *vdec, struct vdec_dma *buf)
 static int vdec_dma_alloc(struct vdec_dev *vdec, struct vdec_dma *buf, size_t size,
 			  bool cached)
 {
-	unsigned int pte, i;
-
 	lockdep_assert_held(&vdec->hw_lock);
 	if (vdec->dead)
 		return -EIO;
@@ -236,30 +251,35 @@ static int vdec_dma_alloc(struct vdec_dev *vdec, struct vdec_dma *buf, size_t si
 		return -EFAULT;
 	}
 
-	pte = buf->iova / VDEC_PAGE;
-	for (i = 0; i < buf->size / VDEC_PAGE; i++)
-		vdec->table[pte + i] = cpu_to_le32((buf->dma + i * VDEC_PAGE) | 1);
+	vdec_map_pages(vdec, buf->iova, buf->dma, buf->size);
 	dma_wmb();
 	dev_dbg(vdec->dev, "map IOVA %#x DMA %pad size %zu\n",
 		buf->iova, &buf->dma, buf->size);
 	return 0;
 }
 
-static void vdec_dma_free(struct vdec_dev *vdec, struct vdec_dma *buf)
+static bool vdec_unmap(struct vdec_dev *vdec, u32 iova, size_t size)
 {
 	lockdep_assert_held(&vdec->hw_lock);
-	if (!buf->cpu || vdec->dead)
-		return;
+	if (vdec->dead)
+		return false;
 
-	memset(vdec->table + buf->iova / VDEC_PAGE, 0,
-	       buf->size / VDEC_PAGE * sizeof(*vdec->table));
+	memset(vdec->table + iova / VDEC_PAGE, 0,
+	       size / VDEC_PAGE * sizeof(*vdec->table));
 	dma_wmb();
 
 	/* Quiesce the walker and reload TTBR before handing out the IOVA again. */
 	if (vdec->tlb_dirty && vdec_reset(vdec))
+		return false;
+	gen_pool_free(vdec->iova_pool, iova, size);
+	return true;
+}
+
+static void vdec_dma_free(struct vdec_dev *vdec, struct vdec_dma *buf)
+{
+	if (!buf->cpu || !vdec_unmap(vdec, buf->iova, buf->size))
 		return;
 	vdec_dma_release(vdec, buf);
-	gen_pool_free(vdec->iova_pool, buf->iova, buf->size);
 }
 
 static void vdec_surface_sync(struct vdec_ctx *ctx, struct vdec_dma *surface,
@@ -267,7 +287,7 @@ static void vdec_surface_sync(struct vdec_ctx *ctx, struct vdec_dma *surface,
 {
 	ktime_t start;
 
-	if (surface->device_owned == for_device)
+	if (!surface->cached || surface->device_owned == for_device)
 		return;
 
 	start = ktime_get();
@@ -904,13 +924,21 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 
 	vdec_surface_sync(ctx, &out->surface, false);
 	start = ktime_get();
-	memset(out->surface.cpu, 0, out->surface.size);
+	if (out->native_pin) {
+		memset(output, 0, PAGE_ALIGN(ctx->capture.plane_fmt[0].sizeimage));
+		memset(out->surface.cpu, 0, out->surface.size);
+		dma_wmb();
+	} else {
+		memset(out->surface.cpu, 0, out->surface.size);
+	}
 	clear_ns = ktime_sub(ktime_get(), start);
 	vdec_surface_sync(ctx, &out->surface, true);
 	ret = vdec_submit(ctx, &hw_ns);
 	ctx->num_slices = 0;
 	if (ret)
 		return ret;
+	if (out->native_pin)
+		goto complete;
 
 	vdec_surface_sync(ctx, &out->surface, false);
 	start = ktime_get();
@@ -928,6 +956,7 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 				  width, height / 2, ctx->stride, 8);
 	}
 	timing->detile_ns += ktime_sub(ktime_get(), start);
+complete:
 	timing->rbsp_ns += ctx->picture_rbsp_ns;
 	timing->hw_ns += hw_ns;
 	timing->clear_ns += clear_ns;
@@ -1763,11 +1792,60 @@ static int vdec_queue_setup(struct vb2_queue *vq, unsigned int *num_buffers,
 		V4L2_TYPE_IS_OUTPUT(vq->type) ? &ctx->output : &ctx->capture;
 	unsigned int size = pix->plane_fmt[0].sizeimage;
 
+	if (!V4L2_TYPE_IS_OUTPUT(vq->type) && vdec_is_tiled(pix->pixelformat) &&
+	    *num_planes && PAGE_ALIGN(sizes[0]) != PAGE_ALIGN(size))
+		return -EINVAL;
 	if (*num_planes)
 		return *num_planes == 1 && sizes[0] >= size ? 0 : -EINVAL;
 	*num_planes = 1;
 	sizes[0] = size;
 	return 0;
+}
+
+/* Map the exportable pixels and private guard/PMV into adjacent VDH IOVAs. */
+static int vdec_native_init(struct vdec_ctx *ctx, struct vb2_buffer *vb)
+{
+	struct vdec_buffer *buf = to_vdec_buffer(vb);
+	struct vdec_dev *vdec = ctx->vdec;
+	struct vdec_dma *aux = &buf->surface;
+	size_t pixels = ALIGN(ctx->capture.plane_fmt[0].sizeimage, VDEC_PAGE);
+	size_t total = ALIGN(ctx->pmv_offset + ctx->pmv_size, VDEC_PAGE);
+	dma_addr_t dma = vb2_dma_contig_plane_dma_addr(vb, 0);
+	int ret;
+
+	if (vdec->dead)
+		return -EIO;
+	if (!IS_ALIGNED(dma, VDEC_PAGE) || !vb2_plane_vaddr(vb, 0))
+		return -EFAULT;
+	/* Keep the pages pinned even if the walker cannot be stopped on failure. */
+	buf->native_pin = vb2_dma_contig_memops.get_dmabuf(vb, vb->planes[0].mem_priv, O_RDWR);
+	if (IS_ERR_OR_NULL(buf->native_pin)) {
+		ret = buf->native_pin ? PTR_ERR(buf->native_pin) : -ENOMEM;
+		buf->native_pin = NULL;
+		return ret;
+	}
+	aux->iova = gen_pool_alloc(vdec->iova_pool, total);
+	if (!aux->iova) {
+		ret = -ENOMEM;
+		goto unpin;
+	}
+	aux->size = total - pixels;
+	aux->cpu = dma_alloc_coherent(vdec->dev, aux->size, &aux->dma, GFP_KERNEL);
+	if (!aux->cpu) {
+		ret = -ENOMEM;
+		goto free_iova;
+	}
+	vdec_map_pages(vdec, aux->iova, dma, pixels);
+	vdec_map_pages(vdec, aux->iova + pixels, aux->dma, aux->size);
+	dma_wmb();
+	return 0;
+
+free_iova:
+	gen_pool_free(vdec->iova_pool, aux->iova, total);
+unpin:
+	dma_buf_put(buf->native_pin);
+	buf->native_pin = NULL;
+	return ret;
 }
 
 static int vdec_buf_init(struct vb2_buffer *vb)
@@ -1781,7 +1859,10 @@ static int vdec_buf_init(struct vb2_buffer *vb)
 
 	/* A surface and its motion vectors live as long as the CAPTURE index. */
 	mutex_lock(&ctx->vdec->hw_lock);
-	ret = vdec_dma_alloc(ctx->vdec, &buf->surface, ctx->pmv_offset + ctx->pmv_size, true);
+	if (vdec_is_tiled(ctx->capture.pixelformat))
+		ret = vdec_native_init(ctx, vb);
+	else
+		ret = vdec_dma_alloc(ctx->vdec, &buf->surface, ctx->pmv_offset + ctx->pmv_size, true);
 	mutex_unlock(&ctx->vdec->hw_lock);
 	return ret;
 }
@@ -1789,9 +1870,19 @@ static int vdec_buf_init(struct vb2_buffer *vb)
 static void vdec_buf_cleanup(struct vb2_buffer *vb)
 {
 	struct vdec_ctx *ctx = vb2_get_drv_priv(vb->vb2_queue);
+	struct vdec_buffer *buf = to_vdec_buffer(vb);
 
 	mutex_lock(&ctx->vdec->hw_lock);
-	vdec_dma_free(ctx->vdec, &to_vdec_buffer(vb)->surface);
+	if (buf->native_pin) {
+		size_t total = ALIGN(ctx->pmv_offset + ctx->pmv_size, VDEC_PAGE);
+
+		if (vdec_unmap(ctx->vdec, buf->surface.iova, total)) {
+			vdec_dma_release(ctx->vdec, &buf->surface);
+			dma_buf_put(buf->native_pin);
+		}
+	} else {
+		vdec_dma_free(ctx->vdec, &buf->surface);
+	}
 	mutex_unlock(&ctx->vdec->hw_lock);
 }
 
@@ -1937,7 +2028,8 @@ static int vdec_set_hevc_sps(struct v4l2_ctrl *ctrl)
 	const struct v4l2_ctrl_hevc_sps *sps = ctrl->p_new.p_hevc_sps;
 	struct vb2_queue *cap = v4l2_m2m_get_dst_vq(ctx->fh.m2m_ctx);
 
-	if (ctx->output.pixelformat == V4L2_PIX_FMT_HEVC_SLICE && !vb2_is_busy(cap))
+	if (ctx->output.pixelformat == V4L2_PIX_FMT_HEVC_SLICE && !vb2_is_busy(cap) &&
+	    !vdec_is_tiled(ctx->capture.pixelformat))
 		vdec_set_capture(ctx, sps->bit_depth_luma_minus8 == 2 &&
 				 sps->bit_depth_chroma_minus8 == 2 ?
 				 V4L2_PIX_FMT_P010 : V4L2_PIX_FMT_NV21);
@@ -2097,6 +2189,13 @@ static void vdec_fill_capture(const struct v4l2_pix_format_mplane *out,
 	cap->pixelformat = fourcc;
 	cap->plane_fmt[0].bytesperline = cap->width * bytes;
 	cap->plane_fmt[0].sizeimage = cap->plane_fmt[0].bytesperline * cap->height * 3 / 2;
+	if (vdec_is_tiled(fourcc)) {
+		unsigned int stride = ALIGN(cap->width, 256);
+		unsigned int y = stride * ALIGN(cap->height, 64);
+
+		cap->plane_fmt[0].bytesperline = stride;
+		cap->plane_fmt[0].sizeimage = y * (fourcc == MV320_TILED_10 ? 15 : 12) / 8;
+	}
 }
 
 static void vdec_h264_surface_layout(struct vdec_ctx *ctx)
@@ -2143,8 +2242,15 @@ static void vdec_set_capture(struct vdec_ctx *ctx, u32 fourcc)
 	ctx->stride = ALIGN(ctx->output.width, 256);
 	ctx->y_size = ctx->stride * ALIGN(ctx->output.height, 64);
 	ctx->vu_size = ctx->y_size / 2;
-	ctx->tail_size = fourcc == V4L2_PIX_FMT_P010 ? (ctx->y_size + ctx->vu_size) / 4 : 0;
+	ctx->tail_size = fourcc == V4L2_PIX_FMT_P010 || fourcc == MV320_TILED_10 ?
+			 (ctx->y_size + ctx->vu_size) / 4 : 0;
 	ctx->codec->surface_layout(ctx);
+	if (ctx->fh.m2m_ctx) {
+		struct vb2_queue *cap = v4l2_m2m_get_dst_vq(ctx->fh.m2m_ctx);
+
+		cap->mem_ops = vdec_is_tiled(fourcc) ? &vb2_dma_contig_memops : &vb2_vmalloc_memops;
+		cap->dma_dir = vdec_is_tiled(fourcc) ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
+	}
 }
 
 static void vdec_set_output(struct vdec_ctx *ctx, struct v4l2_pix_format_mplane *pix)
@@ -2166,6 +2272,12 @@ static int vdec_enum_fmt(struct file *file, void *priv, struct v4l2_fmtdesc *f)
 		f->pixelformat = V4L2_PIX_FMT_NV21;
 	} else if (f->index == 1 && ctx->codec == &vdec_hevc_ops) {
 		f->pixelformat = V4L2_PIX_FMT_P010;
+	} else if (f->index == (ctx->codec == &vdec_hevc_ops ? 2 : 1)) {
+		f->pixelformat = MV320_TILED_8;
+		strscpy(f->description, "MV320 tiled VU 8-bit", sizeof(f->description));
+	} else if (f->index == 3 && ctx->codec == &vdec_hevc_ops) {
+		f->pixelformat = MV320_TILED_10;
+		strscpy(f->description, "MV320 tiled VU 8+2-bit", sizeof(f->description));
 	} else {
 		return -EINVAL;
 	}
@@ -2181,9 +2293,9 @@ static int vdec_enum_framesizes(struct file *file, void *priv, struct v4l2_frmsi
 	if (f->index || (f->pixel_format != V4L2_PIX_FMT_H264_SLICE &&
 			 f->pixel_format != V4L2_PIX_FMT_HEVC_SLICE &&
 			 f->pixel_format != V4L2_PIX_FMT_NV21 &&
-			 f->pixel_format != V4L2_PIX_FMT_P010))
+			 f->pixel_format != V4L2_PIX_FMT_P010 && !vdec_is_tiled(format)))
 		return -EINVAL;
-	if (format == V4L2_PIX_FMT_NV21)
+	if (format == V4L2_PIX_FMT_NV21 || vdec_is_tiled(format))
 		format = ctx->codec->pixelformat;
 	step = format == V4L2_PIX_FMT_H264_SLICE ? 16 : 8;
 	f->type = V4L2_FRMSIZE_TYPE_STEPWISE;
@@ -2213,8 +2325,9 @@ static int vdec_try_fmt(struct file *file, void *priv, struct v4l2_format *f)
 		vdec_fill_output(&f->fmt.pix_mp);
 		return 0;
 	}
-	if (fourcc != V4L2_PIX_FMT_NV21 &&
-	    (fourcc != V4L2_PIX_FMT_P010 || ctx->codec != &vdec_hevc_ops))
+	if (fourcc != V4L2_PIX_FMT_NV21 && fourcc != MV320_TILED_8 &&
+	    ((fourcc != V4L2_PIX_FMT_P010 && fourcc != MV320_TILED_10) ||
+	     ctx->codec != &vdec_hevc_ops))
 		fourcc = ctx->capture.pixelformat;
 	vdec_fill_capture(&ctx->output, &f->fmt.pix_mp, fourcc);
 	return 0;
@@ -2534,3 +2647,4 @@ module_platform_driver(vdec_driver);
 
 MODULE_DESCRIPTION("HiSilicon Hi3798MV320 stateless H.264 and HEVC decoder");
 MODULE_LICENSE("GPL");
+MODULE_IMPORT_NS("DMA_BUF");

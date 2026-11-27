@@ -16,9 +16,11 @@ elif [[ $variant == 7.3.5-* ]]; then
 fi
 vpu_probe=
 vdec=
+vdp=
 case "$variant" in
     7.3.5-vpu-probe) base_variant=all-2g-hdmi-bt-dvfs; vpu_probe=y ;;
     7.3.5-vdec) base_variant=all-2g-hdmi-bt-dvfs; vdec=y ;;
+    7.3.5-vdp) base_variant=all-2g-hdmi-bt-dvfs; vdec=y; vdp=y ;;
 esac
 linux="$root/source/linux-$linux_ver"
 busybox="$root/source/busybox-1.37.0"
@@ -169,13 +171,20 @@ if [[ $vpu_probe ]]; then
     variant_key+=" HI3798MV320_VPU_PROBE"
 fi
 if [[ $vdec ]]; then
-    variant_key+=" VIDEO_HI3798MV320_VDEC V4L2_MEM2MEM_DEV MEDIA_CONTROLLER VIDEOBUF2_VMALLOC CMA DMA_CMA"
+    variant_key+=" VIDEO_HI3798MV320_VDEC V4L2_MEM2MEM_DEV MEDIA_CONTROLLER VIDEOBUF2_VMALLOC VIDEOBUF2_DMA_CONTIG CMA DMA_CMA"
     apply_board_patch "$inputs/0012-media-add-Hi3798MV320-vdec.patch"
     apply_board_patch "$inputs/0013-media-add-Hi3798MV320-vdec-NEON.patch"
     install -m644 "$inputs/hi3798mv320-vdec.c" "$linux/drivers/media/platform/hi3798mv320-vdec-core.c"
     install -m644 "$inputs/hi3798mv320-vdec-neon.S" "$inputs/hi3798mv320-vdec-cabac.h" \
-        "$inputs/hi3798mv320-vdh.h" "$linux/drivers/media/platform/"
+        "$inputs/hi3798mv320-vdh.h" "$inputs/hi3798mv320-tiled.h" "$linux/drivers/media/platform/"
     board=hi3798mv320-fiberhome-hg680kd-arm64-vdec
+    install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
+fi
+if [[ $vdp ]]; then
+    variant_key+=" DRM_HI3798MV320_VDP DRM_GEM_DMA_HELPER"
+    apply_board_patch "$inputs/0014-drm-add-Hi3798MV320-vdp.patch"
+    install -m644 "$inputs/hi3798mv320-vdp.c" "$inputs/hi3798mv320-tiled.h" "$linux/drivers/gpu/drm/"
+    board=hi3798mv320-fiberhome-hg680kd-arm64-vdp
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
 if ! grep -Fq " $board.dtb" "$linux/arch/arm64/boot/dts/hisilicon/Makefile"; then
@@ -324,8 +333,10 @@ file /lib/firmware/rtl_bt/rtl8761btv_vat_config.bin $inputs/rtl8761btv_vat_confi
 EOF
 fi
 if [[ $vdec && ${VDEC_TEST:-0} == 1 ]]; then
+    make -C "$linux" O="$out" ARCH=arm64 CROSS_COMPILE="$cross" -j"$jobs" headers
     "$sysroot/bin/musl-gcc" -O2 -static -Wall -Wextra -Werror \
-        -o "$out/vdec-request" "$inputs/vdec-request-test.c"
+        -I "$out/usr/include/drm" -o "$out/vdec-request" \
+        "$inputs/vdec-request-test.c" "$inputs/vdp-scanout-test.c"
     applets+=(base64)
     printf 'file /bin/vdec-request %s/vdec-request 0755 0 0\n' "$out" >>"$list"
     printf 'dir /etc/vdec-test 0755 0 0\n' >>"$list"
@@ -403,6 +414,9 @@ if [[ $vdec ]]; then
     if [[ ${VDEC_TEST:-0} == 1 ]]; then
         "$linux/scripts/config" --file "$out/.config" --enable DYNAMIC_DEBUG
     fi
+fi
+if [[ $vdp ]]; then
+    "$linux/scripts/config" --file "$out/.config" --enable DRM_HI3798MV320_VDP
 fi
 if [[ -z $usb_root ]]; then
     "$linux/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/initramfs.cpio"

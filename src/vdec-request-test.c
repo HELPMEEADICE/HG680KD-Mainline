@@ -13,7 +13,11 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <time.h>
 #include <unistd.h>
+
+#include "hi3798mv320-tiled.h"
+#include "vdp-scanout-test.h"
 
 #define MAX_FRAMES 32
 #define OUTPUT V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE
@@ -84,12 +88,14 @@ static void map_buffers(int video, enum v4l2_buf_type type, unsigned int count,
 		};
 
 		IOCTL(video, VIDIOC_QUERYBUF, &buf);
-		maps[i].len = plane.length;
-		maps[i].addr = mmap(NULL, plane.length, PROT_READ | PROT_WRITE,
-				    MAP_SHARED, video, plane.m.mem_offset);
-		if (maps[i].addr == MAP_FAILED) {
-			perror("mmap");
-			exit(EXIT_FAILURE);
+		if (maps) {
+			maps[i].len = plane.length;
+			maps[i].addr = mmap(NULL, plane.length, PROT_READ | PROT_WRITE,
+					    MAP_SHARED, video, plane.m.mem_offset);
+			if (maps[i].addr == MAP_FAILED) {
+				perror("mmap");
+				exit(EXIT_FAILURE);
+			}
 		}
 		if (type == CAPTURE)
 			IOCTL(video, VIDIOC_QBUF, &buf);
@@ -189,6 +195,13 @@ static unsigned int setup_decoder(int video, uint32_t fourcc, unsigned int width
 	unsigned int stride = width * (pixel_format == V4L2_PIX_FMT_P010 ? 2 : 1);
 	unsigned int frame_size = stride * height * 3 / 2;
 	struct v4l2_format fmt = { .type = OUTPUT };
+	bool tiled = !dst;
+
+	if (tiled) {
+		stride = (width + 255) & ~255U;
+		frame_size = stride * ((height + 63) & ~63U) *
+			     (pixel_format == MV320_TILED_10 ? 15 : 12) / 8;
+	}
 
 	fmt.fmt.pix_mp.width = width;
 	fmt.fmt.pix_mp.height = height;
@@ -199,13 +212,19 @@ static unsigned int setup_decoder(int video, uint32_t fourcc, unsigned int width
 	if (sequence)
 		IOCTL(video, VIDIOC_S_EXT_CTRLS, sequence);
 	fmt.type = CAPTURE;
-	IOCTL(video, VIDIOC_G_FMT, &fmt);
+	if (tiled) {
+		fmt.fmt.pix_mp.pixelformat = pixel_format;
+		IOCTL(video, VIDIOC_S_FMT, &fmt);
+	} else {
+		IOCTL(video, VIDIOC_G_FMT, &fmt);
+	}
 	if (fmt.fmt.pix_mp.width != width || fmt.fmt.pix_mp.height != height ||
 	    fmt.fmt.pix_mp.pixelformat != pixel_format ||
 	    fmt.fmt.pix_mp.plane_fmt[0].bytesperline != stride ||
 	    fmt.fmt.pix_mp.plane_fmt[0].sizeimage != frame_size)
 		fail("unexpected CAPTURE dimensions or pixel layout");
-	IOCTL(video, VIDIOC_S_FMT, &fmt);
+	if (!tiled)
+		IOCTL(video, VIDIOC_S_FMT, &fmt);
 	map_buffers(video, OUTPUT, 1, src);
 	map_buffers(video, CAPTURE, frames, dst);
 	IOCTL(video, VIDIOC_STREAMON, &output);
@@ -251,7 +270,41 @@ static void read_hevc_weights(FILE *manifest, unsigned int count,
 	}
 }
 
-static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *raw, bool main10)
+static void requeue_capture(int video, unsigned int index)
+{
+	struct v4l2_plane plane = {};
+	struct v4l2_buffer buf = {
+		.index = index, .type = CAPTURE, .memory = V4L2_MEMORY_MMAP,
+		.length = 1, .m.planes = &plane,
+	};
+
+	IOCTL(video, VIDIOC_QBUF, &buf);
+}
+
+struct test_usage {
+	struct timespec time;
+	unsigned long long busy, total;
+};
+
+static struct test_usage sample_usage(void)
+{
+	struct test_usage usage;
+	unsigned long long user, nice, kernel, idle, iowait, irq, softirq, steal;
+	FILE *stat = fopen("/proc/stat", "r");
+
+	if (!stat || fscanf(stat, "cpu %llu%llu%llu%llu%llu%llu%llu%llu",
+			    &user, &nice, &kernel, &idle, &iowait, &irq, &softirq, &steal) != 8)
+		fail("cannot read aggregate CPU counters");
+	fclose(stat);
+	if (clock_gettime(CLOCK_MONOTONIC, &usage.time))
+		fail("cannot read monotonic clock");
+	usage.busy = user + nice + kernel + irq + softirq + steal;
+	usage.total = usage.busy + idle + iowait;
+	return usage;
+}
+
+static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *raw, bool main10,
+		    const char *display, unsigned int limit, unsigned int hold_ms)
 {
 	enum v4l2_buf_type output = OUTPUT, capture = CAPTURE;
 	struct v4l2_ctrl_hevc_sps sps = {};
@@ -272,6 +325,11 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 	};
 	struct v4l2_fmtdesc format = { .index = 1, .type = OUTPUT };
 	struct mapping src, dst[MAX_FRAMES];
+	struct vdp_test *scanout = NULL;
+	struct test_usage start;
+	unsigned int last_use[MAX_FRAMES], slot[MAX_FRAMES], buffers, requeued = 0;
+	bool plan_dpb = display != NULL;
+	fpos_t slice_start;
 	uint32_t pixel_format = main10 ? V4L2_PIX_FMT_P010 : V4L2_PIX_FMT_NV21;
 	unsigned int width, height, frames, frame_size, i;
 	unsigned long long sps_flags, pps_flags;
@@ -320,6 +378,17 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 		for (i = 0; i < sizeof(scaling); i++)
 			if (fscanf(manifest, "%hhu", (uint8_t *)&scaling + i) != 1)
 				fail("invalid HEVC scaling matrix");
+	if (limit && limit < frames)
+		frames = limit;
+	if (display) {
+		pixel_format = main10 ? MV320_TILED_10 : MV320_TILED_8;
+		for (i = 0; i < frames; i++) {
+			last_use[i] = i;
+			slot[i] = MAX_FRAMES;
+		}
+		if (fgetpos(manifest, &slice_start))
+			fail("cannot save fixture slice position");
+	}
 
 	IOCTL(video, VIDIOC_G_EXT_CTRLS, &modes);
 	if (mode[0].value != V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED ||
@@ -328,9 +397,17 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 	IOCTL(video, VIDIOC_ENUM_FMT, &format);
 	if (format.pixelformat != V4L2_PIX_FMT_HEVC_SLICE)
 		fail("missing HEVC OUTPUT format");
-	frame_size = setup_decoder(video, V4L2_PIX_FMT_HEVC_SLICE, width, height, frames,
-				   &src, dst, &sequence, pixel_format);
+	buffers = frames;
 
+read_slices:
+	if (!plan_dpb) {
+		frame_size = setup_decoder(video, V4L2_PIX_FMT_HEVC_SLICE, width, height, buffers,
+					   &src, display ? NULL : dst, &sequence, pixel_format);
+		if (display) {
+			scanout = vdp_test_open(display, width, height, main10);
+			start = sample_usage();
+		}
+	}
 	for (i = 0; i < frames;) {
 		struct v4l2_ctrl_hevc_slice_params slice = {};
 		struct v4l2_ctrl_hevc_decode_params dec = {};
@@ -353,7 +430,7 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 			   &slice.slice_beta_offset_div2, &slice.slice_tc_offset_div2,
 			   &slice.five_minus_max_num_merge_cand, &slice.collocated_ref_idx,
 			   &slice.slice_segment_addr, &hold, &flags, &slice.num_entry_point_offsets) != 17 ||
-		    bytes > src.len || fread(src.addr, 1, bytes, stream) != bytes)
+		    (!plan_dpb && (bytes > src.len || fread(src.addr, 1, bytes, stream) != bytes)))
 			fail("invalid HEVC slice");
 		slice.bit_size = bytes * 8;
 		slice.flags = flags;
@@ -375,6 +452,8 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 
 			if (fscanf(manifest, "%u%d", &index, &dpb->pic_order_cnt_val) != 2 || index >= i)
 				fail("invalid HEVC DPB entry");
+			if (plan_dpb)
+				last_use[index] = i;
 			dpb->timestamp = (uint64_t)(index + 1) * 1000000000;
 			if (j < dec.num_poc_st_curr_before)
 				dec.poc_st_curr_before[j] = j;
@@ -404,20 +483,65 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 			read_hevc_weights(manifest, l1, weights->delta_luma_weight_l1, weights->luma_offset_l1,
 					  weights->delta_chroma_weight_l1, weights->chroma_offset_l1);
 		}
-		queue_slice(video, media, &ext, i, bytes, hold);
+		if (!plan_dpb)
+			queue_slice(video, media, &ext, i, bytes, hold);
 		if (hold)
 			continue;
+		if (plan_dpb) {
+			i++;
+			continue;
+		}
 		index = dequeue(video, CAPTURE, i, frame_size);
-		if (index >= frames || fwrite(dst[index].addr, frame_size, 1, raw) != 1)
+		if (index >= buffers)
+			fail("unexpected HEVC CAPTURE index");
+		if (scanout) {
+			vdp_test_flip(scanout, video, index);
+			slot[i] = index;
+			for (j = 0; j < i; j++) {
+				if (slot[j] == MAX_FRAMES || last_use[j] > i)
+					continue;
+				requeue_capture(video, slot[j]);
+				slot[j] = MAX_FRAMES;
+				requeued++;
+			}
+		} else if (fwrite(dst[index].addr, frame_size, 1, raw) != 1) {
 			fail("cannot write HEVC frame");
+		}
 		printf("frame %u: POC %d, %ux%u %s %u bytes, CAPTURE index %u\n",
-		       i++, dec.pic_order_cnt_val, width, height, main10 ? "P010" : "NV21",
+		       i++, dec.pic_order_cnt_val, width, height,
+		       display ? (main10 ? "H0TV" : "H8TV") : (main10 ? "P010" : "NV21"),
 		       frame_size, index);
+	}
+	if (plan_dpb) {
+		buffers = 1;
+		for (i = 1; i < frames; i++) {
+			unsigned int live = 2, j;
+
+			for (j = 0; j + 1 < i; j++)
+				live += last_use[j] >= i;
+			if (live > buffers)
+				buffers = live;
+		}
+		if (fsetpos(manifest, &slice_start))
+			fail("cannot rewind fixture slices");
+		plan_dpb = false;
+		goto read_slices;
+	}
+	if (scanout) {
+		struct test_usage end = sample_usage();
+		double elapsed = end.time.tv_sec - start.time.tv_sec +
+				 (end.time.tv_nsec - start.time.tv_nsec) / 1e9;
+		double busy = 100.0 * (end.busy - start.busy) / (end.total - start.total);
+
+		printf("V0 result frames=%u capture_buffers=%u requeued=%u seconds=%.4f fps=%.2f cpu_all=%.2f%%\n",
+		       frames, buffers, requeued, elapsed, frames / elapsed, busy);
+		vdp_test_close(scanout, hold_ms);
 	}
 	IOCTL(video, VIDIOC_STREAMOFF, &output);
 	IOCTL(video, VIDIOC_STREAMOFF, &capture);
-	for (i = 0; i < frames; i++)
-		munmap(dst[i].addr, dst[i].len);
+	if (!display)
+		for (i = 0; i < frames; i++)
+			munmap(dst[i].addr, dst[i].len);
 	munmap(src.addr, src.len);
 	return 0;
 }
@@ -444,17 +568,33 @@ int main(int argc, char **argv)
 	struct picture pictures[MAX_FRAMES];
 	int qp, chroma, chroma2, video, media;
 	FILE *manifest, *stream, *raw;
+	static char display_log[16384];
+	const char *display = NULL;
+	unsigned int limit = 0, hold_ms = 0;
 	bool test_flush = getenv("VDEC_TEST_FLUSH") != NULL;
 
-	if (argc != 6)
-		fail("usage: vdec-request /dev/videoN /dev/mediaN manifest slices output.raw");
+	if (argc >= 7 && argc <= 9 && !strcmp(argv[5], "--display")) {
+		display = argv[6];
+		/* Keep serial console writes outside the decode-to-flip measurement. */
+		if (setvbuf(stdout, display_log, _IOFBF, sizeof(display_log)))
+			fail("cannot buffer display logs");
+		if (argc >= 8)
+			limit = atoi(argv[7]);
+		if (argc == 9)
+			hold_ms = atoi(argv[8]);
+		if ((argc >= 8 && (!limit || limit > MAX_FRAMES)) || hold_ms > 60000)
+			fail("invalid frame limit or last-frame hold time");
+	} else if (argc != 6) {
+		fail("usage: vdec-request /dev/videoN /dev/mediaN manifest slices "
+		     "output.raw | --display /dev/dri/cardN [frames [hold_ms]]");
+	}
 
 	video = open_device(argv[1]);
 	media = open_device(argv[2]);
 	manifest = fopen(argv[3], "r");
 	stream = fopen(argv[4], "rb");
-	raw = fopen(argv[5], "wb");
-	if (!manifest || !stream || !raw) {
+	raw = display ? NULL : fopen(argv[5], "wb");
+	if (!manifest || !stream || (!display && !raw)) {
 		perror("fixture/output file");
 		return EXIT_FAILURE;
 	}
@@ -466,9 +606,12 @@ int main(int argc, char **argv)
 		if (fscanf(manifest, "%15s", codec) != 1 ||
 		    (strcmp(codec, "HEVC") && strcmp(codec, "HEVC10")))
 			fail("invalid codec in fixture");
-		run_hevc(video, media, manifest, stream, raw, !strcmp(codec, "HEVC10"));
+		run_hevc(video, media, manifest, stream, raw, !strcmp(codec, "HEVC10"),
+			 display, limit, hold_ms);
 		goto close_files;
 	}
+	if (display)
+		fail("display validation expects an HEVC fixture");
 	rewind(manifest);
 
 	if (fscanf(manifest, "%u%u%u%u%u%u%u%u%u%u%u%u%d%d%d",
@@ -603,5 +746,5 @@ close_files:
 	fclose(stream);
 	close(video);
 	close(media);
-	return fclose(raw) ? EXIT_FAILURE : EXIT_SUCCESS;
+	return raw && fclose(raw) ? EXIT_FAILURE : EXIT_SUCCESS;
 }
