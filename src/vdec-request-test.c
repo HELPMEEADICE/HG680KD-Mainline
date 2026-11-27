@@ -20,6 +20,8 @@
 #include "vdp-scanout-test.h"
 
 #define MAX_FRAMES 32
+#define MAX_DISPLAY_FRAMES 4096
+#define DISPLAY_EXTRA_BUFFERS 4
 #define OUTPUT V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE
 #define CAPTURE V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 
@@ -232,7 +234,7 @@ static unsigned int setup_decoder(int video, uint32_t fourcc, unsigned int width
 	return frame_size;
 }
 
-static void queue_slice(int video, int media, struct v4l2_ext_controls *ext,
+static int submit_slice(int video, int media, struct v4l2_ext_controls *ext,
 			unsigned int frame, unsigned int bytes, bool hold)
 {
 	struct v4l2_plane plane = { .bytesused = bytes };
@@ -251,6 +253,14 @@ static void queue_slice(int video, int media, struct v4l2_ext_controls *ext,
 	qbuf.request_fd = req;
 	IOCTL(video, VIDIOC_QBUF, &qbuf);
 	IOCTL(req, MEDIA_REQUEST_IOC_QUEUE, NULL);
+	return req;
+}
+
+static void queue_slice(int video, int media, struct v4l2_ext_controls *ext,
+			unsigned int frame, unsigned int bytes, bool hold)
+{
+	int req = submit_slice(video, media, ext, frame, bytes, hold);
+
 	expect_request(req);
 	dequeue(video, OUTPUT, frame, 0);
 	close(req);
@@ -281,9 +291,73 @@ static void requeue_capture(int video, unsigned int index)
 	IOCTL(video, VIDIOC_QBUF, &buf);
 }
 
+struct display_pipeline {
+	struct vdp_test *scanout;
+	const unsigned int *last_use;
+	unsigned int ready[VDP_TEST_MAX_CAPTURE];
+	int capture_frame[VDP_TEST_MAX_CAPTURE];
+	unsigned int buffers, queued, decoded, submitted, requeued;
+	int active, pending;
+};
+
+static void display_recycle(struct display_pipeline *p, int video)
+{
+	unsigned int index;
+
+	for (index = 0; index < p->buffers; index++) {
+		int frame = p->capture_frame[index];
+
+		/* A queued, ready, pending, active or DPB buffer is still owned. */
+		if (frame < 0 || (unsigned int)frame >= p->submitted ||
+		    (int)index == p->pending || (int)index == p->active ||
+		    p->last_use[frame] >= p->decoded)
+			continue;
+		requeue_capture(video, index);
+		p->capture_frame[index] = -1;
+		p->queued++;
+		p->requeued++;
+	}
+}
+
+static void display_submit(struct display_pipeline *p)
+{
+	if (p->pending >= 0 || p->submitted == p->decoded)
+		return;
+	p->pending = p->ready[p->submitted % p->buffers];
+	vdp_test_submit(p->scanout, p->pending);
+	p->submitted++;
+}
+
+/* While VDH owns a request, service every DRM event that becomes ready. */
+static void display_poll(struct display_pipeline *p, int video, int req)
+{
+	do {
+		struct pollfd fds[] = {
+			{ .fd = p->pending >= 0 ? vdp_test_fd(p->scanout) : -1, .events = POLLIN },
+			{ .fd = req, .events = POLLPRI },
+		};
+		int ret;
+
+		do {
+			ret = poll(fds, 2, 3000);
+		} while (ret < 0 && errno == EINTR);
+		if (ret <= 0 || ((fds[0].revents | fds[1].revents) & (POLLERR | POLLHUP | POLLNVAL)))
+			fail("display pipeline timed out or poll failed");
+		if (fds[0].revents & POLLIN) {
+			vdp_test_complete(p->scanout);
+			p->active = p->pending;
+			p->pending = -1;
+			display_submit(p);
+			display_recycle(p, video);
+		}
+		if (fds[1].revents & POLLPRI)
+			return;
+	} while (req >= 0);
+}
+
 struct test_usage {
 	struct timespec time;
-	unsigned long long busy, total;
+	unsigned long long usr, sys, idle, total;
 };
 
 static struct test_usage sample_usage(void)
@@ -298,8 +372,10 @@ static struct test_usage sample_usage(void)
 	fclose(stat);
 	if (clock_gettime(CLOCK_MONOTONIC, &usage.time))
 		fail("cannot read monotonic clock");
-	usage.busy = user + nice + kernel + irq + softirq + steal;
-	usage.total = usage.busy + idle + iowait;
+	usage.usr = user + nice;
+	usage.sys = kernel + irq + softirq;
+	usage.idle = idle;
+	usage.total = usage.usr + usage.sys + idle + iowait + steal;
 	return usage;
 }
 
@@ -325,17 +401,17 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 	};
 	struct v4l2_fmtdesc format = { .index = 1, .type = OUTPUT };
 	struct mapping src, dst[MAX_FRAMES];
-	struct vdp_test *scanout = NULL;
+	struct display_pipeline pipeline = { .active = -1, .pending = -1 };
 	struct test_usage start;
-	unsigned int last_use[MAX_FRAMES], slot[MAX_FRAMES], buffers, requeued = 0;
+	unsigned int last_use[MAX_DISPLAY_FRAMES], buffers;
 	bool plan_dpb = display != NULL;
 	fpos_t slice_start;
 	uint32_t pixel_format = main10 ? V4L2_PIX_FMT_P010 : V4L2_PIX_FMT_NV21;
-	unsigned int width, height, frames, frame_size, i;
+	unsigned int width, height, frames, frame_size = 0, i;
 	unsigned long long sps_flags, pps_flags;
 
 	if (fscanf(manifest, "%u%u%u", &width, &height, &frames) != 3 ||
-	    !frames || frames > MAX_FRAMES || !width || !height ||
+	    !frames || frames > (display ? MAX_DISPLAY_FRAMES : MAX_FRAMES) || !width || !height ||
 	    width % 8 || height % 8 || width > 4096 || height > 2176)
 		fail("invalid HEVC fixture header");
 	if (fscanf(manifest, "%hhu%hhu%hhu%hhu%hhu%hhu%hhu%hhu%llu",
@@ -382,10 +458,8 @@ static int run_hevc(int video, int media, FILE *manifest, FILE *stream, FILE *ra
 		frames = limit;
 	if (display) {
 		pixel_format = main10 ? MV320_TILED_10 : MV320_TILED_8;
-		for (i = 0; i < frames; i++) {
+		for (i = 0; i < frames; i++)
 			last_use[i] = i;
-			slot[i] = MAX_FRAMES;
-		}
 		if (fgetpos(manifest, &slice_start))
 			fail("cannot save fixture slice position");
 	}
@@ -404,7 +478,12 @@ read_slices:
 		frame_size = setup_decoder(video, V4L2_PIX_FMT_HEVC_SLICE, width, height, buffers,
 					   &src, display ? NULL : dst, &sequence, pixel_format);
 		if (display) {
-			scanout = vdp_test_open(display, width, height, main10);
+			pipeline.scanout = vdp_test_open(display, width, height, main10);
+			pipeline.last_use = last_use;
+			pipeline.buffers = pipeline.queued = buffers;
+			for (i = 0; i < buffers; i++)
+				pipeline.capture_frame[i] = -1;
+			vdp_test_import(pipeline.scanout, video, buffers);
 			start = sample_usage();
 		}
 	}
@@ -483,8 +562,18 @@ read_slices:
 			read_hevc_weights(manifest, l1, weights->delta_luma_weight_l1, weights->luma_offset_l1,
 					  weights->delta_chroma_weight_l1, weights->chroma_offset_l1);
 		}
-		if (!plan_dpb)
+		if (pipeline.scanout) {
+			int req;
+
+			while (!pipeline.queued)
+				display_poll(&pipeline, video, -1);
+			req = submit_slice(video, media, &ext, i, bytes, hold);
+			display_poll(&pipeline, video, req);
+			dequeue(video, OUTPUT, i, 0);
+			close(req);
+		} else if (!plan_dpb) {
 			queue_slice(video, media, &ext, i, bytes, hold);
+		}
 		if (hold)
 			continue;
 		if (plan_dpb) {
@@ -494,48 +583,72 @@ read_slices:
 		index = dequeue(video, CAPTURE, i, frame_size);
 		if (index >= buffers)
 			fail("unexpected HEVC CAPTURE index");
-		if (scanout) {
-			vdp_test_flip(scanout, video, index);
-			slot[i] = index;
-			for (j = 0; j < i; j++) {
-				if (slot[j] == MAX_FRAMES || last_use[j] > i)
-					continue;
-				requeue_capture(video, slot[j]);
-				slot[j] = MAX_FRAMES;
-				requeued++;
-			}
-		} else if (fwrite(dst[index].addr, frame_size, 1, raw) != 1) {
-			fail("cannot write HEVC frame");
+		if (pipeline.scanout) {
+			if (pipeline.capture_frame[index] >= 0)
+				fail("display buffer dequeued while still in use");
+			pipeline.queued--;
+			pipeline.capture_frame[index] = i;
+			pipeline.ready[pipeline.decoded % buffers] = index;
+			pipeline.decoded++;
+			display_submit(&pipeline);
+			display_recycle(&pipeline, video);
+		} else {
+			if (fwrite(dst[index].addr, frame_size, 1, raw) != 1)
+				fail("cannot write HEVC frame");
+			printf("frame %u: POC %d, %ux%u %s %u bytes, CAPTURE index %u\n",
+			       i, dec.pic_order_cnt_val, width, height,
+			       main10 ? "P010" : "NV21", frame_size, index);
 		}
-		printf("frame %u: POC %d, %ux%u %s %u bytes, CAPTURE index %u\n",
-		       i++, dec.pic_order_cnt_val, width, height,
-		       display ? (main10 ? "H0TV" : "H8TV") : (main10 ? "P010" : "NV21"),
-		       frame_size, index);
+		i++;
 	}
 	if (plan_dpb) {
-		buffers = 1;
-		for (i = 1; i < frames; i++) {
-			unsigned int live = 2, j;
+		unsigned int release[MAX_DISPLAY_FRAMES] = {}, live = 0;
 
-			for (j = 0; j + 1 < i; j++)
-				live += last_use[j] >= i;
+		for (i = 0; i < frames; i++)
+			release[last_use[i]]++;
+		buffers = 0;
+		for (i = 0; i < frames; i++) {
+			live++;
 			if (live > buffers)
 				buffers = live;
+			live -= release[i];
 		}
+		buffers += DISPLAY_EXTRA_BUFFERS;
+		if (buffers > frames)
+			buffers = frames;
+		if (buffers > VDP_TEST_MAX_CAPTURE)
+			fail("DPB and display buffer count exceeds CAPTURE limit");
 		if (fsetpos(manifest, &slice_start))
 			fail("cannot rewind fixture slices");
 		plan_dpb = false;
 		goto read_slices;
 	}
-	if (scanout) {
-		struct test_usage end = sample_usage();
-		double elapsed = end.time.tv_sec - start.time.tv_sec +
-				 (end.time.tv_nsec - start.time.tv_nsec) / 1e9;
-		double busy = 100.0 * (end.busy - start.busy) / (end.total - start.total);
+	if (pipeline.scanout) {
+		const struct vdp_test_stats *stats = vdp_test_stats(pipeline.scanout);
+		struct test_usage end;
+		double elapsed, ticks, fps;
 
-		printf("V0 result frames=%u capture_buffers=%u requeued=%u seconds=%.4f fps=%.2f cpu_all=%.2f%%\n",
-		       frames, buffers, requeued, elapsed, frames / elapsed, busy);
-		vdp_test_close(scanout, hold_ms);
+		while (pipeline.pending >= 0)
+			display_poll(&pipeline, video, -1);
+		end = sample_usage();
+		elapsed = end.time.tv_sec - start.time.tv_sec +
+			  (end.time.tv_nsec - start.time.tv_nsec) / 1e9;
+		ticks = (double)(end.total - start.total);
+		fps = stats->last_us > stats->first_us ?
+		      1e6 * (stats->frames - 1) / (stats->last_us - stats->first_us) : 0;
+		printf("V0 result frames=%u capture_buffers=%u requeued=%u seconds=%.4f "
+		       "fps=%.2f wall_fps=%.2f dropped=%u missed_vblanks=%u",
+		       stats->frames, buffers, pipeline.requeued, elapsed, fps, stats->frames / elapsed,
+		       frames - stats->frames, stats->missed_vblanks);
+		if (ticks)
+			printf(" usr=%.2f%% sys=%.2f%% idle=%.2f%%",
+			       100.0 * (end.usr - start.usr) / ticks,
+			       100.0 * (end.sys - start.sys) / ticks,
+			       100.0 * (end.idle - start.idle) / ticks);
+		puts("");
+		vdp_test_close(pipeline.scanout, hold_ms);
+		if (pipeline.submitted != frames)
+			fail("display pipeline did not drain all frames");
 	}
 	IOCTL(video, VIDIOC_STREAMOFF, &output);
 	IOCTL(video, VIDIOC_STREAMOFF, &capture);
@@ -582,7 +695,7 @@ int main(int argc, char **argv)
 			limit = atoi(argv[7]);
 		if (argc == 9)
 			hold_ms = atoi(argv[8]);
-		if ((argc >= 8 && (!limit || limit > MAX_FRAMES)) || hold_ms > 60000)
+		if ((argc >= 8 && (!limit || limit > MAX_DISPLAY_FRAMES)) || hold_ms > 60000)
 			fail("invalid frame limit or last-frame hold time");
 	} else if (argc != 6) {
 		fail("usage: vdec-request /dev/videoN /dev/mediaN manifest slices "

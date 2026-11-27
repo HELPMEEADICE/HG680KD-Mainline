@@ -12,9 +12,9 @@
 
 | VDP 偏移 | 本阶段编程或核验 |
 |---|---|
-| `0x04/08/0c`、`0xc228/0xc2a0` | IRQ 状态、W1C 清除、mask。HD0 VT1 使用 bit 0，Linux 把阈值移到最后一条活动线，在消隐状态 `0xc2a0[1]` 置位后记账。采样原始 IRQ 状态以识别取数异常。 |
+| `0x04/08/0c`、`0xc228/0xc2a0` | IRQ 状态、W1C 清除和 mask。HD0 VT1 使用 bit 0，阈值 12 对应后肩内的消隐中断。HD0 underflow 使用 bit 3，单独累计。 |
 | `0x2000/04/18`、`0x2080–8c`、`0x8338` | V0 enable、更新触发、活动控制、1:1 视频区域和活动 Y 地址。更新位清除且活动控制、活动地址已匹配时交付翻页事件。 |
-| `0x22c0/0x22d8–e8`、`0xe0c/0xe1c/0xf00` | ZME1 的 1:1 亮度设置与 4:2:0 → 4:2:2 色度路径。使用 DMA 参数区装载垂直滤波系数。 |
+| `0x2600/04/08/0c/10`、`0x22c0/0x22d8–e8` | V0 IFIR 设为原厂模式 3 并装载其系数。ZME1 以 1:1 扫描和最近行色度扩展输出 4:2:2。1:1 路径关闭 ZME FIR。 |
 | `0x4000/04/10`、`0x4080–94`、`0x4100/08`、`0x208` | V0 经 VP0 进入固件已配置的 HD0 mixer。按 `xdp_drv_set_vp0_reso`、`xdp_drv_set_vid_cbm` 和 `xdp_drv_set_reg_up` 设置 VP0 全屏范围、背景、alpha、V0 优先级并触发锁存。 |
 | `0x8210/20/40` | VU 顺序位为 0。主 Y/VU 2D 取数 bypass 为 1。`data_type=2, data_fmt=1, data_width=0/1, dcmp_type=0`，复核逐行显示模式。 |
 | `0x8244/48/4c` | 源分辨率、裁剪起点、取数尺寸。以有效像素尺寸编程，pitch 和偏移使用分配尺寸。 |
@@ -47,14 +47,14 @@ VDEC_TEST=1 VDEC_FIXTURES='h265ip1080 hevc10ip1080 hevc4k hevc10ip4k ip32' \
   bash scripts/build_arm64.sh "$PWD" "$PWD/inputs" 7.3.5-vdp
 ```
 
-单帧的最后两个参数是帧数与保持时间（毫秒）。省略它们会播放整个 fixture，逐次等待 flip event，并按 manifest 中的最后引用帧回收 CAPTURE 缓冲。FPS 从第一次提交解码到最后一次翻页完成计时，CPU 为 `/proc/stat` 四核合计忙碌占比。
+单帧的最后两个参数是帧数与保持时间（毫秒）。省略它们会播放整个 fixture。测试程序按最大同时存活的解码参考面和当前输出分配 CAPTURE，再预留最多四个显示缓冲。一个 `poll` 循环同时处理解码请求和非阻塞 Atomic 翻页。收到新帧翻页事件且旧帧最后一次 DPB 引用完成后，旧面才能重新入队。翻页 FPS 采用首尾事件间的平均间隔，`wall_fps` 另计第一次提交前至末次事件后的吞吐。CPU 使用这一墙钟区间的 `/proc/stat` 四核合计，`usr` 含 nice，`sys` 含硬件和软件中断。
 
 ```sh
 vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10ip4k.txt \
   /etc/vdec-test/hevc10ip4k.265 --display /dev/dri/card0 1 9000
 ```
 
-主机测试用 `scripts/vdp_ram_test.py --image <boot.img> --log <日志>`。加 `--capture-device 'USB2 Video'` 保存 HDMI 采集图。`--capture-reference` 可与软解首帧 PNG 比较，按 160×90 RGB 平均绝对误差 24/255 判定这组彩条的画面检查。`--payload` 可从主机 HTTP 向板上 `/tmp` 发送更长的 HEVC fixture，`--linear` 可逐帧核对已有 NV21/P010 参考。采集卡将 2160p HDMI 输入输出为 1080p MJPEG，可核对画面形状和颜色。Main10 的 HDMI 深色链路、逐像素低 2 位还需额外采集能力或硬件校验。
+主机测试用 `scripts/vdp_ram_test.py --image <boot.img> --log <日志>`。加 `--capture-device 'USB2 Video'` 保存 HDMI 采集图。`--capture-reference` 将 160×90 RGB 平均绝对误差与 24/255 上限及交换 U/V 后的误差比较。`--payload` 可从主机 HTTP 向板上 `/tmp` 发送更长的 HEVC fixture，`--linear` 可逐帧核对已有 NV21/P010 参考。采集卡将 2160p HDMI 输入输出为 1080p MJPEG，可核对画面形状和颜色。HDMI 链路的逐像素 10-bit 验证需要深色采集设备。
 
 ## 2026-11-27 · Phase 1 板测结果
 
@@ -87,3 +87,35 @@ HDMI 采集可辨认两种位深和两种输入分辨率的图像。彩条的位
 | U-Boot RAM 回读 CRC32 | `b8f83792` |
 
 镜像由 `hedc@ArchLinux-E5-Server` 使用 GCC 14.2.0 构建。COM4 以 115200 8N1 独占，通过 TFTP 加载至 `0x01fdffc0` 并核验 CRC32，Linux 根位于 RAM。`mmcblk0/ro=1`，没有块设备挂载。未写 U 盘 `/boot/boot.img`、eMMC、OTP 或 U-Boot 持久环境。[构建日志](artifacts/arm64-7.3.5-vdp/build.txt) · [镜像](artifacts/arm64-7.3.5-vdp/boot.img) · [TFTP 日志](artifacts/arm64-7.3.5-vdp/phase1-board.tftp.txt)
+
+## 2026-11-27 · Phase 1 色彩验收与异步 4K60 复测
+
+**四种原生输入的 HDMI 色彩通过验收，两组 4K 样本均持续翻页 60.00 FPS。** 本轮保持固件交接的 3840×2160p60 HDMI 时序，1920×1080 内容在输出内居中 1:1 扫描。采集卡输出 1080p 8-bit MJPEG，验收范围包含 Main10 输入经 V0 上屏后的颜色。HDMI 深色链路和逐像素的 10-bit HDMI 输出精度仍待深色采集。[实机串口](logs/487-vdp-phase1-async.txt) · [采集与参考对照](logs/487-vdp-phase1-async-hdmi.png)
+
+色度衰减位于 V0 到 VP0 之前。FDR mute 注入同一 YCbCr 仍可复现，V0 layer mute 与 VP0 mute 输出一致。对照原厂 `xdp_drv_set_vid_ifir`（`c05e83f8`）恢复 `0x2600[2:1]=3`，把 `-7,12,-17,25,-38,58,-105,328` 装入 `0x2604–0x2610`。实验垂直 FIR 的衰减随系数装载和窗口位置变化，同一 1080p 图在零纵向偏移时可恢复。1:1 路径使用 `0x22d8=0xc0080001`，保留 4:2:0→4:2:2 最近行扩展，关闭 ZME FIR。VP0 接收 YCbCr，按固件链路旁路 V0 CSC/HDR。主 VU 地址与 pitch 保持原生值，Main10 回读 `0x8240=0x10a` 以及非零的低位 Y/VU 地址和 pitch。[V0、VP0 和 FIR 诊断记录](logs/488-vdp-color-and-vt1-diagnostics.txt)
+
+| 输入 | HDMI 对软解 RGB MAE | HDMI 对 U/V 互换参考 RGB MAE |
+|---|---:|---:|
+| 1080p Main | 3.29/255 | 116.12/255 |
+| 1080p Main10 | 2.88/255 | 116.15/255 |
+| 4K Main | 3.13/255 | 116.05/255 |
+| 4K Main10 | 2.65/255 | 116.06/255 |
+
+同一组 240 帧 I/P 样本使用两个参考帧。每种位深分配 7 个 CAPTURE，DMA-BUF 预导入，一次保持一个待完成翻页。原消隐末端的 VT1 每次跨过两个 vblank，异步但未调整阈值时两组均为 30.00 FPS。把 VT1 移到后肩前部后，活动 Y 地址匹配时可提早确认锁存，并给下一次提交留下完整的帧间隔。原生 HEVC 的全宽整 tile 路径仅清空对齐区及私有 guard/PMV，4K 每帧清零均值降至 Main 1.31 ms、Main10 1.34 ms。其余 CAPTURE 布局保留逐帧初始化。[初次异步实测和 VT1 阈值记录](logs/488-vdp-color-and-vt1-diagnostics.txt) · [最终板测](logs/487-vdp-phase1-async.txt#L910)
+
+| 4K 输入 | 翻页完成 | 翻页 FPS / 墙钟 FPS | CPU usr / sys / idle | 丢帧 / 错失 vblank | VDP IRQ 122 增量 | HD0 underflow | SMMU IRQ 181 增量 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| HEVC Main | 240/240 | 60.00 / 59.99 | 0.00% / 5.18% / 94.82% | 0 / 0 | 241 | 0 | 0 |
+| HEVC Main10 | 240/240 | 60.00 / 59.78 | 0.19% / 5.42% / 94.40% | 0 / 0 | 241 | 0 | 0 |
+
+线性 NV21/P010 逐帧 SHA256 共 14/14，与 FFmpeg 参考一致。NV21 的 H.264 32×32 为 2/2，HEVC 1080p 和 4K 各 3/3。P010 1080p 和 4K 各 3/3。[逐帧 SHA256](logs/487-vdp-phase1-async.txt#L1027)
+
+另用诊断程序映射回读两组 4K 原生 CAPTURE，将可见像素解排布后逐帧与 FFmpeg 比较 CRC32。Main 和 Main10 各匹配 12/12，均覆盖七个 CAPTURE 索引和回收后的再次写入。Main10 CRC 包含 Y、U、V 的实际低 2 位。该诊断读回单独执行。[原生像素 CRC32](logs/487-vdp-phase1-async-native-crc.txt)
+
+| 最终纯 RAM 镜像校验 | 值 |
+|---|---|
+| `boot.img` 大小 | 17,369,160 bytes |
+| SHA256 | `a58f4f756c1a400165cf8aea8c6e615d21e34d3140ec466ba7c24f80bf2f7a50` |
+| U-Boot RAM 回读 CRC32 | `5c7b89d6` |
+
+镜像在 `hedc@ArchLinux-E5-Server` 的 `/home/hedc/hg680kd-mainline` 构建，经 COM4 单进程独占 TFTP 纯 RAM 启动。板端根文件系统为 `rootfs`，无块设备挂载，`mmcblk0/ro=1`。BL31 走原有只读加载流程。本机镜像位于 `artifacts/arm64-7.3.5-vdp/phase1-async/final/boot.img`。[构建](logs/487-vdp-phase1-async-build.txt) · [串口校验](logs/487-vdp-phase1-async.txt#L145) · [TFTP](logs/487-vdp-phase1-async.tftp.txt)

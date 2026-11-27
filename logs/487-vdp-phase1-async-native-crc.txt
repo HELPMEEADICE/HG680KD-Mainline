@@ -1,0 +1,43 @@
+(cd /tmp && wget -q -O vdec-native-verify http://192.168.6.172:8098/vdec-native-verify && chmod +x vdec-native-verify); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (/tmp/vdec-native-verify /dev/video0 /dev/media0 /tmp/4k60-8.txt /tmp/4k60-8.265 --display /dev/dri/card0 12); printf '\nEXIT=%s\n' $?
+DRM connector=39 CRTC=37 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+NATIVE_CRC 0 0 86b1899e
+NATIVE_CRC 1 1 3df8e39a
+NATIVE_CRC 2 2 07b4818f
+NATIVE_CRC 3 3 835f3667
+NATIVE_CRC 4 4 c02a3af2
+NATIVE_CRC 5 5 669703b5
+NATIVE_CRC 6 6 713e6cae
+NATIVE_CRC 7 0 ef563eb5
+NATIVE_CRC 8 1 6497a40a
+NATIVE_CRC 9 2 bc8f7648
+NATIVE_CRC 10 3 f8fe579f
+NATIVE_CRC 11 4 da29e41b
+V0 result frames=12 capture_buffers=7 requeued=11 seconds=24.7217 fps=0.48 wall_fps=0.49 dropped=0 missed_vblanks=1350 usr=24.84% sys=0.03% idle=75.13%
+V0 complete=12 first_vblank=1749 last_vblank=3110
+
+EXIT=0
+#
+[host] Main 8-bit native CRC32 12/12, 7 indices used
+(/tmp/vdec-native-verify /dev/video0 /dev/media0 /tmp/4k60-10.txt /tmp/4k60-10.265 --display /dev/dri/card0 12); printf '\nEXIT=%s\n' $?
+DRM connector=39 CRTC=37 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+NATIVE_CRC 0 0 479d93af
+NATIVE_CRC 1 1 a76b8185
+NATIVE_CRC 2 2 645b64d1
+NATIVE_CRC 3 3 b4b8b3e3
+NATIVE_CRC 4 4 b35e1f4a
+NATIVE_CRC 5 5 b9ad4369
+NATIVE_CRC 6 6 68c0f3cc
+NATIVE_CRC 7 0 7b84f119
+NATIVE_CRC 8 1 42826b2b
+NATIVE_CRC 9 2 891402dd
+NATIVE_CRC 10 3 0270db6b
+NATIVE_CRC 11 4 e1dfaf8d
+V0 result frames=12 capture_buffers=7 requeued=11 seconds=54.7409 fps=0.22 wall_fps=0.22 dropped=0 missed_vblanks=2999 usr=24.93% sys=0.02% idle=75.06%
+V0 complete=12 first_vblank=3112 last_vblank=6122
+
+EXIT=0
+#
+[host] Main 10-bit native CRC32 12/12, 7 indices used

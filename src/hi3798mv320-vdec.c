@@ -908,6 +908,31 @@ static int vdec_copy_rbsp(struct vdec_ctx *ctx, u8 *dst, const u8 *src, unsigned
 #define REQUEST_SCALING		BIT(1)
 #define REQUEST_WEIGHTS		BIT(2)
 
+static void vdec_clear_native_padding(struct vdec_ctx *ctx, u8 *output)
+{
+	unsigned int width = ctx->output.width, height = ctx->output.height;
+	unsigned int y, vu, pixels = ctx->y_size + ctx->vu_size;
+	u8 *tail = output + pixels;
+
+	/* A complete HEVC picture overwrites all active samples in whole tiles. */
+	if (ctx->codec->pixelformat != V4L2_PIX_FMT_HEVC_SLICE ||
+	    width != ctx->stride || !IS_ALIGNED(height, 16)) {
+		memset(output, 0, PAGE_ALIGN(ctx->capture.plane_fmt[0].sizeimage));
+		return;
+	}
+
+	y = width * height;
+	vu = y / 2;
+	memset(output + y, 0, ctx->y_size - y);
+	memset(output + ctx->y_size + vu, 0, ctx->vu_size - vu);
+	if (ctx->tail_size) {
+		memset(tail + y / 4, 0, (ctx->y_size - y) / 4);
+		memset(tail + ctx->y_size / 4 + vu / 4, 0, (ctx->vu_size - vu) / 4);
+	}
+	memset(tail + ctx->tail_size, 0, PAGE_ALIGN(pixels + ctx->tail_size) -
+	       pixels - ctx->tail_size);
+}
+
 static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst)
 {
 	struct vdec_buffer *out = to_vdec_buffer(&dst->vb2_buf);
@@ -925,7 +950,7 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 	vdec_surface_sync(ctx, &out->surface, false);
 	start = ktime_get();
 	if (out->native_pin) {
-		memset(output, 0, PAGE_ALIGN(ctx->capture.plane_fmt[0].sizeimage));
+		vdec_clear_native_padding(ctx, output);
 		memset(out->surface.cpu, 0, out->surface.size);
 		dma_wmb();
 	} else {

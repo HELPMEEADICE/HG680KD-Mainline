@@ -35,12 +35,10 @@
 #define VDP_INT_MASK		0x000c
 #define HD0_VT1			BIT(0)
 #define HD0_TIMING_IRQS		GENMASK(2, 0)
+#define HD0_UNDERFLOW		BIT(3)
+#define HD0_SCANOUT_IRQS	(HD0_VT1 | HD0_UNDERFLOW)
 #define HD0_MIX_BG		0x0200
 #define V0_LINK_CTRL		0x0c00
-#define V0_ZME1_VY_COEF		0x0e0c
-#define V0_ZME1_VC_COEF		0x0e1c
-#define V0_ZME_COEF_UPDATE	0x0f00
-#define V0_ZME_VERTICAL_COEFS	(BIT(1) | BIT(3))
 #define V0_CTRL			0x2000
 #define V0_UPDATE		0x2004
 #define V0_ACTIVE_CTRL		0x2018
@@ -53,8 +51,13 @@
 #define V0_ZME1_VRATIO		0x22dc
 #define V0_ZME1_VPHASE		0x22e0
 #define V0_OUT_SIZE		0x22e8
-#define V0_ZME_V_COPY		(BIT(31) | BIT(30))
-#define V0_ZME_V_CHROMA_FIR	BIT(23)
+#define V0_IFIR_CTRL		0x2600
+#define V0_IFIR_MODE		GENMASK(2, 1)
+#define V0_IFIR_FACTORY_MODE	3
+#define V0_IFIR_COEF0		0x2604
+#define V0_IFIR_COEF_MASK	GENMASK(9, 0)
+#define V0_ZME_V_LUMA_ENABLE	BIT(31)
+#define V0_ZME_V_CHROMA_ENABLE	BIT(30)
 #define V0_ZME_V_INPUT_420	BIT(19)
 #define V0_ZME_V_CLOCK		BIT(0)
 #define VP0_CTRL		0x4000
@@ -100,14 +103,14 @@
 #define HD0_HACTIVE		0xc210
 #define HD0_VT			0xc228
 #define HD0_VT1_LINE		GENMASK(12, 0)
+#define HD0_VT1_BACK_PORCH	12
 #define HD0_STATE		0xc2a0
 #define HD0_IN_BLANK		BIT(1)
 #define VDP_SMMU_CTRL		0xe000
 #define V0_CSC_CTRL		0xb000
 #define V0_CSC_ENABLE		BIT(4)
-#define V0_ZME_COEF_PLANE_SIZE	256
-#define V0_ZME_COEF_PHASES	18
-#define V0_ZME_COEF_BITS		10
+#define V0_CSC_GLOBAL_ENABLE	BIT(0)
+#define V0_HDR_ENABLE		BIT(6)
 
 struct mv320_vdp {
 	struct drm_device drm;
@@ -118,9 +121,9 @@ struct mv320_vdp {
 	struct drm_display_mode mode;
 	void __iomem *regs;
 	struct drm_pending_vblank_event *flip;
-	dma_addr_t vzme_dma;
 	atomic64_t irqs;
 	atomic64_t blank_irqs;
+	atomic64_t underflow_irqs;
 	u32 last_irq_state;
 	u32 unexpected_status;
 	bool logo_enabled;
@@ -134,27 +137,6 @@ static inline struct mv320_vdp *to_vdp(struct drm_device *drm)
 static void mv320_update_bits(struct mv320_vdp *vdp, u32 reg, u32 mask, u32 val)
 {
 	writel((readl(vdp->regs + reg) & ~mask) | val, vdp->regs + reg);
-}
-
-static void mv320_zme_linear_coefficients(u8 *table, unsigned int taps)
-{
-	unsigned int phase;
-
-	/* Each 16-byte word holds 12 consecutive 10-bit coefficients. */
-	for (phase = 0; phase < V0_ZME_COEF_PHASES; phase++) {
-		unsigned int frac = min(phase, 16U) * 511 / 16;
-		unsigned int tap = taps / 2 - 1, i, bit;
-		unsigned int weights[] = { 511 - frac, frac };
-
-		for (i = 0; i < ARRAY_SIZE(weights); i++) {
-			unsigned int sample = phase * taps + tap + i;
-			unsigned int start = sample / 12 * 128 + sample % 12 * V0_ZME_COEF_BITS;
-
-			for (bit = 0; bit < V0_ZME_COEF_BITS; bit++)
-				if (weights[i] & BIT(bit))
-					table[(start + bit) / 8] |= BIT((start + bit) % 8);
-		}
-	}
 }
 
 static const struct drm_format_info mv320_main10 = {
@@ -340,15 +322,19 @@ static irqreturn_t mv320_irq(int irq, void *data)
 	u32 scan, ctrl;
 	unsigned long flags;
 
-	if (!(status & HD0_VT1))
+	if (!(status & HD0_SCANOUT_IRQS))
 		return IRQ_NONE;
-	readl_poll_timeout_atomic(vdp->regs + HD0_STATE, scan, scan & HD0_IN_BLANK, 1, 16);
-	WRITE_ONCE(vdp->last_irq_state, scan);
 	WRITE_ONCE(vdp->unexpected_status,
 		   vdp->unexpected_status | (status & ~HD0_TIMING_IRQS));
+	if (status & HD0_UNDERFLOW)
+		atomic64_inc(&vdp->underflow_irqs);
+	writel(status & HD0_SCANOUT_IRQS, vdp->regs + VDP_INT_CLEAR);
+	if (!(status & HD0_VT1))
+		return IRQ_HANDLED;
+	readl_poll_timeout_atomic(vdp->regs + HD0_STATE, scan, scan & HD0_IN_BLANK, 1, 16);
+	WRITE_ONCE(vdp->last_irq_state, scan);
 	if (scan & HD0_IN_BLANK)
 		atomic64_inc(&vdp->blank_irqs);
-	writel(HD0_VT1, vdp->regs + VDP_INT_CLEAR);
 	atomic64_inc(&vdp->irqs);
 	drm_crtc_handle_vblank(&vdp->crtc);
 	spin_lock_irqsave(&vdp->drm.event_lock, flags);
@@ -369,8 +355,8 @@ static int mv320_enable_vblank(struct drm_crtc *crtc)
 {
 	struct mv320_vdp *vdp = to_vdp(crtc->dev);
 
-	writel(HD0_VT1, vdp->regs + VDP_INT_CLEAR);
-	writel(HD0_VT1, vdp->regs + VDP_INT_MASK);
+	writel(HD0_SCANOUT_IRQS, vdp->regs + VDP_INT_CLEAR);
+	writel(HD0_SCANOUT_IRQS, vdp->regs + VDP_INT_MASK);
 	return 0;
 }
 
@@ -381,20 +367,34 @@ static void mv320_disable_vblank(struct drm_crtc *crtc)
 
 static void mv320_crtc_enable(struct drm_crtc *crtc, struct drm_atomic_commit *state)
 {
+	static const s16 ifir_coefficients[] = { -7, 12, -17, 25, -38, 58, -105, 328 };
 	struct mv320_vdp *vdp = to_vdp(crtc->dev);
 	u32 size = ((vdp->mode.vdisplay - 1) << 16) | (vdp->mode.hdisplay - 1);
+	unsigned int i;
 
-	/* Unity luma and vertical chroma upsampling, entirely in the scanout path. */
+	/* Factory V0 IFIR mode and coefficients restore chroma ahead of ZME. */
+	for (i = 0; i < ARRAY_SIZE(ifir_coefficients); i += 2) {
+		u32 low = ifir_coefficients[i] & V0_IFIR_COEF_MASK;
+		u32 high = ifir_coefficients[i + 1] & V0_IFIR_COEF_MASK;
+
+		writel(low | (high << 16), vdp->regs + V0_IFIR_COEF0 + i * 2);
+	}
+	mv320_update_bits(vdp, V0_IFIR_CTRL, V0_IFIR_MODE,
+			  FIELD_PREP(V0_IFIR_MODE, V0_IFIR_FACTORY_MODE));
+
+	/*
+	 * The 1:1 plane uses unity luma and nearest-line 4:2:0 to 4:2:2
+	 * chroma expansion. Leave the ZME FIRs disabled for this path.
+	 */
 	mv320_update_bits(vdp, V0_LINK_CTRL, BIT(0), 0);
-	mv320_update_bits(vdp, V0_CSC_CTRL, V0_CSC_ENABLE, 0);
+	/* VP0 mixes YCbCr for the inherited HDMI link. */
+	mv320_update_bits(vdp, V0_CSC_CTRL, V0_CSC_ENABLE | V0_CSC_GLOBAL_ENABLE |
+			  V0_HDR_ENABLE, 0);
 	writel(BIT(20), vdp->regs + V0_ZME1_HCTRL);
-	writel(V0_ZME_V_COPY | V0_ZME_V_CHROMA_FIR | V0_ZME_V_INPUT_420 | V0_ZME_V_CLOCK,
+	writel(V0_ZME_V_LUMA_ENABLE | V0_ZME_V_CHROMA_ENABLE | V0_ZME_V_INPUT_420 | V0_ZME_V_CLOCK,
 	       vdp->regs + V0_ZME1_VCTRL);
 	writel(BIT(12), vdp->regs + V0_ZME1_VRATIO);
 	writel((u16)-512, vdp->regs + V0_ZME1_VPHASE);
-	writel(vdp->vzme_dma, vdp->regs + V0_ZME1_VY_COEF);
-	writel(vdp->vzme_dma + V0_ZME_COEF_PLANE_SIZE, vdp->regs + V0_ZME1_VC_COEF);
-	mv320_update_bits(vdp, V0_ZME_COEF_UPDATE, V0_ZME_VERTICAL_COEFS, V0_ZME_VERTICAL_COEFS);
 
 	/* V0 feeds HD0 through the VP0 video mixer. Slot 0 selects V0. */
 	mv320_update_bits(vdp, VP0_MUTE, BIT(31), 0);
@@ -559,7 +559,8 @@ static ssize_t scanout_show(struct device *dev, struct device_attribute *attr, c
 	static const u32 offsets[] = {
 		VDP_INT_STATUS, VDP_INT_MASK, 0x0208, V0_CTRL, V0_UPDATE, V0_ACTIVE_CTRL,
 		V0_VIDEO_FIRST, V0_VIDEO_LAST, V0_OUT_SIZE, V0_ZME1_HCTRL, V0_ZME1_VCTRL,
-		V0_ZME1_VRATIO, VP0_CTRL, VP0_IN_SIZE,
+		V0_ZME1_VRATIO, V0_IFIR_CTRL, V0_IFIR_COEF0, V0_IFIR_COEF0 + 4,
+		V0_IFIR_COEF0 + 8, V0_IFIR_COEF0 + 12, VP0_CTRL, VP0_IN_SIZE,
 		VP0_MIX_PRIO, G0_CTRL, V0_FDR_CTRL,
 		V0_FDR_BYPASS, V0_FDR_FORMAT, V0_FDR_SRC_SIZE, V0_FDR_IN_SIZE, V0_FDR_Y_LO,
 		V0_FDR_VU_LO, V0_FDR_Y2_LO, V0_FDR_VU2_LO, V0_FDR_PITCH, V0_FDR_PITCH2,
@@ -567,9 +568,10 @@ static ssize_t scanout_show(struct device *dev, struct device_attribute *attr, c
 		V0_CSC_CTRL, HD0_VT, HD0_STATE, VDP_SMMU_CTRL,
 	};
 	ssize_t len = sysfs_emit(buf,
-				 "vblank_irqs %lld in_blank %lld last_irq_state %08x unexpected_status %08x\n",
+				 "vblank_irqs %lld in_blank %lld last_irq_state %08x unexpected_status %08x underflow_irqs %lld\n",
 				 atomic64_read(&vdp->irqs), atomic64_read(&vdp->blank_irqs),
-				 READ_ONCE(vdp->last_irq_state), READ_ONCE(vdp->unexpected_status));
+				 READ_ONCE(vdp->last_irq_state), READ_ONCE(vdp->unexpected_status),
+				 atomic64_read(&vdp->underflow_irqs));
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(offsets); i++)
@@ -608,7 +610,6 @@ static int mv320_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct mv320_vdp *vdp;
 	struct drm_device *drm;
-	u8 *vzme;
 	int irq, ret;
 
 	if (device_iommu_mapped(dev))
@@ -626,12 +627,6 @@ static int mv320_probe(struct platform_device *pdev)
 	ret = mv320_firmware_mode(vdp, dev);
 	if (ret)
 		return ret;
-	vzme = dmam_alloc_coherent(dev, 2 * V0_ZME_COEF_PLANE_SIZE, &vdp->vzme_dma, GFP_KERNEL);
-	if (!vzme)
-		return -ENOMEM;
-	mv320_zme_linear_coefficients(vzme, 6);
-	mv320_zme_linear_coefficients(vzme + V0_ZME_COEF_PLANE_SIZE, 4);
-	dma_wmb();
 	vdp->logo_enabled = readl(vdp->regs + G0_CTRL) & LAYER_ENABLE;
 
 	ret = drmm_mode_config_init(drm);
@@ -669,8 +664,11 @@ static int mv320_probe(struct platform_device *pdev)
 		return ret;
 	drm_mode_config_reset(drm);
 	writel(0, vdp->regs + VDP_INT_MASK);
-	/* VT1 is available for Linux. Place it near the end of the blanking lines. */
-	mv320_update_bits(vdp, HD0_VT, HD0_VT1_LINE, vdp->mode.vtotal - 1);
+	/*
+	 * In the back porch the new FDR address can be confirmed, and the
+	 * next commit has the rest of the frame to latch.
+	 */
+	mv320_update_bits(vdp, HD0_VT, HD0_VT1_LINE, HD0_VT1_BACK_PORCH);
 	mv320_update_bits(vdp, HD0_CTRL, HD0_UPDATE, HD0_UPDATE);
 	irq = platform_get_irq_byname(pdev, "vblank");
 	if (irq < 0)

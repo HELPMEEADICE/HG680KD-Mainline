@@ -21,6 +21,11 @@ from vdec_ram_test import boot, compare_fixture
 BUILTIN = ("h265ip1080", "hevc10ip1080", "hevc4k", "hevc10ip4k")
 IRQ = "grep -E 'GICv3 +(122|169|181) ' /proc/interrupts"
 SCANOUT = "/sys/bus/platform/devices/f8cc0000.display-controller/scanout"
+RESULT = re.compile(
+    rb"(?m)^V0 result frames=(\d+) capture_buffers=(\d+) requeued=(\d+) "
+    rb"seconds=([\d.]+) fps=([\d.]+) wall_fps=([\d.]+) "
+    rb"dropped=(\d+) missed_vblanks=(\d+)(?: usr=([\d.]+)% sys=([\d.]+)% idle=([\d.]+)%)?"
+)
 
 
 def count_irq(output, intid):
@@ -55,14 +60,22 @@ def request(prefix):
     return f"vdec-request /dev/video0 /dev/media0 {prefix}.txt {prefix}.265 --display /dev/dri/card0"
 
 
-def camera_rgb(path, crop):
+def camera_rgb(path, crop=False, swap_uv=False):
     filters = "scale=160:90:flags=area"
     if crop:
         filters = "crop=iw/2:ih/2:iw/4:ih/4," + filters
+    if swap_uv:
+        filters = "format=yuv444p,swapuv," + filters
     return subprocess.check_output([
         "ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(path), "-vf", filters,
         "-frames:v", "1", "-pix_fmt", "rgb24", "-f", "rawvideo", "-threads", "1", "-",
     ], timeout=8)
+
+
+def rgb_mae(measured, expected):
+    if len(measured) != 160 * 90 * 3 or len(measured) != len(expected):
+        raise RuntimeError("unexpected HDMI comparison image size")
+    return sum(abs(a - b) for a, b in zip(measured, expected)) / len(expected)
 
 
 def check_frame(console, args, name):
@@ -103,19 +116,39 @@ def check_frame(console, args, name):
               regs.get(0x8240) == (0x10a if main10 else 0xa) and
               regs.get(0x8254, 0) == regs.get(0x8338) and regs.get(0x825c, 0) and
               all(bool(regs.get(reg, 0)) == main10 for reg in (0x8284, 0x828c, 0x8294)) and
-              b"unexpected_status 00000000" in first)
+              b"unexpected_status 00000000 underflow_irqs 0" in first)
     visual = not camera or camera.returncode == 0
     if visual and args.capture_reference:
         crop = name.endswith("1080") and b"firmware=3840x2160" in first
         measured = camera_rgb(capture, crop)
-        expected = camera_rgb(args.capture_reference / f"{name}-reference.png", False)
-        if len(measured) != 160 * 90 * 3 or len(measured) != len(expected):
-            raise RuntimeError("unexpected HDMI comparison image size")
-        difference = sum(abs(a - b) for a, b in zip(measured, expected)) / len(expected)
-        visual = difference <= 24
+        reference = args.capture_reference / f"{name}-reference.png"
+        difference = rgb_mae(measured, camera_rgb(reference))
+        swapped = rgb_mae(measured, camera_rgb(reference, swap_uv=True))
+        visual = difference <= 24 and swapped > difference
         console.record(f"\n[host] {name} HDMI reference MAE={difference:.2f}/255 "
+                       f"swapped_uv_MAE={swapped:.2f}/255 "
                        f"{'PASS' if visual else 'FAIL'}\n".encode())
     return fb, visual
+
+
+def check_continuous(console, prefix, expected, benchmark=False):
+    status, output = shell(console, f"{IRQ}; {request(prefix)}; test_status=$?; "
+                           f"{IRQ}; cat {SCANOUT}; (exit $test_status)", timeout=60)
+    result = RESULT.search(output)
+    vdp, smmu = count_irq(output, 122), count_irq(output, 181)
+    valid = (status == 0 and result and int(result[1]) == expected and
+             int(result[3]) > 0 and int(result[7]) == 0 and
+             len(vdp) == 2 and vdp[1] > vdp[0] and smmu == [0, 0] and
+             b"unexpected_status 00000000 underflow_irqs 0" in output)
+    if benchmark and result:
+        valid &= expected >= 120 and result[9] is not None
+        underflows = re.search(rb"underflow_irqs (\d+)", output)
+        if len(vdp) == 2 and len(smmu) == 2 and underflows:
+            console.record(f"\n[host] {prefix} INTID 122 delta={vdp[1] - vdp[0]} "
+                           f"INTID 181 delta={smmu[1] - smmu[0]} "
+                           f"underflow_irqs={int(underflows[1])}\n".encode())
+    console.record(f"\n[host] {prefix} continuous {'PASS' if valid else 'FAIL'}\n".encode())
+    return bool(valid)
 
 
 def main():
@@ -166,20 +199,18 @@ def main():
             passed &= valid and visual
         if args.fixtures:
             download_fixtures(console, args, args.fixtures)
-        for prefix in (*[f"/etc/vdec-test/{name}" for name in BUILTIN],
-                       *[f"/tmp/{name}" for name in args.fixtures]):
-            status, output = shell(console, f"{request(prefix)} && {IRQ}")
-            result = re.search(rb"(?m)^V0 result frames=(\d+).* requeued=(\d+) ", output)
-            valid = (status == 0 and result and int(result[1]) > 1 and int(result[2]) > 0 and
-                     count_irq(output, 181) == [0])
-            console.record(f"\n[host] {prefix} continuous {'PASS' if valid else 'FAIL'}\n".encode())
-            passed &= bool(valid)
+        for name in BUILTIN:
+            passed &= check_continuous(console, f"/etc/vdec-test/{name}", 3)
+        for name in args.fixtures:
+            header = (args.payload / f"{name}.txt").read_text(encoding="ascii").splitlines()[0].split()
+            expected = int(header[-1])
+            passed &= check_continuous(console, f"/tmp/{name}", expected, benchmark=expected >= 120)
         for fixture in args.linear:
             passed &= compare_fixture(console, fixture, 0)
         _, final = shell(console, f"{IRQ}; cat {SCANOUT}; "
                          "dmesg | grep -Ei 'vdp|underflow|smmu|timing|WARNING|Oops'")
         passed &= (count_irq(final, 181) == [0] and
-                   b"unexpected_status 00000000" in final and
+                   b"unexpected_status 00000000 underflow_irqs 0" in final and
                    not re.search(rb"(?im)^<\d+>.*(?:WARNING:|Oops:|underflow|SMMU fault|\*ERROR\*)", final))
     return 0 if passed else 1
 

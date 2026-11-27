@@ -144,7 +144,7 @@ def write_reference(stream, out, pocs, width, height, main10, visible=False):
     out.write_bytes(b"".join(pixels[order[poc] * size:(order[poc] + 1) * size] for poc in pocs))
 
 
-def fixture(stream, out):
+def fixture(stream, out, reference=True):
     sps, pps, slices = trace_fields(stream)
     units = list(vcl_units(stream.read_bytes()))
     if not units or len(units) != len(slices):
@@ -221,6 +221,8 @@ def fixture(stream, out):
         "".join(" ".join(map(str, row)) + "\n" for row in rows), encoding="ascii", newline="\n",
     )
     out.with_suffix(".265").write_bytes(b"".join(unit for unit, _ in units))
+    if not reference:
+        return
     write_reference(stream, out.with_suffix(f".{extension}"), pocs, width, height, main10)
     left, right, top, bottom = (
         2 * sps.get(f"conf_win_{side}_offset", 0) for side in ("left", "right", "top", "bottom")
@@ -234,5 +236,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("stream", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--no-reference", action="store_true", help="skip raw software decode output")
     args = parser.parse_args()
-    fixture(args.stream, args.output)
+    fixture(args.stream, args.output, reference=not args.no_reference)

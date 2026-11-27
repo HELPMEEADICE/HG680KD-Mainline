@@ -3,7 +3,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/videodev2.h>
-#include <poll.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,12 +16,11 @@
 #include "hi3798mv320-tiled.h"
 #include "vdp-scanout-test.h"
 
-#define MAX_CAPTURE 32
-
 struct vdp_test {
 	int fd;
-	uint32_t format, width, height, blob, frames, first_sequence, last_sequence;
-	uint32_t fb[MAX_CAPTURE];
+	uint32_t format, width, height, blob;
+	struct vdp_test_stats stats;
+	uint32_t fb[VDP_TEST_MAX_CAPTURE];
 	uint32_t objects[3], counts[3], props[13];
 	uint64_t values[13];
 };
@@ -221,42 +219,80 @@ static uint32_t add_fb(struct vdp_test *t, int video, unsigned int index)
 	return fb.fb_id;
 }
 
-static void commit(struct vdp_test *t, unsigned int flags)
+void vdp_test_import(struct vdp_test *t, int video, unsigned int buffers)
 {
+	unsigned int i;
+
+	if (buffers > VDP_TEST_MAX_CAPTURE)
+		drm_fail("CAPTURE count exceeds display buffer table");
+	for (i = 0; i < buffers; i++)
+		t->fb[i] = add_fb(t, video, i);
+}
+
+int vdp_test_fd(const struct vdp_test *t)
+{
+	return t->fd;
+}
+
+static void commit(struct vdp_test *t, unsigned int flags, bool flip_only)
+{
+	uint32_t one = 1;
 	struct drm_mode_atomic cmd = {
 		.flags = flags, .count_objs = 3, .objs_ptr = PTR(t->objects),
 		.count_props_ptr = PTR(t->counts), .props_ptr = PTR(t->props),
-		.prop_values_ptr = PTR(t->values), .user_data = t->frames + 1,
+		.prop_values_ptr = PTR(t->values), .user_data = t->stats.frames + 1,
 	};
 
+	if (flip_only) {
+		cmd.count_objs = 1;
+		cmd.objs_ptr = PTR(&t->objects[2]);
+		cmd.count_props_ptr = PTR(&one);
+		cmd.props_ptr = PTR(&t->props[3]);
+		cmd.prop_values_ptr = PTR(&t->values[3]);
+	}
 	CALL(t->fd, DRM_IOCTL_MODE_ATOMIC, &cmd);
 }
 
-void vdp_test_flip(struct vdp_test *t, int video, unsigned int index)
+void vdp_test_submit(struct vdp_test *t, unsigned int index)
 {
-	struct pollfd pfd = { .fd = t->fd, .events = POLLIN };
-	struct drm_event_vblank event;
-	int ret;
+	unsigned int flags = DRM_MODE_ATOMIC_NONBLOCK | DRM_MODE_PAGE_FLIP_EVENT;
 
-	if (index >= MAX_CAPTURE)
-		drm_fail("CAPTURE index exceeds display buffer table");
-	if (!t->fb[index])
-		t->fb[index] = add_fb(t, video, index);
+	if (index >= VDP_TEST_MAX_CAPTURE || !t->fb[index])
+		drm_fail("CAPTURE index has no framebuffer");
 	t->values[3] = t->fb[index];
-	commit(t, DRM_MODE_ATOMIC_ALLOW_MODESET | DRM_MODE_ATOMIC_NONBLOCK | DRM_MODE_PAGE_FLIP_EVENT);
+	if (!t->stats.frames)
+		flags |= DRM_MODE_ATOMIC_ALLOW_MODESET;
+	commit(t, flags, t->stats.frames != 0);
+}
+
+void vdp_test_complete(struct vdp_test *t)
+{
+	struct vdp_test_stats *stats = &t->stats;
+	struct drm_event_vblank event;
+	ssize_t ret;
+
 	do {
-		ret = poll(&pfd, 1, 2000);
+		ret = read(t->fd, &event, sizeof(event));
 	} while (ret < 0 && errno == EINTR);
-	if (ret != 1 || !(pfd.revents & POLLIN) || read(t->fd, &event, sizeof(event)) != sizeof(event) ||
-	    event.base.type != DRM_EVENT_FLIP_COMPLETE || event.user_data != t->frames + 1 ||
-	    (t->frames && (int32_t)(event.sequence - t->last_sequence) <= 0))
+	if (ret != sizeof(event) || event.base.length != sizeof(event) ||
+	    event.base.type != DRM_EVENT_FLIP_COMPLETE || event.crtc_id != t->objects[1] ||
+	    event.user_data != stats->frames + 1 ||
+	    (stats->frames && (int32_t)(event.sequence - stats->last_sequence) <= 0))
 		drm_fail("missing or invalid V0 page-flip completion");
-	if (!t->frames)
-		t->first_sequence = event.sequence;
-	t->last_sequence = event.sequence;
-	t->frames++;
-	printf("V0 flip frame=%u index=%u FB=%u sequence=%u time=%u.%06u\n",
-	       t->frames, index, (unsigned int)t->values[3], event.sequence, event.tv_sec, event.tv_usec);
+	stats->last_us = (uint64_t)event.tv_sec * 1000000 + event.tv_usec;
+	if (!stats->frames) {
+		stats->first_us = stats->last_us;
+		stats->first_sequence = event.sequence;
+	} else {
+		stats->missed_vblanks += event.sequence - stats->last_sequence - 1;
+	}
+	stats->last_sequence = event.sequence;
+	stats->frames++;
+}
+
+const struct vdp_test_stats *vdp_test_stats(const struct vdp_test *t)
+{
+	return &t->stats;
 }
 
 void vdp_test_close(struct vdp_test *t, unsigned int hold_ms)
@@ -265,7 +301,7 @@ void vdp_test_close(struct vdp_test *t, unsigned int hold_ms)
 	unsigned int i;
 
 	printf("V0 complete=%u first_vblank=%u last_vblank=%u\n",
-	       t->frames, t->first_sequence, t->last_sequence);
+	       t->stats.frames, t->stats.first_sequence, t->stats.last_sequence);
 	fflush(stdout);
 	if (hold_ms) {
 		struct timespec wait = { .tv_sec = hold_ms / 1000, .tv_nsec = (hold_ms % 1000) * 1000000UL };
@@ -274,8 +310,8 @@ void vdp_test_close(struct vdp_test *t, unsigned int hold_ms)
 			;
 	}
 	t->values[0] = t->values[1] = t->values[2] = t->values[3] = t->values[4] = 0;
-	commit(t, DRM_MODE_ATOMIC_ALLOW_MODESET);
-	for (i = 0; i < MAX_CAPTURE; i++)
+	commit(t, DRM_MODE_ATOMIC_ALLOW_MODESET, false);
+	for (i = 0; i < VDP_TEST_MAX_CAPTURE; i++)
 		if (t->fb[i])
 			CALL(t->fd, DRM_IOCTL_MODE_RMFB, &t->fb[i]);
 	CALL(t->fd, DRM_IOCTL_MODE_DESTROYPROPBLOB, &blob);

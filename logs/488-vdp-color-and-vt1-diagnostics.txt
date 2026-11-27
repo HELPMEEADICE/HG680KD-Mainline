@@ -1,0 +1,38 @@
+# VDP Phase 1 diagnostic captures
+
+The UART and HDMI diagnostics used RAM-only TFTP images before the final image.
+Offsets below are relative to VDP MMIO at 0xf8cc0000.
+
+## Color path
+
+Factory MV320 xdp_drv_set_vid_ifir at c05e83f8 writes mode 3 for V0 and loads
+eight signed taps. The factory taps at c107f3c0 are
+-7, 12, -17, 25, -38, 58, -105, 328. The four packed registers read
+000c03f9, 001903ef, 003a03da, 01480397 at 0x2604 through 0x2610.
+
+With Y=400, Cb=700 and Cr=600 injected as 10-bit codes, the V0 layer
+mute register 0x2098 and VP0 mute register 0x4098 both gave RGB (146,59,219).
+FDR mute via 0x8200 and 0x8214 gave RGB (0,177,1). The injected FDR result
+was also green with the vertical FIR disabled and without the IFIR fix.
+
+With factory IFIR and the experimental ZME FIR, the 1080p capture on the
+2160p link depended on position. At (960,540), the reference RGB MAE was
+84.36/255. Setting (960,0) gave 3.07/255. At the same centered position,
+clearing the ZME1 vertical chroma FIR bit 23 in 0x22d8 and leaving the
+vertical scaler enabled gave 3.10/255 even with the chroma LUT address
+cleared. The 4K capture gave 2.93/255 in that configuration. These
+diagnostic MAEs are from 160x90 Pillow-resized crops.
+
+## VT1 and asynchronous scanout
+
+On the early asynchronous image, both 4K 240-frame streams completed
+with seven CAPTURE buffers, 239 missed vblanks and 30.00 FPS.
+Short 1080p tests at VT1 line 2249 repeated the 30 FPS cadence.
+VT1 at 12 gave approximately 60 FPS with no missed vblanks, with
+HD0_STATE bit 1 reporting blanking. The final image retains line 12.
+
+The sequential 240-frame Main and Main10 inputs use FFmpeg testsrc2 at
+3840x2160 and 60 fps. Encode one closed I/P GOP with libx265 ultrafast and
+pools=8:frame-threads=4:wpp=0:bframes=0:ref=2:keyint=250:min-keyint=250:scenecut=0:open-gop=0.
+Use yuv420p or yuv420p10le and prepare the request stream and manifest with
+scripts/vdec_hevc_fixture.py --no-reference.
