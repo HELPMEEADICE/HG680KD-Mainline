@@ -871,7 +871,7 @@ static ssize_t scanout_show(struct device *dev, struct device_attribute *attr, c
 	for (i = 0; i < ARRAY_SIZE(offsets); i++)
 		len += sysfs_emit_at(buf, len, "%04x %08x\n", offsets[i], readl(vdp->regs + offsets[i]));
 	len += sysfs_emit_at(buf, len, "fetch_underflow %08x\n",
-			    readl(vdp->regs + VDP_FETCH_UNDERFLOW) & (V0_UNDERFLOW | G0_UNDERFLOW));
+			    (u32)(readl(vdp->regs + VDP_FETCH_UNDERFLOW) & (V0_UNDERFLOW | G0_UNDERFLOW)));
 	return len;
 }
 static DEVICE_ATTR_RO(scanout);

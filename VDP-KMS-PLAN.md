@@ -254,3 +254,57 @@ Main10 同一进程按 2→9、11→3、5→16 秒跳转，再正常播放至 EO
 | U-Boot `0x01fdffc0` RAM 回读 CRC32 | `b13a17d7` |
 
 COM4 以 115200 8N1 单进程独占。系统从 TFTP 上传的镜像在 RAM 启动，播放器及素材经校验后加载到 `/tmp`。根文件系统为 `rootfs`，块设备挂载数为 0，`mmcblk0/ro=1`。U-Boot 环境变量仅在 RAM 设置。 完整构建、串口、TFTP 和 HDMI 录像保存在本地的 `artifacts/arm64-7.3.5-vdp/phase3/`。 [播放器、运行库和片源 SHA256](logs/490-vdp-phase3-acceptance.txt#L12)
+
+## Linux 7.3.6 · Phase 3 纯 RAM 回归
+
+在远端 `/home/hedc/hg680kd-mainline` 解开干净的 7.3.5 发布归档，对独立的 `source/linux-7.3.6` 应用官方 `patch-7.3.5-6.xz`，再由 `arm64-7.3.6-vdp` 目标应用现有板级补丁和 DTS。归档的 SHA256 为 `8f293f83d54f0b7b9be56863ebc5e4ea79d73e530b4ae55c572be97ef39f0990`，增量补丁的 SHA256 为 `f9738464f487bdbb1e19b1a1ab41f8071d4b0ceed51fe886631c3d5e40234de5`，均与 kernel.org 清单一致。 [发布清单](https://cdn.kernel.org/pub/linux/kernel/v7.x/sha256sums.asc) · [增量补丁清单](https://cdn.kernel.org/pub/linux/kernel/v7.x/incr/sha256sums.asc)
+
+上游同时修改了 DRM Makefile 和 Hix5HD2 GMAC，板级条目和上游改动均已合入。检查了 DRM Atomic、vblank、GEM DMA、DMA-BUF、V4L2/VB2/Media Request 和 ARM64 NEON 所用接口。`dma-fence.h` 涉及的变更为注释修正，VDEC 与 VDP 无需接口适配。VDP 的 `fetch_underflow` 寄存器按 `u32` 输出，消除了原 `%08x` 的编译警告。VPU 的旧 `HI3798MV320_VPU_H264_POC` 诊断项在验收配置中未启用，7.3.6 采用仓库的 VPU probe 补丁。
+
+构建目标使用 7.3.5 Phase 3 发布目录的完整 `kernel.config` 执行 `olddefconfig`。活动配置只有内嵌 initramfs 的构建路径变动。板级驱动仍以内建方式链接，`CONFIG_MODULES` 维持禁用，发布包包含 `modules.builtin` 和 `modules.builtin.modinfo`。Hi3798MV320 VDEC 的 SMMU 由 VDEC 驱动控制，运行时 CMA 由 `cma=384M` 指定。
+
+远端准备输入时，将当前仓库的 `src/` 与 `patches/` 平铺至构建输入目录，并加入原 Phase 3 构建使用的 RTL8761BTV 固件和 VDEC fixture。Windows 上可用 `git -c core.autocrlf=false archive` 导出已提交的文本，保留 Linux 构建所需的 LF 换行。远端使用同步过去的 `scripts/build_arm64-7.3.6.sh`，对应仓库的 `scripts/build_arm64.sh`。产物位于 `out/release-arm64-7.3.6-vdp/`。
+
+~~~bash
+cd /home/hedc/hg680kd-mainline
+VDEC_TEST=1 VDEC_FIXTURES='h265ip1080 hevc10ip1080 hevc4k hevc10ip4k ip32' \
+  bash scripts/build_arm64-7.3.6.sh "$PWD" "$PWD/out/upgrade-7.3.6/inputs" 7.3.6-vdp
+~~~
+
+本机取回构建产物后，使用同一台 HDMI 采集设备和原 Phase 3 的播放器、片源、软解参考。两个脚本依次独占 COM4，线性回归沿用第一步引导的 RAM 系统。
+
+~~~powershell
+$result = 'artifacts/arm64-7.3.6-vdp'
+$payload = 'artifacts/arm64-7.3.5-vdp/phase3/serve'
+python -u scripts/vdp_player_ram.py --kernel-release 7.3.6-hg680kd-arm64-vdp `
+  --image "$result/boot.img" --payload $payload --log "$result/board.txt" `
+  --capture-device 'USB2 Video' --color-switch
+python -u scripts/vdec_ffmpeg_ram.py --mode check --payload $payload `
+  --log "$result/linear.txt" h264-1080p hevc10-2160p
+~~~
+
+GCC 14.2.0 完整重编为零警告。生成的 HG680KD DTB 与 7.3.5 验收版逐字节相同，SHA256 为 `789cbb43f6e5f5c0880c40769c756c738ef8d9009641409031a84b7542fd9201`。[构建日志](artifacts/arm64-7.3.6-vdp/build.txt) · [配置差异](artifacts/arm64-7.3.6-vdp/kernel-config.diff) · [源码核对](artifacts/arm64-7.3.6-vdp/source-audit.txt)
+
+COM4 以 115200 8N1 单进程独占。`uname -a` 显示 `7.3.6-hg680kd-arm64-vdp`，`cma=384M` 实际预留 393,216 KiB。`/dev/video0`、`/dev/media0` 和 `/dev/dri/card0` 均为已注册的字符设备。根文件系统为 `rootfs`，板载 eMMC 为只读，块设备挂载数为 0。播放器与片源经 SHA256 校验后载入 `/tmp`。[板端串口](artifacts/arm64-7.3.6-vdp/board.txt) · [验收日志摘录](logs/491-vdp-7.3.6-phase3-acceptance.txt)
+
+| 容器与输入 | 显示帧 / 显示 FPS / 丢帧 | 墙钟 FPS（7.3.5 → 7.3.6） | 四核 usr / sys / idle（7.3.5 → 7.3.6） | 峰值 RSS KiB（7.3.5 → 7.3.6） |
+|---|---:|---:|---:|---:|
+| 4K60 HEVC Main10 MKV | 1080 / 60.000 / 0 | 59.521 → 59.474 | 2.59 / 4.81 / 92.60% → 3.63 / 3.98 / 92.39% | 89,180 → 89,180 |
+| 4K60 HEVC Main MP4 | 1080 / 60.000 / 0 | 59.576 → 59.572 | 2.73 / 5.38 / 91.89% → 3.12 / 4.32 / 92.57% | 89,288 → 89,264 |
+| 1080p60 H.264 MP4 + G0 | 1080 / 60.000 / 0 | 59.766 → 59.836 | 1.55 / 6.54 / 91.91% → 2.51 / 5.57 / 91.93% | 22,784 → 22,848 |
+
+三段均正常到达 EOS，错失 vblank 为 0，`detile=0`、`sync=0`。每段 VDP INTID 122 增加 1,081，PXP INTID 169 增加 1,080，与 7.3.5 一致。G0 进度条翻页 100 次，HDMI 采集记录了 301 帧，采集第 2 秒与第 7 秒可见进度条向前移动。[HDMI 录像](artifacts/arm64-7.3.6-vdp/h264-osd-playback.mkv) · [第 2 秒](artifacts/arm64-7.3.6-vdp/h264-osd-motion-2s.png) · [第 7 秒](artifacts/arm64-7.3.6-vdp/h264-osd-motion-7s.png)
+
+Main10 按 2→9、11→3、5→16 秒跳转，显示 480 帧，丢帧为 0，VDP/PXP 增加 590/624。主回归的 `CmaFree` 为 388,608 → 202,452 → 388,564 KiB，退出差值为 −44 KiB，7.3.5 同项为 −40 KiB。三轮独立起停每轮显示 120 帧，CMA 退出差值依次为 0、+32、0 KiB。追加的 Seek 与独立起停复测均记录 `CmaFree` 388,564 → 202,452 → 388,564 KiB，内核 DMA-BUF 对象数 0 → 20 → 0，退出后剩余 0 字节。[起停与 DMA-BUF](artifacts/arm64-7.3.6-vdp/cma-dmabuf.txt) · [Seek 复测](artifacts/arm64-7.3.6-vdp/cma-seek-repeat.txt)
+
+SDR 色域和限幅切换样本显示 480 帧，实测 60.000 FPS，零丢帧，VDP/PXP 增加 481/480。线性 H.264 NV21 和 HEVC Main10 P010 各 240 帧均与原软件解码参考的逐帧哈希匹配，每项 PXP 增加 240。测试及追加复测结束时，VDP/PXP 累计计数为 6,603/6,600，SMMU INTID 181、VDP underflow 和 fetch underflow 均为 0。[线性回归](artifacts/arm64-7.3.6-vdp/linear.txt) · [最终中断及 dmesg](artifacts/arm64-7.3.6-vdp/dmesg-final.txt)
+
+`dmesg` 无新增驱动错误。7.3.5 和本轮最终启动均记录了蓝牙 H5 短包提示，RTL8761BTV 随后加载固件 `0x1ed6b420`。
+
+| 纯 RAM 镜像校验 | 值 |
+|---|---|
+| `boot.img` 大小 | 17,369,160 bytes |
+| SHA256 | `e7166a95ac6a7b8ed404961da7ecd70a2023ab5649bc5e175f5ae460d59334c3` |
+| U-Boot `0x01fdffc0` RAM 回读 CRC32 | `f0ad64c3` |
+
+BL31 通过原有只读流程加载。测试期间未写入 USB `/boot/boot.img`、eMMC、OTP 或持久 U-Boot 环境。[镜像](artifacts/arm64-7.3.6-vdp/boot.img) · [传输日志](artifacts/arm64-7.3.6-vdp/board.tftp.txt)

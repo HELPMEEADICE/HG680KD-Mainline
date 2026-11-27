@@ -1,4 +1,4 @@
-"""Play MP4/MKV files on the HG680KD in the Phase 2 TFTP RAM system."""
+"""Run the Phase 3 MP4/MKV player checks on the HG680KD TFTP RAM system."""
 
 import argparse
 import hashlib
@@ -140,9 +140,11 @@ def run(console, args, label, filename, expected=None, options="", seeks=0, capt
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("--image", type=Path, help="TFTP boot this Phase 2 RAM image")
+    source.add_argument("--image", type=Path, help="TFTP boot this VDP RAM image")
     source.add_argument("--running-ram", action="store_true",
-                        help="reuse the Phase 2 image already TFTP-booted on the target")
+                        help="reuse the VDP image already TFTP-booted on the target")
+    parser.add_argument("--kernel-release", default="7.3.5-hg680kd-arm64-vdp",
+                        help="exact kernel release expected on the board")
     parser.add_argument("--log", type=Path, required=True)
     parser.add_argument("--payload", type=Path, required=True)
     parser.add_argument("--port", default="COM4")
@@ -165,13 +167,22 @@ def main():
         else:
             port.write(b"\r")
             console.expect(SHELL_PROMPT)
-        status, output = shell(console, "uname -r; cat /proc/mounts; "
+        status, output = shell(console, "uname -a; cat /proc/mounts; "
                                "printf EMMC_RO=; cat /sys/block/mmcblk0/ro")
-        if (status or b"7.3.5-hg680kd-arm64-vdp" not in output or
+        release = re.escape(args.kernel_release.encode())
+        if (status or not re.search(rb"(?m)^Linux \S+ " + release + rb" ", output) or
                 not re.search(rb"(?m)^rootfs / rootfs ", output) or
                 not re.search(rb"(?m)^EMMC_RO=1\r?$", output) or
                 re.search(rb"(?m)^/dev/\S+ ", output)):
             raise RuntimeError("expected a VDP RAM boot with read-only eMMC and no block mounts")
+        devices = (b"/dev/video0", b"/dev/media0", b"/dev/dri/card0")
+        status, output = shell(console, "cat /proc/cmdline; grep '^CmaTotal:' /proc/meminfo; "
+                               "ls -l " + b" ".join(devices).decode("ascii"))
+        character_devices = re.findall(rb"(?m)^c\S+ [^\r\n]* (/dev/\S+)\r?$", output)
+        if (status or not re.search(rb"(?m)^console=[^\r\n]*\bcma=384M(?:\s|$)", output) or
+                not re.search(rb"(?m)^CmaTotal:\s+393216 kB\r?$", output) or
+                not all(device in character_devices for device in devices)):
+            raise RuntimeError("expected 384 MiB CMA and the VDEC, media and DRM character devices")
         shell(console, "echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 3")
         load_payload(console, args)
         if args.smoke:

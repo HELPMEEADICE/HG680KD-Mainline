@@ -1,0 +1,91 @@
+HG680KD Linux 7.3.6 Phase 3 acceptance, 2026-11-27
+
+## Build
+ArchLinux-E5-Server, AArch64 GCC 14.2.0, complete kernel build with zero warnings.
+Linux 7.3.5 plus the official patch-7.3.5-6.xz.
+INITRAMFS_SOURCE "/home/hedc/hg680kd-mainline/out/arm64-7.3.5-vdp/initramfs.cpio" -> "/home/hedc/hg680kd-mainline/out/arm64-7.3.6-vdp/initramfs.cpio"
+The HG680KD DTB matches the 7.3.5 acceptance DTB byte for byte.
+The matched DTB SHA256 is 789cbb43f6e5f5c0880c40769c756c738ef8d9009641409031a84b7542fd9201.
+The accepted config links board drivers into Image and leaves CONFIG_MODULES disabled.
+
+## TFTP RAM boot
+COM4, 115200 8N1, single process.
+[host] boot.img SHA256 e7166a95ac6a7b8ed404961da7ecd70a2023ab5649bc5e175f5ae460d59334c3
+CRC32 for 01fdffc0 ... 03070807 ==> f0ad64c3
+[host] CRC32 matches local image: f0ad64c3
+Linux hg680kd 7.3.6-hg680kd-arm64-vdp #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+crw-------    1  226,   0 /dev/dri/card0
+crw-------    1  253,   0 /dev/media0
+crw-------    1   81,   0 /dev/video0
+CmaTotal: 393216 kB
+TFTP transferred 17369160 bytes.
+Block-device mounts: 0.
+
+## main10-eos
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.474 seconds=18.159 usr=3.63% sys=3.98% idle=92.39% peak_rss_kib=89180
+[host] main10-eos VDP IRQ +1081, PXP IRQ +1080, SMMU 181 +0, CMA free change -76 KiB PASS
+
+## main-eos
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.572 seconds=18.129 usr=3.12% sys=4.32% idle=92.57% peak_rss_kib=89264
+[host] main-eos VDP IRQ +1081, PXP IRQ +1080, SMMU 181 +0, CMA free change -120 KiB PASS
+
+## h264-osd-playback
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.836 seconds=18.049 usr=2.51% sys=5.57% idle=91.93% peak_rss_kib=22848
+G0 progress flips=100 permille=990 duration=18.000
+[host] h264-osd-playback VDP IRQ +1081, PXP IRQ +1080, SMMU 181 +0, CMA free change 92 KiB PASS
+
+## h264-osd-held
+PLAY decoded=1 displayed=1 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=0.000 wall_fps=0.124 seconds=8.074 usr=0.06% sys=0.19% idle=99.75% peak_rss_kib=22016
+G0 progress flips=1 permille=0 duration=18.000
+[host] h264-osd-held VDP IRQ +312, PXP IRQ +8, SMMU 181 +0, CMA free change -8 KiB PASS
+
+## h264-clean-held
+PLAY decoded=1 displayed=1 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=0.000 wall_fps=0.124 seconds=8.077 usr=0.06% sys=0.15% idle=99.78% peak_rss_kib=22016
+[host] h264-clean-held VDP IRQ +314, PXP IRQ +8, SMMU 181 +0, CMA free change 80 KiB PASS
+
+## main10-seek
+PLAY decoded=603 displayed=480 dropped=0 preroll=120 seeks=3 eos=1 missed_vblanks=0 fps=48.878 wall_fps=48.172 seconds=9.964 usr=3.11% sys=4.82% idle=92.07% peak_rss_kib=89132
+[host] main10-seek VDP IRQ +590, PXP IRQ +624, SMMU 181 +0, CMA free change -44 KiB PASS
+
+## main10-restart-1
+PLAY decoded=121 displayed=120 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=60.000 wall_fps=55.335 seconds=2.169 usr=2.31% sys=6.11% idle=91.58% peak_rss_kib=89056
+[host] main10-restart-1 VDP IRQ +121, PXP IRQ +128, SMMU 181 +0, CMA free change 0 KiB PASS
+
+## main10-restart-2
+PLAY decoded=121 displayed=120 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=60.000 wall_fps=56.008 seconds=2.143 usr=2.21% sys=5.94% idle=91.84% peak_rss_kib=88964
+[host] main10-restart-2 VDP IRQ +121, PXP IRQ +128, SMMU 181 +0, CMA free change 32 KiB PASS
+
+## main10-restart-3
+PLAY decoded=121 displayed=120 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=60.000 wall_fps=55.941 seconds=2.145 usr=3.49% sys=5.12% idle=91.39% peak_rss_kib=89056
+[host] main10-restart-3 VDP IRQ +121, PXP IRQ +128, SMMU 181 +0, CMA free change 0 KiB PASS
+
+## color-switch
+PLAY decoded=480 displayed=480 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.677 seconds=8.043 usr=2.52% sys=5.66% idle=91.82% peak_rss_kib=21384
+[host] color-switch VDP IRQ +481, PXP IRQ +480, SMMU 181 +0, CMA free change -408 KiB PASS
+
+## DMA-BUF and CMA
+[host] seek CmaFree [388608, 202452, 388564] KiB, object/byte samples [(0, 0), (20, 313344000), (0, 0)]: PASS
+[host] start-stop CmaFree [388564, 202452, 388564] KiB, object/byte samples [(0, 0), (20, 313344000), (0, 0)]: PASS
+[host] seek-repeat-1 CmaFree [388564, 202452, 388564] KiB, object/byte samples [(0, 0), (20, 313344000), (0, 0)]: PASS
+
+## Linear CAPTURE
+Using CAPTURE buffer format NV21 (1920x1088)
+HASH FRAMES 240
+fa9bec434bf726d39941e865fc1c5f000f07e2939e6e6a54fd2084da9215d262  -
+[host] h264-1080p pixels MATCH
+Using CAPTURE buffer format P010 (3840x2160)
+HASH FRAMES 240
+7678094fd8d6edd846ba680c0e85c0c1543feea74594029f89a2435b2e51fb1f  -
+[host] hevc10-2160p pixels MATCH
+
+## Final interrupts and storage
+  16:       6603          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  19:       6600          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 6603 in_blank 6603 last_irq_state 00ae0023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+No new driver errors. RTL8761BTV completed firmware loading after the H5 short-packet message.
+The run used read-only BL31 loading and performed no USB boot image writes, eMMC writes, OTP operations, or saveenv.

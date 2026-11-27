@@ -13,15 +13,25 @@ if [[ $variant == 7.2.5-* ]]; then
 elif [[ $variant == 7.3.5-* ]]; then
     linux_ver=7.3.5
     base_variant=${variant#7.3.5-}
+elif [[ $variant == 7.3.6-vdp ]]; then
+    linux_ver=7.3.6
 fi
 vpu_probe=
 vdec=
 vdp=
+kernel_config_seed=
 case "$variant" in
     7.3.5-vpu-probe) base_variant=all-2g-hdmi-bt-dvfs; vpu_probe=y ;;
     7.3.5-vdec) base_variant=all-2g-hdmi-bt-dvfs; vdec=y ;;
-    7.3.5-vdp) base_variant=all-2g-hdmi-bt-dvfs; vdec=y; vdp=y ;;
+    7.3.5-vdp|7.3.6-vdp) base_variant=all-2g-hdmi-bt-dvfs; vdec=y; vdp=y ;;
 esac
+if [[ $variant == 7.3.6-vdp ]]; then
+    kernel_config_seed="$root/out/release-arm64-7.3.5-vdp/kernel.config"
+    if [[ ! -s $kernel_config_seed ]]; then
+        echo "Missing the accepted 7.3.5 VDP configuration: $kernel_config_seed" >&2
+        exit 1
+    fi
+fi
 linux="$root/source/linux-$linux_ver"
 busybox="$root/source/busybox-1.37.0"
 musl="$root/source/musl-1.2.5"
@@ -399,16 +409,20 @@ if [[ $base_variant != core ]]; then
     fi
 fi
 kernel=(make -C "$linux" O="$out" ARCH=arm64 CROSS_COMPILE="$cross")
-"${kernel[@]}" KCONFIG_ALLCONFIG="$config" allnoconfig
+if [[ $kernel_config_seed ]]; then
+    install -m644 "$kernel_config_seed" "$out/.config"
+else
+    "${kernel[@]}" KCONFIG_ALLCONFIG="$config" allnoconfig
+fi
 if [[ $vpu_probe ]]; then
     "$linux/scripts/config" --file "$out/.config" --enable HI3798MV320_VPU_PROBE \
         --set-str LOCALVERSION "-hg680kd-arm64-${variant#7.3.5-}"
 fi
-if [[ $vdec ]]; then
+if [[ $vdec && -z $kernel_config_seed ]]; then
     "$linux/scripts/config" --file "$out/.config" --enable MEDIA_SUPPORT \
         --enable MEDIA_PLATFORM_SUPPORT --enable MEDIA_PLATFORM_DRIVERS --enable VIDEO_DEV \
         --enable V4L_MEM2MEM_DRIVERS --enable VIDEO_HI3798MV320_VDEC --enable CMA --enable DMA_CMA \
-        --set-str LOCALVERSION "-hg680kd-arm64-${variant#7.3.5-}"
+        --set-str LOCALVERSION "-hg680kd-arm64-${variant#"$linux_ver"-}"
     cmdline=$(sed -n 's/^CONFIG_CMDLINE="\(.*\)"$/\1/p' "$out/.config")
     "$linux/scripts/config" --file "$out/.config" --set-str CMDLINE "$cmdline cma=384M"
     if [[ ${VDEC_TEST:-0} == 1 ]]; then
@@ -434,6 +448,9 @@ if [[ -z $usb_root ]]; then
     "${kernel[@]}" -j"$jobs" Image "hisilicon/$board.dtb"
     install -m644 "$bbout/.config" "$release/busybox.config"
     install -m644 "$out/initramfs.cpio" "$release/"
+    if [[ $kernel_config_seed ]]; then
+        install -m644 "$out/modules.builtin" "$out/modules.builtin.modinfo" "$release/"
+    fi
 else
     grep -qx "CONFIG_BT_HCIUART=m" "$out/.config" || { echo "Expected CONFIG_BT_HCIUART=m for usb_root" >&2; exit 1; }
     "${kernel[@]}" -j"$jobs" Image "hisilicon/$board.dtb" modules
@@ -450,6 +467,9 @@ install -m644 "$out/System.map" "$out/vmlinux" "$release"
 if [[ $vdec ]]; then
     python3 "$(dirname "$0")/pack_arm64.py" --image "$release/Image" \
         --dtb "$release/$board.dtb" --out "$release" --name boot.img
+fi
+if [[ $kernel_config_seed ]]; then
+    (cd "$release" && sha256sum boot.img modules.builtin modules.builtin.modinfo >> SHA256SUMS)
 fi
 tar -C "$release" -czf "$release.tar.gz" .
 ls -lh "$release/Image" "$release/$board.dtb" "$release.tar.gz"
