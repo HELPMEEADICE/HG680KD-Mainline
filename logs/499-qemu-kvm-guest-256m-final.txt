@@ -1,0 +1,288 @@
+
+# uname -r; cat /sys/block/mmcblk0/ro; cat /proc/cmdline; grep -E '^(MemTotal|MemAvailable|CmaTotal|CmaFree|SwapTotal):' /proc/meminfo
+7.3.6-hg680kd-arm64-kvm-test
+1
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+MemTotal:        2021212 kB
+MemAvailable:    1873316 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+# dmesg | grep -iE 'out of memory|oom-kill|killed process|page allocation failure'
+# /qemu/run-guest 256
+/qemu/run-guest: line 7: [: not found
+/qemu/run-guest: line 7: [: not found
+QEMU RAM=256MiB, prealloc=on, sampler=/tmp/qemu-256.mem
+[    4.021151] random: crng init done
+Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+Linux version 7.3.6-hg680kd-qemu-guest (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+random: crng init done
+Machine model: linux,dummy-virt
+OF: reserved mem: Reserved memory: No reserved-memory node in the DT
+psci: probing for conduit method from DT.
+psci: PSCIv1.3 detected in firmware.
+psci: Using standard PSCI v0.2 function IDs
+psci: Trusted OS migration not required
+psci: SMC Calling Convention v1.1
+smccc: KVM: hypervisor services detected (0x00000000 0x00000000 0x00000000 0x00000003)
+Zone ranges:
+  DMA      [mem 0x0000000040000000-0x000000004fffffff]
+  DMA32    empty
+  Normal   empty
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000040000000-0x000000004fffffff]
+Initmem setup node 0 [mem 0x0000000040000000-0x000000004fffffff]
+percpu: Embedded 14 pages/cpu s25440 r0 d31904 u57344
+Detected VIPT I-cache on CPU0
+CPU features: detected: GICv3 CPU interface
+alternatives: applying boot alternatives
+Kernel command line: console=ttyAMA0,115200 rdinit=/init panic=1
+printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+Dentry cache hash table entries: 32768 (order: 6, 262144 bytes, linear)
+Inode-cache hash table entries: 16384 (order: 5, 131072 bytes, linear)
+software IO TLB: SWIOTLB bounce buffer size adjusted to 0MB
+software IO TLB: area num 2.
+software IO TLB: SWIOTLB bounce buffer size roundup to 0MB
+software IO TLB: mapped [mem 0x000000004fe61000-0x000000004fee1000] (0MB)
+Built 1 zonelists, mobility grouping on.  Total pages: 65536
+mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+rcu: Hierarchical RCU implementation.
+rcu: 	RCU restricting CPUs from NR_CPUS=512 to nr_cpu_ids=2.
+rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+GICv3: 256 SPIs implemented
+GICv3: 0 Extended SPIs implemented
+Root IRQ handler: gic_handle_irq
+GICv3: GICv3 features: 16 PPIs, DirectLPI
+GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+GICv3: CPU0: found redistributor 0 region 0:0x00000000080a0000
+rcu: srcu_init: Setting srcu_struct sizes based on contention.
+clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+arch_timer: cp15 timer running at 24.00MHz (virt).
+clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+Console: colour dummy device 80x25
+Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+VFS: Finished mounting rootfs on nullfs
+rcu: Hierarchical SRCU implementation.
+rcu: 	Max phase no-delay instances is 1000.
+smp: Bringing up secondary CPUs ...
+Detected VIPT I-cache on CPU1
+GICv3: CPU1: found redistributor 1 region 0:0x00000000080c0000
+CPU1: Booted secondary processor 0x0000000001 [0x412fd050]
+smp: Brought up 1 node, 2 CPUs
+SMP: Total of 2 processors activated.
+CPU: All CPU(s) started at EL1
+CPU features: detected: 32-bit EL0 Support
+CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+CPU features: detected: CRC32 instructions
+CPU features: detected: RCpc load-acquire (LDAPR)
+CPU features: detected: LSE atomic instructions
+CPU features: detected: Privileged Access Never
+CPU features: detected: XNX
+CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+alternatives: applying system-wide alternatives
+Memory: 247640K/262144K available (2816K kernel code, 632K rwdata, 640K rodata, 768K init, 359K bss, 12724K reserved, 0K cma-reserved)
+devtmpfs: initialized
+posixtimers hash table entries: 1024 (order: 2, 16384 bytes, linear)
+futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+ASID allocator initialised with 65536 entries
+Serial: AMBA PL011 UART driver
+9000000.pl011: ttyAMA0 MMIO:0x0000000009000000 (irq = 13, base_baud = 0) is a PL011 rev1
+printk: console [ttyAMA0] enabled
+clocksource: Switched to clocksource arch_sys_counter
+Unpacking initramfs...
+Freeing initrd memory: 500K
+workingset: timestamp_bits=62 (anon: 57) max_order=16 bucket_order=0 (anon: 0)
+clk: Disabling unused clocks
+Freeing unused kernel memory: 768K
+Run /init as init process
+HG680KD QEMU/KVM ARM64 guest
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+guest# QEMU 10.1.5 monitor - type 'help' for more information
+(qemu) i[K[Din[K[D[Dinf[K[D[D[Dinfo[K[D[D[D[Dinfo [K[D[D[D[D[Dinfo k[K[D[D[D[D[D[Dinfo kv[K[D[D[D[D[D[D[Dinfo kvm[K
+kvm support: enabled
+(qemu) 
+
+guest# uname -a; cat /sys/devices/system/cpu/online; cat /sys/devices/system/clocksource/clocksource0/current_clocksource; dmesg | grep -E 'GICv3|arch_timer|Brought up'
+Linux (none) 7.3.6-hg680kd-qemu-guest #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+0-1
+arch_sys_counter
+<6>CPU features: detected: GICv3 CPU interface
+<6>GICv3: 256 SPIs implemented
+<6>GICv3: 0 Extended SPIs implemented
+<6>GICv3: GICv3 features: 16 PPIs, DirectLPI
+<6>GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+<6>GICv3: CPU0: found redistributor 0 region 0:0x00000000080a0000
+<6>arch_timer: cp15 timer running at 24.00MHz (virt).
+<6>GICv3: CPU1: found redistributor 1 region 0:0x00000000080c0000
+<6>smp: Brought up 1 node, 2 CPUs
+guest# sleep 2; cat /proc/uptime; cat /proc/interrupts
+2.54 4.67
+            CPU0       CPU1       
+  11:        622        632  GICv3      27 Level     arch_timer
+  13:          3          0  GICv3      33 Level     uart-pl011
+IPI0:          6         15  Rescheduling interrupts
+IPI1:        105        113  Function call interrupts
+IPI2:          0          0  CPU stop interrupts
+IPI3:          0          0  CPU stop NMIs
+IPI4:          0          0  Timer broadcast interrupts
+IPI5:          0          0  IRQ work interrupts
+IPI6:          0          0  CPU backtrace interrupts
+IPI7:          0          0  KGDB roundup interrupts
+ Err:          0
+guest# sleep 2; cat /proc/uptime; cat /proc/interrupts
+4.67 8.80
+            CPU0       CPU1       
+  11:       1142       1163  GICv3      27 Level     arch_timer
+  13:          4          0  GICv3      33 Level     uart-pl011
+IPI0:          8         15  Rescheduling interrupts
+IPI1:        105        118  Function call interrupts
+IPI2:          0          0  CPU stop interrupts
+IPI3:          0          0  CPU stop NMIs
+IPI4:          0          0  Timer broadcast interrupts
+IPI5:          0          0  IRQ work interrupts
+IPI6:          0          0  CPU backtrace interrupts
+IPI7:          0          0  KGDB roundup interrupts
+ Err:          0
+guest# grep -E '^(MemTotal|MemAvailable|CmaTotal|CmaFree|SwapTotal):' /proc/meminfo
+MemTotal:         250688 kB
+MemAvailable:     240312 kB
+SwapTotal:             0 kB
+guest# /bin/guest-memcheck 208 8
+GUEST-MEM start: 208 MiB, minimum 8 s
+GUEST-MEM pass=1 elapsed=1.05 s
+GUEST-MEM pass=5 elapsed=1.98 s
+GUEST-MEM pass=10 elapsed=3.14 s
+GUEST-MEM pass=15 elapsed=4.30 s
+GUEST-MEM pass=20 elapsed=5.49 s
+GUEST-MEM pass=25 elapsed=6.94 s
+GUEST-MEM PASS: 208 MiB, 29 full write/verify passes, 8.10 s
+guest# reboot -f
+reboot: Restarting system
+QEMU-EXIT=0
+# sleep 2; grep -E '^(MemTotal|MemAvailable|CmaTotal|CmaFree|SwapTotal):' /proc/meminfo
+MemTotal:        2021212 kB
+MemAvailable:    1895060 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+# cat /tmp/qemu-256.mem
+time=2.55 8.78
+MemTotal:        2021212 kB
+MemAvailable:    1872944 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=3.56 11.80
+MemTotal:        2021212 kB
+MemAvailable:    1602836 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=4.57 14.85
+MemTotal:        2021212 kB
+MemAvailable:    1586344 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=5.58 18.64
+MemTotal:        2021212 kB
+MemAvailable:    1586340 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=6.58 22.67
+MemTotal:        2021212 kB
+MemAvailable:    1586340 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=7.59 26.56
+MemTotal:        2021212 kB
+MemAvailable:    1587956 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=8.60 30.60
+MemTotal:        2021212 kB
+MemAvailable:    1590876 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=9.61 33.90
+MemTotal:        2021212 kB
+MemAvailable:    1593296 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=10.62 36.91
+MemTotal:        2021212 kB
+MemAvailable:    1595500 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=11.63 39.93
+MemTotal:        2021212 kB
+MemAvailable:    1597104 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=12.63 42.94
+MemTotal:        2021212 kB
+MemAvailable:    1599472 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=13.64 45.96
+MemTotal:        2021212 kB
+MemAvailable:    1601240 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=14.65 48.98
+MemTotal:        2021212 kB
+MemAvailable:    1602676 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=15.66 51.99
+MemTotal:        2021212 kB
+MemAvailable:    1604428 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+time=16.67 55.02
+MemTotal:        2021212 kB
+MemAvailable:    1606824 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+# dmesg | grep -iE 'out of memory|oom-kill|killed process|page allocation failure'
+# 
+[host] RESULT memory=256MiB stress=208MiB host_min_available=1586340KiB host_min_cma_free=388576KiB samples=15

@@ -1,0 +1,766 @@
+
+# uname -r; cat /proc/cmdline; cat /sys/block/mmcblk0/ro; grep -E '^(MemAvailable|SwapTotal|CmaTotal|CmaFree):' /proc/meminfo
+7.3.6-hg680kd-arm64-kvm-test
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+1
+MemAvailable:    1898196 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388212 kB
+# dmesg | grep -iE 'out of memory|oom-kill|killed process|page allocation failure|smmu.*fault|cma.*fail|cma_alloc.*ret: -|vdp.*underflow'
+# /media/mix-run 1216 6 long1216 vm-first
+MIX_BEFORE ram=1216MiB clips=6 order=vm-first
+MemAvailable:    1897948 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388212 kB
+  18:       9738          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  21:       9720          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  22:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  24:      16201          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+vblank_irqs 9738 in_blank 9738 last_irq_state 0135002b unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+8240 0000010a
+8254 71b00000
+825c 722f8000
+8284 726f4000
+828c 728f2000
+fetch_underflow 00000000
+closed
+/sys/class/drm/card0-HDMI-A-1/status:connected
+/sys/class/drm/card0-HDMI-A-1/modes:3840x2160
+TIMINGS_BEFORE=9
+QEMU_START ram=1216MiB order=vm-first t=388.67
+Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+Linux version 7.3.6-hg680kd-qemu-guest (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+random: crng init done
+Machine model: linux,dummy-virt
+OF: reserved mem: Reserved memory: No reserved-memory node in the DT
+psci: probing for conduit method from DT.
+psci: PSCIv1.3 detected in firmware.
+psci: Using standard PSCI v0.2 function IDs
+psci: Trusted OS migration not required
+psci: SMC Calling Convention v1.1
+smccc: KVM: hypervisor services detected (0x00000000 0x00000000 0x00000000 0x00000003)
+Zone ranges:
+  DMA      [mem 0x0000000040000000-0x000000008bffffff]
+  DMA32    empty
+  Normal   empty
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000040000000-0x000000008bffffff]
+Initmem setup node 0 [mem 0x0000000040000000-0x000000008bffffff]
+On node 0, zone DMA: 16384 pages in unavailable ranges
+percpu: Embedded 14 pages/cpu s25440 r0 d31904 u57344
+Detected VIPT I-cache on CPU0
+CPU features: detected: GICv3 CPU interface
+alternatives: applying boot alternatives
+Kernel command line: console=ttyAMA0,115200 rdinit=/init panic=1
+printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+software IO TLB: SWIOTLB bounce buffer size adjusted to 1MB
+software IO TLB: area num 2.
+software IO TLB: SWIOTLB bounce buffer size roundup to 2MB
+software IO TLB: mapped [mem 0x000000008a400000-0x000000008a600000] (2MB)
+Built 1 zonelists, mobility grouping on.  Total pages: 311296
+mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+rcu: Hierarchical RCU implementation.
+rcu: 	RCU restricting CPUs from NR_CPUS=512 to nr_cpu_ids=2.
+rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+GICv3: 256 SPIs implemented
+GICv3: 0 Extended SPIs implemented
+Root IRQ handler: gic_handle_irq
+GICv3: GICv3 features: 16 PPIs, DirectLPI
+GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+GICv3: CPU0: found redistributor 0 region 0:0x00000000080a0000
+rcu: srcu_init: Setting srcu_struct sizes based on contention.
+clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+arch_timer: cp15 timer running at 24.00MHz (virt).
+clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+Console: colour dummy device 80x25
+Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+VFS: Finished mounting rootfs on nullfs
+rcu: Hierarchical SRCU implementation.
+rcu: 	Max phase no-delay instances is 1000.
+smp: Bringing up secondary CPUs ...
+Detected VIPT I-cache on CPU1
+GICv3: CPU1: found redistributor 1 region 0:0x00000000080c0000
+CPU1: Booted secondary processor 0x0000000001 [0x412fd050]
+smp: Brought up 1 node, 2 CPUs
+SMP: Total of 2 processors activated.
+CPU: All CPU(s) started at EL1
+CPU features: detected: 32-bit EL0 Support
+CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+CPU features: detected: CRC32 instructions
+CPU features: detected: RCpc load-acquire (LDAPR)
+CPU features: detected: LSE atomic instructions
+CPU features: detected: Privileged Access Never
+CPU features: detected: XNX
+CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+alternatives: applying system-wide alternatives
+Memory: 1206856K/1245184K available (2816K kernel code, 632K rwdata, 640K rodata, 768K init, 359K bss, 35272K reserved, 0K cma-reserved)
+devtmpfs: initialized
+posixtimers hash table entries: 1024 (order: 2, 16384 bytes, linear)
+futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+ASID allocator initialised with 65536 entries
+Serial: AMBA PL011 UART driver
+9000000.pl011: ttyAMA0 MMIO:0x0000000009000000 (irq = 13, base_baud = 0) is a PL011 rev1
+printk: console [ttyAMA0] enabled
+clocksource: Switched to clocksource arch_sys_counter
+Unpacking initramfs...
+workingset: timestamp_bits=62 (anon: 57) max_order=19 bucket_order=0 (anon: 0)
+Freeing initrd memory: 500K
+clk: Disabling unused clocks
+Freeing unused kernel memory: 768K
+Run /init as init process
+HG680KD QEMU/KVM ARM64 guest
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+guest# QEMU 10.1.5 monitor - type 'help' for more information
+(qemu) i[K[Din[K[D[Dinf[K[D[D[Dinfo[K[D[D[D[Dinfo [K[D[D[D[D[Dinfo k[K[D[D[D[D[D[Dinfo kv[K[D[D[D[D[D[D[Dinfo kvm[K
+kvm support: enabled
+(qemu) 
+
+guest# grep '^MemAvailable:' /proc/meminfo
+MemAvailable:    1194752 kB
+guest# /bin/guest-memcheck 1150 120
+GUEST-MEM start: 1150 MiB, minimum 120 s
+GUEST-MEM pass=1 elapsed=14.20 s
+[  411.246611] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=87429 hw=10316759 detile=0 clear=1024311 sync=0
+[  430.004250] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=118399 hw=10422110 detile=0 clear=1351348 sync=0
+GUEST-MEM pass=5 elapsed=38.86 s
+[  448.511479] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=116471 hw=10403452 detile=0 clear=1352965 sync=0
+GUEST-MEM pass=10 elapsed=70.97 s
+[  467.310581] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=119981 hw=10415592 detile=0 clear=1379936 sync=0
+[  485.994254] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=120531 hw=10398396 detile=0 clear=1406570 sync=0
+GUEST-MEM pass=15 elapsed=103.52 s
+[  504.694672] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=118196 hw=10411678 detile=0 clear=1383904 sync=0
+GUEST-MEM pass=20 elapsed=122.10 s
+GUEST-MEM PASS: 1150 MiB, 20 full write/verify passes, 122.10 s
+guest# reboot -f
+reboot: Restarting system
+QEMU_EXIT status=0 t=514.91
+MIX_STATUS qemu=0 media=0
+GUEST_MEMORY_ACTIVE t=392.68
+MEDIA_START clip=1 t=392.68
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+[AVHWFramesContext @ 0xffff8d7d2f20] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S265
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1079 dropped=1 preroll=0 seeks=0 eos=1 missed_vblanks=1 fps=59.944 wall_fps=58.820 seconds=18.344 usr=21.37% sys=12.02% idle=66.61% peak_rss_kib=89816
+CPU active cpu0=23.92% cpu1=35.44% cpu2=36.26% cpu3=37.90%
+AVSYNC samples=1078 mean_ms=-0.907 min_ms=-17.644 max_ms=-0.447
+MEDIA_END clip=1 status=0 t=411.21
+MEDIA_START clip=2 t=411.21
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+[AVHWFramesContext @ 0xffff94d22f20] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S265
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1072 dropped=8 preroll=0 seeks=0 eos=1 missed_vblanks=8 fps=59.555 wall_fps=57.703 seconds=18.578 usr=29.00% sys=7.70% idle=63.31% peak_rss_kib=89752
+CPU active cpu0=63.72% cpu1=27.30% cpu2=26.87% cpu3=28.90%
+AVSYNC samples=1071 mean_ms=-0.869 min_ms=-17.795 max_ms=0.016
+MEDIA_END clip=2 status=0 t=429.93
+MEDIA_START clip=3 t=429.93
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+[AVHWFramesContext @ 0xffff9f1c2f20] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S265
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1077 dropped=3 preroll=0 seeks=0 eos=1 missed_vblanks=3 fps=59.833 wall_fps=58.676 seconds=18.355 usr=28.99% sys=7.61% idle=63.39% peak_rss_kib=89708
+CPU active cpu0=15.31% cpu1=20.50% cpu2=80.50% cpu3=30.12%
+AVSYNC samples=1076 mean_ms=-0.900 min_ms=-17.883 max_ms=-0.183
+MEDIA_END clip=3 status=0 t=448.47
+MEDIA_START clip=4 t=448.47
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+[AVHWFramesContext @ 0xffff885f2f20] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S265
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1074 dropped=6 preroll=0 seeks=0 eos=1 missed_vblanks=6 fps=59.666 wall_fps=57.747 seconds=18.598 usr=28.44% sys=8.23% idle=63.33% peak_rss_kib=89764
+CPU active cpu0=60.56% cpu1=26.06% cpu2=25.32% cpu3=34.82%
+AVSYNC samples=1073 mean_ms=-0.839 min_ms=-17.822 max_ms=-0.384
+MEDIA_END clip=4 status=0 t=467.27
+MEDIA_START clip=5 t=467.27
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+[AVHWFramesContext @ 0xffff9ea32f20] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S265
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1075 dropped=5 preroll=0 seeks=0 eos=1 missed_vblanks=5 fps=59.722 wall_fps=58.143 seconds=18.489 usr=28.51% sys=7.14% idle=64.35% peak_rss_kib=90084
+CPU active cpu0=26.89% cpu1=65.01% cpu2=27.10% cpu3=23.47%
+AVSYNC samples=1074 mean_ms=-0.867 min_ms=-17.918 max_ms=-0.399
+MEDIA_END clip=5 status=0 t=485.95
+MEDIA_START clip=6 t=485.96
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+[AVHWFramesContext @ 0xffffa9c82f20] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S265
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1073 dropped=7 preroll=0 seeks=0 eos=1 missed_vblanks=7 fps=59.611 wall_fps=57.995 seconds=18.502 usr=28.48% sys=7.09% idle=64.42% peak_rss_kib=89856
+CPU active cpu0=38.49% cpu1=29.35% cpu2=44.11% cpu3=30.43%
+AVSYNC samples=1072 mean_ms=-0.869 min_ms=-17.773 max_ms=-0.403
+MEDIA_END clip=6 status=0 t=504.62
+MIX_MEMORY_SAMPLES
+SAMPLE t=388.67
+MemAvailable:    1897700 kB
+CmaFree:          388212 kB
+SAMPLE t=389.67
+MemAvailable:    1363360 kB
+CmaFree:          388212 kB
+SAMPLE t=390.68
+MemAvailable:     758136 kB
+CmaFree:          383252 kB
+SAMPLE t=391.68
+MemAvailable:     614560 kB
+CmaFree:          310836 kB
+SAMPLE t=392.69
+MemAvailable:     614080 kB
+CmaFree:          310908 kB
+state: SETUP
+SAMPLE t=393.70
+MemAvailable:     357940 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=394.71
+MemAvailable:     357852 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=395.72
+MemAvailable:     356860 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=396.74
+MemAvailable:     356844 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=397.75
+MemAvailable:     356464 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=398.77
+MemAvailable:     356352 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=399.78
+MemAvailable:     356352 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=400.80
+MemAvailable:     356100 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=401.81
+MemAvailable:     355364 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=402.83
+MemAvailable:     355104 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=403.85
+MemAvailable:     355104 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=404.87
+MemAvailable:     355104 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=405.90
+MemAvailable:     354852 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=406.93
+MemAvailable:     354600 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=407.96
+MemAvailable:     354220 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=408.99
+MemAvailable:     353860 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=410.02
+MemAvailable:     354108 kB
+CmaFree:          159572 kB
+state: RUNNING
+SAMPLE t=411.04
+MemAvailable:     353856 kB
+CmaFree:          159572 kB
+SAMPLE t=412.06
+MemAvailable:     390348 kB
+CmaFree:          188416 kB
+state: RUNNING
+SAMPLE t=413.09
+MemAvailable:     357220 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=414.12
+MemAvailable:     356844 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=415.16
+MemAvailable:     356344 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=416.18
+MemAvailable:     356336 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=417.21
+MemAvailable:     356084 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=418.23
+MemAvailable:     355596 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=419.26
+MemAvailable:     355592 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=420.29
+MemAvailable:     355092 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=421.32
+MemAvailable:     355088 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=422.35
+MemAvailable:     354596 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=423.37
+MemAvailable:     354344 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=424.40
+MemAvailable:     354344 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=425.42
+MemAvailable:     354344 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=426.45
+MemAvailable:     353852 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=427.48
+MemAvailable:     353604 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=428.50
+MemAvailable:     353724 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=429.52
+MemAvailable:     353736 kB
+CmaFree:          161792 kB
+state: RUNNING
+SAMPLE t=430.54
+MemAvailable:     353644 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=431.56
+MemAvailable:     349276 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=432.59
+MemAvailable:     348772 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=433.61
+MemAvailable:     348768 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=434.64
+MemAvailable:     348388 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=435.66
+MemAvailable:     348028 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=436.69
+MemAvailable:     348024 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=437.72
+MemAvailable:     347772 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=438.74
+MemAvailable:     347148 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=439.77
+MemAvailable:     347028 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=440.80
+MemAvailable:     346776 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=441.82
+MemAvailable:     346528 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=442.85
+MemAvailable:     346284 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=443.88
+MemAvailable:     346032 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=444.91
+MemAvailable:     346032 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=445.93
+MemAvailable:     346032 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=446.96
+MemAvailable:     347568 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=447.98
+MemAvailable:     348736 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=449.01
+MemAvailable:     420028 kB
+CmaFree:          203200 kB
+state: SETUP
+SAMPLE t=450.04
+MemAvailable:     345544 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=451.07
+MemAvailable:     345484 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=452.10
+MemAvailable:     345236 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=453.12
+MemAvailable:     345232 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=454.14
+MemAvailable:     345104 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=455.17
+MemAvailable:     344992 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=456.20
+MemAvailable:     344992 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=457.22
+MemAvailable:     344992 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=458.25
+MemAvailable:     345112 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=459.28
+MemAvailable:     345964 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=460.31
+MemAvailable:     347068 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=461.34
+MemAvailable:     347956 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=462.36
+MemAvailable:     348744 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=463.39
+MemAvailable:     349672 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=464.42
+MemAvailable:     350156 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=465.44
+MemAvailable:     350720 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=466.47
+MemAvailable:     351672 kB
+CmaFree:          162220 kB
+state: RUNNING
+SAMPLE t=467.50
+MemAvailable:     467512 kB
+CmaFree:          256556 kB
+state: SETUP
+SAMPLE t=468.52
+MemAvailable:     351968 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=469.55
+MemAvailable:     351736 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=470.58
+MemAvailable:     350740 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=471.61
+MemAvailable:     350352 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=472.63
+MemAvailable:     350236 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=473.66
+MemAvailable:     350236 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=474.69
+MemAvailable:     350236 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=475.71
+MemAvailable:     349860 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=476.74
+MemAvailable:     349744 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=477.77
+MemAvailable:     349744 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=478.80
+MemAvailable:     349744 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=479.83
+MemAvailable:     349744 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=480.85
+MemAvailable:     349996 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=481.87
+MemAvailable:     349992 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=482.90
+MemAvailable:     350076 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=483.93
+MemAvailable:     350076 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=484.95
+MemAvailable:     350328 kB
+CmaFree:          161796 kB
+state: RUNNING
+SAMPLE t=485.98
+MemAvailable:     621348 kB
+CmaFree:          359496 kB
+state: SETUP
+SAMPLE t=487.00
+MemAvailable:     371768 kB
+CmaFree:          174080 kB
+state: RUNNING
+SAMPLE t=488.03
+MemAvailable:     356644 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=489.06
+MemAvailable:     340400 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=490.09
+MemAvailable:     340140 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=491.12
+MemAvailable:     339892 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=492.15
+MemAvailable:     339648 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=493.18
+MemAvailable:     339396 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=494.21
+MemAvailable:     341260 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=495.23
+MemAvailable:     343008 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=496.26
+MemAvailable:     344328 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=497.29
+MemAvailable:     345732 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=498.32
+MemAvailable:     347148 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=499.35
+MemAvailable:     347932 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=500.38
+MemAvailable:     348672 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=501.41
+MemAvailable:     348960 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=502.43
+MemAvailable:     349692 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=503.46
+MemAvailable:     349884 kB
+CmaFree:          161804 kB
+state: RUNNING
+SAMPLE t=504.49
+MemAvailable:     350748 kB
+CmaFree:          161804 kB
+SAMPLE t=505.51
+MemAvailable:     624700 kB
+CmaFree:          358832 kB
+SAMPLE t=506.52
+MemAvailable:     625140 kB
+CmaFree:          359168 kB
+SAMPLE t=507.53
+MemAvailable:     625448 kB
+CmaFree:          359492 kB
+SAMPLE t=508.54
+MemAvailable:     625816 kB
+CmaFree:          359780 kB
+SAMPLE t=509.55
+MemAvailable:     626152 kB
+CmaFree:          359916 kB
+SAMPLE t=510.56
+MemAvailable:     626528 kB
+CmaFree:          360160 kB
+SAMPLE t=511.57
+MemAvailable:     626928 kB
+CmaFree:          360260 kB
+SAMPLE t=512.58
+MemAvailable:     627084 kB
+CmaFree:          360304 kB
+SAMPLE t=513.59
+MemAvailable:     627316 kB
+CmaFree:          360304 kB
+SAMPLE t=514.60
+MemAvailable:    1211868 kB
+CmaFree:          366380 kB
+MIX_AFTER
+MemAvailable:    1890748 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388280 kB
+  18:      16230          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  21:      16200          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  22:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  24:      27002          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+vblank_irqs 16230 in_blank 16230 last_irq_state 0002002b unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+8240 0000010a
+8254 69700000
+825c 69ef8000
+8284 6a2f4000
+828c 6a4f2000
+fetch_underflow 00000000
+closed
+/sys/class/drm/card0-HDMI-A-1/status:connected
+/sys/class/drm/card0-HDMI-A-1/modes:3840x2160
+<6>[   93.503412] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=107150 hw=9908485 detile=0 clear=1301872 sync=0
+<6>[  134.515250] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=44262 hw=10743945 detile=0 clear=556267 sync=0
+<6>[  164.870577] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=50789 hw=10510543 detile=0 clear=638958 sync=0
+<6>[  195.701595] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=56189 hw=10449178 detile=0 clear=697125 sync=0
+<6>[  232.403257] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=71616 hw=10449740 detile=0 clear=815485 sync=0
+<6>[  264.436682] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=24462 hw=11071534 detile=0 clear=438700 sync=0
+<6>[  294.570306] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=45428 hw=10747332 detile=0 clear=563814 sync=0
+<6>[  341.582698] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=48617 hw=10671430 detile=0 clear=604034 sync=0
+<6>[  373.274329] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=95173 hw=10108091 detile=0 clear=1084654 sync=0
+<6>[  411.246611] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=87429 hw=10316759 detile=0 clear=1024311 sync=0
+<6>[  430.004250] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=118399 hw=10422110 detile=0 clear=1351348 sync=0
+<6>[  448.511479] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=116471 hw=10403452 detile=0 clear=1352965 sync=0
+<6>[  467.310581] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=119981 hw=10415592 detile=0 clear=1379936 sync=0
+<6>[  485.994254] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=120531 hw=10398396 detile=0 clear=1406570 sync=0
+<6>[  504.694672] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=118196 hw=10411678 detile=0 clear=1383904 sync=0
+MIX_END
+# dmesg | grep -iE 'out of memory|oom-kill|killed process|page allocation failure|smmu.*fault|cma.*fail|cma_alloc.*ret: -|vdp.*underflow'
+# 
+[host] RESULT ram=1216MiB order=vm-first clips=6/6 shown=6450 dropped=30 missed=30 xruns=0 fps_min=59.555 min_available=339396KiB min_cma=159572KiB cma_before=388212KiB cma_after=388280KiB irq_116_122_169_181=10801,6492,6480,0 pcm_running_samples=104 pass=False
+[host] HDMI capture rc=0

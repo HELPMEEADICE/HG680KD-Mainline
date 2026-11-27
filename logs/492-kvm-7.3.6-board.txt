@@ -1,0 +1,183 @@
+
+# uname -a; cat /proc/cmdline; cat /sys/devices/system/cpu/online; cat /proc/mounts; echo EMMC_RO; cat /sys/block/mmcblk0/ro
+Linux hg680kd 7.3.6-hg680kd-arm64-aiao #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+0-3
+rootfs / rootfs rw,size=811080k,nr_inodes=202770 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=811080k,nr_inodes=202770,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+EMMC_RO
+1
+# dmesg | grep -iE "CPU: All CPU|EL2|EL1|hyp|kvm|psci|gic|arch_timer"
+<6>[    0.000000] psci: probing for conduit method from DT.
+<6>[    0.000000] psci: PSCIv1.1 detected in firmware.
+<6>[    0.000000] psci: Using standard PSCI v0.2 function IDs
+<6>[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+<6>[    0.000000] psci: SMC Calling Convention v1.2
+<6>[    0.000000] CPU features: detected: GICv3 CPU interface
+<6>[    0.000000] GICv3: 224 SPIs implemented
+<6>[    0.000000] GICv3: 0 Extended SPIs implemented
+<6>[    0.000000] Root IRQ handler: gic_handle_irq
+<6>[    0.000000] GICv3: GICv3 features: 16 PPIs
+<6>[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+<6>[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0x00000000f1040000
+<6>[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+<6>[    0.071008] GICv3: CPU1: found redistributor 100 region 0:0x00000000f1060000
+<6>[    0.071560] GICv3: CPU2: found redistributor 200 region 0:0x00000000f1080000
+<6>[    0.072039] GICv3: CPU3: found redistributor 300 region 0:0x00000000f10a0000
+<6>[    0.134456] CPU: All CPU(s) started at EL1
+<5>[    1.831144] sd 0:0:0:0: [sda] 60125184 512-byte logical blocks: (30.8 GB/28.7 GiB)
+# cat /proc/cpuinfo; grep -E "^(MemTotal|MemFree|MemAvailable|CmaTotal|CmaFree|SwapTotal):" /proc/meminfo; grep -iE "arch_timer|vgic|kvm" /proc/interrupts; ls -l /dev/kvm
+processor	: 0
+BogoMIPS	: 48.00
+Features	: fp asimd aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 1
+BogoMIPS	: 48.00
+Features	: fp asimd aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 2
+BogoMIPS	: 48.00
+Features	: fp asimd aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 3
+BogoMIPS	: 48.00
+Features	: fp asimd aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+MemTotal:        2021904 kB
+MemFree:         1962600 kB
+MemAvailable:    1953440 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388500 kB
+  11:     243982     252249     239642     243888  GICv3      27 Level     arch_timer
+ls: /dev/kvm: No such file or directory
+# cd /sys/firmware/devicetree/base && ls ./soc/interrupt-controller@f1000000 ./psci ./timer; for p in ./interrupt-parent ./soc/compatible ./soc/interrupt-controller@f1000000/compatible ./soc/interrupt-controller@f1000000/reg ./soc/interrupt-controller@f1000000/phandle ./soc/interrupt-controller@f1000000/#interrupt-cells ./psci/compatible ./psci/method ./timer/compatible ./timer/interrupts ./timer/interrupt-names ./timer/clock-frequency ./cpus/cpu@*/compatible ./cpus/cpu@*/enable-method; do echo "$p"; busybox hexdump -Cv "$p"; done
+./timer:
+name             compatible       interrupts
+interrupt-names  clock-frequency
+
+./psci:
+name        compatible  method
+
+./soc/interrupt-controller@f1000000:
+interrupt-controller  reg                   #address-cells
+name                  #interrupt-cells
+phandle               compatible
+./interrupt-parent
+00000000  00 00 00 01                                       |....|
+00000004
+./soc/compatible
+00000000  73 69 6d 70 6c 65 2d 62  75 73 00                 |simple-bus.|
+0000000b
+./soc/interrupt-controller@f1000000/compatible
+00000000  61 72 6d 2c 67 69 63 2d  76 33 00                 |arm,gic-v3.|
+0000000b
+./soc/interrupt-controller@f1000000/reg
+00000000  00 00 00 00 f1 00 00 00  00 00 00 00 00 01 00 00  |................|
+00000010  00 00 00 00 f1 04 00 00  00 00 00 00 00 08 00 00  |................|
+00000020
+./soc/interrupt-controller@f1000000/phandle
+00000000  00 00 00 01                                       |....|
+00000004
+./soc/interrupt-controller@f1000000/#interrupt-cells
+00000000  00 00 00 03                                       |....|
+00000004
+./psci/compatible
+00000000  61 72 6d 2c 70 73 63 69  2d 30 2e 32 00           |arm,psci-0.2.|
+0000000d
+./psci/method
+00000000  73 6d 63 00                                       |smc.|
+00000004
+./timer/compatible
+00000000  61 72 6d 2c 61 72 6d 76  38 2d 74 69 6d 65 72 00  |arm,armv8-timer.|
+00000010
+./timer/interrupts
+00000000  00 00 00 01 00 00 00 0d  00 00 00 04 00 00 00 01  |................|
+00000010  00 00 00 0e 00 00 00 04  00 00 00 01 00 00 00 0b  |................|
+00000020  00 00 00 04 00 00 00 01  00 00 00 0a 00 00 00 04  |................|
+00000030
+./timer/interrupt-names
+00000000  73 65 63 2d 70 68 79 73  00 70 68 79 73 00 76 69  |sec-phys.phys.vi|
+00000010  72 74 00 68 79 70 2d 70  68 79 73 00              |rt.hyp-phys.|
+0000001c
+./timer/clock-frequency
+00000000  01 6e 36 00                                       |.n6.|
+00000004
+./cpus/cpu@0/compatible
+00000000  61 72 6d 2c 63 6f 72 74  65 78 2d 61 35 35 00     |arm,cortex-a55.|
+0000000f
+./cpus/cpu@100/compatible
+00000000  61 72 6d 2c 63 6f 72 74  65 78 2d 61 35 35 00     |arm,cortex-a55.|
+0000000f
+./cpus/cpu@200/compatible
+00000000  61 72 6d 2c 63 6f 72 74  65 78 2d 61 35 35 00     |arm,cortex-a55.|
+0000000f
+./cpus/cpu@300/compatible
+00000000  61 72 6d 2c 63 6f 72 74  65 78 2d 61 35 35 00     |arm,cortex-a55.|
+0000000f
+./cpus/cpu@0/enable-method
+00000000  70 73 63 69 00                                    |psci.|
+00000005
+./cpus/cpu@100/enable-method
+00000000  70 73 63 69 00                                    |psci.|
+00000005
+./cpus/cpu@200/enable-method
+00000000  70 73 63 69 00                                    |psci.|
+00000005
+./cpus/cpu@300/enable-method
+00000000  70 73 63 69 00                                    |psci.|
+00000005
+# sha256sum /sys/firmware/fdt /proc/config.gz
+2b6a4c95a548fc6c3612bac1e5c5d787cda32b748879f5f44d23c7f68571da5e  /sys/firmware/fdt
+563dbd9dad04c95540a9d2c983f4175859002747da4832db9d569b2df345c36d  /proc/config.gz
+# 
+[host] Image SHA256: 890e329cf7376a18f6814e8ed400935bc2dfc43e40a42d601656b391f1732fa6
+[host] Image CRC32: 76c87e43, load: 0x01fe0000, entry: 0x01fe0000, arch: 22
+[host] Exact DTB match at image offset 0x1040, SHA256: 2b6a4c95a548fc6c3612bac1e5c5d787cda32b748879f5f44d23c7f68571da5e
+[host] /proc/config.gz exact match to embedded IKCONFIG; decompressed config exact match to kernel.config, SHA256: 35f471f2936e9a5b80a05c8d44beebb8dbb5a214ff7e4a74d64f8e11de03bfe6
+CONFIG_IKCONFIG=y
+CONFIG_IKCONFIG_PROC=y
+# CONFIG_VIRTUALIZATION is not set
+# CONFIG_MODULES is not set
+CONFIG_CMA=y
+# CONFIG_CMA_DEBUGFS is not set
+# CONFIG_CMA_SYSFS is not set
+CONFIG_CMA_AREAS=8
+CONFIG_ARM_PSCI_FW=y
+CONFIG_ARM_ARCH_TIMER=y
+# CONFIG_ARM_ARCH_TIMER_EVTSTREAM is not set
+CONFIG_ARM_GIC=y
+CONFIG_ARM_GIC_MAX_NR=1
+CONFIG_ARM_GIC_V3=y
+CONFIG_ARM_GIC_ITS_PARENT=y
+CONFIG_ARM_GIC_V3_ITS=y
+CONFIG_ARM_GIC_V5=y
+CONFIG_CMA_SIZE_MBYTES=16
+CONFIG_CMA_SIZE_SEL_MBYTES=y
+# CONFIG_CMA_SIZE_SEL_PERCENTAGE is not set
+# CONFIG_CMA_SIZE_SEL_MIN is not set
+# CONFIG_CMA_SIZE_SEL_MAX is not set
+CONFIG_CMA_ALIGNMENT=8

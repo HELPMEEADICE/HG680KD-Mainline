@@ -1,0 +1,149 @@
+
+# uname -r; cat /proc/cmdline; cat /sys/block/mmcblk0/ro; grep -E '^(MemAvailable|SwapTotal|CmaTotal|CmaFree):' /proc/meminfo
+7.3.6-hg680kd-arm64-kvm-test
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+1
+MemAvailable:    1901912 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+# dmesg | grep -iE 'out of memory|oom-kill|killed process|page allocation failure|smmu.*fault|cma.*fail|cma_alloc.*ret: -|vdp.*underflow'
+# /media/mix-run 0 1 base2 baseline
+MIX_BEFORE ram=0MiB clips=1 order=baseline
+MemAvailable:    1901656 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388576 kB
+  18:          0          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  21:          0          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  22:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  24:          0          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+vblank_irqs 0 in_blank 0 last_irq_state 00000000 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+8240 00000000
+8254 00000000
+825c 00000000
+8284 00000000
+828c 00000000
+fetch_underflow 00000000
+closed
+TIMINGS_BEFORE=0
+[   93.503412] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=107150 hw=9908485 detile=0 clear=1301872 sync=0
+MIX_STATUS qemu=0 media=0
+MEDIA_START clip=1 t=75.15
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+[AVHWFramesContext @ 0xffffb2da2f20] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S265
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.412 seconds=18.178 usr=2.87% sys=5.82% idle=91.31% peak_rss_kib=89804
+CPU active cpu0=7.37% cpu1=9.08% cpu2=9.91% cpu3=8.47%
+AVSYNC samples=1079 mean_ms=-0.924 min_ms=-1.333 max_ms=-0.489
+MEDIA_END clip=1 status=0 t=93.41
+MIX_MEMORY_SAMPLES
+SAMPLE t=75.15
+MemAvailable:    1901160 kB
+CmaFree:          388576 kB
+SAMPLE t=76.16
+MemAvailable:    1629620 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=77.16
+MemAvailable:    1629120 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=78.17
+MemAvailable:    1629120 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=79.19
+MemAvailable:    1628872 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=80.19
+MemAvailable:    1628740 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=81.20
+MemAvailable:    1628376 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=82.22
+MemAvailable:    1628128 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=83.23
+MemAvailable:    1627876 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=84.24
+MemAvailable:    1627384 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=85.25
+MemAvailable:    1627136 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=86.26
+MemAvailable:    1627132 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=87.27
+MemAvailable:    1626880 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=88.28
+MemAvailable:    1626880 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=89.29
+MemAvailable:    1626880 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=90.30
+MemAvailable:    1626628 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=91.32
+MemAvailable:    1626140 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=92.33
+MemAvailable:    1626136 kB
+CmaFree:          202388 kB
+state: RUNNING
+SAMPLE t=93.34
+MemAvailable:    1626132 kB
+CmaFree:          202388 kB
+MIX_AFTER
+MemAvailable:    1897736 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          388500 kB
+  18:       1082          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  21:       1080          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  22:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  24:       1800          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+vblank_irqs 1082 in_blank 1082 last_irq_state 01a50023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+8240 0000010a
+8254 71b00000
+825c 722f8000
+8284 726f4000
+828c 728f2000
+fetch_underflow 00000000
+closed
+/sys/class/drm/card0-HDMI-A-1/status:connected
+/sys/class/drm/card0-HDMI-A-1/modes:3840x2160
+<6>[   93.503412] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=107150 hw=9908485 detile=0 clear=1301872 sync=0
+MIX_END
+# dmesg | grep -iE 'out of memory|oom-kill|killed process|page allocation failure|smmu.*fault|cma.*fail|cma_alloc.*ret: -|vdp.*underflow'
+# 
+[host] RESULT ram=0MiB order=baseline clips=1/1 shown=1080 dropped=0 missed=0 xruns=0 fps_min=60.000 min_available=1626132KiB min_cma=202388KiB cma_before=388576KiB cma_after=388500KiB irq_116_122_169_181=1800,1082,1080,0 pcm_running_samples=17 pass=False
+
+[host] Revalidated inline underflow counter. RESULT ram=0MiB order=baseline clips=1/1 shown=1080 dropped=0 missed=0 xruns=0 fps_min=60.000 min_available=1626132KiB min_cma=202388KiB cma_before=388576KiB cma_after=388500KiB irq_116_122_169_181=1800,1082,1080,0 pcm_running_samples=17 pass=True

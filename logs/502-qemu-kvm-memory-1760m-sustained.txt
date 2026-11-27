@@ -1,0 +1,1179 @@
+
+# uname -r; cat /sys/block/mmcblk0/ro; cat /proc/cmdline; grep -E '^(MemTotal|MemAvailable|CmaTotal|CmaFree|SwapTotal):' /proc/meminfo
+7.3.6-hg680kd-arm64-kvm-test
+1
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 ignore_loglevel clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro cma=384M
+MemTotal:        2021212 kB
+MemAvailable:    1915272 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          387184 kB
+# dmesg | grep -iE 'out of memory|oom-kill|killed process|page allocation failure'
+# /qemu/run-guest 1760
+/qemu/run-guest: line 7: [: not found
+/qemu/run-guest: line 7: [: not found
+QEMU RAM=1760MiB, prealloc=on, sampler=/tmp/qemu-1760.mem
+Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+Linux version 7.3.6-hg680kd-qemu-guest (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+random: crng init done
+Machine model: linux,dummy-virt
+OF: reserved mem: Reserved memory: No reserved-memory node in the DT
+psci: probing for conduit method from DT.
+psci: PSCIv1.3 detected in firmware.
+psci: Using standard PSCI v0.2 function IDs
+psci: Trusted OS migration not required
+psci: SMC Calling Convention v1.1
+smccc: KVM: hypervisor services detected (0x00000000 0x00000000 0x00000000 0x00000003)
+Zone ranges:
+  DMA      [mem 0x0000000040000000-0x00000000adffffff]
+  DMA32    empty
+  Normal   empty
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000040000000-0x00000000adffffff]
+Initmem setup node 0 [mem 0x0000000040000000-0x00000000adffffff]
+On node 0, zone DMA: 8192 pages in unavailable ranges
+percpu: Embedded 14 pages/cpu s25440 r0 d31904 u57344
+Detected VIPT I-cache on CPU0
+CPU features: detected: GICv3 CPU interface
+alternatives: applying boot alternatives
+Kernel command line: console=ttyAMA0,115200 rdinit=/init panic=1
+printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+software IO TLB: SWIOTLB bounce buffer size adjusted to 1MB
+software IO TLB: area num 2.
+software IO TLB: SWIOTLB bounce buffer size roundup to 2MB
+software IO TLB: mapped [mem 0x00000000abb00000-0x00000000abd00000] (2MB)
+Built 1 zonelists, mobility grouping on.  Total pages: 450560
+mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+rcu: Hierarchical RCU implementation.
+rcu: 	RCU restricting CPUs from NR_CPUS=512 to nr_cpu_ids=2.
+rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+GICv3: 256 SPIs implemented
+GICv3: 0 Extended SPIs implemented
+Root IRQ handler: gic_handle_irq
+GICv3: GICv3 features: 16 PPIs, DirectLPI
+GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+GICv3: CPU0: found redistributor 0 region 0:0x00000000080a0000
+rcu: srcu_init: Setting srcu_struct sizes based on contention.
+clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+arch_timer: cp15 timer running at 24.00MHz (virt).
+clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+Console: colour dummy device 80x25
+Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+VFS: Finished mounting rootfs on nullfs
+rcu: Hierarchical SRCU implementation.
+rcu: 	Max phase no-delay instances is 1000.
+smp: Bringing up secondary CPUs ...
+Detected VIPT I-cache on CPU1
+GICv3: CPU1: found redistributor 1 region 0:0x00000000080c0000
+CPU1: Booted secondary processor 0x0000000001 [0x412fd050]
+smp: Brought up 1 node, 2 CPUs
+SMP: Total of 2 processors activated.
+CPU: All CPU(s) started at EL1
+CPU features: detected: 32-bit EL0 Support
+CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+CPU features: detected: CRC32 instructions
+CPU features: detected: RCpc load-acquire (LDAPR)
+CPU features: detected: LSE atomic instructions
+CPU features: detected: Privileged Access Never
+CPU features: detected: XNX
+CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+alternatives: applying system-wide alternatives
+Memory: 1754860K/1802240K available (2816K kernel code, 632K rwdata, 640K rodata, 768K init, 359K bss, 44552K reserved, 0K cma-reserved)
+devtmpfs: initialized
+posixtimers hash table entries: 1024 (order: 2, 16384 bytes, linear)
+futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+ASID allocator initialised with 65536 entries
+Serial: AMBA PL011 UART driver
+9000000.pl011: ttyAMA0 MMIO:0x0000000009000000 (irq = 13, base_baud = 0) is a PL011 rev1
+printk: console [ttyAMA0] enabled
+clocksource: Switched to clocksource arch_sys_counter
+Unpacking initramfs...
+workingset: timestamp_bits=62 (anon: 57) max_order=19 bucket_order=0 (anon: 0)
+Freeing initrd memory: 500K
+clk: Disabling unused clocks
+Freeing unused kernel memory: 768K
+Run /init as init process
+HG680KD QEMU/KVM ARM64 guest
+
+
+BusyBox v1.37.0 (2025-12-01 08:00:00 CST) built-in shell (ash)
+
+guest# QEMU 10.1.5 monitor - type 'help' for more information
+(qemu) i[K[Din[K[D[Dinf[K[D[D[Dinfo[K[D[D[D[Dinfo [K[D[D[D[D[Dinfo k[K[D[D[D[D[D[Dinfo kv[K[D[D[D[D[D[D[Dinfo kvm[K
+kvm support: enabled
+(qemu) 
+
+guest# uname -a; cat /sys/devices/system/cpu/online; cat /sys/devices/system/clocksource/clocksource0/current_clocksource; dmesg | grep -E 'GICv3|arch_timer|Brought up'
+Linux (none) 7.3.6-hg680kd-qemu-guest #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+0-1
+arch_sys_counter
+<6>CPU features: detected: GICv3 CPU interface
+<6>GICv3: 256 SPIs implemented
+<6>GICv3: 0 Extended SPIs implemented
+<6>GICv3: GICv3 features: 16 PPIs, DirectLPI
+<6>GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+<6>GICv3: CPU0: found redistributor 0 region 0:0x00000000080a0000
+<6>arch_timer: cp15 timer running at 24.00MHz (virt).
+<6>GICv3: CPU1: found redistributor 1 region 0:0x00000000080c0000
+<6>smp: Brought up 1 node, 2 CPUs
+guest# sleep 2; cat /proc/uptime; cat /proc/interrupts
+2.56 4.70
+            CPU0       CPU1       
+  11:        626        635  GICv3      27 Level     arch_timer
+  13:          3          0  GICv3      33 Level     uart-pl011
+IPI0:          7         14  Rescheduling interrupts
+IPI1:        108        115  Function call interrupts
+IPI2:          0          0  CPU stop interrupts
+IPI3:          0          0  CPU stop NMIs
+IPI4:          0          0  Timer broadcast interrupts
+IPI5:          0          0  IRQ work interrupts
+IPI6:          0          0  CPU backtrace interrupts
+IPI7:          0          0  KGDB roundup interrupts
+ Err:          0
+guest# sleep 2; cat /proc/uptime; cat /proc/interrupts
+4.69 8.84
+            CPU0       CPU1       
+  11:       1144       1166  GICv3      27 Level     arch_timer
+  13:          4          0  GICv3      33 Level     uart-pl011
+IPI0:          9         14  Rescheduling interrupts
+IPI1:        108        123  Function call interrupts
+IPI2:          0          0  CPU stop interrupts
+IPI3:          0          0  CPU stop NMIs
+IPI4:          0          0  Timer broadcast interrupts
+IPI5:          0          0  IRQ work interrupts
+IPI6:          0          0  CPU backtrace interrupts
+IPI7:          0          0  KGDB roundup interrupts
+ Err:          0
+guest# grep -E '^(MemTotal|MemAvailable|CmaTotal|CmaFree|SwapTotal):' /proc/meminfo
+MemTotal:        1758956 kB
+MemAvailable:    1739960 kB
+SwapTotal:             0 kB
+guest# /bin/guest-memcheck 1683 120
+GUEST-MEM start: 1683 MiB, minimum 120 s
+GUEST-MEM pass=1 elapsed=8.41 s
+GUEST-MEM pass=5 elapsed=19.72 s
+GUEST-MEM pass=10 elapsed=35.29 s
+GUEST-MEM pass=15 elapsed=48.75 s
+GUEST-MEM pass=20 elapsed=58.72 s
+GUEST-MEM pass=25 elapsed=72.93 s
+GUEST-MEM pass=30 elapsed=88.56 s
+GUEST-MEM pass=35 elapsed=101.88 s
+GUEST-MEM pass=40 elapsed=113.26 s
+GUEST-MEM PASS: 1683 MiB, 43 full write/verify passes, 122.97 s
+guest# uname -a; cat /sys/devices/system/cpu/online; cat /sys/devices/system/clocksource/clocksource0/current_clocksource; dmesg | grep -E 'GICv3|arch_timer|Brought up'
+Linux (none) 7.3.6-hg680kd-qemu-guest #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64
+0-1
+arch_sys_counter
+<6>CPU features: detected: GICv3 CPU interface
+<6>GICv3: 256 SPIs implemented
+<6>GICv3: 0 Extended SPIs implemented
+<6>GICv3: GICv3 features: 16 PPIs, DirectLPI
+<6>GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+<6>GICv3: CPU0: found redistributor 0 region 0:0x00000000080a0000
+<6>arch_timer: cp15 timer running at 24.00MHz (virt).
+<6>GICv3: CPU1: found redistributor 1 region 0:0x00000000080c0000
+<6>smp: Brought up 1 node, 2 CPUs
+guest# sleep 2; cat /proc/uptime; cat /proc/interrupts
+130.78 137.01
+            CPU0       CPU1       
+  11:      32622      32679  GICv3      27 Level     arch_timer
+  13:          8          0  GICv3      33 Level     uart-pl011
+IPI0:         14         14  Rescheduling interrupts
+IPI1:        121        136  Function call interrupts
+IPI2:          0          0  CPU stop interrupts
+IPI3:          0          0  CPU stop NMIs
+IPI4:          0          0  Timer broadcast interrupts
+IPI5:          0          0  IRQ work interrupts
+IPI6:          0          0  CPU backtrace interrupts
+IPI7:          0          0  KGDB roundup interrupts
+ Err:          0
+guest# sleep 2; cat /proc/uptime; cat /proc/interrupts
+132.88 141.12
+            CPU0       CPU1       
+  11:      33142      33206  GICv3      27 Level     arch_timer
+  13:         10          0  GICv3      33 Level     uart-pl011
+IPI0:         16         15  Rescheduling interrupts
+IPI1:        122        144  Function call interrupts
+IPI2:          0          0  CPU stop interrupts
+IPI3:          0          0  CPU stop NMIs
+IPI4:          0          0  Timer broadcast interrupts
+IPI5:          0          0  IRQ work interrupts
+IPI6:          0          0  CPU backtrace interrupts
+IPI7:          0          0  KGDB roundup interrupts
+ Err:          0
+guest# reboot -f
+reboot: Restarting system
+QEMU-EXIT=0
+# sleep 2; grep -E '^(MemTotal|MemAvailable|CmaTotal|CmaFree|SwapTotal):' /proc/meminfo
+MemTotal:        2021212 kB
+MemAvailable:    1911988 kB
+SwapTotal:             0 kB
+CmaTotal:         393216 kB
+CmaFree:          387892 kB
+# cat /tmp/qemu-1760.mem
+time=180.62 599.71
+MemTotal:        2021212 kB
+MemAvailable:    1915024 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          387184 kB
+time=181.63 602.72
+MemTotal:        2021212 kB
+MemAvailable:    1394560 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          387184 kB
+time=182.64 605.74
+MemTotal:        2021212 kB
+MemAvailable:     791264 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:          387184 kB
+time=183.64 608.76
+MemTotal:        2021212 kB
+MemAvailable:     181876 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           94744 kB
+time=184.65 611.83
+MemTotal:        2021212 kB
+MemAvailable:      70808 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=185.67 615.67
+MemTotal:        2021212 kB
+MemAvailable:      70788 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=186.68 619.71
+MemTotal:        2021212 kB
+MemAvailable:      70296 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=187.68 623.59
+MemTotal:        2021212 kB
+MemAvailable:      70048 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=188.69 627.62
+MemTotal:        2021212 kB
+MemAvailable:      70044 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=189.70 630.86
+MemTotal:        2021212 kB
+MemAvailable:      69792 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=190.71 633.87
+MemTotal:        2021212 kB
+MemAvailable:      69288 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=191.71 636.88
+MemTotal:        2021212 kB
+MemAvailable:      68296 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=192.72 639.90
+MemTotal:        2021212 kB
+MemAvailable:      68280 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=193.73 642.91
+MemTotal:        2021212 kB
+MemAvailable:      66296 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=194.73 645.92
+MemTotal:        2021212 kB
+MemAvailable:      67500 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=195.74 648.94
+MemTotal:        2021212 kB
+MemAvailable:      69288 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=196.75 651.96
+MemTotal:        2021212 kB
+MemAvailable:      70780 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39384 kB
+time=197.76 654.97
+MemTotal:        2021212 kB
+MemAvailable:      72164 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           39632 kB
+time=198.76 657.98
+MemTotal:        2021212 kB
+MemAvailable:      73140 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           40092 kB
+time=199.77 661.00
+MemTotal:        2021212 kB
+MemAvailable:      74316 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           40556 kB
+time=200.78 664.02
+MemTotal:        2021212 kB
+MemAvailable:      75496 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           41300 kB
+time=201.79 667.04
+MemTotal:        2021212 kB
+MemAvailable:      76952 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           41944 kB
+time=202.80 670.07
+MemTotal:        2021212 kB
+MemAvailable:      77492 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           42092 kB
+time=203.81 673.08
+MemTotal:        2021212 kB
+MemAvailable:      78244 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           42416 kB
+time=204.83 676.11
+MemTotal:        2021212 kB
+MemAvailable:      78688 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           42744 kB
+time=205.84 679.13
+MemTotal:        2021212 kB
+MemAvailable:      78832 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           42832 kB
+time=206.85 682.16
+MemTotal:        2021212 kB
+MemAvailable:      78972 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           43036 kB
+time=207.86 685.18
+MemTotal:        2021212 kB
+MemAvailable:      79432 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           43280 kB
+time=208.87 688.20
+MemTotal:        2021212 kB
+MemAvailable:      79832 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           43484 kB
+time=209.88 691.23
+MemTotal:        2021212 kB
+MemAvailable:      80368 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           43596 kB
+time=210.89 694.24
+MemTotal:        2021212 kB
+MemAvailable:      79980 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           43704 kB
+time=211.91 697.27
+MemTotal:        2021212 kB
+MemAvailable:      80512 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           43940 kB
+time=212.92 700.29
+MemTotal:        2021212 kB
+MemAvailable:      80660 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44004 kB
+time=213.93 703.31
+MemTotal:        2021212 kB
+MemAvailable:      81032 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44280 kB
+time=214.94 706.34
+MemTotal:        2021212 kB
+MemAvailable:      80876 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44284 kB
+time=215.95 709.36
+MemTotal:        2021212 kB
+MemAvailable:      80872 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44316 kB
+time=216.96 712.38
+MemTotal:        2021212 kB
+MemAvailable:      81312 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44316 kB
+time=217.98 715.41
+MemTotal:        2021212 kB
+MemAvailable:      81196 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44396 kB
+time=218.99 718.43
+MemTotal:        2021212 kB
+MemAvailable:      81120 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44472 kB
+time=220.00 721.46
+MemTotal:        2021212 kB
+MemAvailable:      81556 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44672 kB
+time=221.01 724.48
+MemTotal:        2021212 kB
+MemAvailable:      81508 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44888 kB
+time=222.02 727.50
+MemTotal:        2021212 kB
+MemAvailable:      81708 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44892 kB
+time=223.03 730.52
+MemTotal:        2021212 kB
+MemAvailable:      82020 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45084 kB
+time=224.05 733.54
+MemTotal:        2021212 kB
+MemAvailable:      81816 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45208 kB
+time=225.06 736.56
+MemTotal:        2021212 kB
+MemAvailable:      82316 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45208 kB
+time=226.07 739.58
+MemTotal:        2021212 kB
+MemAvailable:      81808 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45080 kB
+time=227.08 742.60
+MemTotal:        2021212 kB
+MemAvailable:      81868 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45204 kB
+time=228.09 745.63
+MemTotal:        2021212 kB
+MemAvailable:      82140 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45032 kB
+time=229.10 748.65
+MemTotal:        2021212 kB
+MemAvailable:      82076 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45084 kB
+time=230.12 751.68
+MemTotal:        2021212 kB
+MemAvailable:      81584 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44844 kB
+time=231.13 754.70
+MemTotal:        2021212 kB
+MemAvailable:      81900 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44844 kB
+time=232.14 757.72
+MemTotal:        2021212 kB
+MemAvailable:      82152 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45032 kB
+time=233.15 760.75
+MemTotal:        2021212 kB
+MemAvailable:      82132 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45132 kB
+time=234.16 763.77
+MemTotal:        2021212 kB
+MemAvailable:      81964 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45132 kB
+time=235.17 766.79
+MemTotal:        2021212 kB
+MemAvailable:      81904 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45284 kB
+time=236.18 769.80
+MemTotal:        2021212 kB
+MemAvailable:      81984 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45088 kB
+time=237.19 772.82
+MemTotal:        2021212 kB
+MemAvailable:      81936 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45096 kB
+time=238.20 775.84
+MemTotal:        2021212 kB
+MemAvailable:      82044 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45132 kB
+time=239.20 778.85
+MemTotal:        2021212 kB
+MemAvailable:      81904 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45160 kB
+time=240.21 781.87
+MemTotal:        2021212 kB
+MemAvailable:      82016 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45196 kB
+time=241.22 784.88
+MemTotal:        2021212 kB
+MemAvailable:      81868 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45228 kB
+time=242.23 787.91
+MemTotal:        2021212 kB
+MemAvailable:      81904 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45184 kB
+time=243.24 790.93
+MemTotal:        2021212 kB
+MemAvailable:      82020 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45148 kB
+time=244.25 793.95
+MemTotal:        2021212 kB
+MemAvailable:      82212 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45340 kB
+time=245.26 796.96
+MemTotal:        2021212 kB
+MemAvailable:      82056 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45152 kB
+time=246.26 799.98
+MemTotal:        2021212 kB
+MemAvailable:      82012 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45212 kB
+time=247.27 803.00
+MemTotal:        2021212 kB
+MemAvailable:      82076 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45052 kB
+time=248.28 806.01
+MemTotal:        2021212 kB
+MemAvailable:      82284 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45104 kB
+time=249.29 809.03
+MemTotal:        2021212 kB
+MemAvailable:      82296 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45104 kB
+time=250.30 812.05
+MemTotal:        2021212 kB
+MemAvailable:      81980 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45224 kB
+time=251.31 815.06
+MemTotal:        2021212 kB
+MemAvailable:      82472 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45224 kB
+time=252.32 818.09
+MemTotal:        2021212 kB
+MemAvailable:      82372 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45248 kB
+time=253.33 821.11
+MemTotal:        2021212 kB
+MemAvailable:      81872 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44876 kB
+time=254.34 824.14
+MemTotal:        2021212 kB
+MemAvailable:      81740 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44856 kB
+time=255.35 827.15
+MemTotal:        2021212 kB
+MemAvailable:      81840 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44856 kB
+time=256.36 830.16
+MemTotal:        2021212 kB
+MemAvailable:      81588 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44856 kB
+time=257.37 833.19
+MemTotal:        2021212 kB
+MemAvailable:      81608 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44980 kB
+time=258.39 836.21
+MemTotal:        2021212 kB
+MemAvailable:      81604 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44776 kB
+time=259.40 839.24
+MemTotal:        2021212 kB
+MemAvailable:      81428 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44776 kB
+time=260.41 842.26
+MemTotal:        2021212 kB
+MemAvailable:      81680 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44900 kB
+time=261.42 845.28
+MemTotal:        2021212 kB
+MemAvailable:      81680 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44904 kB
+time=262.43 848.30
+MemTotal:        2021212 kB
+MemAvailable:      81932 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45028 kB
+time=263.44 851.32
+MemTotal:        2021212 kB
+MemAvailable:      81932 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45032 kB
+time=264.45 854.35
+MemTotal:        2021212 kB
+MemAvailable:      82308 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44908 kB
+time=265.46 857.37
+MemTotal:        2021212 kB
+MemAvailable:      82108 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44952 kB
+time=266.48 860.40
+MemTotal:        2021212 kB
+MemAvailable:      82232 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44952 kB
+time=267.49 863.42
+MemTotal:        2021212 kB
+MemAvailable:      82156 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44952 kB
+time=268.50 866.44
+MemTotal:        2021212 kB
+MemAvailable:      82292 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           44952 kB
+time=269.51 869.46
+MemTotal:        2021212 kB
+MemAvailable:      82544 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45076 kB
+time=270.53 872.49
+MemTotal:        2021212 kB
+MemAvailable:      82544 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=271.54 875.51
+MemTotal:        2021212 kB
+MemAvailable:      82540 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=272.55 878.54
+MemTotal:        2021212 kB
+MemAvailable:      82744 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=273.56 881.56
+MemTotal:        2021212 kB
+MemAvailable:      82628 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=274.57 884.58
+MemTotal:        2021212 kB
+MemAvailable:      82660 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=275.58 887.61
+MemTotal:        2021212 kB
+MemAvailable:      82660 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=276.59 890.63
+MemTotal:        2021212 kB
+MemAvailable:      82916 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=277.61 893.66
+MemTotal:        2021212 kB
+MemAvailable:      82424 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=278.62 896.68
+MemTotal:        2021212 kB
+MemAvailable:      82676 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=279.63 899.70
+MemTotal:        2021212 kB
+MemAvailable:      82424 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45116 kB
+time=280.64 902.72
+MemTotal:        2021212 kB
+MemAvailable:      82672 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45488 kB
+time=281.65 905.75
+MemTotal:        2021212 kB
+MemAvailable:      82604 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45624 kB
+time=282.66 908.77
+MemTotal:        2021212 kB
+MemAvailable:      82508 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45500 kB
+time=283.68 911.80
+MemTotal:        2021212 kB
+MemAvailable:      82748 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45472 kB
+time=284.69 914.82
+MemTotal:        2021212 kB
+MemAvailable:      82792 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45472 kB
+time=285.70 917.84
+MemTotal:        2021212 kB
+MemAvailable:      82308 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45472 kB
+time=286.71 920.86
+MemTotal:        2021212 kB
+MemAvailable:      82920 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45608 kB
+time=287.72 923.88
+MemTotal:        2021212 kB
+MemAvailable:      82768 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45608 kB
+time=288.73 926.89
+MemTotal:        2021212 kB
+MemAvailable:      83020 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45608 kB
+time=289.74 929.91
+MemTotal:        2021212 kB
+MemAvailable:      82280 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45132 kB
+time=290.75 932.92
+MemTotal:        2021212 kB
+MemAvailable:      81932 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45044 kB
+time=291.75 935.94
+MemTotal:        2021212 kB
+MemAvailable:      82448 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45056 kB
+time=292.76 938.96
+MemTotal:        2021212 kB
+MemAvailable:      82196 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45104 kB
+time=293.77 941.98
+MemTotal:        2021212 kB
+MemAvailable:      82208 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45224 kB
+time=294.78 944.99
+MemTotal:        2021212 kB
+MemAvailable:      82516 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45224 kB
+time=295.79 948.02
+MemTotal:        2021212 kB
+MemAvailable:      82328 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45160 kB
+time=296.80 951.04
+MemTotal:        2021212 kB
+MemAvailable:      82328 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45200 kB
+time=297.81 954.06
+MemTotal:        2021212 kB
+MemAvailable:      82580 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45224 kB
+time=298.82 957.08
+MemTotal:        2021212 kB
+MemAvailable:      82832 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45224 kB
+time=299.83 960.10
+MemTotal:        2021212 kB
+MemAvailable:      83080 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45224 kB
+time=300.84 963.11
+MemTotal:        2021212 kB
+MemAvailable:      83084 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45328 kB
+time=301.85 966.14
+MemTotal:        2021212 kB
+MemAvailable:      82956 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45328 kB
+time=302.86 969.16
+MemTotal:        2021212 kB
+MemAvailable:      82836 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45328 kB
+time=303.87 972.18
+MemTotal:        2021212 kB
+MemAvailable:      82744 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45328 kB
+time=304.88 975.20
+MemTotal:        2021212 kB
+MemAvailable:      82872 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45328 kB
+time=305.89 978.22
+MemTotal:        2021212 kB
+MemAvailable:      82676 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45328 kB
+time=306.90 981.24
+MemTotal:        2021212 kB
+MemAvailable:      82608 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45328 kB
+time=307.91 984.26
+MemTotal:        2021212 kB
+MemAvailable:      82768 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45336 kB
+time=308.92 987.29
+MemTotal:        2021212 kB
+MemAvailable:      82172 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+time=309.93 990.30
+MemTotal:        2021212 kB
+MemAvailable:      82308 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+time=310.95 993.33
+MemTotal:        2021212 kB
+MemAvailable:      82312 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+time=311.96 996.35
+MemTotal:        2021212 kB
+MemAvailable:      82472 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+time=312.97 999.33
+MemTotal:        2021212 kB
+MemAvailable:      82508 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+time=313.98 1003.30
+MemTotal:        2021212 kB
+MemAvailable:      82564 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+time=314.99 1007.33
+MemTotal:        2021212 kB
+MemAvailable:      82724 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+time=316.00 1011.24
+MemTotal:        2021212 kB
+MemAvailable:      82256 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+time=317.01 1015.27
+MemTotal:        2021212 kB
+MemAvailable:      82512 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+CmaTotal:         393216 kB
+CmaFree:           45016 kB
+# dmesg | grep -iE 'out of memory|oom-kill|killed process|page allocation failure'
+# 
+[host] RESULT memory=1760MiB stress=1683MiB host_min_available=66296KiB host_min_cma_free=39384KiB samples=136

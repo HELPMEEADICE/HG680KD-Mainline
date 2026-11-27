@@ -1,0 +1,31 @@
+HG680KD Linux 7.3.6 QEMU/KVM and 3840x2160p60 HEVC Main10 + HDMI + AIAO
+CMA total 384 MiB. One preallocated 2-vCPU guest. No swap. VM-first unless baseline.
+Each clip has 1080 video frames and 18 seconds of 48 kHz stereo PCM.
+A short trial runs one clip. A sustained trial runs six consecutive plays.
+Lowest memory values are samples. Pass requires 0 drops, 0 missed vblanks, 0 XRUN and at least 64 MiB host MemAvailable.
+Resident trials use either a 1 MiB one-second warm-up or explicit idle readiness (idle-named logs).
+
+RAM MiB | Workload | Plays | Decoded | Shown | Dropped | XRUN | Avail min MiB | CMA min MiB | CMA after MiB | Pass | Serial log
+0 | baseline | 1 | 1080 | 1080 | 0 | 0 | 1588.0 | 197.6 | 379.4 | True | logs/504-kvm-media-baseline-final.txt
+0 | baseline | 6 | 6480 | 6476 | 4 | 0 | 1587.0 | 197.5 | 379.3 | False | logs/517-kvm-media-baseline-sustained.txt
+768 | memcheck | 6 | 6480 | 6473 | 7 | 0 | 790.9 | 196.9 | 379.3 | False | logs/512-kvm-media-768m-sustained.txt
+1024 | memcheck | 1 | 1080 | 1080 | 0 | 0 | 533.6 | 197.6 | 379.4 | True | logs/505-kvm-media-1024m.txt
+1024 | memcheck | 6 | 6480 | 6474 | 6 | 0 | 528.7 | 197.2 | 379.2 | False | logs/510-kvm-media-1024m-sustained.txt
+1024 | resident | 1 | 1080 | 1080 | 0 | 0 | 540.9 | 197.6 | 379.4 | True | logs/513-kvm-media-resident-1024m.txt
+1024 | resident | 6 | 6480 | 6476 | 4 | 0 | 538.2 | 197.4 | 379.4 | False | logs/516-kvm-media-idle-1024m-sustained.txt
+1152 | memcheck | 1 | 1080 | 1080 | 0 | 0 | 409.9 | 169.1 | 379.3 | True | logs/506-kvm-media-1152m.txt
+1152 | memcheck | 6 | 6480 | 6466 | 14 | 0 | 404.6 | 168.3 | 379.0 | False | logs/509-kvm-media-1152m-sustained.txt
+1152 | resident | 1 | 1080 | 1080 | 0 | 0 | 411.5 | 165.9 | 378.9 | True | logs/514-kvm-media-idle-1152m.txt
+1152 | resident | 6 | 6480 | 6478 | 2 | 0 | 410.5 | 165.0 | 377.7 | False | logs/515-kvm-media-idle-1152m-sustained.txt
+1216 | memcheck | 1 | 1080 | 1080 | 0 | 0 | 343.5 | 164.0 | 375.8 | True | logs/506-kvm-media-1216m.txt
+1216 | memcheck | 6 | 6480 | 6450 | 30 | 0 | 331.4 | 155.8 | 379.2 | False | logs/508-kvm-media-1216m-sustained.txt
+1232 | memcheck | 1 | 1080 | 1077 | 3 | 0 | 326.3 | 149.7 | 379.1 | False | logs/507-kvm-media-1232m.txt
+1248 | memcheck | 1 | 1080 | 1079 | 1 | 0 | 307.1 | 142.1 | 378.7 | False | logs/507-kvm-media-1248m.txt
+1280 | memcheck | 1 | 1080 | 1076 | 4 | 0 | 278.1 | 143.7 | 377.2 | False | logs/506-kvm-media-1280m.txt
+1280 | resident | 1 | 1080 | 1065 | 15 | 0 | 268.6 | 143.2 | 376.9 | False | logs/513-kvm-media-resident-1280m.txt
+1280 | resident | 1 | 1080 | 1078 | 2 | 0 | 277.8 | 126.2 | 378.8 | False | logs/514-kvm-media-idle-1280m.txt
+1344 | memcheck | 1 | 1080 | 1071 | 9 | 0 | 214.4 | 113.5 | 377.9 | False | logs/505-kvm-media-1344m.txt
+1408 | resident | 1 | 1080 | 1073 | 7 | 0 | 146.0 | 78.6 | 375.7 | False | logs/513-kvm-media-resident-1408m.txt
+1472 | memcheck | 1 | 1080 | 1073 | 7 | 0 | 81.1 | 49.0 | 377.8 | False | logs/505-kvm-media-1472m.txt
+1488 | resident | 1 | 1080 | 1035 | 45 | 0 | 75.2 | 42.9 | 377.3 | False | logs/511-kvm-media-resident-1488m.txt
+1504 | resident | 1 | 1080 | 1064 | 16 | 0 | 58.6 | 34.9 | 378.5 | False | logs/511-kvm-media-resident-1504m.txt
