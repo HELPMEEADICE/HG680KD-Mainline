@@ -1,0 +1,65 @@
+
+# (uname -r); printf '\nEXIT=%s\n' $?
+7.3.6-hg680kd-arm64-jpgd
+
+EXIT=0
+# (ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (cd /tmp && wget -q -O 638x478-dri.jpg http://192.168.6.172:8088/638x478-dri.jpg && sha256sum 638x478-dri.jpg); printf '\nEXIT=%s\n' $?
+3de60cc4278fb5678b902d7d27f2e43f9140f7c0d17227bf497e998cef17084f  638x478-dri.jpg
+
+EXIT=0
+# (grep -E 'GICv3 +(116|122|129|169|181) ' /proc/interrupts; grep '^Cma' /proc/meminfo; cat /sys/kernel/debug/dma_buf/bufinfo); printf '\nEXIT=%s\n' $?
+  16:         64          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  19:          2          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  21:        124          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  22:       1000          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+CmaTotal:         393216 kB
+CmaFree:          388548 kB
+
+Dma-buf Objects:
+size    	flags   	mode    	count   	exp_name	ino     	name
+
+Total 0 objects, 0 bytes
+
+EXIT=0
+# (/tmp/jpgd-test /dev/video1 638 478 /tmp/638x478-dri.jpg --export --send 192.168.6.172 10154); printf '\nEXIT=%s\n' $?
+device=/dev/video1 driver=hi3798-jpgd visible=638x478 capture=638x480 stride=640 format=NV12 buffers=1
+frames=1 rejected=0 elapsed_ms=22.298 fps=44.848 ms_per_frame=22.298 mean_queue_latency_ms=1.127
+cpu0_busy=0.00% cpu1_busy=50.00% cpu2_busy=0.00% cpu3_busy=0.00% cpu4_average_busy=12.50%
+
+EXIT=0
+# (grep -E 'GICv3 +(116|122|129|169|181) ' /proc/interrupts; grep '^Cma' /proc/meminfo; cat /sys/kernel/debug/dma_buf/bufinfo); printf '\nEXIT=%s\n' $?
+  16:         64          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  19:          2          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  21:        125          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  22:       1000          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+CmaTotal:         393216 kB
+CmaFree:          388568 kB
+
+Dma-buf Objects:
+size    	flags   	mode    	count   	exp_name	ino     	name
+
+Total 0 objects, 0 bytes
+
+EXIT=0
+# [host] 638x478-dri NV12 PSNR Y/U/V 62.649/66.410/66.100 dB MAE Y/U/V 0.0353/0.0149/0.0160
+(grep -E 'GICv3 +(116|122|129|169|181) ' /proc/interrupts; grep '^Cma' /proc/meminfo; cat /sys/kernel/debug/dma_buf/bufinfo); printf '\nEXIT=%s\n' $?
+  16:         64          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  19:          2          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  21:        125          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  22:       1000          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+CmaTotal:         393216 kB
+CmaFree:          388568 kB
+
+Dma-buf Objects:
+size    	flags   	mode    	count   	exp_name	ino     	name
+
+Total 0 objects, 0 bytes
+
+EXIT=0
+#

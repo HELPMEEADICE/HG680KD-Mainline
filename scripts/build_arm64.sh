@@ -4,6 +4,9 @@ set -euo pipefail
 root=${1:-"$HOME/hg680kd-mainline"}
 inputs=${2:-"$root/inputs"}
 variant=${3:-core}
+if [[ $variant == 7.3.6-jpgd ]]; then
+    exec bash "$(dirname "$0")/build_jpgd_736.sh" "$root" "$inputs"
+fi
 jobs=${JOBS:-$(nproc)}
 linux_ver=${LINUX_VERSION:-6.18.64}
 base_variant=$variant
@@ -141,6 +144,7 @@ else
     apply_board_patch "$inputs/0004-NET-hix5hd2-try-Hi3798MV320-GMAC.patch"
     apply_board_patch "$patch_0005"
     install -m644 "$inputs/crg-hi3798mv320-reset.c" "$linux/drivers/clk/hisilicon/"
+    install -m644 "$inputs/hisilicon,hi3798mv320-jpgd.h" "$linux/include/dt-bindings/clock/"
     install -m644 "$inputs/hi3798mv320-fiberhome-hg680kd-arm64.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi
 

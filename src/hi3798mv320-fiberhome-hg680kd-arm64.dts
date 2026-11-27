@@ -118,5 +118,14 @@
 			clock-names = "uartclk", "apb_pclk";
 			arm,primecell-periphid = <0x00241011>;
 		};
+
+		jpgd: jpeg-decoder@f8c40000 {
+			compatible = "hisilicon,hi3798mv320-jpgd";
+			reg = <0x0 0xf8c40000 0x0 0x6f0>,
+			      <0x0 0xf8c4f000 0x0 0x364>;
+			reg-names = "core", "smmu";
+			interrupts = <GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>;
+			status = "disabled";
+		};
 	};
 };

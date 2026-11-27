@@ -1,0 +1,8 @@
+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
+#ifndef _DT_BINDINGS_CLK_HI3798MV320_JPGD_H
+#define _DT_BINDINGS_CLK_HI3798MV320_JPGD_H
+
+#define HI3798MV320_CLK_JPGD		4
+#define HI3798MV320_CLK_JPGD_SMMU	5
+
+#endif

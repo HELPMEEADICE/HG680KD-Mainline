@@ -10,6 +10,7 @@
 #include <linux/of.h>
 #include <linux/platform_device.h>
 #include <linux/spinlock.h>
+#include <dt-bindings/clock/hisilicon,hi3798mv320-jpgd.h>
 
 #include "reset.h"
 
@@ -22,6 +23,8 @@
 #define CRG_VDEC_CTRL		0x078
 #define CRG_VDEC_DISABLE	BIT(0)
 #define CRG_VDEC_INIT_MASK	(GENMASK(9, 8) | GENMASK(17, 12))
+#define CRG_JPGD_CTRL		0x07c
+#define CRG_JPGD_SMMU_CTRL	0x334
 
 #define CRG_APLL_FRAC		0x000
 #define CRG_APLL_DIV		0x004
@@ -363,8 +366,9 @@ static int hi3798mv320_register_clks(struct platform_device *pdev,
 	struct device *dev = &pdev->dev;
 	bool dvfs = of_device_is_compatible(dev->of_node, "hisilicon,hi3798mv320-crg-dvfs");
 	bool vdec = of_device_is_compatible(dev->of_node, "hisilicon,hi3798mv320-crg-vpu-probe");
-	unsigned int num_clks = vdec ? 4 : dvfs ? 3 : 2;
+	unsigned int num_clks = HI3798MV320_CLK_JPGD_SMMU + 1;
 	struct resource *res;
+	struct clk_hw *hw;
 	int i, ret;
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
@@ -423,6 +427,18 @@ static int hi3798mv320_register_clks(struct platform_device *pdev,
 			return ret;
 		priv->clk_data->hws[3] = &priv->vdec_clk;
 	}
+
+	/* These gates share their CRG words with the corresponding reset bits. */
+	hw = devm_clk_hw_register_gate(dev, "jpgd", NULL, 0,
+				       priv->base + CRG_JPGD_CTRL, 0, 0, &priv->lock);
+	if (IS_ERR(hw))
+		return PTR_ERR(hw);
+	priv->clk_data->hws[HI3798MV320_CLK_JPGD] = hw;
+	hw = devm_clk_hw_register_gate(dev, "jpgd_smmu", NULL, 0,
+				       priv->base + CRG_JPGD_SMMU_CTRL, 0, 0, &priv->lock);
+	if (IS_ERR(hw))
+		return PTR_ERR(hw);
+	priv->clk_data->hws[HI3798MV320_CLK_JPGD_SMMU] = hw;
 
 	return devm_of_clk_add_hw_provider(dev, of_clk_hw_onecell_get, priv->clk_data);
 }

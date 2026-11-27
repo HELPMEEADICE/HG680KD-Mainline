@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/media/hisilicon,hi3798mv320-jpgd.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: HiSilicon Hi3798MV320 JPEG decoder
+
+maintainers:
+  - HELPMEEADICE <yuanzhenpeng210@gmail.com>
+
+description:
+  The JPEG decoder has a private SMMU register aperture. The driver can
+  configure this SMMU for physical DMA without an external IOMMU provider.
+
+properties:
+  compatible:
+    const: hisilicon,hi3798mv320-jpgd
+
+  reg:
+    items:
+      - description: JPEG decoder core registers
+      - description: Private SMMU registers
+
+  reg-names:
+    items:
+      - const: core
+      - const: smmu
+
+  interrupts:
+    maxItems: 1
+
+  clocks:
+    items:
+      - description: Decoder core gate
+      - description: Private SMMU gate
+
+  clock-names:
+    items:
+      - const: core
+      - const: smmu
+
+  resets:
+    items:
+      - description: Decoder core reset
+      - description: Private SMMU reset
+
+  reset-names:
+    items:
+      - const: core
+      - const: smmu
+
+required:
+  - compatible
+  - reg
+  - reg-names
+  - interrupts
+  - clocks
+  - clock-names
+  - resets
+  - reset-names
+
+additionalProperties: false

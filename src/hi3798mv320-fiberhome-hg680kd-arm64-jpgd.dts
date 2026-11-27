@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+#include "hi3798mv320-fiberhome-hg680kd-arm64-aiao.dts"
+#include <dt-bindings/clock/hisilicon,hi3798mv320-jpgd.h>
+
+&jpgd {
+	clocks = <&crg HI3798MV320_CLK_JPGD>, <&crg HI3798MV320_CLK_JPGD_SMMU>;
+	clock-names = "core", "smmu";
+	resets = <&crg 0x07c 4>, <&crg 0x334 4>;
+	reset-names = "core", "smmu";
+	status = "okay";
+};
+
+&{/soc/mmc@f9830000} {
+	status = "disabled";
+};

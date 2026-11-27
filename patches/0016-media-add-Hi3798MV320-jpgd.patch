@@ -1,0 +1,26 @@
+--- a/drivers/media/platform/Kconfig
++++ b/drivers/media/platform/Kconfig
+@@ -50,6 +50,17 @@ config VIDEO_HI3798MV320_VDEC
+ 	  Enable the H.264 and HEVC V4L2 stateless decoder on Hi3798MV320.
+ 	  Applications submit parsed slices using the Media Request API.
+ 
++config VIDEO_HI3798MV320_JPGD
++	bool "HiSilicon Hi3798MV320 hardware JPEG decoder"
++	depends on ARM64 && OF && COMMON_CLK_HI3798MV320_RESET=y
++	depends on V4L_MEM2MEM_DRIVERS && VIDEO_DEV=y
++	select V4L2_JPEG_HELPER
++	select V4L2_MEM2MEM_DEV
++	select VIDEOBUF2_DMA_CONTIG
++	help
++	  Decode baseline 4:2:0 JPEG images using the Hi3798MV320 JPGD
++	  engine through a V4L2 memory-to-memory video device.
++
+ # Ancillary drivers
+ 
+ config VIDEO_MEM2MEM_DEINTERLACE
+--- a/drivers/media/platform/Makefile
++++ b/drivers/media/platform/Makefile
+@@ -46,2 +46,3 @@ obj-$(CONFIG_VIDEO_HI3798MV320_VDEC)	+= hi3798mv320-vdec.o
+ hi3798mv320-vdec-y			:= hi3798mv320-vdec-core.o
+ hi3798mv320-vdec-$(CONFIG_KERNEL_MODE_NEON)	+= hi3798mv320-vdec-neon.o
++obj-$(CONFIG_VIDEO_HI3798MV320_JPGD)	+= hi3798mv320-jpgd.o

@@ -80,6 +80,7 @@ fi
 if [[ $variant == net || $variant == gpu || $variant == all || $variant == all-fastfetch || $variant == all-2g ]]; then
     apply_board_patch "$inputs/0005-CLK-hisi-register-Hi3798MV320-reset-controller.patch"
     install -m644 "$inputs/crg-hi3798mv320-reset.c" "$linux/drivers/clk/hisilicon/"
+    install -m644 "$inputs/hisilicon,hi3798mv320-jpgd.h" "$linux/include/dt-bindings/clock/"
 fi
 if [[ $variant != core ]]; then
     if [[ $variant == storage ]]; then
