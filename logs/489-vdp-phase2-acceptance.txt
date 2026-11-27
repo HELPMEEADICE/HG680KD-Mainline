@@ -1,0 +1,499 @@
+VDP Phase 2 acceptance, 2026-11-27
+Selected readbacks and results from the validated boot.img. Full logs are under artifacts/arm64-7.3.5-vdp/phase2/validated.
+
+## Build and firmware
+54e4179c37da9c8b072046333f279b662eeec24d8a0ffdb3512ecc8b7018edf8  boot.img  (17369160 bytes, CRC32=b13a17d7, load_at=0x01fdffc0)
+f8cc0200: 04080200 00000000 00000021 00000000  ........!.......
+f8cc6810: 0437077f 00000000                    ..7.....
+f8cc6908: 00000021                             !...
+f8ce1800: 00007f14 00000001 000003ff 000003f8  ................
+f8ce1810: 00000408 00000000 000d0282 00a870f6  .............p..
+f8ce1820: 00000061 00000000 00000000 00000000  a...............
+f8ce18a8: 00000000 00000000 00000000 00000000  ................
+f8ce1a08: 00000101 00000002 00000000 00000000  ................
+
+## V0 scale and 4K direct scanout
+Bytes transferred = 17369160 (1090848 hex)
+[host] boot.img SHA256 54e4179c37da9c8b072046333f279b662eeec24d8a0ffdb3512ecc8b7018edf8
+CRC32 for 01fdffc0 ... 03070807 ==> b13a17d7
+[host] CRC32 matches local image: b13a17d7
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0210 fps=0.00 wall_fps=47.64 dropped=0 missed_vblanks=0 usr=0.00% sys=12.50% idle=87.50%
+V0 complete=1 first_vblank=2 last_vblank=2
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 59 in_blank 59 last_irq_state 00fa0023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4080000
+22d8 c1080001
+22dc 00000800
+5000 600000ff
+8a08 00000303
+8a54 7f6c1000
+8b38 7f6c1000
+8240 0000000a
+b000 00000002
+b004 00000000
+b00c 00000000
+b050 00000000
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] h265ip1080 HDMI reference MAE=3.02/255 swapped_uv_MAE=116.29/255 PASS
+[host] h265ip1080 single-frame FB and IRQ PASS
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0094 fps=0.00 wall_fps=106.14 dropped=0 missed_vblanks=0 usr=0.00% sys=25.00% idle=75.00%
+V0 complete=1 first_vblank=312 last_vblank=312
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 369 in_blank 369 last_irq_state 01550023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4080000
+22d8 c1080001
+22dc 00000800
+5000 600000ff
+8a08 00000303
+8a54 7f6c1000
+8b38 7f6c1000
+8240 0000010a
+b000 00000002
+b004 00000000
+b00c 00000000
+b050 00000000
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc10ip1080 HDMI reference MAE=2.66/255 swapped_uv_MAE=116.26/255 PASS
+[host] hevc10ip1080 single-frame FB and IRQ PASS
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0247 fps=0.00 wall_fps=40.47 dropped=0 missed_vblanks=0 usr=0.00% sys=0.00% idle=100.00%
+V0 complete=1 first_vblank=619 last_vblank=619
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 674 in_blank 674 last_irq_state 01af0023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 00100000
+22d8 c0080001
+22dc 00001000
+5000 600000ff
+8a08 00000303
+8a54 7f6c1000
+8b38 7f6c1000
+8240 0000000a
+b000 00000002
+b004 00000000
+b00c 00000000
+b050 00000000
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc4k HDMI reference MAE=3.13/255 swapped_uv_MAE=116.05/255 PASS
+[host] hevc4k single-frame FB and IRQ PASS
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0317 fps=0.00 wall_fps=31.50 dropped=0 missed_vblanks=0 usr=0.00% sys=7.69% idle=92.31%
+V0 complete=1 first_vblank=922 last_vblank=922
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 975 in_blank 975 last_irq_state 000a0023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 00100000
+22d8 c0080001
+22dc 00001000
+5000 600000ff
+8a08 00000303
+8a54 7f6c1000
+8b38 7f6c1000
+8240 0000010a
+b000 00000002
+b004 00000000
+b00c 00000000
+b050 00000000
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc10ip4k HDMI reference MAE=2.65/255 swapped_uv_MAE=116.06/255 PASS
+[host] hevc10ip4k single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 1230 in_blank 1230 last_irq_state 01090023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 00100000
+22d8 c0080001
+22dc 00001000
+5000 600000ff
+8a08 00000303
+8a54 7f6c1000
+8b38 7f6c1000
+8240 0000010a
+b000 00000002
+b004 00000000
+b00c 00000000
+b050 00000000
+fetch_underflow 00000000
+
+## G0 ARGB coverage and independent flips
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+G0 plane=40 format=argb source=960x135 display=1920x270 alpha=65535
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0120 fps=0.00 wall_fps=83.22 dropped=0 missed_vblanks=0 usr=0.00% sys=0.00% idle=100.00%
+G0 independent flip complete vblank=1237
+V0 complete=1 first_vblank=1236 last_vblank=1236
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 1289 in_blank 1289 last_irq_state 00820023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] h265ip1080 single-frame FB and IRQ PASS
+G0 plane=40 format=argb source=960x135 display=1920x270 alpha=65535
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0335 fps=0.00 wall_fps=29.85 dropped=0 missed_vblanks=0 usr=0.00% sys=0.00% idle=100.00%
+G0 independent flip complete vblank=1549
+V0 complete=1 first_vblank=1548 last_vblank=1548
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 1599 in_blank 1599 last_irq_state 00d60023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc4k single-frame FB and IRQ PASS
+G0 plane=40 format=argb source=960x135 display=1920x270 alpha=65535
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0218 fps=0.00 wall_fps=45.95 dropped=0 missed_vblanks=0 usr=0.00% sys=10.00% idle=90.00%
+G0 independent flip complete vblank=1863
+V0 complete=1 first_vblank=1862 last_vblank=1862
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 1912 in_blank 1912 last_irq_state 012b0023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc10ip4k single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 2169 in_blank 2169 last_irq_state 002c0023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+
+## G0 XRGB and independent flip
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+G0 plane=40 format=xrgb source=960x135 display=1920x270 alpha=32768
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0299 fps=0.00 wall_fps=33.47 dropped=0 missed_vblanks=0 usr=0.00% sys=15.38% idle=84.62%
+G0 independent flip complete vblank=2179
+V0 complete=1 first_vblank=2178 last_vblank=2178
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 2227 in_blank 2227 last_irq_state 00a00023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc4k single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 2485 in_blank 2485 last_irq_state 00a20023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+
+## 4K60 with same-commit G0 and V0 flips
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+G0 plane=40 format=argb source=960x135 display=1920x270 alpha=65535
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=240 capture_buffers=7 requeued=239 seconds=4.0024 fps=60.00 wall_fps=59.96 dropped=0 missed_vblanks=0 usr=0.06% sys=4.99% idle=94.94%
+V0 complete=240 first_vblank=2495 last_vblank=2734
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 2726 in_blank 2726 last_irq_state 005a003b unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+[host] /tmp/4k60-8 INTID 122 delta=241 INTID 181 delta=0 underflow_irqs=0
+[host] /tmp/4k60-8 continuous PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+G0 plane=40 format=argb source=960x135 display=1920x270 alpha=65535
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=240 capture_buffers=7 requeued=239 seconds=4.0018 fps=60.00 wall_fps=59.97 dropped=0 missed_vblanks=0 usr=0.06% sys=5.06% idle=94.88%
+V0 complete=240 first_vblank=2737 last_vblank=2976
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 2967 in_blank 2967 last_irq_state 005a0023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+[host] /tmp/4k60-10 INTID 122 delta=241 INTID 181 delta=0 underflow_irqs=0
+[host] /tmp/4k60-10 continuous PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 2967 in_blank 2967 last_irq_state 005a0023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+
+## 4K60 single plane and linear regressions
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=240 capture_buffers=7 requeued=239 seconds=4.0082 fps=60.00 wall_fps=59.88 dropped=0 missed_vblanks=0 usr=0.19% sys=4.36% idle=95.45%
+V0 complete=240 first_vblank=2979 last_vblank=3218
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 3208 in_blank 3208 last_irq_state 0139003b unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+[host] /tmp/4k60-8 INTID 122 delta=241 INTID 181 delta=0 underflow_irqs=0
+[host] /tmp/4k60-8 continuous PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=240 capture_buffers=7 requeued=239 seconds=4.0135 fps=60.00 wall_fps=59.80 dropped=0 missed_vblanks=0 usr=0.12% sys=4.74% idle=95.14%
+V0 complete=240 first_vblank=3221 last_vblank=3460
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 3449 in_blank 3449 last_irq_state 01390023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+[host] /tmp/4k60-10 INTID 122 delta=241 INTID 181 delta=0 underflow_irqs=0
+[host] /tmp/4k60-10 continuous PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] ip32 frame 1 board=4a91cbdd96c2fa9c6f77b513133aaf0435f6c55386a39c884452a8e0f95e8000 FFmpeg=4a91cbdd96c2fa9c6f77b513133aaf0435f6c55386a39c884452a8e0f95e8000 MATCH
+[host] RESULT ip32 2/2
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] h265ip1080 frame 1 board=535be5f835c92c7831d34286b77850be844ca154725659fc61965366792b5485 FFmpeg=535be5f835c92c7831d34286b77850be844ca154725659fc61965366792b5485 MATCH
+[host] h265ip1080 frame 2 board=a9267674531f5a889b791d31e792382eb97e2258c13b3833d9592fa827a19ec3 FFmpeg=a9267674531f5a889b791d31e792382eb97e2258c13b3833d9592fa827a19ec3 MATCH
+[host] RESULT h265ip1080 3/3
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc10ip1080 frame 1 board=04c4094ea4aa171328901462236139ebdd7c4cc63277f5622db2024e9136edbc FFmpeg=04c4094ea4aa171328901462236139ebdd7c4cc63277f5622db2024e9136edbc MATCH
+[host] hevc10ip1080 frame 2 board=1591e9d08f001054cfd938cbadcd594a313909c76a08f6ed4d3b64b9ab8540b9 FFmpeg=1591e9d08f001054cfd938cbadcd594a313909c76a08f6ed4d3b64b9ab8540b9 MATCH
+[host] RESULT hevc10ip1080 3/3
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc4k frame 1 board=f6758170a36d0fdb0f5f4227a3b7cd11258a7288cdb69772adba79c824206e66 FFmpeg=f6758170a36d0fdb0f5f4227a3b7cd11258a7288cdb69772adba79c824206e66 MATCH
+[host] hevc4k frame 2 board=d552b88e7ba1739e6514abb54a88d54eda830d2696aed4f50f9e6d90e0d14348 FFmpeg=d552b88e7ba1739e6514abb54a88d54eda830d2696aed4f50f9e6d90e0d14348 MATCH
+[host] RESULT hevc4k 3/3
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc10ip4k frame 1 board=6c54db3741f54590943aa43a5363c296cc3b5132d12ae9c4822c783f63376e44 FFmpeg=6c54db3741f54590943aa43a5363c296cc3b5132d12ae9c4822c783f63376e44 MATCH
+[host] hevc10ip4k frame 2 board=800ab8d4b2909e7b6b0b3b05f4e3e133830ce38ddfcf67067726c6749b900967 FFmpeg=800ab8d4b2909e7b6b0b3b05f4e3e133830ce38ddfcf67067726c6749b900967 MATCH
+[host] RESULT hevc10ip4k 3/3
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 3449 in_blank 3449 last_irq_state 01390023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+
+## 720p scale
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0158 fps=0.00 wall_fps=63.43 dropped=0 missed_vblanks=0 usr=0.00% sys=0.00% idle=100.00%
+V0 complete=1 first_vblank=3463 last_vblank=3463
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 3508 in_blank 3508 last_irq_state 00860023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc720 HDMI reference MAE=8.62/255 swapped_uv_MAE=121.68/255 PASS
+[host] hevc720 single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 3751 in_blank 3751 last_irq_state 01790023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+
+## BT.601 limited
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0184 fps=0.00 wall_fps=54.31 dropped=0 missed_vblanks=0 usr=0.00% sys=0.00% idle=100.00%
+V0 complete=1 first_vblank=3766 last_vblank=3766
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 3810 in_blank 3810 last_irq_state 00340023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4055555
+22d8 c1080001
+22dc 00000555
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000000a
+b000 00000013
+b004 00001000
+b00c 00007cac
+b050 000007c0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc-bt601 HDMI reference MAE=9.92/255 swapped_uv_MAE=121.58/255 PASS
+[host] hevc-bt601 single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 4058 in_blank 4058 last_irq_state 002c0023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4055555
+22d8 c1080001
+22dc 00000555
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000000a
+b000 00000013
+b004 00001000
+b00c 00007cac
+b050 000007c0
+fetch_underflow 00000000
+
+## BT.709 full
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0101 fps=0.00 wall_fps=99.04 dropped=0 missed_vblanks=0 usr=0.00% sys=0.00% idle=100.00%
+V0 complete=1 first_vblank=4074 last_vblank=4074
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 4118 in_blank 4118 last_irq_state 00e40023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4055555
+22d8 c1080001
+22dc 00000555
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000000a
+b000 00000013
+b004 00000db3
+b00c 00000000
+b050 00000000
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc-bt709-full HDMI reference MAE=8.52/255 swapped_uv_MAE=121.76/255 PASS
+[host] hevc-bt709-full single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 4370 in_blank 4370 last_irq_state 00e00023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4055555
+22d8 c1080001
+22dc 00000555
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000000a
+b000 00000013
+b004 00000db3
+b00c 00000000
+b050 00000000
+fetch_underflow 00000000
+
+## BT.2020 limited
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0169 fps=0.00 wall_fps=59.20 dropped=0 missed_vblanks=0 usr=0.00% sys=0.00% idle=100.00%
+V0 complete=1 first_vblank=4387 last_vblank=4387
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 4430 in_blank 4430 last_irq_state 00940023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4055555
+22d8 c1080001
+22dc 00000555
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000010a
+b000 00000013
+b004 00001000
+b00c 00007e83
+b050 000007c0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc10-bt2020 HDMI reference MAE=9.34/255 swapped_uv_MAE=121.39/255 PASS
+[host] hevc10-bt2020 single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 4685 in_blank 4685 last_irq_state 01930023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4055555
+22d8 c1080001
+22dc 00000555
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000010a
+b000 00000013
+b004 00001000
+b00c 00007e83
+b050 000007c0
+fetch_underflow 00000000
+
+## HDR10 input on SDR handoff
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0128 fps=0.00 wall_fps=77.92 dropped=0 missed_vblanks=0 usr=0.00% sys=0.00% idle=100.00%
+V0 complete=1 first_vblank=4703 last_vblank=4703
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 4745 in_blank 4745 last_irq_state 01470023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4055555
+22d8 c1080001
+22dc 00000555
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000010a
+b000 00000013
+b004 00001000
+b00c 00007e83
+b050 000007c0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc10-hdr10 single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 5000 in_blank 5000 last_irq_state 00460023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 c4055555
+22d8 c1080001
+22dc 00000555
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000010a
+b000 00000013
+b004 00001000
+b00c 00007e83
+b050 000007c0
+fetch_underflow 00000000
+
+## BT.709 limited reset
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+DRM connector=47 CRTC=45 V0=35 firmware=3840x2160 refresh=60 modifier=0xfe00000000000320
+V0 result frames=1 capture_buffers=1 requeued=0 seconds=0.0270 fps=0.00 wall_fps=37.09 dropped=0 missed_vblanks=0 usr=0.00% sys=9.09% idle=90.91%
+V0 complete=1 first_vblank=5019 last_vblank=5019
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 5059 in_blank 5059 last_irq_state 00ca0023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 00100000
+22d8 c0080001
+22dc 00001000
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000000a
+b000 00000002
+b004 00001000
+b00c 00007e83
+b050 000007c0
+fetch_underflow 00000000
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[host] hevc4k HDMI reference MAE=3.13/255 swapped_uv_MAE=116.05/255 PASS
+[host] hevc4k single-frame FB and IRQ PASS
+  20:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+vblank_irqs 5301 in_blank 5301 last_irq_state 00bc0023 unexpected_status 00000000 underflow_irqs 0
+0208 00000021
+22c0 00100000
+22d8 c0080001
+22dc 00001000
+5000 600000ff
+8a08 00000303
+8a54 6ec80000
+8b38 6ec80000
+8240 0000000a
+b000 00000002
+b004 00001000
+b00c 00007e83
+b050 000007c0
+fetch_underflow 00000000
+
+## G0 HDMI sample values
+7x7 RGB medians from the 1920x1080 HDMI capture
+point (x,y)                         V0 only        ARGB coverage   XRGB global 50%
+alpha-zero patch                   (0, 255, 0)    (0, 255, 0)     (0, 224, 116)
+half-alpha black over green        (0, 255, 0)    (0, 145, 0)     (0, 145, 0)
+half-alpha black over yellow       (255, 255, 5)  (135, 137, 0)   (135, 137, 0)
+opaque red block                   (0, 125, 229)  (242, 1, 65)    (114, 65, 142)
+opaque border                      (255, 0, 255)  (245, 241, 43)  (254, 122, 150)
+
+## HDR10 input stream (ffprobe)
+frame|side_datum/h_26_45__user_data_unregistered_sei_message:side_data_type=H.26[45] User Data Unregistered SEI message|side_datum/mastering_display_metadata:side_data_type=Mastering display metadata|side_datum/content_light_level_metadata:side_data_type=Content light level metadata|side_datum/content_light_level_metadata:max_content=1000|side_datum/content_light_level_metadata:max_average=100
+stream|profile=Main 10|pix_fmt=yuv420p10le|color_range=tv|color_space=bt2020nc|color_transfer=smpte2084|color_primaries=bt2020

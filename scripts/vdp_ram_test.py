@@ -1,4 +1,4 @@
-"""Check VDP V0 scanout on the HG680KD after a TFTP RAM boot."""
+"""Check VDP V0 scanout and G0 overlay on the HG680KD after a TFTP RAM boot."""
 
 import argparse
 import hashlib
@@ -7,6 +7,7 @@ from http.server import ThreadingHTTPServer
 from ipaddress import IPv4Address
 from pathlib import Path
 import re
+import shlex
 import subprocess
 from threading import Thread
 import time
@@ -56,8 +57,23 @@ def download_fixtures(console, args, names):
             thread.join()
 
 
-def request(prefix):
-    return f"vdec-request /dev/video0 /dev/media0 {prefix}.txt {prefix}.265 --display /dev/dri/card0"
+def request(prefix, args=None):
+    env = {}
+    if args:
+        if args.scale:
+            env["VDP_TEST_SCALE"] = "1"
+        if args.overlay:
+            env["VDP_TEST_OVERLAY"] = args.overlay
+        if args.independent:
+            env["VDP_TEST_G0_ONLY"] = "1"
+        if args.alpha is not None:
+            env["VDP_TEST_ALPHA"] = str(args.alpha)
+        if args.encoding:
+            env["VDP_TEST_ENCODING"] = args.encoding
+        if args.color_range:
+            env["VDP_TEST_RANGE"] = args.color_range
+    config = "".join(f"{key}={shlex.quote(value)} " for key, value in env.items())
+    return f"{config}vdec-request /dev/video0 /dev/media0 {prefix}.txt {prefix}.265 --display /dev/dri/card0"
 
 
 def camera_rgb(path, crop=False, swap_uv=False):
@@ -78,8 +94,8 @@ def rgb_mae(measured, expected):
     return sum(abs(a - b) for a, b in zip(measured, expected)) / len(expected)
 
 
-def check_frame(console, args, name):
-    command = (f"{request(f'/etc/vdec-test/{name}')} 1 9000 & p=$!; "
+def check_frame(console, args, name, directory):
+    command = (f"{request(f'{directory}/{name}', args)} 1 9000 & p=$!; "
                f"sleep 1; {IRQ}; cat {SCANOUT}; sleep 1; {IRQ}; "
                "printf '\\nFRAME_HELD\\n'; wait $p; printf '\\nFRAME_EXIT=%s\\n' $?")
     camera = None
@@ -87,7 +103,7 @@ def check_frame(console, args, name):
         capture = args.log.parent / f"{name}-hdmi.png"
         camera = subprocess.Popen([
             "ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "dshow",
-            "-video_size", "1920x1080", "-framerate", "30", "-vcodec", "mjpeg",
+            "-rtbufsize", "64M", "-video_size", "1920x1080", "-framerate", "30", "-vcodec", "mjpeg",
             "-i", f"video={args.capture_device}", "-vf", r"select=gte(t\,4)",
             "-frames:v", "1", "-threads", "2", "-update", "1", str(capture),
         ])
@@ -107,7 +123,11 @@ def check_frame(console, args, name):
         rb"(?m)^([0-9a-f]{4}) ([0-9a-f]{8})\r?$", first)}
     counts = count_irq(first, 122)
     blank = re.search(rb"vblank_irqs (\d+) in_blank (\d+)", first)
-    main10 = name.startswith("hevc10")
+    if directory == "/tmp":
+        header = (args.payload / f"{name}.txt").read_text(encoding="ascii").splitlines()[0].split()
+        main10 = header[0] == "HEVC10"
+    else:
+        main10 = name.startswith("hevc10")
     fb = bool(b"V0 complete=1 " in first and b"FRAME_EXIT=0\r\n" in last and
               len(counts) == 2 and 59 <= counts[1] - counts[0] <= 62 and
               blank and int(blank[2]) >= int(blank[1]) - 1 and
@@ -116,10 +136,28 @@ def check_frame(console, args, name):
               regs.get(0x8240) == (0x10a if main10 else 0xa) and
               regs.get(0x8254, 0) == regs.get(0x8338) and regs.get(0x825c, 0) and
               all(bool(regs.get(reg, 0)) == main10 for reg in (0x8284, 0x828c, 0x8294)) and
-              b"unexpected_status 00000000 underflow_irqs 0" in first)
+              b"unexpected_status 00000000 underflow_irqs 0" in first and
+              regs.get(0x0050, 0) & 0x101 == 0)
+    if args.scale:
+        mode = re.search(rb"firmware=(\d+)x(\d+)", first)
+        full = ((int(mode[2]) - 1) << 16) | (int(mode[1]) - 1) if mode else -1
+        fb &= regs.get(0x2088) == 0 and regs.get(0x208c) == regs.get(0x22e8) == full
+    if args.overlay:
+        fb &= (b"G0 plane=" in first and regs.get(0x5004) == 0 and
+               bool(regs.get(0x5018, 0) & (1 << 31)) and
+               regs.get(0x8a54, 0) != 0 and regs.get(0x8a54) == regs.get(0x8b38) and
+               bool(regs.get(0x8a08, 0) & 2) == (args.overlay == "argb"))
+    if args.independent:
+        fb &= b"G0 independent flip complete" in first
+    if args.encoding or args.color_range:
+        full_range = args.color_range == "YCbCr full range"
+        csc = args.encoding not in (None, "ITU-R BT.709 YCbCr") or full_range
+        fb &= regs.get(0xb000, 0) & 0x11 == (0x11 if csc else 0)
+        if csc:
+            fb &= regs.get(0xb050) == (0 if full_range else 0x7c0)
     visual = not camera or camera.returncode == 0
-    if visual and args.capture_reference:
-        crop = name.endswith("1080") and b"firmware=3840x2160" in first
+    if camera and visual and args.capture_reference:
+        crop = not args.scale and name.endswith("1080") and b"firmware=3840x2160" in first
         measured = camera_rgb(capture, crop)
         reference = args.capture_reference / f"{name}-reference.png"
         difference = rgb_mae(measured, camera_rgb(reference))
@@ -131,17 +169,22 @@ def check_frame(console, args, name):
     return fb, visual
 
 
-def check_continuous(console, prefix, expected, benchmark=False):
-    status, output = shell(console, f"{IRQ}; {request(prefix)}; test_status=$?; "
+def check_continuous(console, prefix, expected, args, benchmark=False):
+    status, output = shell(console, f"{IRQ}; {request(prefix, args)}; test_status=$?; "
                            f"{IRQ}; cat {SCANOUT}; (exit $test_status)", timeout=60)
     result = RESULT.search(output)
     vdp, smmu = count_irq(output, 122), count_irq(output, 181)
     valid = (status == 0 and result and int(result[1]) == expected and
              int(result[3]) > 0 and int(result[7]) == 0 and
              len(vdp) == 2 and vdp[1] > vdp[0] and smmu == [0, 0] and
-             b"unexpected_status 00000000 underflow_irqs 0" in output)
+             b"unexpected_status 00000000 underflow_irqs 0" in output and
+             not re.search(rb"fetch_underflow (?!00000000)[0-9a-f]{8}", output))
+    if args.independent:
+        valid = valid and b"G0 independent flip complete" in output
+    if args.overlay:
+        valid = valid and b"G0 plane=" in output
     if benchmark and result:
-        valid &= expected >= 120 and result[9] is not None
+        valid &= expected >= 120 and result[9] is not None and int(result[8]) == 0
         underflows = re.search(rb"underflow_irqs (\d+)", output)
         if len(vdp) == 2 and len(smmu) == 2 and underflows:
             console.record(f"\n[host] {prefix} INTID 122 delta={vdp[1] - vdp[0]} "
@@ -163,6 +206,17 @@ def main():
     parser.add_argument("--capture-device", help="DirectShow HDMI capture device name")
     parser.add_argument("--capture-reference", type=Path,
                         help="directory holding FFmpeg first-frame reference PNGs")
+    parser.add_argument("--scale", action="store_true", help="scale V0 to the inherited output")
+    parser.add_argument("--overlay", choices=("argb", "xrgb"), help="flip a G0 test pattern with V0")
+    parser.add_argument("--independent", action="store_true", help="also submit and verify a G0-only flip")
+    parser.add_argument("--alpha", type=int, help="global G0 alpha in the DRM 0–65535 range")
+    parser.add_argument("--encoding", choices=("ITU-R BT.601 YCbCr", "ITU-R BT.709 YCbCr",
+                                              "ITU-R BT.2020 YCbCr"))
+    parser.add_argument("--color-range", choices=("YCbCr limited range", "YCbCr full range"))
+    parser.add_argument("--single", action="append", default=[],
+                        help="only hold and capture the named fixture, repeatable")
+    parser.add_argument("--bench-only", action="store_true",
+                        help="run only downloaded sequences and any requested linear regressions")
     parser.add_argument("--linear", type=Path, action="append", default=[],
                         help="fixture prefix with a local NV21/P010 reference")
     parser.add_argument("fixtures", nargs="*", help="extra HEVC fixtures to download and flip")
@@ -172,6 +226,12 @@ def main():
         parser.error("extra fixtures require a payload directory and plain fixture names")
     if args.capture_reference and not args.capture_device:
         parser.error("capture comparison requires a capture device")
+    if any(name not in (*BUILTIN, *args.fixtures) for name in args.single):
+        parser.error("single frame name must be a built-in or supplied fixture")
+    if args.alpha is not None and (not args.overlay or not 0 <= args.alpha <= 65535):
+        parser.error("global alpha requires an overlay and a value from 0 to 65535")
+    if args.independent and not args.overlay:
+        parser.error("the G0-only flip requires an overlay")
 
     port = serial.Serial(baudrate=115200, timeout=.08, write_timeout=3)
     port.port = args.port
@@ -192,19 +252,21 @@ def main():
         shell(console, "echo N > /sys/module/printk/parameters/ignore_loglevel; dmesg -n 3")
         status, initial = shell(console, f"ls -l /dev/dri/card0 /dev/video0 /dev/media0 && {IRQ}")
         passed &= status == 0 and count_irq(initial, 181) == [0]
-        for name in BUILTIN:
-            valid, visual = check_frame(console, args, name)
+        if args.fixtures:
+            download_fixtures(console, args, args.fixtures)
+        for name in args.single or (() if args.bench_only else BUILTIN):
+            directory = "/etc/vdec-test" if name in BUILTIN else "/tmp"
+            valid, visual = check_frame(console, args, name, directory)
             console.record(f"\n[host] {name} single-frame FB and IRQ "
                            f"{'PASS' if valid else 'FAIL'}\n".encode())
             passed &= valid and visual
-        if args.fixtures:
-            download_fixtures(console, args, args.fixtures)
-        for name in BUILTIN:
-            passed &= check_continuous(console, f"/etc/vdec-test/{name}", 3)
-        for name in args.fixtures:
-            header = (args.payload / f"{name}.txt").read_text(encoding="ascii").splitlines()[0].split()
-            expected = int(header[-1])
-            passed &= check_continuous(console, f"/tmp/{name}", expected, benchmark=expected >= 120)
+        if not args.single:
+            for name in (() if args.bench_only else BUILTIN):
+                passed &= check_continuous(console, f"/etc/vdec-test/{name}", 3, args)
+            for name in args.fixtures:
+                header = (args.payload / f"{name}.txt").read_text(encoding="ascii").splitlines()[0].split()
+                expected = int(header[-1])
+                passed &= check_continuous(console, f"/tmp/{name}", expected, args, benchmark=expected >= 120)
         for fixture in args.linear:
             passed &= compare_fixture(console, fixture, 0)
         _, final = shell(console, f"{IRQ}; cat {SCANOUT}; "

@@ -25,14 +25,37 @@
 
 验收包含 `/dev/dri/card0`、V0 的 `IN_FORMATS`、vblank 计数与刷新率一致、两种布局的 DMA 导入及 Atomic Pageflip、VDP 活动地址和格式回读、无 underflow、VDH SMMU INTID 181 保持零。HDMI 画面以采集或现场观察单独判定。Main10 的低位面参与扫描和 HDMI 深色链路分别验收。报告各样本有效帧数、扫描提交/完成数、两种 UHD 样本的墙钟 FPS 与 CPU 口径、镜像 SHA256 和 U-Boot RAM 回读 CRC32。
 
-## Phase 2 · VDEC 原生 Tiled 路径与队列生命周期
+## Phase 2 · V0 缩放、G0 叠加与 SDR 色彩
+
+- V0 在既有 Tiled DMA-BUF 上使用 ZME1，允许整个帧缓冲缩放至 CRTC 内偶数对齐的矩形。目标尺寸各轴支持源尺寸的 0.5–8 倍。1:1 使用 Phase 1 的旁路与最近行色度扩展。放大轴启用亮度线性 FIR。色度保留最近邻，避免 Phase 1 在实验垂直色度 FIR 下出现的衰减。
+- G0 以固定 zpos 1 注册 DRM Overlay Plane，V0 为 zpos 0。G0 支持线性 ARGB8888 与 XRGB8888、标准 `alpha` 与 `pixel blend mode`。G0 走固件已启用的 GP0 画布。在本次 UHD 时序下，目标矩形是 G0 帧缓冲的 2 倍，位置按两个输出像素对齐。两层共用 HD0 VT1，翻页事件在待更新寄存器清除且两层的活动地址匹配后交付。
+- V0 的标准 `COLOR_ENCODING` 与 `COLOR_RANGE` 支持 BT.601 / BT.709 / BT.2020 和限幅 / 全幅。输出保持 HDMI 固件的 BT.709 限幅时序。V0 CSC 对非默认输入重编码 YCbCr，保留传递函数编码后的 R′G′B′ 分量。BT.709 限幅直通。PQ 色调映射、线性光 RGB 原色变换及 HDMI HDR 元数据属于后续工作。 [DRM KMS 平面属性](https://docs.kernel.org/gpu/drm-kms.html)
+
+| 数据路径 | 原厂依据与寄存器 |
+|---|---|
+| V0 IFIR 与 ZME1 几何 | `xdp_drv_set_vid_ifir`（`c05e83f8`）设置 `0x2600[2:1]=3`，在 `0x2604–0x2610` 写入八个固定系数。 `vdp_drv_set_vid_zme1`（`c05e8540`）写入水平 Q20 比例 `0x22c0[23:0]`、垂直 Q12 比例 `0x22dc[15:0]`、相位与 `0x22e8` 输出尺寸。Y/C 共用输入尺寸比，水平相位均为 0，垂直相位 Y 为 0、C 为 −512。1080p→2160p 的比值字段分别为 `0x80000` 和 `0x0800`。 |
+| ZME1 FIR | `vdp_drv_set_zme_coef`（`c05e8adc`）、`drv_vdp_tranlate_zoom_coef`（`c05e68ec`）、`vdp_vid_set_zme_coef_addr`（`c0614368`）与 `vdp_vid_set_para_upd`（`c0615434`）给出 DDR 加载链路。四表顺序为 H-Y、H-C、V-Y、V-C，槽间距 256 字节。每 128 bit 包含 12 个 10-bit 系数。驱动在 `0x0e04/14/0c/1c` 写入地址，向 `0x0f00` 写 `0xf` 请求更新。水平 Y FIR 为 `0x22c0[26]`，垂直 Y FIR 为 `0x22d8[24]`。采用 8/4/6/4 抽头表布局，系数使用线性权重。ZME1 以 `0x22d8[20:19]=1` 接收 4:2:0，以 `[22:21]=0` 输出 4:2:2，沿固件链路送 VP0。 |
+| G0 与 CBM | 原厂 DT 的 `virtdev` 将 VDP IRQ 定为 SPI 90。G0 共享 VDP MMIO。 `vdp_fdr_gfx_set_ifmt`（`c05fbbd0`）指定 `0x8a40=0x68`。`0x8a50/54` 写入地址、`0x8a60` 写入 16 字节单位的 stride，`0x8b38` 为活动地址。 `vdp_gfx_set_layer_galpha`（`c05f1134`）对应 `0x5000[7:0]`。 `0x8a08[1:0]` 控制逐像素 Alpha 与 0–255 范围，bit 10 选择预乘。CBM 的 `0x6908=0x21` 将 G0 接入 GP0，HD0 的 `0x0208=0x21` 从底到顶选择 VP0、GP0。 |
+| V0 CSC | `xdp_drv_set_vid_csc`（`c05e9674`）、`vdp_func_set_csc1_{coef,dc_coef}`（`c05ee840`、`c05ee6e8`）给出 Q12 矩阵、符号位和 DC 坐标。转换启用时 `0xb000[4:0]=0x13`，`0xb004–0xb024` 为九个系数，`0xb050–0xb064` 为输入输出 DC。限幅场景输入减去 Y=64、Cb/Cr=512，全幅场景 Y 的输入 DC 为 0。输出加回 64/512/512。系数写入后触发 `0x4004` 使 VP0 锁存。 |
+
+指定的原厂 [ARM32 反编译报告](artifacts/vpu-reverse-factory/arm32-result.txt) 用于 VDEC/取数链路核对。上表的显示函数由同一原厂内核的 kallsyms 与二进制复核。显示路径以 [原厂 DT 摘要](logs/04-factory-dtb-summary.txt)、[HDMI 寄存器记录](HDMI-REVERSE.md) 和板端回读佐证。
+
+原厂 `g_y2r_m33_*` 表是一组 YCbCr→RGB Q12 矩阵，输入 DC 表 `c106569c` 和 `c10656b8` 分别为 `(-64,-512,-512)` 与 `(0,-512,-512)`。当前驱动使用等效的 YCbCr→BT.709 限幅 YCbCr 矩阵，混合器接收 YCbCr。BT.601 限幅沿用原厂 `g_pq_gfx_csc_table_ycbcr601l_to_ycbcr709l` 的 Q12 换算值。
+
+| 原厂输入编码 | 限幅表地址与九个系数 | 全幅表地址与九个系数 |
+|---|---|---|
+| BT.601 | `c10656e8` · 4784, 0, 6557, 4784, −1610, −3340, 4784, 8279, 0 | `c10656fc` · 4096, 0, 5743, 4096, −1410, −2925, 4096, 7251, 0 |
+| BT.709 | `c10656c0` · 4784, 0, 7365, 4784, −876, −2190, 4784, 8678, 0 | `c10656d4` · 4096, 0, 6451, 4096, −768, −1918, 4096, 7601, 0 |
+| BT.2020 | `c106566c` · 4784, 0, 6896, 4784, −770, −2672, 4784, 8799, 0 | `c10656a4` · 4096, 0, 6040, 4096, −674, −2341, 4096, 7706, 0 |
+
+### Phase 2 后续 · VDEC 原生队列生命周期
 
 - 在 Phase 1 配对原型基础上验证较深 DPB、重排序及多 slice。根据请求时间戳、flip/out-fence、DRM FB 引用和流关闭顺序安排缓冲回收；验证暂停、背压、丢帧、多个解码上下文及持续运行。涉及的 V0 寄存器继续按 Phase 1 索引核对。启用 VDP 私有 SMMU 时，单独管理 `0xe000`、`0xe2ec`、TLB 失效和错误恢复。
 - 验收包括 8-bit、Main10 持续解码与 Atomic Pageflip、旧缓冲在停止被扫描和引用后回收、Streamoff 后无滞留引用或 DMA 故障，线性格式逐帧回归通过。根据实测固定 modifier 布局、地址/尺寸限制和对象生命周期，再规划公开 UAPI 编号。
 
 ## Phase 3 · 4K60 与播放器生态
 
-- 接入独立 HD0 modeset、海思 HDMI bridge、EDID/HPD、CRG 门控/复位和 PHY。依据 `HDMI-REVERSE.md` 的 TX `0xf8ce0000`、AVI `0xf8ce1800`、DDC/AON `0xf8ce4000`、PHY `0xf8d30000` 补齐时序与链路。按 sink 能力处理 HDR metadata、输出位宽、色域矩阵与 YCbCr range。G0 的 `0x5000/04` 和 FDR `0x8a00` 用作独立 UI plane。
+- 接入独立 HD0 modeset、海思 HDMI bridge、EDID/HPD、CRG 门控/复位和 PHY。依据 `HDMI-REVERSE.md` 的 TX `0xf8ce0000`、AVI `0xf8ce1800`、DDC/AON `0xf8ce4000`、PHY `0xf8d30000` 补齐时序与链路。按 sink 能力处理 HDR metadata、输出位宽、色域矩阵与 YCbCr range。
 - 为 FFmpeg V4L2 Request 构造带正确 modifier 和存储面数量的 `AVDRMFrameDescriptor`，验证 mpv DRM PRIME overlay。验收包括动态模式切换及热插拔、HDR 与 SDR 像素、UI 叠加、Main/Main10 原生缓冲的稳定 2160p60 播放、帧率与延迟分位数、CPU 与温度记录。
 
 ## RAM 验证边界
@@ -55,6 +78,8 @@ vdec-request /dev/video0 /dev/media0 /etc/vdec-test/hevc10ip4k.txt \
 ```
 
 主机测试用 `scripts/vdp_ram_test.py --image <boot.img> --log <日志>`。加 `--capture-device 'USB2 Video'` 保存 HDMI 采集图。`--capture-reference` 将 160×90 RGB 平均绝对误差与 24/255 上限及交换 U/V 后的误差比较。`--payload` 可从主机 HTTP 向板上 `/tmp` 发送更长的 HEVC fixture，`--linear` 可逐帧核对已有 NV21/P010 参考。采集卡将 2160p HDMI 输入输出为 1080p MJPEG，可核对画面形状和颜色。HDMI 链路的逐像素 10-bit 验证需要深色采集设备。
+
+Phase 2 的主机参数 `--scale` 让 V0 占满固件模式。 `--overlay argb` 在两个 G0 测试缓冲间轮换，`--independent` 额外提交一次只更新 G0 的非阻塞翻页。 `--overlay xrgb --alpha 32768` 验证全局 Alpha。缩放采集用 `--single h265ip1080 --single hevc10ip1080 --capture-reference artifacts/arm64-7.3.5-vdp`。 240 帧叠加压力测试用 `--overlay argb --bench-only --payload artifacts/arm64-7.3.5-vdp/phase1-async 4k60-8 4k60-10`。指定非默认色彩时，使用 `--encoding` 和 `--color-range`，其默认值为 BT.709 限幅。
 
 ## 2026-11-27 · Phase 1 板测结果
 
@@ -119,3 +144,43 @@ HDMI 采集可辨认两种位深和两种输入分辨率的图像。彩条的位
 | U-Boot RAM 回读 CRC32 | `5c7b89d6` |
 
 镜像在 `hedc@ArchLinux-E5-Server` 的 `/home/hedc/hg680kd-mainline` 构建，经 COM4 单进程独占 TFTP 纯 RAM 启动。板端根文件系统为 `rootfs`，无块设备挂载，`mmcblk0/ro=1`。BL31 走原有只读加载流程。本机镜像位于 `artifacts/arm64-7.3.5-vdp/phase1-async/final/boot.img`。[构建](logs/487-vdp-phase1-async-build.txt) · [串口校验](logs/487-vdp-phase1-async.txt#L145) · [TFTP](logs/487-vdp-phase1-async.tftp.txt)
+
+## 2026-11-27 · Phase 2 板测验收
+
+V0 的 720p/1080p ZME1 全屏缩放、4K 原生直扫、G0 叠加及 SDR CSC 通过本轮验收。1080p 使用 2×、720p 使用 3× 放大。采集画面的彩条、斜边和细棋盘与软解参考对应，未观察到偏绿、花屏或明显边缘伪影。MAE 使用 160×90 RGB，采集设备的输出为 1080p 8-bit MJPEG。[HDMI 对照图](logs/489-vdp-phase2-hdmi.png) · [缩放与直扫串口](artifacts/arm64-7.3.5-vdp/phase2/validated/scale/board.txt)
+
+| 输入 | V0 输出 | HDMI 对 FFmpeg RGB MAE | HDMI 对 U/V 互换参考 RGB MAE |
+|---|---|---:|---:|
+| 720p Main | UHD 全屏 3× | 8.62/255 | 121.68/255 |
+| 1080p Main | UHD 全屏 2× | 3.02/255 | 116.29/255 |
+| 1080p Main10 | UHD 全屏 2× | 2.66/255 | 116.26/255 |
+| 4K Main | 1:1 | 3.13/255 | 116.05/255 |
+| 4K Main10 | 1:1 | 2.65/255 | 116.06/255 |
+
+G0 的 ARGB Coverage 在 1080p 放大与 4K Main/Main10 直扫时出图，G0-only 非阻塞提交均收到独立翻页事件。4K Main 的透明区采集像素保持 `(0,255,0)`，128/255 Alpha 的黑底覆盖同一绿色输入后为 `(0,145,0)`。XRGB8888 也通过独立翻页，0x8000 全局 Alpha 下同一取样点为 `(0,145,0)`。GP0 使用固件的 1920×1080 画布。实测将 GP0 改为 3840×2160 单位比会导致 HD0 underflow 和花屏。[叠加像素取样](artifacts/arm64-7.3.5-vdp/phase2/validated/overlay/pixels.txt) · [G0 事件和活动地址](artifacts/arm64-7.3.5-vdp/phase2/validated/overlay/board.txt)
+
+| V0 4K60 输入与 G0 ARGB 叠加 | 翻页 | 翻页 FPS / 墙钟 FPS | 四核 usr / sys / idle | 丢帧 / 错失 vblank | IRQ 122 增量 | VDP underflow | SMMU IRQ 181 增量 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| HEVC Main | 240/240 | 60.00 / 59.96 | 0.06% / 4.99% / 94.94% | 0 / 0 | 241 | 0 | 0 |
+| HEVC Main10 | 240/240 | 60.00 / 59.97 | 0.06% / 5.06% / 94.88% | 0 / 0 | 241 | 0 | 0 |
+
+压力测试每帧同时切换 V0 的原生 Tiled DMA-BUF 和 G0 的线性缓冲。每组使用 7 个 CAPTURE、回收 239 次，`detile=0`、`sync=0`。两组 4K 关闭 G0 后再次翻页 240/240，均为 60.00 FPS，墙钟分别为 59.88 和 59.80 FPS。线性 NV21/P010 与 FFmpeg 的逐帧 SHA256 匹配 14/14。[叠加压力串口](artifacts/arm64-7.3.5-vdp/phase2/validated/overlay/bench.txt) · [4K 单层与线性回归](artifacts/arm64-7.3.5-vdp/phase2/validated/regression/board.txt)
+
+| 输入色彩属性 | V0 CSC 回读 | HDMI 对软解 RGB MAE |
+|---|---|---:|
+| BT.709 限幅 | `0xb000=0x02`，旁路 | 4K Main 3.13/255，Main10 2.65/255 |
+| BT.601 限幅 | `0xb000=0x13`，Y 输入 DC −64 | 9.92/255 |
+| BT.709 全幅 | `0xb000=0x13`，Y 输入 DC 0 | 8.52/255 |
+| BT.2020 限幅 Main10 SDR | `0xb000=0x13`，Y 输入 DC −64 | 9.34/255 |
+
+三个转换样本均从 720p 放大。色彩属性显式选择，BT.709 全幅后切至 BT.2020 限幅，再以默认属性恢复 BT.709 限幅。恢复后 `0xb000=0x02`，4K Main MAE 仍为 3.13/255。[色彩和回归摘要](logs/489-vdp-phase2-acceptance.txt)
+
+实际 HDMI 交接模式为 3840×2160p60，AVI 为 YCbCr 4:2:0、BT.709 限幅，`0xf8ce1800[1:0]=0`，`0xf8ce1a08[1]=0`，HDR 通用数据包头 `0xf8ce18a8=0`。原厂驱动有 `vdp_drv_set_hdr_cfg`、`vdp_drv_set_hdr_vcoef` 和 `drv_hdmi_drm_infoframe_send` 链路。带 BT.2020、PQ、Mastering Display 和 MaxCLL 的 HDR10 样本通过 Main10 解码、V0 原生导入及翻页。当前固件交接保持 8-bit SDR，验收仅覆盖样本输入和扫描。HDR InfoFrame、深色传输、PQ 色调映射和线性光宽色域变换仍待独立链路支持，Connector 未注册 `HDR_OUTPUT_METADATA`。[固件数据包回读](artifacts/arm64-7.3.5-vdp/phase2/validated/firmware.txt) · [HDR10 输入板测](artifacts/arm64-7.3.5-vdp/phase2/validated/hdr10/board.txt)
+
+| 纯 RAM 镜像校验 | 值 |
+|---|---|
+| 大小 | 17,369,160 bytes |
+| SHA256 | `54e4179c37da9c8b072046333f279b662eeec24d8a0ffdb3512ecc8b7018edf8` |
+| U-Boot RAM `0x01fdffc0` 回读 CRC32 | `b13a17d7` |
+
+使用远程 GCC 14.2.0 构建。COM4 单进程独占，以 115200 8N1 经 TFTP 启动并回读 CRC32。板端根为 `rootfs`，无块设备挂载，`mmcblk0/ro=1`。BL31 按原有流程只读加载，未写入 U 盘、eMMC、OTP 或持久环境。[镜像](artifacts/arm64-7.3.5-vdp/phase2/validated/boot.img) · [构建](artifacts/arm64-7.3.5-vdp/phase2/validated/build.txt) · [TFTP](artifacts/arm64-7.3.5-vdp/phase2/validated/scale/board.tftp.txt)

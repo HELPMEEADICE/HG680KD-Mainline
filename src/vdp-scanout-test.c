@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -16,13 +17,18 @@
 #include "hi3798mv320-tiled.h"
 #include "vdp-scanout-test.h"
 
+#define V0_FB_PROP 3
+
 struct vdp_test {
 	int fd;
 	uint32_t format, width, height, blob;
 	struct vdp_test_stats stats;
 	uint32_t fb[VDP_TEST_MAX_CAPTURE];
-	uint32_t objects[3], counts[3], props[13];
-	uint64_t values[13];
+	uint32_t objects[4], counts[4], props[27];
+	uint64_t values[27];
+	uint32_t overlay_fb[2], overlay_handles[2];
+	unsigned int g0_prop;
+	bool overlay;
 };
 
 static void drm_fail(const char *reason)
@@ -47,7 +53,7 @@ static void drm_call(int fd, unsigned long cmd, void *arg, const char *name)
 #define CALL(fd, cmd, arg) drm_call(fd, cmd, arg, #cmd)
 #define PTR(p) ((uintptr_t)(p))
 
-static uint32_t property(int fd, uint32_t id, uint32_t type, const char *name, uint64_t *val)
+static uint32_t find_property(int fd, uint32_t id, uint32_t type, const char *name, uint64_t *val)
 {
 	uint32_t props[64];
 	uint64_t values[64];
@@ -70,11 +76,19 @@ static uint32_t property(int fd, uint32_t id, uint32_t type, const char *name, u
 			return props[i];
 		}
 	}
-	drm_fail(name);
 	return 0;
 }
 
-static bool supports_format(int fd, uint32_t plane, uint32_t format)
+static uint32_t property(int fd, uint32_t id, uint32_t type, const char *name, uint64_t *val)
+{
+	uint32_t prop = find_property(fd, id, type, name, val);
+
+	if (!prop)
+		drm_fail(name);
+	return prop;
+}
+
+static bool supports_format(int fd, uint32_t plane, uint32_t format, uint64_t modifier)
 {
 	struct drm_mode_get_blob get = {};
 	struct drm_format_modifier_blob *blob;
@@ -99,7 +113,7 @@ static bool supports_format(int fd, uint32_t plane, uint32_t format)
 	formats = (void *)((char *)blob + blob->formats_offset);
 	mods = (void *)((char *)blob + blob->modifiers_offset);
 	for (i = 0; i < blob->count_modifiers; i++) {
-		if (mods[i].modifier != MV320_TILED_MODIFIER)
+		if (mods[i].modifier != modifier)
 			continue;
 		for (j = 0; j < 64 && (uint64_t)mods[i].offset + j < blob->count_formats; j++)
 			if ((mods[i].formats & (1ULL << j)) && formats[mods[i].offset + j] == format)
@@ -107,6 +121,58 @@ static bool supports_format(int fd, uint32_t plane, uint32_t format)
 	}
 	free(blob);
 	return found;
+}
+
+static uint64_t enum_value(int fd, uint32_t id, const char *name)
+{
+	struct drm_mode_property_enum items[16];
+	struct drm_mode_get_property p = {
+		.prop_id = id, .count_enum_blobs = 16, .enum_blob_ptr = PTR(items),
+	};
+	unsigned int i;
+
+	CALL(fd, DRM_IOCTL_MODE_GETPROPERTY, &p);
+	for (i = 0; i < p.count_enum_blobs && i < 16; i++)
+		if (!strcmp(items[i].name, name))
+			return items[i].value;
+	drm_fail(name);
+	return 0;
+}
+
+static void create_overlay(struct vdp_test *t, unsigned int index, uint32_t format,
+			   unsigned int width, unsigned int height)
+{
+	struct drm_mode_create_dumb dumb = { .width = width, .height = height, .bpp = 32 };
+	struct drm_mode_map_dumb map = {};
+	struct drm_mode_fb_cmd2 fb = { .width = width, .height = height, .pixel_format = format };
+	uint8_t *pixels;
+	unsigned int x, y;
+
+	CALL(t->fd, DRM_IOCTL_MODE_CREATE_DUMB, &dumb);
+	fb.handles[0] = map.handle = dumb.handle;
+	fb.pitches[0] = dumb.pitch;
+	CALL(t->fd, DRM_IOCTL_MODE_ADDFB2, &fb);
+	CALL(t->fd, DRM_IOCTL_MODE_MAP_DUMB, &map);
+	pixels = mmap(NULL, dumb.size, PROT_READ | PROT_WRITE, MAP_SHARED, t->fd, map.offset);
+	if (pixels == MAP_FAILED)
+		drm_fail("cannot map the G0 dumb buffer");
+	for (y = 0; y < height; y++) {
+		uint32_t *line = (void *)(pixels + y * dumb.pitch);
+
+		for (x = 0; x < width; x++) {
+			if (x < 8 || y < 8 || x >= width - 8 || y >= height - 8)
+				line[x] = 0xfff0e040;
+			else if (y < height / 3)
+				line[x] = 0x002090f0;
+			else if (x >= width * 3 / 4)
+				line[x] = index ? 0xffe02040 : 0xff2090f0;
+			else
+				line[x] = 0x80000000;
+		}
+	}
+	munmap(pixels, dumb.size);
+	t->overlay_fb[index] = fb.fb_id;
+	t->overlay_handles[index] = dumb.handle;
 }
 
 struct vdp_test *vdp_test_open(const char *path, unsigned int width, unsigned int height,
@@ -123,6 +189,11 @@ struct vdp_test *vdp_test_open(const char *path, unsigned int width, unsigned in
 	struct drm_mode_get_connector conn = {};
 	struct drm_mode_modeinfo mode = {};
 	struct drm_mode_create_blob blob = { .data = PTR(&mode), .length = sizeof(mode) };
+	const char *overlay = getenv("VDP_TEST_OVERLAY");
+	const char *encoding = getenv("VDP_TEST_ENCODING");
+	const char *range = getenv("VDP_TEST_RANGE");
+	bool scale = getenv("VDP_TEST_SCALE") != NULL;
+	uint32_t plane_ids[16], gfx_format = DRM_FORMAT_ARGB8888;
 	unsigned int i;
 
 	if (!t)
@@ -144,12 +215,24 @@ struct vdp_test *vdp_test_open(const char *path, unsigned int width, unsigned in
 	res.count_fbs = res.count_encoders = 0;
 	CALL(t->fd, DRM_IOCTL_MODE_GETRESOURCES, &res);
 	CALL(t->fd, DRM_IOCTL_MODE_GETPLANERESOURCES, &planes);
-	if (planes.count_planes != 1)
-		drm_fail("expected one V0 plane");
-	planes.plane_id_ptr = PTR(&t->objects[2]);
+	if (!planes.count_planes || planes.count_planes > 16)
+		drm_fail("invalid DRM plane count");
+	planes.plane_id_ptr = PTR(plane_ids);
 	CALL(t->fd, DRM_IOCTL_MODE_GETPLANERESOURCES, &planes);
-	if (!supports_format(t->fd, t->objects[2], t->format))
+	if (overlay && !strcmp(overlay, "xrgb"))
+		gfx_format = DRM_FORMAT_XRGB8888;
+	else if (overlay && strcmp(overlay, "argb"))
+		drm_fail("VDP_TEST_OVERLAY expects argb or xrgb");
+	for (i = 0; i < planes.count_planes; i++) {
+		if (supports_format(t->fd, plane_ids[i], t->format, MV320_TILED_MODIFIER))
+			t->objects[2] = plane_ids[i];
+		if (overlay && supports_format(t->fd, plane_ids[i], gfx_format, DRM_FORMAT_MOD_LINEAR))
+			t->objects[3] = plane_ids[i];
+	}
+	if (!t->objects[2])
 		drm_fail("V0 IN_FORMATS lacks the selected tiled format");
+	if (overlay && !t->objects[3])
+		drm_fail("G0 IN_FORMATS lacks the selected linear format");
 	conn.connector_id = t->objects[0];
 	CALL(t->fd, DRM_IOCTL_MODE_GETCONNECTOR, &conn);
 	if (conn.count_modes != 1)
@@ -157,7 +240,7 @@ struct vdp_test *vdp_test_open(const char *path, unsigned int width, unsigned in
 	conn.modes_ptr = PTR(&mode);
 	conn.count_props = conn.count_encoders = 0;
 	CALL(t->fd, DRM_IOCTL_MODE_GETCONNECTOR, &conn);
-	if (width > mode.hdisplay || height > mode.vdisplay)
+	if (!scale && (width > mode.hdisplay || height > mode.vdisplay))
 		drm_fail("fixture is larger than the firmware mode");
 	CALL(t->fd, DRM_IOCTL_MODE_CREATEPROPBLOB, &blob);
 	t->blob = blob.blob_id;
@@ -174,10 +257,62 @@ struct vdp_test *vdp_test_open(const char *path, unsigned int width, unsigned in
 	t->values[2] = 1;
 	t->values[7] = width << 16;
 	t->values[8] = height << 16;
-	t->values[9] = ((mode.hdisplay - width) / 2) & ~1U;
-	t->values[10] = ((mode.vdisplay - height) / 2) & ~1U;
-	t->values[11] = width;
-	t->values[12] = height;
+	t->values[9] = scale ? 0 : ((mode.hdisplay - width) / 2) & ~1U;
+	t->values[10] = scale ? 0 : ((mode.vdisplay - height) / 2) & ~1U;
+	t->values[11] = scale ? mode.hdisplay : width;
+	t->values[12] = scale ? mode.vdisplay : height;
+	i = V0_FB_PROP + t->counts[2];
+	t->props[i] = find_property(t->fd, t->objects[2], DRM_MODE_OBJECT_PLANE, "COLOR_ENCODING", NULL);
+	if (t->props[i]) {
+		t->values[i] = enum_value(t->fd, t->props[i], encoding ? encoding : "ITU-R BT.709 YCbCr");
+		t->counts[2]++;
+	} else if (encoding) {
+		drm_fail("V0 has no COLOR_ENCODING property");
+	}
+	i = V0_FB_PROP + t->counts[2];
+	t->props[i] = find_property(t->fd, t->objects[2], DRM_MODE_OBJECT_PLANE, "COLOR_RANGE", NULL);
+	if (t->props[i]) {
+		t->values[i] = enum_value(t->fd, t->props[i], range ? range : "YCbCr limited range");
+		t->counts[2]++;
+	} else if (range) {
+		drm_fail("V0 has no COLOR_RANGE property");
+	}
+	if (overlay) {
+		unsigned int factor = mode.vdisplay == 2160 ? 2 : 1;
+		unsigned int w = mode.hdisplay / 2, h = mode.vdisplay / (8 * factor) * factor;
+		unsigned int g0 = t->objects[3];
+		uint32_t alpha = 65535;
+		const char *alpha_env = getenv("VDP_TEST_ALPHA");
+
+		t->overlay = true;
+		t->g0_prop = V0_FB_PROP + t->counts[2];
+		if (alpha_env) {
+			char *end;
+			unsigned long value = strtoul(alpha_env, &end, 10);
+
+			if (end == alpha_env || *end || value > 65535)
+				drm_fail("VDP_TEST_ALPHA expects an integer from 0 to 65535");
+			alpha = value;
+		}
+		for (i = 0; i < sizeof(plane_props) / sizeof(*plane_props); i++)
+			t->props[t->g0_prop + i] = property(t->fd, g0, DRM_MODE_OBJECT_PLANE, plane_props[i], NULL);
+		t->counts[3] = i + 2;
+		t->props[t->g0_prop + 10] = property(t->fd, g0, DRM_MODE_OBJECT_PLANE, "pixel blend mode", NULL);
+		t->values[t->g0_prop + 10] = enum_value(t->fd, t->props[t->g0_prop + 10], "Coverage");
+		t->props[t->g0_prop + 11] = property(t->fd, g0, DRM_MODE_OBJECT_PLANE, "alpha", NULL);
+		t->values[t->g0_prop + 11] = alpha;
+		t->values[t->g0_prop + 1] = t->objects[1];
+		t->values[t->g0_prop + 4] = (uint64_t)(w / factor) << 16;
+		t->values[t->g0_prop + 5] = (uint64_t)(h / factor) << 16;
+		t->values[t->g0_prop + 6] = (mode.hdisplay - w) / 2;
+		t->values[t->g0_prop + 7] = mode.vdisplay - 2 * h;
+		t->values[t->g0_prop + 8] = w;
+		t->values[t->g0_prop + 9] = h;
+		for (i = 0; i < 2; i++)
+			create_overlay(t, i, gfx_format, w / factor, h / factor);
+		printf("G0 plane=%u format=%s source=%ux%u display=%ux%u alpha=%u\n",
+		       g0, overlay, w / factor, h / factor, w, h, alpha);
+	}
 	printf("DRM connector=%u CRTC=%u V0=%u firmware=%s refresh=%u modifier=%#llx\n",
 	       t->objects[0], t->objects[1], t->objects[2], mode.name, mode.vrefresh,
 	       MV320_TILED_MODIFIER);
@@ -236,19 +371,21 @@ int vdp_test_fd(const struct vdp_test *t)
 
 static void commit(struct vdp_test *t, unsigned int flags, bool flip_only)
 {
-	uint32_t one = 1;
+	uint32_t flip_counts[] = { 1, 1 };
+	uint32_t flip_props[] = { t->props[V0_FB_PROP], t->props[t->g0_prop] };
+	uint64_t flip_values[] = { t->values[V0_FB_PROP], t->values[t->g0_prop] };
 	struct drm_mode_atomic cmd = {
-		.flags = flags, .count_objs = 3, .objs_ptr = PTR(t->objects),
+		.flags = flags, .count_objs = 3 + t->overlay, .objs_ptr = PTR(t->objects),
 		.count_props_ptr = PTR(t->counts), .props_ptr = PTR(t->props),
 		.prop_values_ptr = PTR(t->values), .user_data = t->stats.frames + 1,
 	};
 
 	if (flip_only) {
-		cmd.count_objs = 1;
+		cmd.count_objs = 1 + t->overlay;
 		cmd.objs_ptr = PTR(&t->objects[2]);
-		cmd.count_props_ptr = PTR(&one);
-		cmd.props_ptr = PTR(&t->props[3]);
-		cmd.prop_values_ptr = PTR(&t->values[3]);
+		cmd.count_props_ptr = PTR(flip_counts);
+		cmd.props_ptr = PTR(flip_props);
+		cmd.prop_values_ptr = PTR(flip_values);
 	}
 	CALL(t->fd, DRM_IOCTL_MODE_ATOMIC, &cmd);
 }
@@ -259,15 +396,16 @@ void vdp_test_submit(struct vdp_test *t, unsigned int index)
 
 	if (index >= VDP_TEST_MAX_CAPTURE || !t->fb[index])
 		drm_fail("CAPTURE index has no framebuffer");
-	t->values[3] = t->fb[index];
+	t->values[V0_FB_PROP] = t->fb[index];
+	if (t->overlay)
+		t->values[t->g0_prop] = t->overlay_fb[t->stats.frames % 2];
 	if (!t->stats.frames)
 		flags |= DRM_MODE_ATOMIC_ALLOW_MODESET;
 	commit(t, flags, t->stats.frames != 0);
 }
 
-void vdp_test_complete(struct vdp_test *t)
+static struct drm_event_vblank read_flip(struct vdp_test *t, uint64_t user_data)
 {
-	struct vdp_test_stats *stats = &t->stats;
 	struct drm_event_vblank event;
 	ssize_t ret;
 
@@ -276,9 +414,19 @@ void vdp_test_complete(struct vdp_test *t)
 	} while (ret < 0 && errno == EINTR);
 	if (ret != sizeof(event) || event.base.length != sizeof(event) ||
 	    event.base.type != DRM_EVENT_FLIP_COMPLETE || event.crtc_id != t->objects[1] ||
-	    event.user_data != stats->frames + 1 ||
-	    (stats->frames && (int32_t)(event.sequence - stats->last_sequence) <= 0))
-		drm_fail("missing or invalid V0 page-flip completion");
+	    event.user_data != user_data)
+		drm_fail("missing or invalid DRM page-flip completion");
+	return event;
+}
+
+void vdp_test_complete(struct vdp_test *t)
+{
+	struct vdp_test_stats *stats = &t->stats;
+	struct drm_event_vblank event = read_flip(t, stats->frames + 1);
+
+	if (stats->frames && (int32_t)(event.sequence - stats->last_sequence) <= 0)
+		drm_fail("V0 page-flip sequence did not advance");
+
 	stats->last_us = (uint64_t)event.tv_sec * 1000000 + event.tv_usec;
 	if (!stats->frames) {
 		stats->first_us = stats->last_us;
@@ -300,6 +448,24 @@ void vdp_test_close(struct vdp_test *t, unsigned int hold_ms)
 	struct drm_mode_destroy_blob blob = { .blob_id = t->blob };
 	unsigned int i;
 
+	if (t->overlay && t->stats.frames && getenv("VDP_TEST_G0_ONLY")) {
+		uint32_t count = 1;
+		uint64_t fb = t->overlay_fb[t->stats.frames % 2];
+		struct drm_mode_atomic cmd = {
+			.flags = DRM_MODE_ATOMIC_NONBLOCK | DRM_MODE_PAGE_FLIP_EVENT,
+			.count_objs = 1, .objs_ptr = PTR(&t->objects[3]),
+			.count_props_ptr = PTR(&count), .props_ptr = PTR(&t->props[t->g0_prop]),
+			.prop_values_ptr = PTR(&fb), .user_data = t->stats.frames + 1,
+		};
+		struct drm_event_vblank event;
+
+		CALL(t->fd, DRM_IOCTL_MODE_ATOMIC, &cmd);
+		event = read_flip(t, cmd.user_data);
+		if ((int32_t)(event.sequence - t->stats.last_sequence) <= 0)
+			drm_fail("G0-only page-flip sequence did not advance");
+		printf("G0 independent flip complete vblank=%u\n", event.sequence);
+	}
+
 	printf("V0 complete=%u first_vblank=%u last_vblank=%u\n",
 	       t->stats.frames, t->stats.first_sequence, t->stats.last_sequence);
 	fflush(stdout);
@@ -310,10 +476,18 @@ void vdp_test_close(struct vdp_test *t, unsigned int hold_ms)
 			;
 	}
 	t->values[0] = t->values[1] = t->values[2] = t->values[3] = t->values[4] = 0;
+	if (t->overlay)
+		t->values[t->g0_prop] = t->values[t->g0_prop + 1] = 0;
 	commit(t, DRM_MODE_ATOMIC_ALLOW_MODESET, false);
 	for (i = 0; i < VDP_TEST_MAX_CAPTURE; i++)
 		if (t->fb[i])
 			CALL(t->fd, DRM_IOCTL_MODE_RMFB, &t->fb[i]);
+	for (i = 0; i < 2 && t->overlay; i++) {
+		struct drm_mode_destroy_dumb dumb = { .handle = t->overlay_handles[i] };
+
+		CALL(t->fd, DRM_IOCTL_MODE_RMFB, &t->overlay_fb[i]);
+		CALL(t->fd, DRM_IOCTL_MODE_DESTROY_DUMB, &dumb);
+	}
 	CALL(t->fd, DRM_IOCTL_MODE_DESTROYPROPBLOB, &blob);
 	close(t->fd);
 	free(t);
