@@ -1,8 +1,25 @@
 # HG680KD U-Boot USB Auto-Boot & Android Fallback
 
+## 2026-11-28 Linux 7.3.6 USB deployment
+
+The deployed kernel is `7.3.6-hg680kd-arm64-usb`, based on the validated 7.3.6 VDEC, VDP, AIAO and KVM RAM configuration. The USB build removes the RAM BusyBox initramfs and retains `root=PARTLABEL=HG680KD_ROOT`, `rootfstype=f2fs`, the original F2FS root flags, `rootwait` and `cma=384M`. The device tree inherits the tested GIC maintenance PPI 9 and virtual hypervisor timer PPI 12, and disables the Linux eMMC controller. The existing default U-Boot flow still reads stock BL31 into RAM. The deployment performed no OTP operation or `saveenv`. [USB device tree](src/hi3798mv320-fiberhome-hg680kd-arm64-usb.dts)
+
+The uncompressed AArch64 legacy uImage is read into `0x01FDFFC0` with load and entry at `0x01FE0000`. Its embedded DTB starts at `0x01FE1000` and the kernel at `0x02000000`. The packed image occupies 14,846,024 bytes and is zero-padded to 15,245,384 bytes to preserve the existing FAT32 allocation. U-Boot reads 29,777 sectors starting at LBA 4136 (`0x1028`). The file and raw-sector readback matched the build byte for byte after sync, unmount and page-cache eviction. The last 440 bytes of the sector window matched the original window. [Readback and serial evidence](logs/519-usb-7.3.6-verification.txt)
+
+| USB file | SHA256 |
+|---|---|
+| `/boot/boot.img` | `401fcc8c363c3640f172f5754cbe56698c30519fc85f69cff7a2c474708541e5` |
+| `/boot/boot.img.bak-2026-11-28` | `670b1de4ff0c95df9738d18b5f1128b2ce3d42b555c9f9d5a4c8ee5840d45790` |
+
+A verified copy of the original image is stored locally at `artifacts/usb-backup/2026-11-28/boot.img`. Both copies are 15,245,384 bytes. The active `BOOT-SHA256SUMS` records the new image, and its predecessor is stored at `/boot/BOOT-SHA256SUMS.bak-2026-11-28`. For rollback from a RAM system, confirm the USB partition identity and backup digest before mounting the FAT32 partition writable. Restore `boot.img` in place with `dd conv=notrunc,fsync` to preserve its LBA mapping, restore the checksum manifest and verify the restored file and sector window before rebooting.
+
+COM4 at 115200 8N1 captured a software reboot through BootROM and the default USB boot command without TFTP. Armbian ran from `/dev/sda3` F2FS with 393,216 KiB CMA. `/dev/video0`, `/dev/media0`, `/dev/dri/card0` and `/dev/snd/pcmC0D0p` registered. All four CPUs entered at EL1 and KVM reported `HYP mode not available`. A physical power cycle was outside this check. The 2160p60 HEVC Main10 sample displayed 1,080/1,080 frames at 60.000 FPS with zero drops and zero missed vblanks. ALSA played 864,000 PCM frames at 48 kHz with zero XRUN, and SMMU INTID 181 remained zero. The player and its private libraries are installed under `/opt/vdp-player`, with `/opt/vdp-player/run` as the entry point. The existing `run-rpc_pipefs.mount` failure and systemd ordering cycle were also seen on 7.3.5.
+
+To reproduce the image, start with the patched Linux 7.3.6 source tree, GCC 14.2.0 toolchain, and accepted `out/arm64-7.3.6-kvm-test` build under `~/hg680kd-mainline`. Stage `rtl8761btv_vat_fw.bin` and `rtl8761btv_vat_config.bin` from the original USB system's `/lib/firmware/rtl_bt/` into `out/arm64-7.3.6-usb-2026-11-28/firmware/rtl_bt/`. The build script checks their hashes and embeds them so the built-in Bluetooth driver can probe before the F2FS root is mounted. It disables global dynamic debug to fit the fixed read window. Run `bash scripts/build_usb_736.sh` from the project checkout. The packed image and its checksum are written under `out/arm64-7.3.6-usb-2026-11-28/deploy/`. The embedded kernel configuration records the absolute firmware directory, so the package hash depends on the build path. [Build script](scripts/build_usb_736.sh)
+
 ## 2026-11-22 USB VDEC deployment
 
-The deployed kernel is `7.3.5-hg680kd-arm64-armbian-usb-vdec`. It uses the validated H.264 Direct fix and Cacheable + NEON detiling from `arm64-7.3.5-vdec-direct`. The legacy AArch64 uImage includes the board DTB and boots without an initrd. It retains `root=PARTLABEL=HG680KD_ROOT`, `rootfstype=f2fs` and the existing F2FS mount options, and adds `cma=384M`.
+That deployment used `7.3.5-hg680kd-arm64-armbian-usb-vdec`. It includes the validated H.264 Direct fix and Cacheable + NEON detiling from `arm64-7.3.5-vdec-direct`. The legacy AArch64 uImage includes the board DTB and boots without an initrd. It retains `root=PARTLABEL=HG680KD_ROOT`, `rootfstype=f2fs` and the existing F2FS mount options, and adds `cma=384M`.
 
 The build on `hedc@ArchLinux-E5-Server` disables global dynamic debug to fit the existing U-Boot read window. The VDEC driver and media dependencies are installed under `/lib/modules/7.3.5-hg680kd-arm64-armbian-usb-vdec/`. The final file is padded to 15,245,384 bytes and written in place to preserve LBA `0x1028` and the existing `0x7451`-sector read. File and raw-sector readback matched the build after sync and unmount.
 

@@ -1,0 +1,77 @@
+HG680KD USB Linux 7.3.6 verification, 2026-11-28
+Selected output from USB backups, file and sector readback, COM4 software reboot, and playback.
+
+Backup and post-write readback
+sda    SanDisk 3.2Gen1 usb  30784094208 gpt
+15245384 bytes /boot/boot.img
+15245384 bytes /boot/boot.img.bak-2026-11-28
+401fcc8c363c3640f172f5754cbe56698c30519fc85f69cff7a2c474708541e5  /boot/boot.img
+670b1de4ff0c95df9738d18b5f1128b2ce3d42b555c9f9d5a4c8ee5840d45790  /boot/boot.img.bak-2026-11-28
+USB_DEPLOY_READBACK_OK
+Raw window SHA256 (29,777 sectors from LBA 4136, 512 bytes/sector)
+  original  1dc5da7035dcb559d9746c0ef1df44e386d0c628c3f7ef0511d2f0e23015fc10
+  deployed  54a8c4727862d366e71685c358e2b1d959cd9333835b90200f667305b964fabb
+
+COM4 at 115200 8N1, default USB autoboot without TFTP
+Bootrom start
+Autobooting in 3 seconds, Press Ctrl+C to stop autoboot
+usb read: device 0 block # 4136, count 29777 ... 29777 blocks read: OK
+MMC read: dev # 0, block # 65536, count 4096 ... 4096 blocks read: OK
+Starting kernel ...
+[    0.000000] Linux version 7.3.6-hg680kd-arm64-usb (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+[    0.000000] cma: Reserved 384 MiB at 0x0000000067000000
+[    0.142572] CPU: All CPU(s) started at EL1
+[    0.364844] kvm [1]: HYP mode not available
+[    1.796555] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+[    2.010460] VFS: Mounted root (f2fs filesystem) readonly on device 8:3.
+
+Runtime checks
+Linux hg680kd 7.3.6-hg680kd-arm64-usb #1 SMP PREEMPT 2025-12-01 00:00:00 UTC aarch64 GNU/Linux
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 clk_ignore_unused blkdevparts=mmcblk0:1200M@0xd400000(system)ro,400M@0x8a400000(vendor)ro root=PARTLABEL=HG680KD_ROOT rootfstype=f2fs rootflags=compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime rootwait cma=384M
+/dev/sda3 f2fs rw,noatime,lazytime,background_gc=on,gc_merge,nodiscard,user_xattr,inline_xattr,acl,inline_data,inline_dentry,noflush_merge,barrier,extent_cache,mode=adaptive,active_logs=6,alloc_mode=default,checkpoint_merge,fsync_mode=posix,compress_algorithm=zstd:6,compress_log_size=2,compress_chksum,compress_mode=fs,atgc,memory=normal,errors=continue,lookup_mode=perf
+/dev/sda1 vfat
+CmaTotal:         393216 kB
+CmaFree:          356160 kB
+crw-rw----+ 1 root video 226,  0 Nov 27 16:49 /dev/dri/card0
+crw-rw----+ 1 root video 253,  0 Nov 27 16:49 /dev/media0
+crw-rw----+ 1 root audio 116, 16 Nov 27 16:49 /dev/snd/pcmC0D0p
+crw-rw----+ 1 root video  81,  0 Nov 27 16:49 /dev/video0
+CONFIG_INITRAMFS_SOURCE=""
+CONFIG_VIRTUALIZATION=y
+CONFIG_KVM=y
+EMMC_CONTROLLER_DISABLED
+KVM_DEVICE_ABSENT
+
+HEVC Main10 plus stereo PCM playback
+BEFORE_PLAYBACK
+  17:          0          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  20:          0          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          0          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+vblank_irqs 0 in_blank 0 last_irq_state 00000000 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+DURING_PLAYBACK
+  17:        166          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  20:        174          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:        276          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+vblank_irqs 167 in_blank 167 last_irq_state 008e0033 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+	mode: "3840x2160": 60 594000 3840 4016 4104 4400 2160 2168 2178 2250 0x48 0x5
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.256 seconds=18.226 usr=6.80% sys=8.71% idle=84.46% peak_rss_kib=89920
+AFTER_PLAYBACK
+  17:       1082          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  20:       1080          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:       1800          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+vblank_irqs 1082 in_blank 1082 last_irq_state 0121002b unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+PLAYER_INSTALLED
+PLAYER_SMOKE_OK
+
+Final on-device boot checksum manifest
+boot.img: OK
+Image: OK
+hi3798mv320-fiberhome-hg680kd-arm64-all-2g-hdmi-bt-dvfs-usb.dtb: OK

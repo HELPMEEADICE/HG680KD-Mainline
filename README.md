@@ -1,6 +1,10 @@
 # 烽火 HG680KD 主线 Linux 适配
 
-本项目最初以 Linux 6.18.64 为基线、后经 Linux 7.2.5 验证全硬件并在最新阶段通过 GCC 14.2.0 升级至 **Linux 7.3.5**，可从原厂 U-Boot 2022.07 和 BL31 直接冷启动 U 盘 **Armbian (Trixie arm64) + Xfce 桌面**（亦保留各版本 RAM 镜像作回退）。设备为海思 Hi3798MV320，四核 Cortex-A55，实装 2 GiB LPDDR4，板载 eMMC 始终强制只读（`ro=1`）。
+本项目从 Linux 6.18.64 起步，现已在海思 Hi3798MV320 的四核 Cortex-A55、2 GiB LPDDR4 烽火 HG680KD 上验证 **Linux 7.3.6**。原厂 U-Boot 和 BL31 可引导 U 盘上的 Armbian（Trixie arm64）。历史 RAM 镜像可用于回退。
+
+## ARM64 Linux 7.3.6（默认 U 盘启动）
+
+`7.3.6-hg680kd-arm64-usb` 已通过 COM4 软件重启验证，沿默认 U-Boot USB 路径挂载 F2FS 根分区，预留 384 MiB CMA。VDEC、VDP 和 AIAO 通过 2160p60 HEVC Main10 与 48 kHz 双声道 PCM 播放测试。默认启动在 EL1，内核已编入 KVM 和 PPI 9/12 设备树。默认 USB 版在 Linux 中禁用 eMMC 控制器。[构建、双重备份与回读验证](UBOOT-USB-BOOT.md#2026-11-28-linux-736-usb-deployment) · [实机记录](logs/519-usb-7.3.6-verification.txt)
 
 ## ARM64 Linux 7.3.5 H.264 / HEVC Stateless 解码（TFTP RAM）
 
