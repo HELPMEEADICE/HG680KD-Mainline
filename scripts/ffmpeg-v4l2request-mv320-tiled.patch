@@ -1,0 +1,150 @@
+diff --git a/libavutil/hwcontext_v4l2request.c b/libavutil/hwcontext_v4l2request.c
+--- a/libavutil/hwcontext_v4l2request.c
++++ b/libavutil/hwcontext_v4l2request.c
+@@ -41,7 +41,14 @@
+     int nb_pixelformats;
+ } V4L2RequestVideoDecoder;
+
++/* Private Hi3798MV320 VDEC/VDP ABI. */
++#define V4L2_PIX_FMT_MV320_TILED8  v4l2_fourcc('H', '8', 'T', 'V')
++#define V4L2_PIX_FMT_MV320_TILED10 v4l2_fourcc('H', '0', 'T', 'V')
++#define DRM_FORMAT_MV320_TILED10  fourcc_code('H', '0', 'T', 'V')
++#define DRM_FORMAT_MOD_MV320_TILED UINT64_C(0xfe00000000000320)
++
+ typedef struct V4L2RequestDeviceContext {
++    int mv320_tiled;
+     V4L2RequestVideoDecoder *decoders;
+     int nb_decoders;
+ } V4L2RequestDeviceContext;
+@@ -67,6 +74,8 @@
+ } v4l2request_capture_pixelformats[] = {
+     { V4L2_PIX_FMT_NV12, AV_PIX_FMT_NV12, DRM_FORMAT_NV12, DRM_FORMAT_MOD_LINEAR, 8 },
+     { V4L2_PIX_FMT_NV21, AV_PIX_FMT_NV21, DRM_FORMAT_NV21, DRM_FORMAT_MOD_LINEAR, 8 },
++    { V4L2_PIX_FMT_MV320_TILED8, AV_PIX_FMT_NV21, DRM_FORMAT_NV21, DRM_FORMAT_MOD_MV320_TILED, 8 },
++    { V4L2_PIX_FMT_MV320_TILED10, AV_PIX_FMT_P010, DRM_FORMAT_MV320_TILED10, DRM_FORMAT_MOD_MV320_TILED, 10 },
+ #if defined(V4L2_PIX_FMT_NV12_32L32)
+     { V4L2_PIX_FMT_NV12_32L32, AV_PIX_FMT_YUV420P, DRM_FORMAT_NV12, DRM_FORMAT_MOD_ALLWINNER_TILED, 8 },
+ #endif
+@@ -152,6 +161,29 @@
+                              format->fmt.pix_mp.plane_fmt[0].bytesperline :
+                              format->fmt.pix.bytesperline;
+
++    if (format_modifier == DRM_FORMAT_MOD_MV320_TILED) {
++        const struct v4l2_pix_format_mplane *pix = &format->fmt.pix_mp;
++        const int main10 = pixelformat == V4L2_PIX_FMT_MV320_TILED10;
++        ptrdiff_t y;
++
++        if (!V4L2_TYPE_IS_MULTIPLANAR(format->type) || desc->nb_objects != 1 ||
++            !pix->width || !pix->height || pix->width > 4096 || pix->height > 2304 ||
++            layer->planes[0].pitch != FFALIGN(pix->width, 256))
++            return AVERROR(EINVAL);
++
++        y = layer->planes[0].pitch * FFALIGN(pix->height, 64);
++        if (desc->objects[0].size < y * (main10 ? 15 : 12) / 8)
++            return AVERROR(EINVAL);
++
++        layer->nb_planes = main10 ? 4 : 2;
++        layer->planes[1] = (AVDRMPlaneDescriptor){ 0, y, layer->planes[0].pitch };
++        if (main10) {
++            layer->planes[2] = (AVDRMPlaneDescriptor){ 0, y * 3 / 2, layer->planes[0].pitch / 4 };
++            layer->planes[3] = (AVDRMPlaneDescriptor){ 0, y * 7 / 4, layer->planes[0].pitch / 4 };
++        }
++        return 0;
++    }
++
+     // AFBC formats only use 1 plane, remaining use 2 planes
+     if ((desc->objects[0].format_modifier >> 56) != DRM_FORMAT_MOD_VENDOR_ARM) {
+         layer->nb_planes = 2;
+@@ -211,6 +243,8 @@
+ {
+     V4L2RequestDeviceContext *hwctx = hwdev->hwctx;
+
++    /* The consumer must explicitly opt in to private, scanout-only buffers. */
++    hwctx->mv320_tiled = av_dict_get(opts, "mv320_tiled", NULL, 0) != NULL;
+     hwctx->decoders = NULL;
+     hwctx->nb_decoders = 0;
+
+@@ -255,6 +289,7 @@
+ {
+     AVV4L2RequestFramesContext *fctx = hwfc->hwctx;
+     AVV4L2RequestFramesContextInternal *fctxi = fctx->internal;
++    const V4L2RequestDeviceContext *dev = hwfc->device_ctx->hwctx;
+     enum v4l2_buf_type type = fctxi->capture.format.type;
+     uint32_t pixelformat, fallback = 0;
+     struct v4l2_format format = {
+@@ -265,6 +300,24 @@
+         .type = type,
+     };
+
++    if (dev->mv320_tiled) {
++        uint32_t native_format;
++        int ret;
++
++        if (!V4L2_TYPE_IS_MULTIPLANAR(type) ||
++            (fctx->bit_depth != 8 && fctx->bit_depth != 10))
++            return AVERROR(ENOSYS);
++
++        native_format = fctx->bit_depth == 10 ? V4L2_PIX_FMT_MV320_TILED10 :
++                                               V4L2_PIX_FMT_MV320_TILED8;
++        ret = v4l2request_set_format(hwfc, type, native_format, 0);
++        if (ret < 0)
++            return ret;
++        if (ioctl(fctxi->video_fd, VIDIOC_G_FMT, &format) < 0)
++            return AVERROR(errno);
++        return format.fmt.pix_mp.pixelformat == native_format ? 0 : AVERROR(ENOSYS);
++    }
++
+     // Get the driver preferred (or default) format
+     if (ioctl(fctxi->video_fd, VIDIOC_G_FMT, &format) < 0)
+         return AVERROR(errno);
+@@ -275,7 +328,8 @@
+
+     // Try to use the driver preferred format when it is a known format
+     for (int i = 0; i < FF_ARRAY_ELEMS(v4l2request_capture_pixelformats); i++) {
+-        if (pixelformat == v4l2request_capture_pixelformats[i].pixelformat &&
++        if (v4l2request_capture_pixelformats[i].format_modifier != DRM_FORMAT_MOD_MV320_TILED &&
++            pixelformat == v4l2request_capture_pixelformats[i].pixelformat &&
+             (fctx->bit_depth == v4l2request_capture_pixelformats[i].bit_depth ||
+              !fctx->bit_depth))
+             return v4l2request_set_format(hwfc, type, pixelformat, 0);
+@@ -284,7 +338,8 @@
+     // Next try to use the first known format with matching bit depth
+     while (ioctl(fctxi->video_fd, VIDIOC_ENUM_FMT, &fmtdesc) >= 0) {
+         for (int i = 0; i < FF_ARRAY_ELEMS(v4l2request_capture_pixelformats); i++) {
+-            if (fmtdesc.pixelformat == v4l2request_capture_pixelformats[i].pixelformat) {
++            if (v4l2request_capture_pixelformats[i].format_modifier != DRM_FORMAT_MOD_MV320_TILED &&
++                fmtdesc.pixelformat == v4l2request_capture_pixelformats[i].pixelformat) {
+                 if (fctx->bit_depth == v4l2request_capture_pixelformats[i].bit_depth ||
+                     !fctx->bit_depth)
+                     return v4l2request_set_format(hwfc, type, fmtdesc.pixelformat, 0);
+@@ -955,7 +1010,7 @@
+         fctxi->video_fd = -1;
+     }
+
+-    if (fctxi->media_fd) {
++    if (fctxi->media_fd >= 0) {
+         close(fctxi->media_fd);
+         fctxi->media_fd = -1;
+     }
+@@ -1014,6 +1069,9 @@
+     V4L2RequestMapping *map;
+     int ret, i, p, plane;
+     void *addr;
++
++    if (desc->objects[0].format_modifier == DRM_FORMAT_MOD_MV320_TILED)
++        return AVERROR(ENOSYS);
+
+     map = av_mallocz(sizeof(*map));
+     if (!map)
+@@ -1078,9 +1136,10 @@
+                                             enum AVHWFrameTransferDirection dir,
+                                             enum AVPixelFormat **formats)
+ {
++    const V4L2RequestDeviceContext *dev = hwfc->device_ctx->hwctx;
+     enum AVPixelFormat *fmts;
+
+-    if (dir == AV_HWFRAME_TRANSFER_DIRECTION_TO)
++    if (dir == AV_HWFRAME_TRANSFER_DIRECTION_TO || dev->mv320_tiled)
+         return AVERROR(ENOSYS);
+
+     fmts = av_malloc_array(2, sizeof(*fmts));

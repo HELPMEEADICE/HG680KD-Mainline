@@ -1,0 +1,282 @@
+VDP Phase 3 player acceptance, 2026-11-27
+Selected serial and build output. Full local logs and media: artifacts/arm64-7.3.5-vdp/phase3.
+
+## Build and RAM boot
+aarch64-linux-gcc (GCC) 14.2.0
+Bytes transferred = 17369160 (1090848 hex)
+[host] boot.img SHA256 54e4179c37da9c8b072046333f279b662eeec24d8a0ffdb3512ecc8b7018edf8
+CRC32 for 01fdffc0 ... 03070807 ==> b13a17d7
+rootfs / rootfs rw,size=811144k,nr_inodes=202786 0 0
+EMMC_RO=1
+
+## Payload SHA256
+07981e273531dc16fcea9d198d672ae10931085ff61c540cc614c950bed0f7c8  vdp-player
+42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c  ld-musl-aarch64.so.1
+a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd  libdrm.so.2
+ad842e6ba84b99bf3e0f1bdfee801798e6114c455d601845df7f5cff8854b10c  libudev.so.1
+63a4f8e2da6f01a29ad6a5bfa5092d8f08dc17dcb2f72650c42180709a5240d2  main10-2160p60.mkv
+ffd53c982a3f8def82d7a8ad8f3b50e972538e1ebbc817e1931da3f0e6194201  main-2160p60.mp4
+e1730ad4eb25207ce8674932cff362551cdba28aacf6446d06ec20ac4411fdbc  h264-1080p60.mp4
+4248174e31c28361eefef290020891c91a11a7a5df4e6cd35543b1c55068f7fb  color-switch.mkv
+
+## main10-eos
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player main10-2160p60.mkv
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.521 seconds=18.145 usr=2.59% sys=4.81% idle=92.60% peak_rss_kib=89180
+CmaFree (before / during / after, KiB) 388640 / 202452 / 202452 / 388564
+MemAvailable (before / during / after, KiB) 1939164 / 1686008 / 1685520 / 1957112
+2018 600000ff
+208c 00000000
+22e8 00000000
+22c0 00100000
+22dc 00001000
+5018 e00000ff
+8a08 00000303
+8240 00000000
+8284 00000000
+828c 00000000
+8294 00000000
+b000 00000002
+b050 00000000
+fetch_underflow 00000000
+2018 e00000ff
+208c 086f0eff
+22e8 086f0eff
+5018 600000ff
+8240 0000010a
+8284 680f4000
+828c 682f2000
+8294 03c003c0
+8284 6e2f4000
+828c 6e4f2000
+8284 715f4000
+828c 717f2000
+vblank_irqs 1081 in_blank 1081 last_irq_state 00aa0023 unexpected_status 00000000 underflow_irqs 0
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=125616 hw=9943213 detile=0 clear=1346968 sync=0
+[host] main10-eos VDP IRQ +1081, PXP IRQ +1080, SMMU 181 +0, CMA free change -76 KiB PASS
+
+## main-eos
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player main-2160p60.mp4
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=NV21 modifier=0xfe00000000000320 objects=1 planes=2
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.576 seconds=18.128 usr=2.73% sys=5.38% idle=91.89% peak_rss_kib=89288
+CmaFree (before / during / after, KiB) 388564 / 233052 / 233052 / 388444
+MemAvailable (before / during / after, KiB) 1957112 / 1716064 / 1715076 / 1955144
+S265 little-endian (0x35363253) -> H8TV little-endian (0x56543848) 3840x2160 timing frames=1080 avg_ns/frame rbsp=126512 hw=9312744 detile=0 clear=1338517 sync=0
+[host] main-eos VDP IRQ +1081, PXP IRQ +1080, SMMU 181 +0, CMA free change -120 KiB PASS
+
+## h264-osd-playback
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player --osd h264-1080p60.mp4
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+G0 plane=40 ARGB8888 1920x1080 -> 3840x2160 blend=Coverage
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=1920x1080 destination=3840x2160 fourcc=NV21 modifier=0xfe00000000000320 objects=1 planes=2
+DRM plane[0] offset=0 pitch=2048
+DRM plane[1] offset=2228224 pitch=2048
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.766 seconds=18.070 usr=1.55% sys=6.54% idle=91.91% peak_rss_kib=22784
+G0 progress flips=100 permille=990 duration=18.000
+CmaFree (before / during / after, KiB) 388444 / 330924 / 330924 / 388636
+MemAvailable (before / during / after, KiB) 1954900 / 1881288 / 1880024 / 1957100
+2018 600000ff
+208c 086f0eff
+22e8 086f0eff
+22c0 00100000
+22dc 00001000
+5018 600000ff
+8a08 00000303
+8240 0000000a
+8284 00000000
+828c 00000000
+8294 00000000
+b000 00000002
+b050 00000000
+fetch_underflow 00000000
+2018 e00000ff
+22c0 c4080000
+22dc 00000800
+5018 e00000ff
+vblank_irqs 3243 in_blank 3243 last_irq_state 00f60023 unexpected_status 00000000 underflow_irqs 0
+S264 little-endian (0x34363253) -> H8TV little-endian (0x56543848) 1920x1088 timing frames=1080 avg_ns/frame rbsp=202227 hw=3818045 detile=0 clear=2379880 sync=0
+[host] h264-osd-playback VDP IRQ +1081, PXP IRQ +1080, SMMU 181 +0, CMA free change 192 KiB PASS
+
+## h264-osd-held
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player --osd --hold-first 8 h264-1080p60.mp4
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+G0 plane=40 ARGB8888 1920x1080 -> 3840x2160 blend=Coverage
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=1920x1080 destination=3840x2160 fourcc=NV21 modifier=0xfe00000000000320 objects=1 planes=2
+DRM plane[0] offset=0 pitch=2048
+DRM plane[1] offset=2228224 pitch=2048
+PLAY decoded=1 displayed=1 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=0.000 wall_fps=0.124 seconds=8.078 usr=0.03% sys=0.19% idle=99.78% peak_rss_kib=22016
+G0 progress flips=1 permille=0 duration=18.000
+CmaFree (before / during / after, KiB) 388636 / 338484 / 388532
+MemAvailable (before / during / after, KiB) 1956768 / 1873936 / 1947624
+S264 little-endian (0x34363253) -> H8TV little-endian (0x56543848) 1920x1088 timing frames=8 avg_ns/frame rbsp=135984 hw=4159078 detile=0 clear=636999 sync=0
+[host] h264-osd-held VDP IRQ +312, PXP IRQ +8, SMMU 181 +0, CMA free change -104 KiB PASS
+
+## h264-clean-held
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player --hold-first 8 h264-1080p60.mp4
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=1920x1080 destination=3840x2160 fourcc=NV21 modifier=0xfe00000000000320 objects=1 planes=2
+DRM plane[0] offset=0 pitch=2048
+DRM plane[1] offset=2228224 pitch=2048
+PLAY decoded=1 displayed=1 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=0.000 wall_fps=0.124 seconds=8.079 usr=0.03% sys=0.19% idle=99.78% peak_rss_kib=21888
+CmaFree (before / during / after, KiB) 388532 / 354684 / 388604
+MemAvailable (before / during / after, KiB) 1948916 / 1891732 / 1945600
+S264 little-endian (0x34363253) -> H8TV little-endian (0x56543848) 1920x1088 timing frames=8 avg_ns/frame rbsp=136604 hw=4149973 detile=0 clear=568526 sync=0
+[host] h264-clean-held VDP IRQ +313, PXP IRQ +8, SMMU 181 +0, CMA free change 72 KiB PASS
+
+## main10-seek
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player --seek 2:9 --seek 11:3 --seek 5:16 main10-2160p60.mkv
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+SEEK 2.000 -> 9.000
+SEGMENT pts=9.000
+SEEK 11.000 -> 3.000
+SEGMENT pts=3.000
+SEEK 5.000 -> 16.000
+SEGMENT pts=16.000
+PLAY decoded=603 displayed=480 dropped=0 preroll=120 seeks=3 eos=1 missed_vblanks=0 fps=48.878 wall_fps=48.191 seconds=9.960 usr=3.14% sys=5.17% idle=91.69% peak_rss_kib=89136
+CmaFree (before / during / after, KiB) 388604 / 202452 / 388564
+MemAvailable (before / during / after, KiB) 1945600 / 1683976 / 1953924
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=624 avg_ns/frame rbsp=112104 hw=10026264 detile=0 clear=1341957 sync=0
+[host] main10-seek VDP IRQ +590, PXP IRQ +624, SMMU 181 +0, CMA free change -40 KiB PASS
+
+## main10-restart-1
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player --start 2 --stop-at 4 main10-2160p60.mkv
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+SEGMENT pts=2.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+PLAY decoded=121 displayed=120 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=60.000 wall_fps=55.922 seconds=2.146 usr=2.57% sys=6.07% idle=91.37% peak_rss_kib=88800
+CmaFree (before / during / after, KiB) 388564 / 202452 / 388564
+MemAvailable (before / during / after, KiB) 1954172 / 1685552 / 1957204
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=128 avg_ns/frame rbsp=91867 hw=10030541 detile=0 clear=1187203 sync=0
+[host] main10-restart-1 VDP IRQ +121, PXP IRQ +128, SMMU 181 +0, CMA free change 0 KiB PASS
+
+## main10-restart-2
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player --start 2 --stop-at 4 main10-2160p60.mkv
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+SEGMENT pts=2.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+PLAY decoded=121 displayed=120 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=60.000 wall_fps=55.571 seconds=2.159 usr=2.66% sys=6.37% idle=90.97% peak_rss_kib=88968
+CmaFree (before / during / after, KiB) 388564 / 202452 / 388564
+MemAvailable (before / during / after, KiB) 1956956 / 1686148 / 1920164
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=128 avg_ns/frame rbsp=85203 hw=10030719 detile=0 clear=1142577 sync=0
+[host] main10-restart-2 VDP IRQ +121, PXP IRQ +128, SMMU 181 +0, CMA free change 0 KiB PASS
+
+## main10-restart-3
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player --start 2 --stop-at 4 main10-2160p60.mkv
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+SEGMENT pts=2.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=3840x2160 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=3840
+DRM plane[1] offset=8355840 pitch=3840
+DRM plane[2] offset=12533760 pitch=960
+DRM plane[3] offset=14622720 pitch=960
+PLAY decoded=121 displayed=120 dropped=0 preroll=0 seeks=0 eos=0 missed_vblanks=0 fps=60.000 wall_fps=56.042 seconds=2.141 usr=2.57% sys=6.42% idle=91.02% peak_rss_kib=89056
+CmaFree (before / during / after, KiB) 388564 / 202452 / 388564
+MemAvailable (before / during / after, KiB) 1922144 / 1684628 / 1953368
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=128 avg_ns/frame rbsp=93292 hw=10027673 detile=0 clear=1167849 sync=0
+[host] main10-restart-3 VDP IRQ +121, PXP IRQ +128, SMMU 181 +0, CMA free change 0 KiB PASS
+
+## color-switch
+cd /tmp && ./ld-musl-aarch64.so.1 --library-path . ./vdp-player color-switch.mkv
+KMS connector=47 CRTC=45 V0=35 mode=3840x2160@60
+SEGMENT pts=0.000
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+V0 source=1920x1080 destination=3840x2160 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+DRM plane[0] offset=0 pitch=2048
+DRM plane[1] offset=2228224 pitch=2048
+DRM plane[2] offset=3342336 pitch=512
+DRM plane[3] offset=3899392 pitch=512
+V0 color COLOR_ENCODING=0 COLOR_RANGE=1
+V0 color COLOR_ENCODING=2 COLOR_RANGE=0
+V0 color COLOR_ENCODING=1 COLOR_RANGE=0
+PLAY decoded=480 displayed=480 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.684 seconds=8.042 usr=0.84% sys=8.96% idle=90.21% peak_rss_kib=21384
+CmaFree (before / during / after, KiB) 388564 / 348252 / 348252 / 348252 / 348252 / 388188
+MemAvailable (before / during / after, KiB) 1953492 / 1900300 / 1899512 / 1897156 / 1900244 / 1951580
+2018 600000ff
+208c 086f0eff
+22e8 086f0eff
+22c0 00100000
+22dc 00001000
+5018 600000ff
+8a08 00000303
+8240 0000010a
+8284 6d1f4000
+828c 6d3f2000
+8294 03c003c0
+b000 00000002
+b050 00000000
+fetch_underflow 00000000
+2018 e00000ff
+22c0 c4080000
+22dc 00000800
+8284 68230000
+828c 682b8000
+8294 02000200
+8284 6a530000
+828c 6a5b8000
+b000 00000013
+8284 68830000
+828c 688b8000
+b050 000007c0
+8284 67830000
+828c 678b8000
+8284 6a630000
+828c 6a6b8000
+vblank_irqs 5302 in_blank 5302 last_irq_state 001e0023 unexpected_status 00000000 underflow_irqs 0
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 1920x1088 timing frames=120 avg_ns/frame rbsp=46324 hw=2335768 detile=0 clear=2631389 sync=0
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 1920x1088 timing frames=120 avg_ns/frame rbsp=67063 hw=2338846 detile=0 clear=2761203 sync=0
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 1920x1088 timing frames=120 avg_ns/frame rbsp=63611 hw=2338916 detile=0 clear=2785512 sync=0
+S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 1920x1088 timing frames=120 avg_ns/frame rbsp=50050 hw=2336636 detile=0 clear=2776999 sync=0
+[host] color-switch VDP IRQ +481, PXP IRQ +480, SMMU 181 +0, CMA free change -376 KiB PASS
+
+## Linear CAPTURE
+Using CAPTURE buffer format NV21 (1920x1088)
+HASH FRAMES 240
+fa9bec434bf726d39941e865fc1c5f000f07e2939e6e6a54fd2084da9215d262  -
+[host] h264-1080p pixels MATCH
+Using CAPTURE buffer format P010 (3840x2160)
+HASH FRAMES 240
+7678094fd8d6edd846ba680c0e85c0c1543feea74594029f89a2435b2e51fb1f  -
+[host] hevc10-2160p pixels MATCH
+
+## HDMI capture
+1080p30 capture of 2160p60 HDMI output. 301 frames recorded.
+RGB MAE versus software reference: 7.74/255; versus U/V-swapped reference: 27.26/255.
+OSD coverage sample, clean to overlay RGB: (55, 108, 30) -> (26, 51, 13).
+Progress fill at 2 s and 7 s of capture: 116 and 544 pixels.
+Representative frame: 490-vdp-phase3-hdmi.png.

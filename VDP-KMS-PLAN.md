@@ -184,3 +184,73 @@ G0 的 ARGB Coverage 在 1080p 放大与 4K Main/Main10 直扫时出图，G0-onl
 | U-Boot RAM `0x01fdffc0` 回读 CRC32 | `b13a17d7` |
 
 使用远程 GCC 14.2.0 构建。COM4 单进程独占，以 115200 8N1 经 TFTP 启动并回读 CRC32。板端根为 `rootfs`，无块设备挂载，`mmcblk0/ro=1`。BL31 按原有流程只读加载，未写入 U 盘、eMMC、OTP 或持久环境。[镜像](artifacts/arm64-7.3.5-vdp/phase2/validated/boot.img) · [构建](artifacts/arm64-7.3.5-vdp/phase2/validated/build.txt) · [TFTP](artifacts/arm64-7.3.5-vdp/phase2/validated/scale/board.tftp.txt)
+
+## Phase 3 · MP4 / MKV 播放器
+
+mpv 的 `--vo=drm` 使用软件像素格式和 swscale。`--drm-drmprime-video-plane` 属于 `drmprime-overlay` 硬件互操作路径。本次使用 `vdp-player`，它通过 libavformat 读取 MP4 / MKV，通过 libavcodec 的 `v4l2request` 解码，并使用 libdrm 提交 Atomic KMS。板端沿用 Phase 2 的 3840×2160p60 固件时序和 SDR BT.709 限幅 HDMI 输出。 [mpv 的 DRM VO 源码](https://github.com/mpv-player/mpv/blob/master/video/out/vo_drm.c) · [mpv DRM plane 选项](https://mpv.io/manual/stable/#drm-drmprime-video-plane-primary-overlay-n)
+
+FFmpeg 补丁在 V4L2 Request 设备上接收 `mv320_tiled=1` 选项。按位深显式协商 `H8TV` 或 `H0TV`，并按 CAPTURE 的 pitch 和对齐高度构造单对象 `AVDRMFrameDescriptor`。8-bit 使用 `DRM_FORMAT_NV21` 和两个面。Main10 使用私有 `H0TV` 和四个面。两者的 modifier 均为 `0xfe00000000000320`。Main10 4K 的四面 pitch 为 `3840/3840/960/960`，offset 为 `0/8355840/12533760/14622720`。普通 FFmpeg V4L2 Request 会话沿用线性 CAPTURE 格式。
+
+播放器使用五帧有界解码队列和容器 PTS 驱动显示。V0 以源显示比例适配输出，16:9 的 1080p 用 V0 放大到全屏，4K 为 1:1。`--osd` 用两个线性 ARGB8888 缓冲绘制 G0 进度条，画布由硬件从 1920×1080 放大到 3840×2160。`COLOR_ENCODING` 和 `COLOR_RANGE` 取自解码后的 `AVFrame`，随 V0 帧提交。当前帧的引用保留到替换帧的 KMS 锁存事件，FFmpeg 另持有 DPB 引用。Seek 由解码线程在丢弃待显示队列后执行 `av_seek_frame()` 和 `avcodec_flush_buffers()`，以目标前的关键帧恢复解码。EOS 排空重排序队列，退出时先关闭扫描，再释放最后一帧和解码上下文。
+
+远程构建使用 `hedc@ArchLinux-E5-Server` 上的 GCC 14.2.0、musl 和仓库固定的 FFmpeg 修订 `b57fbbe50c9b2656fad86a1a7eeabfd2b2a50935`。同步两个 FFmpeg patch 到远程 `scripts/`，播放器 C 文件与共享 ABI 头到 `src/`，即可通过 `scripts/remote.ps1` 执行以下构建和样本准备。三个主验收样本取自 Blender Foundation《Big Buck Bunny》4K60 版的第 45 至 63 秒，均有 1,080 个视频包和有效时间戳。Main10 由 8-bit SDR 母片重新编码，以 10-bit 格式解码。1080p H.264 使用 `direct=auto`。 [Blender 片源](https://peach.blender.org/download/)
+
+~~~bash
+cd /home/hedc/hg680kd-mainline
+bash scripts/build_vdec_ffmpeg.sh "$PWD" player
+source_video="$PWD/out/vdec-ffmpeg/bbb_sunflower_2160p_60fps_normal.mp4"
+bash scripts/make_vdp_player_clips.sh "$source_video" "$PWD/out/vdp-player/serve"
+bash scripts/make_vdp_player_clips.sh "$source_video" "$PWD/out/vdp-player/serve" color
+~~~
+
+将 `out/vdp-player/serve/` 下载到主机的 `artifacts/arm64-7.3.5-vdp/phase3/serve/`。串口脚本先 TFTP 启动 Phase 2 验收镜像并回读 CRC32，再从主机 HTTP 校验并加载播放器与片源到板上 `/tmp`。`--color-switch` 额外测试单个 MKV 内的 SDR 矩阵及限幅切换。
+
+~~~powershell
+$phase3 = 'artifacts/arm64-7.3.5-vdp/phase3'
+New-Item -ItemType Directory -Force "$phase3/final" | Out-Null
+python -u scripts/vdp_player_ram.py `
+  --image artifacts/arm64-7.3.5-vdp/phase2/validated/boot.img `
+  --payload "$phase3/serve" --log "$phase3/final/board.txt" `
+  --capture-device 'USB2 Video' --color-switch
+~~~
+
+板端直接运行的命令如下。`--seek AT:TO` 以流内时间触发跳转，允许连续指定。`--start` 和 `--stop-at` 用于从关键帧附近开始并提前关闭播放器。
+
+~~~sh
+cd /tmp
+./ld-musl-aarch64.so.1 --library-path . ./vdp-player main10-2160p60.mkv
+./ld-musl-aarch64.so.1 --library-path . ./vdp-player main-2160p60.mp4
+./ld-musl-aarch64.so.1 --library-path . ./vdp-player --osd h264-1080p60.mp4
+./ld-musl-aarch64.so.1 --library-path . ./vdp-player --seek 2:9 --seek 11:3 --seek 5:16 main10-2160p60.mkv
+./ld-musl-aarch64.so.1 --library-path . ./vdp-player --start 2 --stop-at 4 main10-2160p60.mkv
+~~~
+
+## 2026-11-27 · Phase 3 HG680KD 板测
+
+三段 18 秒容器文件均播放至 EOS。每组 PXP INTID 169 增加 1,080，VDP INTID 122 增加 1,081。VDP underflow、fetch underflow 和 VDEC SMMU INTID 181 均为 0。VDEC 原生路径报告 `detile=0`、`sync=0`，并由 `DRM_PRIME` 导入单个 DMA-BUF 直接出图。 [板端验收记录](logs/490-vdp-phase3-acceptance.txt)
+
+| 容器与输入 | 解码 / 显示 | 显示 / 墙钟 FPS | 丢帧 / 错失 vblank | 四核 usr / sys / idle | 进程峰值 RSS |
+|---|---:|---:|---:|---:|---:|
+| `main10-2160p60.mkv` · HEVC Main10 | 1080 / 1080 | 60.000 / 59.521 | 0 / 0 | 2.59% / 4.81% / 92.60% | 89,180 KiB |
+| `main-2160p60.mp4` · HEVC Main | 1080 / 1080 | 60.000 / 59.576 | 0 / 0 | 2.73% / 5.38% / 91.89% | 89,288 KiB |
+| `h264-1080p60.mp4` · H.264 High + G0 进度条 | 1080 / 1080 | 60.000 / 59.766 | 0 / 0 | 1.55% / 6.54% / 91.91% | 22,784 KiB |
+
+显示 FPS 由首末 KMS 翻页时间戳计算。墙钟 FPS 和四核 CPU 覆盖预缓冲至播放结束。Main10 进程峰值 RSS 为 87.1 MiB，系统 `MemAvailable` 在播放前、播放中最低采样和结束后分别为 1,939,164、1,685,520、1,957,112 KiB。同期 `CmaFree` 为 388,640、202,452、388,564 KiB。由于原生解码面由内核 CMA 分配，进程 RSS 和 CMA 分别列示。
+
+1080p 输入按 16:9 由 V0 全屏放大，ZME1 读回水平 `0x80000`、垂直 `0x0800` 的比例字段。G0 以 ARGB8888 1080p 全画布覆盖 4K，并以 Coverage 逐像素混合。18 秒内完成 100 次 G0 翻页。HDMI 录像是 1920×1080、30 fps、301 帧，画面抽查未见撕裂，进度条在采集第 2 秒和第 7 秒分别填充约 116 和 544 像素。 [HDMI 运动帧](logs/490-vdp-phase3-hdmi.png)
+
+同一首帧的 HDMI 图与软件解码参考相比，160×90 RGB 平均绝对误差为 7.74/255。交换参考的 U/V 后，误差为 27.26/255。G0 区域外的像素在开关叠加时一致。半透明黑底采样位置的 RGB 中位数从 (55, 108, 30) 变为 (26, 51, 13)。
+
+Main10 同一进程按 2→9、11→3、5→16 秒跳转，再正常播放至 EOS。三次跳转共显示 480 帧，播放器丢帧为 0，另丢弃关键帧预滚 120 帧。PXP IRQ 增加 624，包含跳转前已排队的解码帧。退出后 `CmaFree` 比开始少 40 KiB。独立起播、停止连续三轮，每轮显示 120 帧，CMA 空闲值每轮恢复到开始值。跳转及重启过程的 VDP underflow 和 SMMU IRQ 181 均为 0。
+
+`color-switch.mkv` 在同一播放会话中依次切换 BT.709 限幅、BT.601 全幅、BT.2020 限幅和 BT.709 限幅。回读 `0xb000` 依次为 `0x02 / 0x13 / 0x13 / 0x02`。两次启用 CSC 时，输入 Y DC 分别为 `0` 和 `0x7c0`。480 帧完整显示，四个解码上下文各完成 120 帧，PXP IRQ 合计增加 480，VDP IRQ 增加 481，underflow 和 SMMU IRQ 181 为 0。
+
+使用同一构建的 FFmpeg CLI 回归默认线性 CAPTURE。H.264 NV21 和 HEVC Main10 P010 各 240 帧，逐帧哈希与软件解码参考一致。每组 PXP IRQ 增加 240，SMMU IRQ 181 为 0。 [线性 CAPTURE 回归](logs/490-vdp-phase3-acceptance.txt#L267)
+
+| 镜像及 RAM 校验 | 值 |
+|---|---|
+| Phase 2 `boot.img` 大小 | 17,369,160 bytes |
+| SHA256 | `54e4179c37da9c8b072046333f279b662eeec24d8a0ffdb3512ecc8b7018edf8` |
+| U-Boot `0x01fdffc0` RAM 回读 CRC32 | `b13a17d7` |
+
+COM4 以 115200 8N1 单进程独占。系统从 TFTP 上传的镜像在 RAM 启动，播放器及素材经校验后加载到 `/tmp`。根文件系统为 `rootfs`，块设备挂载数为 0，`mmcblk0/ro=1`。U-Boot 环境变量仅在 RAM 设置。 完整构建、串口、TFTP 和 HDMI 录像保存在本地的 `artifacts/arm64-7.3.5-vdp/phase3/`。 [播放器、运行库和片源 SHA256](logs/490-vdp-phase3-acceptance.txt#L12)
