@@ -1,0 +1,132 @@
+HG680KD Linux 7.3.6 VENC RAM probe, 2026-11-28
+Selected lines from the build and COM4/FFmpeg logs
+
+## Clean remote build
+Source: build-clean.log
+
+aarch64-linux-gcc (GCC) 14.2.0
+/home/hedc/hg680kd-mainline/out/release-arm64-7.3.6-aiao/initramfs.cpio: OK
+/home/hedc/hg680kd-mainline/out/lima-dualpp/final/boot.img: OK
+018f9c8fcc7822a01705dd41ee85852b0d124b343b064da09018d5de1042bd2c  boot.img  (19826760 bytes, CRC32=543f395b, load_at=0x01fdffc0)
+
+## First attempt with reversed stream slots
+Source: board-02.txt
+
+[   21.601639] pc : __ipi_send_mask+0x14/0x100
+[   21.711501]  __ipi_send_mask+0x14/0x100 (P)
+[   21.832036] Kernel panic - not syncing: Oops: Fatal exception
+Autobooting in 3 seconds, Press Ctrl+C to stop autoboot
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#<INTERRUPT>
+fastboot#
+
+## Private identity table caught the bad DMA write
+Source: board-03-identity.txt
+
+[   12.937093] hi3798-venc-ram-probe f8c80000.video-encoder: job identity SMMU=00000008 TTBR=68100000 source=670c1000/670d0000 stride=01400140 rec=67e52800/67f33800 stream=68081040/249856 params=67059000 slice=000000e1/00080001
+[   12.952396] hi3798-venc-ram-probe f8c80000.video-encoder: IRQ 3000=00000001 3004=00000001 3010=00000000 3844=00000180 3848=8000000f 3810=00000171 31c0=00000298 31c4=00000000 fault=00000000/00000008 addr=00000000/0003d000/00000000/00000000
+[   12.979682] hi3798-venc-ram-probe f8c80000.video-encoder: DMA changed recY=1 recC=1 aux=1 params=0 rpwp=0 sink=1
+[   12.986872] hi3798-venc-ram-probe f8c80000.video-encoder: CRG after smmu/core 00000001/00000003 status=0
+
+## Corrected identity table
+Source: board-04-identity.txt
+
+[   13.014162] hi3798-venc-ram-probe f8c80000.video-encoder: job identity SMMU=00000008 TTBR=68100000 source=670c1000/670d0000 stride=01400140 rec=67e52800/67f33800 stream=68081040/249856 params=67059000 slice=000000e1/00080001
+[   13.016846] hi3798-venc-ram-probe f8c80000.video-encoder: IRQ 3000=00000001 3004=00000001 3010=00000000 3844=00000180 3848=8000000f 3810=00000171 31c0=00000298 31c4=00000000 fault=00000000/00000000 addr=00000000/00000000/00000000/00000000
+[   13.027919] hi3798-venc-ram-probe f8c80000.video-encoder: drain request 3010=00000001 elapsed_us=1 status=0
+[   13.040733] hi3798-venc-ram-probe f8c80000.video-encoder: DMA changed recY=1 recC=1 aux=1 params=0 rpwp=0 sink=0
+[   13.045737] hi3798-venc-ram-probe f8c80000.video-encoder: slot0 padded=384 padding=15 bytesused=369
+[   13.067511] hi3798-venc-ram-probe f8c80000.video-encoder: CRG after smmu/core 00000001/00000003 status=0
+# [host] /dev/video0 NV21 SHA256 matches FFmpeg byte-for-byte
+
+## Corrected bypass, RAM boot and one frame
+Source: board-05-bypass.txt
+
+rootfs / rootfs rw,size=809892k,nr_inodes=202473 0 0
+fastboot#[host] stock-bl31.bin SHA256 5f32da6063d8c49d0c2cc9fc7a1667f0e2b75931ce4d73af842f3efc51a97b7b
+CRC32 for 08020000 ... 0805ffff ==> fa236592
+[host] CRC32 matches local image: fa236592
+[host] boot.img SHA256 018f9c8fcc7822a01705dd41ee85852b0d124b343b064da09018d5de1042bd2c
+CRC32 for 01fdffc0 ... 032c8807 ==> 543f395b
+[host] CRC32 matches local image: 543f395b
+rootfs / rootfs rw,size=809892k,nr_inodes=202473 0 0
+  17:          0          0          0          0  GICv3     133 Level     f8c80000.video-encoder
+  22:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+[   12.979839] hi3798-venc-ram-probe f8c80000.video-encoder: job bypass SMMU=00000009 TTBR=00000000 source=670c1000/670d0000 stride=01400140 rec=67e52800/67f33800 stream=68081040/249856 params=67059000 slice=000000e1/00080001
+[   12.979947] hi3798-venc-ram-probe f8c80000.video-encoder: before START 3000=00000000 3004=00000000 3010=00000000 3844=00000000 3848=00000000 3810=00000000 31c0=00000000 31c4=00000000 fault=00000000/00000000 addr=00000000/00000000/00000000/00000000
+[   12.983593] hi3798-venc-ram-probe f8c80000.video-encoder: IRQ 3000=00000001 3004=00000001 3010=00000000 3844=00000180 3848=8000000f 3810=00000171 31c0=00000298 31c4=00000000 fault=00000000/00000000 addr=00000000/00000000/00000000/00000000
+[   12.986981] hi3798-venc-ram-probe f8c80000.video-encoder: before drain 3000=00000000 3004=00000000 3010=00000000 3844=00000180 3848=8000000f 3810=00000171 31c0=00000298 31c4=00000000 fault=00000000/00000000 addr=00000000/00000000/00000000/00000000
+[   12.990524] hi3798-venc-ram-probe f8c80000.video-encoder: irq_count=1 start_3010=00000000 wait_us=357
+[   12.992329] hi3798-venc-ram-probe f8c80000.video-encoder: drain request 3010=00000001 elapsed_us=1 status=0
+[   12.994120] hi3798-venc-ram-probe f8c80000.video-encoder: after drain release 3000=00000000 3004=00000000 3010=00000001 3844=00000180 3848=8000000f 3810=00000171 31c0=00000298 31c4=00000000 fault=00000000/00000000 addr=00000000/00000000/00000000/00000000
+[   13.002940] hi3798-venc-ram-probe f8c80000.video-encoder: DMA changed recY=1 recC=1 aux=1 params=0 rpwp=0 sink=0
+[   13.006988] hi3798-venc-ram-probe f8c80000.video-encoder: slot0 padded=384 padding=15 bytesused=369
+[   13.008864] venc head 00000000: 00 00 00 01 65 b8 42 72 62 80 00 83 c5 f3 e0 e0
+[   13.010720] venc head 00000010: 00 40 2f 10 00 04 03 80 07 88 25 3e ed 7c f8 a0
+[   13.012585] venc head 00000020: 00 20 2f 1c 00 04 18 a3 80 00 82 6d f3 e0 e0 00
+[   13.014440] venc head 00000030: 48 3f 10 00 04 05 00 01 62 02 d3 ee d7 cf 8a 00
+[   13.016306] venc tail 00000000: 23 df 4e af a7 17 23 df 4e af a7 57 df 4e af a7
+[   13.018156] venc tail 00000010: 17 23 df 5a be 9d 5b df 4e af a7 56 f7 d3 ab e9
+[   13.020006] venc tail 00000020: d5 f7 d3 ab e9 d5 bd f5 8b be 9d 4a f7 d3 8b be
+[   13.021867] venc tail 00000030: 9d 4a f7 d3 8b be 9c 5d f7 d3 8b be 9d 4a f7 e0
+[   13.023766] hi3798-venc-ram-probe f8c80000.video-encoder: after reset 3000=00000000 3004=00000000 3010=00000000 3844=00000000 3848=00000000 3810=00000000 31c0=00000000 31c4=00000000 fault=00000000/00000000 addr=00000000/00000000/00000000/00000000
+[   13.027643] hi3798-venc-ram-probe f8c80000.video-encoder: CRG after smmu/core 00000001/00000003 status=0
+  17:          1          0          0          0  GICv3     133 Level     f8c80000.video-encoder
+  22:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  17:          1          0          0          0  GICv3     133 Level     f8c80000.video-encoder
+  22:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  17:          1          0          0          0  GICv3     133 Level     f8c80000.video-encoder
+  22:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+
+## Truncated-by-one-byte decoder check
+Source: ffmpeg-truncated-errors.txt
+
+[h264 @ 000001da87595880] corrupted macroblock 19 11 (total_coeff=-1)
+[h264 @ 000001da87595880] error while decoding MB 19 11
+[h264 @ 000001da87666d80] corrupted macroblock 19 11 (total_coeff=-1)
+[h264 @ 000001da87666d80] error while decoding MB 19 11
+
+## Fixed QP and hardware decoder output
+Source: board-11-pixel-compare.txt
+
+# [host] FFmpeg Constrained Baseline QP 28, DMA NALs [5], added 20 parameter bytes, PSNR Y/U/V {'Y': 51.4301, 'U': 50.3043, 'V': 48.1037}
+e8731f975d95edbbcf47f2d6e37f63a23881ea0357cc7f6b5e1dfee5d0d25974  venc-decoded.nv21
+# [host] /dev/video0 NV21 SHA256 matches FFmpeg byte-for-byte
+
+## FFmpeg macroblock QP grid
+Source: ffmpeg-qp.txt
+
+[h264 @ 000001d17eee6980]   0 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980]  16 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980]  32 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980]  48 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980]  64 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980]  80 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980]  96 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980] 112 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980] 128 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980] 144 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980] 160 2828282828282828282828282828282828282828
+[h264 @ 000001d17eee6980] 176 2828282828282828282828282828282828282828
+
+## Media and Lima regression
+Source: board-07-regression.txt
+
+# [host] Lima -p 1 -n 16 matched 16/16 jobs, INTID 126 +32
+# [host] Lima -p 2 -n 16 matched 16/16 jobs, INTID 126 +32
+# [host] Lima -a -n 32 matched 32/32 jobs, INTID 126 +64
+# [host] JPGD 1080p passed, INTID 129 +1
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.413 seconds=18.178 usr=4.69% sys=5.54% idle=89.77% peak_rss_kib=89700
+# [host] VDEC/VDP/AIAO IRQ deltas [1080, 1090, 1800], SMMU INTID 181=0
+# [host] Lima, JPGD, VDEC, VDP and AIAO regression passed
+
+## Mesa GLES regression
+Source: board-09-mesa.txt
+
+EGL render node /dev/dri/renderD128
+GL_RENDERER=Mali450 GL_VERSION=OpenGL ES 2.0 Mesa 25.2.7
+LIMA_GLES_PASS frames=60 size=640x480
+# [host] Mesa Lima GLES passed, INTID 126 +180

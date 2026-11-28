@@ -1,0 +1,25 @@
+{
+  "profile": "Constrained Baseline",
+  "width": 320,
+  "height": 192,
+  "qp": 28,
+  "macroblocks_at_qp_28": 240,
+  "raw_nal_types": [
+    5
+  ],
+  "parameter_set_bytes_added": 20,
+  "dma_padded": 384,
+  "dma_padding": 15,
+  "dma_bytesused": 369,
+  "h264_bytes": 389,
+  "truncated_final_byte_rejected": true,
+  "psnr_db": {
+    "Y": 51.4301,
+    "U": 50.3043,
+    "V": 48.1037
+  },
+  "ffmpeg_nv21_sha256": "e8731f975d95edbbcf47f2d6e37f63a23881ea0357cc7f6b5e1dfee5d0d25974",
+  "vdec_nv21_sha256": "e8731f975d95edbbcf47f2d6e37f63a23881ea0357cc7f6b5e1dfee5d0d25974",
+  "vdec_nv21_identical_bytes": 92160,
+  "vdec_irq_delta": 1
+}

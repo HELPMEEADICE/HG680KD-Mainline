@@ -2,7 +2,7 @@
 
 2026-11-28 · 烽火 HG680KD · 原厂 ARM32 V500 R002 HAL
 
-同板 RAM 审计已确认 VEDU 整窗 `0xf8c80000/0x10000` 可访问，核心中断使能位可写回读，CRG 两个字可恢复原值。原厂 DTB 给出高电平 SPI `101`，即 GIC INTID `133`。首版建议用 8-bit NV12、Baseline/CAVLC、固定 QP、每帧 IDR、单 Slice 和原厂单段 ListBuf 工作方式。优先做一次单帧 RAM 验证，关闭 DMA 地址翻译、有效字节数和总线停止条件这三个作业级疑点后再接 V4L2。 [同板审计](MEDIA-CODEC-AUDIT.md#L34) · [原厂 DTB](artifacts/vpu-reverse-factory/out/factory.dts#L1135) · [历史验活读回](artifacts/arm64-7.3.6-codec-probe/board.txt#L603)
+同板 RAM 审计已确认 VEDU 整窗 `0xf8c80000/0x10000` 可访问，核心中断使能位可写回读，CRG 两个字可恢复原值。原厂 DTB 给出高电平 SPI `101`，即 GIC INTID `133`。Linux 7.3.6 RAM 探针已通过 320×192 NV12、Constrained Baseline/CAVLC、QP 28、单 Slice IDR 的编解码验收。第 6 节记录 DMA 地址域、码流边界和总线排空实测。 [同板审计](MEDIA-CODEC-AUDIT.md#L34) · [原厂 DTB](artifacts/vpu-reverse-factory/out/factory.dts#L1135) · [历史验活读回](artifacts/arm64-7.3.6-codec-probe/board.txt#L603)
 
 本文中 **静态已证**表示同板原厂 ARM32 指令可追到该访问或数据流。**推断**表示由调用链、数据结构或相邻 SDK 得出，涉及引擎行为的推断仍需板验。除单列的 CRG 和 SMMU 表外，`+0x…` 均相对于 VEDU 整窗。文中 `c09…`、`c0a…` 为原厂 ARM32 VA，按同板镜像基址 `0xc0008000` 可定位原始指令。基础反编译的 `pdt_init` 属于 VDEC。VENC 本身使用 `drv_venc_pdt_v500_r002_init`（`c09ced14`），寄存器以其回调和同板二进制为准。 [基础反编译](artifacts/vpu-reverse-factory/arm32-result.txt#L114) · [原厂符号表](artifacts/vpu-reverse-factory/hg680kd-stock-kallsyms.txt#L31936) · [HAL 分支](artifacts/media-codec-audit/stock-codecs-arm32.txt#L17489) · [原厂 HAL 回调表](artifacts/media-codec-audit/stock-codecs-arm32.txt#L27480)
 
@@ -21,7 +21,7 @@
 | `0x05c` / `0x060` | `0x05c[5:0]` / `[13:8]` 分别取 RC MinQP / MaxQP。`[16]` 由 HAL 默认项写入。`0x060[5:0]` / `[13:8]` 在此路径为 0 / 51 | 固定 QP 先令 StartQP、MinQP、MaxQP 相等。`0x05c[16]`、第二组限制的硬件作用和局部 QP 修正须核实。 |
 | `0x030` / `0x058` / `0x0b8` | 原厂默认写 `0x02625a00`、`0x003d0900`、`0x0001186a` | 计时相关候选字。按原厂数据保留，具体计数单位、对应状态和频率换算待查。 |
 | `0x100–0x1f0` / `0x23c` | 源面、步幅、Rec/Ref、辅助面、读写指针与相关配置 | 地址和打包方式见第 2 节。 |
-| `0x27c+4i` / `0x2bc+4i` | 16 对输出段基址和长度，`i=0…15` | 普通单 Slice ListBuf 使用 slot 0，其他 slot 清零。长度来自字节容量。 |
+| `0x27c+4i` / `0x2bc+4i` | 16 对输出段字节容量和 DMA 基址，`i=0…15`，顺序已板验 | 普通单 Slice ListBuf 使用 slot 0，其他 slot 清零。 |
 | `0x2fc–0x3c0` / `0x454–0x474` | 参数集地址、内容和 Slice Header 装载 | 见第 3 节。 |
 | `0x3000` / `0x3004` / `0x3010` / `0x3844–0x38c0` | 核心状态、总线排空状态、逐段码流长度和结束标志 | 见第 4 节。 |
 
@@ -86,7 +86,7 @@ NV12 是 Y 加 UV，NV21 是 Y 加 VU。原厂手动送帧的 H.264 分支检查
 | 每槽第二组辅助面 | `M=128*ceil(D/32)^2`。按 Rec/Ref 同步轮换。原厂同系有 Rec 头、TMV、PME 多类对象，R002 此组的精确含义待定 | `0x124/0x128` 为 Rec 侧，`0x11c/0x120` 为 Ref0 侧，通道地址数组 `+0x868`。 |
 | 按帧轮换的运动估计信息候选 | 三槽，每槽 `P=32*(ceil(D/16)+1)`。索引随 `f%3` 轮换，同系称 PME Info | `0x134/0x138` 取 `(f+1)%3, f%3`，通道数组 `+0x874`。 |
 | H.264 三块额外工作区 | `A=256*ALIGN(D,16)`、`B=ceil(D/16)*ALIGN(D,256)/32`、`C=ceil(D/16)*ALIGN(D,128)/16`。分配切分精确可复算，可能包含 MV/TMV 或逐行工作区，单块算法用途待确认 | `A→0x144, B→0x140, C→0x13c`。原厂从通道 `+0x888, +0x884, +0x880` 装载。 |
-| H.264 码流 DMA 工作区 | 单 Slice 用 1 段，基址和块大小按 64 B 对齐。原厂主流区预留开头 64 B，按段设置可用上限。槽的长度为字节值 | 第一段 `0x27c/0x2bc`，后续每槽加 4。先保留独立 DMA 工作区供解析和边界验证。 |
+| H.264 码流 DMA 工作区 | 单 Slice 用 1 段，基址和块大小按 64 B 对齐。原厂主流区预留开头 64 B，按段设置可用上限。槽的长度为字节值 | 首段容量 `0x27c`，首段 DMA 基址 `0x2bc`，后续每槽偏移加 4。探针使用独立 DMA 工作区和前后护栏。 |
 | 码流 RP/WP | 原厂申请并清零 4 KiB，64 B 基对齐，RP 在 +0，WP 在 +16 | `0x130=RP_DMA`，`0x12c=WP_DMA`。在 ListBuf 中先照填。原厂 MMZ 物理地址与主码流 IOVA 的差异见第 1 节。实际单帧长度从逐段状态取。 |
 | 参数集 DMA 页 | 原厂 ListBuf 申请 4 KiB、64 B 对齐。保留此页，首版仍由软件生产 SPS/PPS | `0x2fc`，`0x300–0x3c0` 为并行的长度、控制和内嵌参数表。 |
 | Tunnel / DDR 配置 | 首版面向离线线性源和直接 MMIO。Tunnel 地址置 0，直接配置路径不分配 DDR 寄存器镜像 | `0x100` 来自 tunnel 地址字段，`0x010` 写寄存器配置结构内的动态字，首版保留原厂直接模式值。 |
@@ -120,7 +120,7 @@ NV12 是 Y 加 UV，NV21 是 Y 加 VU。原厂手动送帧的 H.264 分支检查
 | --- | --- |
 | `0x2fc` | 参数集 work buffer 总线地址。 |
 | `0x300`、`0x304–0x3c0` | `[7:0]` 装参数集的对齐长度低字节，原厂 OR `0x1100`，`[16]` 取 IntraPic。后续装入 48 个 32-bit 参数集数据字。原厂 `get_para_set_write_buffer`（`c09cfd04`）将 SPS/PPS 的有效字节数按 64 B 对齐后交给 HAL。硬件接受的长度下限、DMA 页和寄存器表各自如何参与输出待测。 |
-| `0x454–0x460` | 四个 H.264 Slice Header 位流字。 |
+| `0x454–0x460` | 四个 H.264 Slice Header 位流字。已验 IDR 的第一个字右对齐，内含 slice_type、PPS ID、frame_num 和 idr_pic_id。起始码、NAL 头、first_mb_in_slice 和 QP 等剩余字段由硬件合成。 |
 | `0x464/0x468`、`0x46c/0x470` | 两个重排字、两个参考 marking 字，与软件位串结构对应。 |
 | `0x474` | 对软件打包的三个长度分别减一。`[5:0]=(marking_bits-1)`，`[13:8]=(reorder_bits-1)`，`[22:16]=(slice_header_bits-1)`，各按字段宽度截取。当长度为 0，相应字段由该运算得到全 1。 |
 | `0x018[12]`、`[19:18]` | 原厂 profile 0（Baseline）写 1、1。非 Baseline 的 CABAC 路径将 `[12]` 清 0，profile 3 时 `[19:18]` 也为 0。结合 PPS 的 entropy flag，`[12]` 是 CAVLC 选择候选，`[19:18]` 还随变换模式变化。位域极性和独立语义须由两种码流对照验证。 |
@@ -200,7 +200,7 @@ venc: video-encoder@f8c80000 {
 4. 写 SMMU 控制及有效地址，清旧状态并启用 `0x000=0x41`，同步 DMA 对设备的可见性。以 `0x008=1` 作为最后一写。避免在尚未确认安全的 DMA 地址域上提交 START。
 5. IRQ 按第 4 节确定结果。等 DMA 数据对 CPU 可见后检查 Annex-B、局部长度和护栏。成功则把 AU 交给 CAPTURE 并标记 keyframe，继承 OUTPUT 时间戳，归还一对缓冲，然后结束 M2M 作业。异常与 STREAMOFF 共享取消和排空流程，PM 引用延续至 DMA 安全停止。
 
-### 5.3 尚待确认与首帧验收
+### 5.3 验收门槛与后续测试
 
 | 优先级 | 待确认 | 通过标准 |
 | --- | --- | --- |
@@ -212,4 +212,46 @@ venc: video-encoder@f8c80000 {
 | P1 | 辅助区精确语义、最小尺寸、All-Intra 能否缩至单槽、P 参考地址和 POC | 初期保留原厂内存形状。逐项确认哪个 master 读写，完成运动图案 IDR→P 和跨 GOP 解码，再决定减少工作区。 |
 | P1 | 三个媒体节点并存及共享 CMA 余量 | 验证 `/dev/video2` 编码前后，`/dev/video0` 解码与 `/dev/video1` JPEG 解码正常，三者中断及 CRG 只变化各自资源。 |
 
-单帧验证的最小证据为 320×192 NV12 的一次受控 DMA 提交、SPI 101 状态和增量、长度对及带护栏的 DMA 输出、软件解码成功、SMMU 零 fault、CRG 结束读回。更窄的结论已有同板 MMIO 验活支持。本轮工作只涉及静态材料和本文档。
+## 6. Linux 7.3.6 纯 RAM 实机验收
+
+2026-11-28 在 HG680KD 上使用包含 Lima 0018、0019 的远端双 PP 基线源码及其 384 MiB CMA 配置。AArch64 GCC 14.2.0 从空输出目录零警告构建 `7.3.6-hg680kd-arm64-venc-probe`，产物与实机镜像逐字节相同。探针只在临时镜像注册 debugfs 节点，开机无编码作业。写入 92,160 字节 NV12 测试图后，手动向 `/sys/kernel/debug/hi3798_venc_probe/run` 写 `bypass` 或 `identity`。输出节点提供有效 DMA 段、带前后护栏的 DMA 窗口以及软件生成的 SPS/PPS。原厂 R002 HAL 在主机离线重放得到 486 条有序配置写入，DMA 地址、中断和 Slice 头由探针在提交时设置。 [探针源码](scripts/venc-probe/probe.c) · [寄存器提取](scripts/venc-probe/extract-registers.py) · [干净构建记录](logs/534-venc-probe-7.3.6.txt#L4)
+
+| TFTP 装载项 | 字节数 | SHA256 | U-Boot RAM 回读 CRC32 |
+| --- | ---: | --- | --- |
+| `boot.img`，`0x01fdffc0` | 19,826,760 | `018f9c8fcc7822a01705dd41ee85852b0d124b343b064da09018d5de1042bd2c` | `543f395b` |
+| 原厂 BL31 RAM 副本，`0x08020000` | 262,144 | `5f32da6063d8c49d0c2cc9fc7a1667f0e2b75931ce4d73af842f3efc51a97b7b` | `fa236592` |
+
+COM4 以 115200 8N1 独占。测试镜像和 BL31 经 TFTP 装入 RAM，二者 CRC32 均匹配后执行 `bootm`。根为 BusyBox RAM rootfs，未暴露 eMMC、USB 大容量存储或 MTD 块设备。测试命令未写入 U 盘 `/boot/boot.img`、eMMC，也未执行 OTP 操作或 `saveenv`。 [TFTP 与旁路串口记录](logs/534-venc-probe-7.3.6.txt#L44)
+
+### 6.1 DMA 地址域与复位
+
+- 首轮将输出地址和容量两个槽写反。旁路触发后内核在 `__ipi_send_mask` 崩溃。U-Boot 自动重启已被串口拦截。私有恒等表复测捕获 NS 写 fault `0x8`，fault 地址 `0x0003d000` 恰为编程容量，错误写入被 sink 页接收。由此确认 `0x27c` 是容量，`0x2bc` 是 DMA 基址。 [首轮旁路异常](logs/534-venc-probe-7.3.6.txt#L12) · [私有表定位](logs/534-venc-probe-7.3.6.txt#L25)
+- 槽位修正后，旁路 `0xf000=0x9`、`TTBR=0`，私有恒等表对照为 `0xf000=0x8`。两种路径的输入、重建 Y/UV、辅助工作区及码流输出通过本单帧验证。重建和辅助区观测到写入，输入、护栏和 sink 页保持原值。参数集页及 RP/WP 页本作业未观测到写入，读取行为仍待专项验证。每帧 INTID 133 增加 1，`0x3000=1`、`0x3004=1`，Slice IRQ、timeout 和两项 overflow 位均为 0。VENC 私有 S/NS fault 和 VDEC SMMU INTID 181 在修正后的各次采样均为 0。两路径的 IDR DMA 段逐字节相同。 [恒等表通过](logs/534-venc-probe-7.3.6.txt#L33) · [旁路通过](logs/534-venc-probe-7.3.6.txt#L44)
+- `0x3010` 在 START 前、START 后、EOF 及发排空请求前均读 0。写 `0x014=1` 后首次轮询读到 1，撤销请求后仍为 1，按原厂顺序复位 SMMU 和核心后回到 0。中断、长度与 fault 状态在复位后清零，CRG `+0x32c/+0x08c` 完整恢复 `0x1/0x3`。同一 RAM 会话连续发起独立 IDR 作业通过。排空超时隔离路径已实现，实测成功路径未触发该分支。 [排空与连续作业](logs/534-venc-probe-7.3.6.txt#L44)
+
+### 6.2 码流边界与双解码
+
+- `0x3844=0x00000180`，`0x3848=0x8000000f`，得到 `384 − 15 = 369` 字节，`0x3810=0x171` 同为 369。DMA 基址首字节为 Annex-B `00 00 00 01 65`，整段仅一个 IDR NAL。第 369 字节为 `e0`，后接 15 个零填充字节，384 字节边界后的 64 字节仍为 `cd`。前置 64 字节护栏仍为 `a5`。FFmpeg 严格模式可解码全部 369 字节，去掉最后一个有效字节后报告末宏块损坏且无输出帧。 [首尾 64 字节 dump](logs/534-venc-probe-7.3.6.txt#L60) · [截尾对照](logs/534-venc-probe-7.3.6.txt#L83)
+- 软件在 DMA IDR 前拼接 20 字节 SPS/PPS，完整 AU 为 389 字节。FFmpeg 严格解码零错误，解析为 320×192 Constrained Baseline/CAVLC、单 Slice IDR，240 个宏块 QP 均为 28。以原始 NV12 为参照，Y/U/V PSNR 分别为 **51.4301 / 50.3043 / 48.1037 dB**。 [完整码流](logs/534-venc-probe-frame.h264) · [结果 JSON](logs/534-venc-probe-result.json) · [宏块 QP 日志](logs/534-venc-probe-7.3.6.txt#L98)
+- 以同一 AU 的 SPS/PPS 和 Slice 字段构造 stateless V4L2 请求，把原始 IDR NAL 提交给板端 `/dev/video0`。VDEC PXP INTID 169 增加 1。串口取回的 92,160 字节 NV21 与 FFmpeg 输出逐字节一致，SHA256 均为 `e8731f975d95edbbcf47f2d6e37f63a23881ea0357cc7f6b5e1dfee5d0d25974`。 [VDEC 环回](logs/534-venc-probe-7.3.6.txt#L91)
+
+### 6.3 回归
+
+Lima 的单 PP、双 PP、交替任务分别通过 16、16、32 个 4096 像素比对任务，INTID 126 分别增加 32、32、64。Mesa 25.2.7 通过 `/dev/dri/renderD128` 用 Mali450 渲染 60 帧 640×480 GLES，INTID 126 增加 180。JPGD `/dev/video1` 通过 1920×1080 JPEG，INTID 129 增加 1。VDEC/VDP 通过 2160p60 HEVC Main10 播放，解码与上屏各 1,080 帧，零丢帧、零漏 vblank。AIAO 播放 864,000 帧 48 kHz PCM，零 XRUN。VDEC、VDP、AIAO 的 IRQ 分别增加 1,080、1,090、1,800。回归期间的 INTID 181 采样均为 0，内核日志无故障。 [回归串口日志](logs/534-venc-probe-7.3.6.txt#L114) · [Mesa GLES 日志](logs/534-venc-probe-7.3.6.txt#L126)
+
+### 6.4 重建与复测
+
+使用 `scripts/remote.ps1` 及本地 DPAPI 凭据将 `probe.c`、`crg-venc-probe.inc`、`r002-registers.h`、`probe.dtsi`、`scripts/pack_arm64.py` 和补丁 0019 上传到 `/home/hedc/hg680kd-mainline/out/venc-probe/input/`。远程脚本复制现有双 PP 源树，只在副本接入探针，输出至 `out/venc-probe/release/`。取回 `boot.img` 和 `SHA256SUMS` 至本地结果目录。镜像与完整原始记录位于构建工作区的 `artifacts/arm64-7.3.6-venc-probe/`。
+
+```powershell
+$hgKey = (Get-ChildItem -LiteralPath $env:TEMP -Filter 'hg680kd-ssh-*.dpapi' |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+& scripts/remote.ps1 -PasswordFile $hgKey script scripts/venc-probe/build.sh /home/hedc/hg680kd-mainline
+
+$dir = 'artifacts/arm64-7.3.6-venc-probe'
+python -u scripts/venc-probe/accept.py $dir --log "$dir/retest-bypass.txt"
+python -u scripts/venc-probe/accept.py $dir --log "$dir/retest-regression.txt" --running-ram --regression-only
+python -u scripts/venc-probe/accept.py $dir --log "$dir/retest-mesa.txt" --running-ram --mesa-only
+```
+
+复测脚本需要现有验收件中的 BL31 RAM 副本、静态 BusyBox、Lima/JPGD 测试工具和 4K 播放样本，主机需安装 FFmpeg、FFprobe 和 pyserial。从已启动的 USB Armbian shell 切换时加 `--leave-usb`，串口会拦截重启到 U-Boot 后走 TFTP。 [远程构建脚本](scripts/venc-probe/build.sh) · [串口验收脚本](scripts/venc-probe/accept.py)
