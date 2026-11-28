@@ -17,3 +17,5 @@ scripts/build_hdmi_drm_736.sh text eol=lf
 patches/0021-drm-hi3798mv320-native-hdmi.patch text eol=lf
 scripts/build_aiao_drain_736.sh text eol=lf
 src/hi3798mv320-aiao.c text eol=lf
+scripts/build_mpv_alsa_drain.sh text eol=lf
+scripts/mpv-alsa-native-drain.patch text eol=lf

@@ -59,3 +59,34 @@ V0 直接导入四平面 `H0TV` DMA-BUF，modifier 为 `0xfe00000000000320`。VD
 VDP underflow、fetch underflow、VENC SMMU fault 和 GIC INTID 181 的计数均为 0。DMA-BUF 回到 0 对象、0 字节。CMA 使用量回到温机基线 3,217 页，`CmaFree` 从 380,312 到 380,168 KiB。冷机初值为 3,193 页，首次 GPU 播放后增加 24 页，后续媒体作业退出后稳定在 3,217 页，与基线全媒体 RAM 验收的收尾值一致。 [最终寄存器与挂载](artifacts/arm64-7.3.6-hdmi-drm/final.txt) · [控制台平面](artifacts/arm64-7.3.6-hdmi-drm/console-restored.txt) · [7.3.6 RAM 参考](logs/538-vdec-ext-acceptance.txt)
 
 本轮覆盖 MS2131 的三档 SDR 与 HPD IRQ 注册。物理拔插、594 MHz RGB8 线端及 Xorg 的 `xrandr` 未列入本次执行。
+
+## AIAO drain 修复复验
+
+2026-11-28 使用已验收的 Linux 7.3.6 HDMI DRM 源码、配置、DTB 和 initramfs，在 ArchLinux-E5-Server 从空输出目录 `out/arm64-7.3.6-aiao-drain/clean.3AlNpmSD/build` 重建。AArch64 GCC 14.2.0 零编译警告，`CONFIG_WERROR=y`、`CONFIG_SND_HI3798MV320_AIAO=y`，模块关闭。 [RAM 镜像构建脚本](scripts/build_aiao_drain_736.sh)
+
+| 项目 | 实测 |
+| --- | --- |
+| 本地产物 | `artifacts/arm64-7.3.6-aiao-drain/boot.img`，19,626,056 字节 |
+| 镜像 SHA256 | `222b4f5879dd92470c9e6a16978692423d9d469683293822100d62f794a916a8` |
+| U-Boot RAM 回读 CRC32 | 镜像 `4d2d0af7`，BL31 `fa236592` |
+
+COM4 以 115200 8N1 单进程独占。U-Boot 通过 TFTP 将 BL31 和镜像分别载入 `0x08020000` 与 `0x01fdffc0`，核对 CRC32 后执行 `bootm 1fdffc0`。Linux 使用内置 `rootfs`，`/proc/partitions` 无块设备。复验期间 U 盘写入、eMMC 写入、OTP 操作和 `saveenv` 次数均为零。
+
+```text
+CRC32 for 08020000 ... 0805ffff ==> fa236592
+CRC32 for 01fdffc0 ... 03297807 ==> 4d2d0af7
+bootm 1fdffc0
+```
+
+TX2 按 32 字节取数。基线的 481 帧用例在 `wptr=1924`、`rptr=1920` 处停住，488 帧用例的两指针均为 1952，但尾段没有再触发周期中断。两者均返回 `-EIO`。修复在 drain 时补齐 DMA burst，并追加一个静音 burst，保护接口 FIFO 报空时仍在输出链路中的有效采样。`pointer()` 以应用提交的帧为终点，驱动用接口 FIFO 空中断完成 drain，并用 `alempty` 覆盖从 `PREPARED` 直接 drain 的短流。 [AIAO 驱动](src/hi3798mv320-aiao.c)
+
+同一最终镜像上，原版 MPV 0.41.0 等待自身 AO 完成事件，退出日志仍有一次 `drain timeout`。带补丁的构建在软件队列排空后调用 `snd_pcm_drain()`，记录一次 `ALSA PCM drain completed`。两轮均使用原生 2160p60、`--vo=gpu --gpu-context=drm --video-sync=display-resample`、`--alsa-buffer-time=80000 --alsa-periods=8`，实际缓冲 3,840 帧、周期 480 帧。 [MPV 补丁](scripts/mpv-alsa-native-drain.patch) · [配套构建脚本](scripts/build_mpv_alsa_drain.sh)
+
+| COM4 实机复验 | 结果 |
+| --- | --- |
+| 48 kHz S16_LE 双声道 | 152 次阻塞 drain 均返回 0，10 次非阻塞 drain 正常进入 `SETUP`，覆盖不足一个 burst、非整周期、整周期及环回。80 ms / 8 periods 最长 81.108 ms，零 XRUN。 |
+| HDMI 音频回采 | 14 段双声道测试音通过尾部逐帧比对，最大误差 32.64 LSB，未检出尾部截断、爆音或削波。 |
+| 配套 MPV 4K60 Main10 | 提交和上屏均为 1,080 帧，60.000 FPS，`detile=0`，VO 与解码掉帧、漏 vblank、MSC/时间戳差异、ALSA XRUN 和 drain timeout 均为 0。进程退出码为 0，最终恢复 1080p60 fbcon。 |
+| 跨档连续 PCM | 2160p60 → 1080p60 → 2160p60 期间同一 PCM 持续为 `RUNNING`，播放 576,000 帧，零 XRUN。 |
+| 全媒体回归 | Lima 双 PP 和 Mesa GLES、JPGD、H.264 / HEVC Main10 / MPEG-1 / MPEG-2 VDEC、FFmpeg VENC 均通过。VENC 编码和 VDEC 回解各 120 帧。VDP underflow、fetch underflow、VENC SMMU fault、GIC INTID 181 均为 0。 |
+| 资源回收 | DMA-BUF 回到 0 对象、0 字节。CMA 使用量恢复到温机基线 3,217 页，`CmaFree` 从 380,276 到 380,324 KiB。 |

@@ -1,0 +1,56 @@
+diff --git a/audio/out/internal.h b/audio/out/internal.h
+--- a/audio/out/internal.h
++++ b/audio/out/internal.h
+@@ -148,4 +148,6 @@ struct ao_driver {
+     // Stop all audio playback, clear buffers, back to state after init().
+     // Optional for pull AOs.
+     void (*reset)(struct ao *ao);
++    // Optional for push AOs. Wait for already submitted audio to play.
++    void (*drain)(struct ao *ao);
+     // pull based: set pause state. Only called after start() and before reset().
+diff --git a/audio/out/buffer.c b/audio/out/buffer.c
+--- a/audio/out/buffer.c
++++ b/audio/out/buffer.c
+@@ -479,5 +479,13 @@ void ao_drain(struct ao *ao)
+     mp_mutex_lock(&p->lock);
+     while (!p->paused && p->playing) {
++        // Once the software queue is empty, let the device drain its tail.
++        if (ao->driver->drain && p->streaming && !ao->stream_silence &&
++            (!p->pending || !mp_aframe_get_size(p->pending)) &&
++            !mp_async_queue_get_samples(p->queue))
++        {
++            ao->driver->drain(ao);
++            break;
++        }
+         mp_mutex_unlock(&p->lock);
+         double delay = ao_get_delay(ao);
+         mp_mutex_lock(&p->lock);
+diff --git a/audio/out/ao_alsa.c b/audio/out/ao_alsa.c
+--- a/audio/out/ao_alsa.c
++++ b/audio/out/ao_alsa.c
+@@ -1038,6 +1038,17 @@ static void audio_start(struct ao *ao)
+ alsa_error: ;
+ }
+ 
++static void audio_drain(struct ao *ao)
++{
++    struct priv *p = ao->priv;
++    int err = snd_pcm_drain(p->alsa);
++
++    if (err < 0)
++        MP_ERR(ao, "ALSA PCM drain failed: %s\n", snd_strerror(err));
++    else
++        MP_VERBOSE(ao, "ALSA PCM drain completed\n");
++}
++
+ static void audio_reset(struct ao *ao)
+ {
+     struct priv *p = ao->priv;
+@@ -1161,6 +1172,7 @@ const struct ao_driver audio_out_alsa = {
+     .start     = audio_start,
+     .set_pause = audio_set_paused,
+     .reset     = audio_reset,
++    .drain     = audio_drain,
+     .list_devs = list_devs,
+     .priv_size = sizeof(struct priv),
+     .global_opts = &ao_alsa_conf,
