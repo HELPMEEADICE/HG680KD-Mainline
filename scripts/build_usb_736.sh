@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-root="$HOME/hg680kd-mainline"
+root=${HG680KD_BUILD_ROOT:-"$HOME/hg680kd-mainline"}
 seed="$root/out/arm64-7.3.6-kvm-test"
-work="$root/out/arm64-7.3.6-usb-display"
-linux="$work/source"
-out="$work/build"
-pack="$out/deploy"
+work="$root/out/arm64-7.3.6-usb-full"
 firmware="$root/out/arm64-7.3.6-usb-2026-11-28/firmware"
 project=$(cd "$(dirname "$0")/.." && pwd)
 board=hi3798mv320-fiberhome-hg680kd-arm64-usb
@@ -17,15 +14,22 @@ export KBUILD_BUILD_TIMESTAMP='2025-12-01 00:00:00 UTC'
 export KBUILD_BUILD_USER=hg680kd KBUILD_BUILD_HOST=build KBUILD_BUILD_VERSION=1
 exec 9>"$root/.build-lock"
 flock 9
+mkdir -p "$work"
+build=$(mktemp -d "$work/clean.XXXXXXXX")
+linux="$build/source"
+out="$build/build"
+pack="$out/deploy"
 mkdir -p "$pack"
+printf 'Clean kernel output directory: %s\n' "$out"
+test -z "$(find "$out" -mindepth 1 -maxdepth 1 ! -name deploy -print -quit)"
+test "$("${cross}gcc" -dumpfullversion)" = 14.2.0
+"${cross}gcc" --version
 printf '%s  %s\n' \
     8a82e29b2aab122f0e911cd5882f441bde7173f4ddf57e7f88aa5beb9762b227 "$seed/.config" \
     1157518b5f739bc455374f6060bd15658d031a9c5277329d3454fa2a15dd8553 "$seed/hi3798mv320-fiberhome-hg680kd-arm64-kvm-test.dtb" \
     846ee9c3b2b4e45f9317d7307753374bd1aa401de9586460684b6b6b543047fe "$firmware/rtl_bt/rtl8761btv_vat_fw.bin" \
     7309d5f317fb80f630c6dca08c09559cf2db834801b86ded9ff0b22416a5e07c "$firmware/rtl_bt/rtl8761btv_vat_config.bin" | sha256sum -c -
-if [[ ! -d $linux ]]; then
-    cp -a --reflink=auto "$root/source/linux-7.3.6" "$linux"
-fi
+cp -a --reflink=auto "$root/source/linux-7.3.6" "$linux"
 apply_patch_if_needed() {
     local patch_file="$project/patches/$1"
     if ! patch -d "$linux" -p1 --reverse --force --dry-run --silent <"$patch_file" >/dev/null 2>&1; then
@@ -40,8 +44,12 @@ if ! patch -d "$linux" -p1 --reverse --force --dry-run --silent <"$project/patch
     apply_patch_if_needed 0018-drm-lima-match-pp-broadcast-to-job.patch
     patch -d "$linux" -p1 --forward --batch <"$project/patches/$lima_final"
 fi
+apply_patch_if_needed 0020-media-add-Hi3798MV320-venc.patch
 install -m644 "$project/src/hi3798mv320-vdp.c" "$linux/drivers/gpu/drm/"
 install -m644 "$project/src/hi3798mv320-jpgd.c" "$linux/drivers/media/platform/"
+install -m644 "$project/src/hi3798mv320-vdec.c" "$linux/drivers/media/platform/hi3798mv320-vdec-core.c"
+install -m644 "$project/src"/hi3798mv320-venc{.c,-r002.h} "$linux/drivers/media/platform/"
+install -m644 "$project/src/hisilicon,hi3798mv320-venc.yaml" "$linux/Documentation/devicetree/bindings/media/"
 install -m644 "$project/src/crg-hi3798mv320-reset.c" "$linux/drivers/clk/hisilicon/"
 install -m644 "$project/src/hisilicon,hi3798mv320-jpgd.h" "$linux/include/dt-bindings/clock/"
 install -m644 "$project/src/hi3798mv320-fiberhome-hg680kd-arm64.dts" \
@@ -68,24 +76,26 @@ config=("$linux/scripts/config" --file "$out/.config")
 "$linux/scripts/kconfig/merge_config.sh" -m -O "$out" "$out/.config" \
     "$project/src/arm64-7.3.6-usb-display.config"
 kernel=(make -C "$linux" O="$out" ARCH=arm64 CROSS_COMPILE="$cross")
-"${kernel[@]}" olddefconfig
-for symbol in VIRTUALIZATION KVM CMDLINE_FORCE CMA DMA_CMA EFI_PARTITION DEVTMPFS_MOUNT F2FS_FS F2FS_FS_ZSTD VFAT_FS USB_STORAGE USB_XHCI_HI3798MV320 VIDEO_HI3798MV320_VDEC VIDEO_HI3798MV320_JPGD DRM_HI3798MV320_VDP SND_HI3798MV320_AIAO CGROUPS UNIX INOTIFY_USER IPV6 MAGIC_SYSRQ_SERIAL DRM_LIMA DRM_CLIENT_SETUP DRM_FBDEV_EMULATION DRM_CLIENT_DEFAULT_FBDEV FRAMEBUFFER_CONSOLE; do
+"${kernel[@]}" olddefconfig > "$build/build.log" 2>&1
+for symbol in VIRTUALIZATION KVM CMDLINE_FORCE CMA CMA_DEBUGFS DMA_CMA EFI_PARTITION DEVTMPFS_MOUNT F2FS_FS F2FS_FS_ZSTD VFAT_FS USB_STORAGE USB_XHCI_HI3798MV320 VIDEO_HI3798MV320_VDEC VIDEO_HI3798MV320_JPGD VIDEO_HI3798MV320_VENC DRM_HI3798MV320_VDP SND_HI3798MV320_AIAO CGROUPS UNIX INOTIFY_USER IPV6 MAGIC_SYSRQ_SERIAL DRM_LIMA DRM_CLIENT_SETUP DRM_FBDEV_EMULATION DRM_CLIENT_DEFAULT_FBDEV FRAMEBUFFER_CONSOLE; do
     grep -qx "CONFIG_$symbol=y" "$out/.config" || { echo "Missing built-in CONFIG_$symbol" >&2; exit 1; }
 done
 grep -Fx 'CONFIG_INITRAMFS_SOURCE=""' "$out/.config"
 grep -Fx "CONFIG_CMDLINE=\"$cmdline\"" "$out/.config"
-if ! "${kernel[@]}" -j"${JOBS:-24}" Image scripts_dtc > "$out/build.log" 2>&1; then
-    tail -100 "$out/build.log"
+if ! "${kernel[@]}" -j"${JOBS:-24}" Image scripts_dtc >> "$build/build.log" 2>&1; then
+    tail -100 "$build/build.log"
     exit 1
 fi
+grep -qw venc_driver_init "$out/System.map"
 cp "$board_dts" "$pack/$board.dts"
 "${cross}gcc" -E -P -nostdinc -undef -D__DTS__ -x assembler-with-cpp \
     -I "$(dirname "$board_dts")" -I "$seed" -I "$linux/include" -I "$linux/arch/arm64/boot/dts/hisilicon" \
     "$pack/$board.dts" -o "$out/$board.pp.dts"
-"$out/scripts/dtc/dtc" -I dts -O dtb -p 0 -o "$pack/$board.dtb" "$out/$board.pp.dts" 2>>"$out/build.log"
-if grep -iEn '(^|[[:space:]])warning[: (]' "$out/build.log"; then
+"$out/scripts/dtc/dtc" -I dts -O dtb -p 0 -o "$pack/$board.dtb" "$out/$board.pp.dts" 2>>"$build/build.log"
+if grep -iEn '(^|[[:space:]])warning[: (]' "$build/build.log"; then
     exit 1
 fi
+cp "$build/build.log" "$pack/"
 cp "$out/arch/arm64/boot/Image" "$pack/Image"
 cp "$out/.config" "$pack/kernel.config"
 cp "$out/include/config/kernel.release" "$pack/kernel.release"
@@ -99,3 +109,4 @@ sha256sum boot.img > BOOT-SHA256SUMS
 sha256sum boot.img Image "$board.dtb" "$board.dts" kernel.config kernel.release > SHA256SUMS
 sha256sum -c SHA256SUMS
 cat SHA256SUMS
+printf 'USB build directory: %s\n' "$pack"

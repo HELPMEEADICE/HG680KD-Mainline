@@ -18,10 +18,3 @@
 		     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
 	interrupt-names = "gp", "gpmmu", "pp0", "ppmmu0", "pp1", "ppmmu1", "pmu", "pp";
 };
-
-&venc {
-	clocks = <&crg HI3798MV320_CLK_VENC>;
-	resets = <&crg 0x08c 4>, <&crg 0x32c 4>;
-	reset-names = "core", "smmu";
-	status = "okay";
-};

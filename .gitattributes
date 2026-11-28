@@ -1,8 +1,10 @@
 scripts/build_arm64.sh text eol=lf
 scripts/build_usb_736.sh text eol=lf
+scripts/verify_usb_736.sh text eol=lf
 scripts/build_jpgd_736.sh text eol=lf
 scripts/build_lima_dualpp_736.sh text eol=lf
 src/arm64-7.3.6-usb-display.config text eol=lf
+src/arm64-7.3.6-usb-full.config text eol=lf
 patches/0017-drm-lima-handle-shared-pp-irq-once.patch text eol=lf
 patches/0018-drm-lima-match-pp-broadcast-to-job.patch text eol=lf
 patches/0019-drm-lima-rearm-shared-pp-broadcast-irq.patch text eol=lf

@@ -18,3 +18,10 @@
 &{/soc/display-controller@f8cc0000} {
     hisilicon,g0-primary;
 };
+
+&venc {
+    clocks = <&crg HI3798MV320_CLK_VENC>;
+    resets = <&crg 0x08c 4>, <&crg 0x32c 4>;
+    reset-names = "core", "smmu";
+    status = "okay";
+};

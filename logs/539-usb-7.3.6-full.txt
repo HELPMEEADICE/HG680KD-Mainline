@@ -1,0 +1,44 @@
+HG680KD Linux 7.3.6 full-media USB deployment, 2026-11-28
+
+Build and install
+  GCC 14.2.0, empty kernel output directory, zero build warnings
+  Image SHA256 9f5f5b3c5a08dc4eaa623b6839743b11de2c2a70b217ae7918239cbb5fc9a0c7
+  DTB SHA256 b4b8c9dbef073903ac5ee415a91d281f451d1905fba53e92baf71850aabd9d85
+  kernel.config SHA256 4e0eb22a725848e68e3215d694b0af286b03e71694fdf84ad4b798d4fbf6ee78
+  USB /boot/boot.img SHA256 275642c781c1294e36d0ba4639eff98536d47b9cb77f26e56fbf65a0edd064ba
+  USB /boot/boot.img.bak SHA256 25b579f9dcc0399c71d5cc07620e4c3a8e81b1b7445ba4428b8ba4cf7eb13c3b
+  USB /opt/vdp-player/vdp-player mode 755 SHA256 7d5efc7bbfd484a2f81bfca3151c05c4c7765dff6419ddb53c15a9cc521db2be
+  USB readback LBA 4136 count 29777, payload byte-identical, 440 trailing bytes preserved
+  Complete sector window SHA256 f7a5d0088626399bfd148109900a4f216149c69a0f06b479cf925ea91b2e6057
+
+Physical cold boot
+  COM4 115200 8N1 recorded all filesystems unmounted and reboot: Power down.
+  Operator disconnected and restored power and confirmed HDMI left U-Boot.
+  The Windows serial handle dropped during power cycling. COM4 reconnected to the Linux console.
+  Boot ID d643a860-4dc5-4647-a202-749a34f4287a
+  /dev/sda3 f2fs and /dev/sda1 vfat. Both installed SHA256 values confirmed on COM4.
+  CmaTotal: 393216 kB. Running kernel config SHA256 matched the build.
+  CONFIG_KVM=y. All CPUs started at EL1. KVM reported HYP mode not available.
+
+Framebuffer, Xfce and GPU
+  HDMI-1 connected, firmware HD0 3840x2160, Xfce KMS mode 1920x1080 at 60 Hz.
+  /dev/fb0 and /dev/dri/card0 driven by VDP. /dev/dri/renderD128 driven by Lima.
+  Mesa GLX accelerated and Mesa EGL / GLES renderer Mali450.
+  glmark2 1080p build, texture and shading completed. Score 24.
+  num_pp=2. 16 single-PP jobs and 16 dual-PP jobs each matched 4096/4096 pixels.
+
+Media and resource checks
+  /dev/video0 VDEC, /dev/video1 JPGD, /dev/video2 VENC, /dev/media0 and /dev/snd/pcmC0D0p registered.
+  HEVC Main10 H0TV Tiled 3840x2160, 1080/1080 displayed at 60.000 FPS, drops 0, missed vblanks 0.
+  G0 Coverage OSD 100 flips. AIAO played 864000 PCM frames at 48000 Hz, XRUNs 0.
+  H.264 1080p60 1080/1080 displayed, drops 0, missed vblanks 0.
+  MPEG-1 1080p 120/120 decoded at 124.733 FPS. MPEG-2 1080p 120/120 at 114.854 FPS.
+  JPEG 1920x1080 to NV12 1920x1088, rejected 0. JPGD INTID 129 +1.
+  Standard FFmpeg h264_v4l2m2m opened /dev/video2. INTID 133 +12. Host strict decode passed, 1 I + 11 P.
+  Encoded H.264 SHA256 1b620066dc12960023da72e612fb5e6603c93163c60808703a0a5d0060b22dd5
+  VENC drained=12 SMMU faults=0 quarantined=0. INTID 181 remained 0. VDP underflows 0.
+  DMA-BUF 0 objects and 0 bytes after media exit. CMA used returned to 3225 pages.
+  CmaFree 380204 to 379432 KiB. CRG 0x08c=0x00000003 0x32c=0x00000001 before and after.
+  LightDM restored. No Lima timeout, SMMU fault, USB I/O error, kernel oops or panic.
+  The existing systemd tmp.mount / zram ordering-cycle message remains visible at boot.
+  Deployment did not write eMMC or OTP and did not execute U-Boot saveenv.
