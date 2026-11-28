@@ -5,6 +5,7 @@
 #include <linux/clk.h>
 #include <linux/delay.h>
 #include <linux/dma-mapping.h>
+#include <linux/gcd.h>
 #include <linux/interrupt.h>
 #include <linux/iopoll.h>
 #include <linux/module.h>
@@ -92,8 +93,10 @@ struct venc_ctx {
 	struct v4l2_ctrl *i_qp, *p_qp, *gop_size;
 	struct venc_dev *venc;
 	struct v4l2_pix_format_mplane output, capture;
+	struct v4l2_fract timeperframe;
 	struct venc_layout layout;
 	struct work_struct work;
+	struct mutex drain_lock;
 	bool aborted;
 	bool force_key_frame;
 	u32 gop_position, idr_pic_id;
@@ -188,7 +191,14 @@ static size_t venc_param_sets(struct venc_ctx *ctx, u8 *params, bool all_intra)
 		venc_put_ue(&sps, 0);
 		venc_put_ue(&sps, bottom);
 	}
-	venc_put_bits(&sps, 0, 1);	/* No VUI */
+	/* Preserve the original parameter sets until a client sets the interval. */
+	venc_put_bits(&sps, !!ctx->timeperframe.numerator, 1);
+	if (ctx->timeperframe.numerator) {
+		venc_put_bits(&sps, 1, 5);	/* Only timing_info_present_flag */
+		venc_put_bits(&sps, ctx->timeperframe.numerator, 32);
+		venc_put_bits(&sps, 2 * ctx->timeperframe.denominator, 32);
+		venc_put_bits(&sps, 0x10, 5);	/* Fixed rate, no HRD, pic_struct or restrictions */
+	}
 	used = venc_append_nal(params, 0x67, &sps);
 
 	venc_put_ue(&pps, 0);		/* PPS id */
@@ -756,6 +766,55 @@ static int venc_s_fmt(struct file *file, void *priv, struct v4l2_format *f)
 	return 0;
 }
 
+static int venc_g_parm(struct file *file, void *priv, struct v4l2_streamparm *parm)
+{
+	struct v4l2_fract interval = venc_file_to_ctx(file)->timeperframe;
+
+	if (!interval.numerator)
+		interval = (struct v4l2_fract) { 1, 30 };
+	if (parm->type == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE)
+		parm->parm.output = (struct v4l2_outputparm) {
+			.capability = V4L2_CAP_TIMEPERFRAME, .timeperframe = interval,
+		};
+	else if (parm->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
+		parm->parm.capture = (struct v4l2_captureparm) {
+			.capability = V4L2_CAP_TIMEPERFRAME, .timeperframe = interval,
+		};
+	else
+		return -EINVAL;
+	return 0;
+}
+
+static int venc_s_parm(struct file *file, void *priv, struct v4l2_streamparm *parm)
+{
+	struct venc_ctx *ctx = venc_file_to_ctx(file);
+	struct v4l2_m2m_ctx *m2m = ctx->fh.m2m_ctx;
+	struct v4l2_fract interval = parm->parm.output.timeperframe;
+	u32 divisor;
+
+	if (parm->type != V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE)
+		return -EINVAL;
+	if (vb2_is_streaming(v4l2_m2m_get_src_vq(m2m)) ||
+	    vb2_is_streaming(v4l2_m2m_get_dst_vq(m2m)))
+		return -EBUSY;
+	if (!interval.numerator || !interval.denominator) {
+		interval = (struct v4l2_fract) { 1, 30 };
+	} else {
+		divisor = gcd(interval.numerator, interval.denominator);
+		interval.numerator /= divisor;
+		interval.denominator /= divisor;
+		/* Level 4.2 covers up to 60 fps at the maximum frame size. */
+		if (interval.denominator < interval.numerator)
+			interval = (struct v4l2_fract) { 1, 1 };
+		else if (interval.denominator > 60ULL * interval.numerator)
+			interval = (struct v4l2_fract) { 1, 60 };
+		else if (interval.denominator > U32_MAX / 2)
+			return -ERANGE;
+	}
+	ctx->timeperframe = interval;
+	return venc_g_parm(file, priv, parm);
+}
+
 static int venc_log_status(struct file *file, void *priv)
 {
 	struct venc_dev *v = venc_file_to_ctx(file)->venc;
@@ -766,20 +825,42 @@ static int venc_log_status(struct file *file, void *priv)
 	return 0;
 }
 
+static void venc_queue_eos(struct venc_ctx *ctx)
+{
+	static const struct v4l2_event eos = { .type = V4L2_EVENT_EOS };
+
+	v4l2_event_queue_fh(&ctx->fh, &eos);
+}
+
+static int venc_subscribe_event(struct v4l2_fh *fh, const struct v4l2_event_subscription *sub)
+{
+	if (sub->type == V4L2_EVENT_EOS)
+		return v4l2_event_subscribe(fh, sub, 0, NULL);
+	return v4l2_ctrl_subscribe_event(fh, sub);
+}
+
 static int venc_encoder_cmd(struct file *file, void *priv, struct v4l2_encoder_cmd *cmd)
 {
 	struct venc_ctx *ctx = venc_file_to_ctx(file);
 	struct v4l2_m2m_ctx *m2m = ctx->fh.m2m_ctx;
-	bool restarting = cmd->cmd == V4L2_ENC_CMD_START && v4l2_m2m_has_stopped(m2m);
-	int ret;
+	bool was_stopped;
+	int ret = v4l2_m2m_ioctl_try_encoder_cmd(file, priv, cmd);
 
-	if (restarting)
-		ctx->gop_position = 0;
+	if (ret || !vb2_is_streaming(v4l2_m2m_get_src_vq(m2m)) ||
+	    !vb2_is_streaming(v4l2_m2m_get_dst_vq(m2m)))
+		return ret;
+
+	mutex_lock(&ctx->drain_lock);
+	was_stopped = v4l2_m2m_has_stopped(m2m);
 	ret = v4l2_m2m_encoder_cmd(file, m2m, cmd);
-	if (!ret && restarting) {
+	if (!ret && cmd->cmd == V4L2_ENC_CMD_START && was_stopped) {
+		ctx->gop_position = 0;
 		vb2_clear_last_buffer_dequeued(v4l2_m2m_get_dst_vq(m2m));
 		v4l2_m2m_try_schedule(m2m);
+	} else if (!ret && !was_stopped && v4l2_m2m_has_stopped(m2m)) {
+		venc_queue_eos(ctx);
 	}
+	mutex_unlock(&ctx->drain_lock);
 	return ret;
 }
 
@@ -794,6 +875,8 @@ static const struct v4l2_ioctl_ops venc_ioctls = {
 	.vidioc_g_fmt_vid_cap_mplane = venc_g_fmt,
 	.vidioc_s_fmt_vid_out_mplane = venc_s_fmt,
 	.vidioc_s_fmt_vid_cap_mplane = venc_s_fmt,
+	.vidioc_g_parm = venc_g_parm,
+	.vidioc_s_parm = venc_s_parm,
 	.vidioc_reqbufs = v4l2_m2m_ioctl_reqbufs,
 	.vidioc_querybuf = v4l2_m2m_ioctl_querybuf,
 	.vidioc_prepare_buf = v4l2_m2m_ioctl_prepare_buf,
@@ -806,7 +889,7 @@ static const struct v4l2_ioctl_ops venc_ioctls = {
 	.vidioc_try_encoder_cmd = v4l2_m2m_ioctl_try_encoder_cmd,
 	.vidioc_encoder_cmd = venc_encoder_cmd,
 	.vidioc_log_status = venc_log_status,
-	.vidioc_subscribe_event = v4l2_ctrl_subscribe_event,
+	.vidioc_subscribe_event = venc_subscribe_event,
 	.vidioc_unsubscribe_event = v4l2_event_unsubscribe,
 };
 
@@ -850,6 +933,7 @@ static void venc_buf_queue(struct vb2_buffer *vb)
 	if (!V4L2_TYPE_IS_OUTPUT(vb->type) && v4l2_m2m_dst_buf_is_last(m2m)) {
 		buf->sequence = ctx->capture_sequence++;
 		v4l2_m2m_last_buffer_done(m2m, buf);
+		venc_queue_eos(ctx);
 	} else {
 		v4l2_m2m_buf_queue(m2m, buf);
 	}
@@ -888,9 +972,16 @@ static int venc_start_streaming(struct vb2_queue *q, unsigned int count)
 static void venc_stop_streaming(struct vb2_queue *q)
 {
 	struct venc_ctx *ctx = vb2_get_drv_priv(q);
+	struct v4l2_m2m_ctx *m2m = ctx->fh.m2m_ctx;
+	bool was_stopped;
 
 	/* M2M has waited for the worker, including the DMA drain and reset. */
-	v4l2_m2m_update_stop_streaming_state(ctx->fh.m2m_ctx, q);
+	mutex_lock(&ctx->drain_lock);
+	was_stopped = v4l2_m2m_has_stopped(m2m);
+	v4l2_m2m_update_stop_streaming_state(m2m, q);
+	if (!was_stopped && v4l2_m2m_has_stopped(m2m))
+		venc_queue_eos(ctx);
+	mutex_unlock(&ctx->drain_lock);
 	venc_return_buffers(q, VB2_BUF_STATE_ERROR);
 	venc_free_areas(ctx->venc);
 	ctx->gop_position = 0;
@@ -936,6 +1027,7 @@ static void venc_work(struct work_struct *work)
 	u8 *output = vb2_plane_vaddr(&dst->vb2_buf, 0);
 	struct venc_frame frame = {};
 	unsigned int gop;
+	bool last;
 	int ret = -EFAULT;
 
 	mutex_lock(ctx->controls.lock);
@@ -960,12 +1052,18 @@ static void venc_work(struct work_struct *work)
 	vb2_set_plane_payload(&dst->vb2_buf, 0, ret > 0 ? ret : 0);
 	if (ret > 0)
 		dst->flags |= frame.index ? V4L2_BUF_FLAG_PFRAME : V4L2_BUF_FLAG_KEYFRAME;
-	if (v4l2_m2m_is_last_draining_src_buf(m2m, src)) {
+	/* Serialize STOP's last-source snapshot with completion of this pair. */
+	mutex_lock(&ctx->drain_lock);
+	last = v4l2_m2m_is_last_draining_src_buf(m2m, src);
+	if (last) {
 		dst->flags |= V4L2_BUF_FLAG_LAST;
 		v4l2_m2m_mark_stopped(m2m);
 	}
 	v4l2_m2m_buf_done_and_job_finish(ctx->venc->m2m, m2m,
 					ret > 0 ? VB2_BUF_STATE_DONE : VB2_BUF_STATE_ERROR);
+	if (last)
+		venc_queue_eos(ctx);
+	mutex_unlock(&ctx->drain_lock);
 }
 
 static void venc_device_run(void *priv)
@@ -1004,6 +1102,7 @@ static int venc_open(struct file *file)
 {
 	struct venc_dev *v = video_drvdata(file);
 	struct venc_ctx *ctx;
+	struct v4l2_ctrl *bitrate;
 	int ret;
 
 	mutex_lock(&v->lock);
@@ -1022,8 +1121,9 @@ static int venc_open(struct file *file)
 	venc_raw_format(&ctx->output);
 	venc_coded_format(&ctx->capture, &ctx->output);
 	INIT_WORK(&ctx->work, venc_work);
+	mutex_init(&ctx->drain_lock);
 	v4l2_fh_init(&ctx->fh, &v->video);
-	v4l2_ctrl_handler_init(&ctx->controls, 5);
+	v4l2_ctrl_handler_init(&ctx->controls, 9);
 	ctx->i_qp = v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_H264_I_FRAME_QP,
 				     0, 51, 1, 28);
 	ctx->p_qp = v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_H264_P_FRAME_QP,
@@ -1031,6 +1131,18 @@ static int venc_open(struct file *file)
 	v4l2_ctrl_new_std_menu(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_H264_PROFILE,
 			       V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE,
 			       GENMASK(0, 0), V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE);
+	v4l2_ctrl_new_std_menu(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_H264_LEVEL,
+			       V4L2_MPEG_VIDEO_H264_LEVEL_4_2,
+			       GENMASK(V4L2_MPEG_VIDEO_H264_LEVEL_4_2 - 1, 0),
+			       V4L2_MPEG_VIDEO_H264_LEVEL_4_2);
+	v4l2_ctrl_new_std_menu(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_HEADER_MODE,
+			       V4L2_MPEG_VIDEO_HEADER_MODE_JOINED_WITH_1ST_FRAME,
+			       BIT(V4L2_MPEG_VIDEO_HEADER_MODE_SEPARATE),
+			       V4L2_MPEG_VIDEO_HEADER_MODE_JOINED_WITH_1ST_FRAME);
+	v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_B_FRAMES, 0, 0, 1, 0);
+	/* Fixed QP has no bitrate target. Report the negotiated value as zero. */
+	bitrate = v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_BITRATE, 0, 0, 1, 0);
+	v4l2_ctrl_activate(bitrate, false);
 	ctx->gop_size = v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_GOP_SIZE,
 					 1, VENC_MAX_GOP, 1, 30);
 	v4l2_ctrl_new_std(&ctx->controls, &venc_force_key_ops, V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME,

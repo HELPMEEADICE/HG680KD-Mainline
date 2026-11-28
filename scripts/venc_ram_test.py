@@ -84,10 +84,10 @@ def prepare(directory, case, frames):
     return raw, packed
 
 
-def verify_boot(console):
+def verify_boot(console, release=RELEASE):
     out = checked(console, "uname -r; cat /proc/mounts /proc/partitions; "
                   "ls -d /dev/sd* /dev/mmcblk* /dev/mtd* 2>/dev/null || :")
-    if not re.search(rb"(?m)^" + RELEASE + rb"\r?$", out) or b"rootfs / rootfs " not in out:
+    if not re.search(rb"(?m)^" + re.escape(release) + rb"\r?$", out) or b"rootfs / rootfs " not in out:
         raise RuntimeError("wrong RAM kernel or root filesystem")
     if re.search(rb"(?m)^/dev/\S+|^\s+\d+\s+\d+\s+\d+\s+\w+\r?$", out):
         raise RuntimeError("a persistent block device is visible")
@@ -394,7 +394,7 @@ def main():
             console.expect(SHELL_PROMPT, 6)
         else:
             ram_boot(console, args)
-        verify_boot(console)
+        verify_boot(console, (args.directory / "kernel.release").read_bytes().strip())
         stage(console, args, BUSYBOX, ("busybox.static",))
         stage(console, args, args.directory, ("venc-test",))
         checked(console, "chmod 755 /tmp/busybox.static /tmp/venc-test")

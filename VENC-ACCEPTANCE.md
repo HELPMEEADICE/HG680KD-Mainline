@@ -151,3 +151,88 @@ python -u scripts/venc_ram_test.py $dir --frames 120 --gops 1 30 --log "$dir/ret
 ```
 
 复测需要 pyserial、NumPy、FFmpeg / ffprobe、已校验的原厂 BL31 RAM 副本，以及双 PP Lima、JPGD 和 2160p60 播放的既有验证件。板端可直接用 `venc-test --gop 30 --i-qp 32 --p-qp 32 /dev/video2 1920 1080 NV12 120 input.raw output.h264` 编码紧凑排列的可见 NV12 帧。`--input-fps` 指定码率换算所用的源帧率，默认 30。
+
+## 标准 FFmpeg `h264_v4l2m2m` 实机验收
+
+2026-11-28，在 HG680KD 上 TFTP 启动 IPPP 基线 `artifacts/arm64-7.3.6-venc-ippp/boot.img`。把上游 FFmpeg 8.1.3 的未修改 AArch64 静态构建临时加载到 `/tmp`。`ffmpeg -encoders | grep h264_v4l2m2m` 列出编码器。FFmpeg 扫描视频节点并打开 `/dev/video2`。`QUERYCAP` 返回 `VIDEO_M2M_MPLANE | STREAMING`，`ENUM_FMT` 和 `S_FMT` 协商出单内存平面 NV12 OUTPUT 与 H.264 CAPTURE，720p 和 1080p 的可见尺寸都保持原值。 [FFmpeg 8.1.3 官方源码包](https://ffmpeg.org/releases/ffmpeg-8.1.3.tar.xz)
+
+原 IPPP 镜像的两种分辨率和两种封装均编码 120 帧，退出码均为 0。`ENCODER_CMD(STOP)` 已能返回空 `LAST` CAPTURE 缓冲。`S_PARM` 返回 `ENOTTY`，EOS 订阅返回 `EINVAL`，`BITRATE=200000` 产生 FFmpeg 警告。裸流缺少 VUI 时基，主机 ffprobe 按 25 fps 推断包时长。MP4 由 FFmpeg 写入 30 fps 时间戳。 [基线及复测 ioctl 摘录](logs/537-venc-ffmpeg-acceptance.txt)
+
+### 驱动补齐与镜像
+
+- `G_PARM` 返回 OUTPUT 和 CAPTURE 的帧间隔，`S_PARM` 接受 OUTPUT 有理数帧间隔并同步到 CAPTURE。显式设定间隔后，IDR 的 SPS 写入对应的固定帧率 VUI。直接使用原 `venc-test` 的客户端保留既有码流语法。
+- 串行化 `STOP` 取最后一笔 OUTPUT 和工作队列完成该笔的过程。CAPTURE 最后一个缓冲可出队后发送 `V4L2_EVENT_EOS`。保留 `V4L2_BUF_FLAG_LAST`、排空后 `EPIPE` 和 `START` 重启。
+- 报告固定 Constrained Baseline、Level 4.2、SPS/PPS 随 IDR 输出和零 B 帧。`BITRATE` 查询为 inactive，设置值回读为 0，编码仍使用固定 QP。FFmpeg 8.1.3 的调试日志保留 `HEADER_MODE=SEPARATE`、`FRAME_RC_ENABLE` 及动态 `H264_MIN_QP/MAX_QP` 的 `EINVAL`。这些探测级返回不影响编码、封装或排空。FFmpeg 对显式 `-profile:v 578` 下发 `H264_PROFILE`，Level 4.2 用驱动控件回读与 SPS 双重验证。 [V4L2 stateful encoder 规范](https://docs.kernel.org/userspace-api/media/v4l/dev-encoder.html)
+
+在 `hedc@ArchLinux-E5-Server:/home/hedc/hg680kd-mainline` 从空内核输出目录用 AArch64 GCC 14.2.0 构建 `7.3.6-hg680kd-arm64-venc-ffmpeg`，内核与 DTB 构建零警告。测试镜像、`build.log`、`SHA256SUMS` 和输出文件在 `artifacts/arm64-7.3.6-venc-ffmpeg/`。板端 FFmpeg ELF SHA256 为 `85a07a3488712f3f7a7664ba70d2737cc64449e949e4338aa593f405761e8ba4`。 [构建和回读记录](logs/537-venc-ffmpeg-acceptance.txt)
+
+| 装载项 | RAM 地址 | 字节数 | SHA256 | U-Boot RAM 回读 CRC32 |
+| --- | ---: | ---: | --- | --- |
+| 新版 `boot.img` | `0x01fdffc0` | 19,826,760 | `a30f495933a6d23e4d0da0d3e44ffdac59179374b4acfdfdb0dba7ac5164519f` | `363f05cd` |
+| IPPP `boot.img` | `0x01fdffc0` | 19,826,760 | `e7936ac99cbc346c9489d202321b7407839c19a91f11f901058529a6e74b69dd` | `5c2d0ac8` |
+| 原厂 BL31 RAM 副本 | `0x08020000` | 262,144 | `5f32da6063d8c49d0c2cc9fc7a1667f0e2b75931ce4d73af842f3efc51a97b7b` | `fa236592` |
+
+COM4 以 115200 8N1 由单进程独占。每次从 U-Boot 用 TFTP 装载 BL31 和镜像并校验 RAM 回读，再用 `bootm 1fdffc0` 启动。测试期间根为 initramfs、`/proc/partitions` 无块设备，板端二进制和样本均位于 `/tmp`。U 盘 `/boot/boot.img` 写入、eMMC 写入、OTP 操作和 `saveenv` 执行次数均为 0。
+
+### 实测命令
+
+源为两段 30 fps 的 120 帧 `testsrc2` NV12 运动序列。文件名沿用 IPPP 夹具，FFmpeg 编码的 I/P QP 均为驱动默认值 28。完整读取输入至 EOF 触发编码排空。以下命令在板端 `/tmp` 执行。
+
+```sh
+./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1280x720 -framerate 30 -i 720p-nv12-qp24.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 720p-ffmpeg.h264
+./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1280x720 -framerate 30 -i 720p-nv12-qp24.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 720p-ffmpeg.mp4
+./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1920x1080 -framerate 30 -i 1080p-nv12-qp32.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 1080p-ffmpeg.h264
+./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1920x1080 -framerate 30 -i 1080p-nv12-qp32.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 1080p-ffmpeg.mp4
+```
+
+### 转码、软硬解环回与资源
+
+每组 FFmpeg 返回 0，输入、编码和封装均为 120 帧，排空前后完整。ffprobe 核对 Constrained Baseline Level 4.2 和 4 个完整 GOP，零基帧号 0、30、60、90 为 IDR，其余为 P 帧。MP4 的 PTS 和 DTS 均从 0 起按 1/30 秒递增，持续 4 秒。Annex B 裸流的 SPS VUI 写入 `num_units_in_tick=1`、`time_scale=60` 和 `fixed_frame_rate_flag=1`，ffprobe 确认每包时长为 1/30 秒。裸流没有容器 PTS/DTS，主机 ffprobe 的流摘要显示 `avg_frame_rate=25/1`、`r_frame_rate=60/1`。四个原始文件全部通过 `ffmpeg -xerror -err_detect explode` 严格软解，`framemd5` 中的解码帧时间均为连续的 0 至 119 个 1/30 秒单位。 [FFmpeg 对 `r_frame_rate` 的定义](https://ffmpeg.org/doxygen/trunk/structAVStream.html)
+
+MP4 解封装成 Annex B 后和裸流分别送 `/dev/video0`。每组按四个 30 帧 GOP 提交 V4L2 Request，硬解 NV21 与软解逐批 SHA256 相同，验证 1080p 时覆盖 1088 行编码面。两种封装在同分辨率解出的 120 帧逐帧哈希一致。720p 和 1080p 的可见 Y/U/V 源到解码 PSNR 分别为 45.98 / 43.60 / 44.09 dB 和 46.52 / 44.61 / 44.98 dB。 [帧、码流和像素哈希](logs/537-venc-ffmpeg-result.json)
+
+FPS 以板端 FFmpeg 进程启动到退出的真实耗时计算，含 RAM 读写和封装。码率为 4 秒源时长内的视频包负载。CPU 取同一窗口的四核 `/proc/stat` 非空闲占比。
+
+| 输出 | 帧数 | FPS | 视频 Mbps | CPU0 / 1 / 2 / 3 % | INTID 133 / VENC 硬件排空 / INTID 169 |
+| --- | ---: | ---: | ---: | --- | --- |
+| 720p `.h264` | 120 | 40.678 | 4.486 | 32.31 / 38.18 / 12.59 / 10.51 | +120 / +120 / +120 |
+| 720p `.mp4` | 120 | 42.403 | 4.486 | 52.65 / 24.03 / 15.96 / 3.19 | +120 / +120 / +120 |
+| 1080p `.h264` | 120 | 18.182 | 9.384 | 20.73 / 21.79 / 34.44 / 16.67 | +120 / +120 / +120 |
+| 1080p `.mp4` | 120 | 18.127 | 9.384 | 21.90 / 17.25 / 33.53 / 23.72 | +120 / +120 / +120 |
+
+四组累计 480 次 SPI 101（INTID 133）与 480 次 VENC 总线排空。每组关闭编码器后 CMA 分配位图回到 3,193 页，DMA-BUF 为 0 个对象、0 字节，CRG `+0x08c/+0x32c` 回到 `0x00000003/0x00000001`。`CmaFree` 随系统页面使用波动，逐轮值收录于结果。VENC 私有 SMMU fault、设备隔离数与 INTID 181 全程为 0。 [资源前后快照](logs/537-venc-ffmpeg-result.json)
+
+独立 ioctl 测试读回缺省帧间隔 1/30，OUTPUT 写入 1001/30000 后 CAPTURE 回读相同值。空 OUTPUT 队列下，分别在 STOP 前和 STOP 后提交 CAPTURE，均收到一次 EOS 和一个空 `LAST`，再执行 `DQBUF` 返回 `EPIPE`。重复 STOP 无额外 EOS，START 后可再次排空。 [ioctl 测试记录](logs/537-venc-ffmpeg-acceptance.txt)
+
+同一镜像另经 TFTP 启动并以 `strace -f -yy -e trace=ioctl` 重跑四组。每组确认 `S_PARM`、EOS 订阅、`ENCODER_CMD(STOP)` 和 `DQEVENT` 均成功，并出队一个带 `LAST` 的 CAPTURE 缓冲。追踪组四个输出的 SHA256 与性能测量组逐文件一致。 [ioctl 前后对照](logs/537-venc-ffmpeg-acceptance.txt)
+
+### 媒体与已有编码路径回归
+
+| 回归项 | 实测结果 |
+| --- | --- |
+| 双 PP Lima | PP0、PP1 各 16 项及交替模式 32 项逐像素通过。INTID 126 分别 +32、+32、+64。 |
+| JPGD | `/dev/video1` 解码 1920×1080 JPEG 通过，INTID 129 +1。 |
+| VDEC / VDP | 2160p60 Main10 源解码与显示均为 1,080 帧，零丢帧、零漏 vblank。HDMI 输出为 1080p60，INTID 169 / 122 分别 +1,080 / +1,090。 |
+| AIAO | 48 kHz PCM 播放 864,000 帧，零 XRUN，INTID 116 +1,800。 |
+
+FFmpeg 与环回结束后 `CmaFree` 为 380,444 KiB，与启动基线相同。媒体回归后 CMA 位图为 3,209 页，和既有媒体回归的 +16 页一致。INTID 133 保持 480，DMA-BUF 和 INTID 181 保持为零，VENC CRG 保持启动读值。 [媒体日志和资源快照](logs/537-venc-ffmpeg-acceptance.txt)
+
+在 ioctl 追踪所用的 RAM 会话中，用原 `venc-test` 复跑 720p NV12 QP 24 与 1080p NV12 QP 32，各测 GOP=1 和 GOP=30，每组 120 帧。四条码流均与 IPPP 基线产物逐字节一致，严格软解和 VDEC 环回全部通过。该次启动累计 INTID 133 和 VENC 硬件排空均为 960，SMMU fault 与 INTID 181 均为 0。 [旧路径码流和环回结果](logs/537-venc-ffmpeg-result.json)
+
+### 复现
+
+按上文 IPPP 的步骤上传内核输入和构建脚本，设 `$work = "$root/out/venc-ffmpeg"`，在远端构建命令中增加 `VENC_LOCALVERSION=-hg680kd-arm64-venc-ffmpeg`，并保留 `mktemp -d` 创建的空输出目录。把 `release` 中的构建产物取到 `artifacts/arm64-7.3.6-venc-ffmpeg/`。
+
+```powershell
+$tools = "$work/upstream"
+$out = 'artifacts/arm64-7.3.6-venc-ffmpeg'
+$archive = Join-Path $env:TEMP 'ffmpeg-8.1.3.tar.xz'
+curl.exe -fLSs https://ffmpeg.org/releases/ffmpeg-8.1.3.tar.xz -o $archive
+& scripts/remote.ps1 -PasswordFile $hgKey run "mkdir -p '$tools'"
+& scripts/remote.ps1 -PasswordFile $hgKey put-inputs $tools $archive scripts/build_venc_ffmpeg.sh src/venc-ioctl-smoke.c
+& scripts/remote.ps1 -PasswordFile $hgKey run "bash '$tools/build_venc_ffmpeg.sh' '$root' '$tools'"
+foreach ($name in @('ffmpeg', 'venc-ioctl-smoke')) {
+    & scripts/remote.ps1 -PasswordFile $hgKey get "$tools/build/$name" "$out/$name"
+}
+python -u scripts/venc_ffmpeg_ram.py $out --image-dir $out --profile --log "$out/retest-com4.txt"
+```

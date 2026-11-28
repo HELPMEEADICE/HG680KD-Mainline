@@ -56,7 +56,8 @@ trap 'tail -100 "$release/build.log" >&3' ERR
     "$linux/scripts/config" --file "$out/.config" --enable VIDEO_HI3798MV320_VENC \
         --enable DEBUG_FS --enable CMA_DEBUGFS \
         --disable MTD --disable USB_STORAGE --disable USB_UAS --disable MODULES \
-        --set-str INITRAMFS_SOURCE "$initramfs" --set-str LOCALVERSION '-hg680kd-arm64-venc-ippp'
+        --set-str INITRAMFS_SOURCE "$initramfs" \
+        --set-str LOCALVERSION "${VENC_LOCALVERSION:--hg680kd-arm64-venc-ippp}"
     "${kernel[@]}" olddefconfig
     for key in CC_IS_GCC DRM_LIMA VIDEO_HI3798MV320_JPGD VIDEO_HI3798MV320_VDEC \
         VIDEO_HI3798MV320_VENC DRM_HI3798MV320_VDP SND_HI3798MV320_AIAO \

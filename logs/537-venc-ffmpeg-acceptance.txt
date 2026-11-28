@@ -1,0 +1,352 @@
+HG680KD Linux 7.3.6 FFmpeg h264_v4l2m2m RAM acceptance, 2026-11-28
+
+## GCC 14.2.0 clean kernel and DTB build
+aarch64-linux-gcc (GCC) 14.2.0
+Kernel output directory is empty
+a30f495933a6d23e4d0da0d3e44ffdac59179374b4acfdfdb0dba7ac5164519f  boot.img  (19826760 bytes, CRC32=363f05cd, load_at=0x01fdffc0)
+Compiler and DTB warnings: 0
+
+## IPPP baseline COM4 TFTP and FFmpeg
+fastboot#[host] stock-bl31.bin SHA256 5f32da6063d8c49d0c2cc9fc7a1667f0e2b75931ce4d73af842f3efc51a97b7b
+Bytes transferred = 262144 (40000 hex)
+[host] CRC32 matches local image: fa236592
+[host] boot.img SHA256 e7936ac99cbc346c9489d202321b7407839c19a91f11f901058529a6e74b69dd
+Bytes transferred = 19826760 (12e8848 hex)
+[host] CRC32 matches local image: 5c2d0ac8
+[h264_v4l2m2m @ 0xffff8dbe7c00] Using device /dev/video2
+[out#0/h264 @ 0xffff8da94d10]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (2242807 bytes);
+# [host] 720p-ffmpeg.h264 FFmpeg exit=0, IRQ +120
+[h264_v4l2m2m @ 0xffff88f56060] Using device /dev/video2
+[out#0/mp4 @ 0xffff88f57d10]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (2242807 bytes);
+# [host] 720p-ffmpeg.mp4 FFmpeg exit=0, IRQ +120
+[h264_v4l2m2m @ 0xffffb7b28c00] Using device /dev/video2
+[out#0/h264 @ 0xffffb782fd10]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (4691974 bytes);
+# [host] 1080p-ffmpeg.h264 FFmpeg exit=0, IRQ +120
+[h264_v4l2m2m @ 0xffffb2e2a060] Using device /dev/video2
+[out#0/mp4 @ 0xffffb2e2bd10]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (4691974 bytes);
+# [host] 1080p-ffmpeg.mp4 FFmpeg exit=0, IRQ +120
+
+## Updated image COM4 TFTP, FFmpeg debug output and hardware loopback
+rootfs / rootfs rw,size=809892k,nr_inodes=202473 0 0
+fastboot#[host] stock-bl31.bin SHA256 5f32da6063d8c49d0c2cc9fc7a1667f0e2b75931ce4d73af842f3efc51a97b7b
+Bytes transferred = 262144 (40000 hex)
+[host] CRC32 matches local image: fa236592
+[host] boot.img SHA256 a30f495933a6d23e4d0da0d3e44ffdac59179374b4acfdfdb0dba7ac5164519f
+Bytes transferred = 19826760 (12e8848 hex)
+[host] CRC32 matches local image: 363f05cd
+[    0.491229] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+rootfs / rootfs rw,size=809892k,nr_inodes=202473 0 0
+major minor  #blocks  name
+<6>[    0.491229] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+ V..... h264_v4l2m2m         V4L2 mem2mem H.264 encoder wrapper (codec h264)
+<6>[    0.491229] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+<6>[    0.491229] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+[h264_v4l2m2m @ 0xffffa7af3c00] Using device /dev/video2
+[h264_v4l2m2m @ 0xffffa7af3c00] Encoder: number of B-frames = 0
+[h264_v4l2m2m @ 0xffffa7af3c00] Failed to set header mode: Invalid argument
+[h264_v4l2m2m @ 0xffffa7af3c00] Encoder: bit rate = 200000
+[h264_v4l2m2m @ 0xffffa7af3c00] Failed to set frame level rate control: Invalid argument
+[h264_v4l2m2m @ 0xffffa7af3c00] Encoder: gop size = 30
+[h264_v4l2m2m @ 0xffffa7af3c00] Encoder: h264 profile = 1
+[h264_v4l2m2m @ 0xffffa7af3c00] Failed to set minimum video quantizer scale: Invalid argument
+[h264_v4l2m2m @ 0xffffa7af3c00] Failed to set maximum video quantizer scale: Invalid argument
+[out#0/h264 @ 0xffffa79a0d10]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (2242847 bytes);
+bench: utime=0.159s stime=0.537s rtime=2.921s
+bench: maxrss=24148KiB
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+# [host] 720p-ffmpeg.h264 FFmpeg exit=0, IRQ +120
+<6>[   16.807045] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+168d4af0511366e0eda4298b560fee76410dd4b921cd58abf1901cfae8221fba  venc-vdec.nv21
+f597a78b6add75346dd0173ddec000f4ccb3874207be9e1c35029d6704b80000  venc-vdec.nv21
+61d271692fb7ecb9b2ba658ea4cf583be6c6c42805aab53ed87bace6d5d1b6c1  venc-vdec.nv21
+1b49e09ad7203d995481efe1eb855483e7264c2f10dce242e209eeba396d493f  venc-vdec.nv21
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+[h264_v4l2m2m @ 0xffff88a20060] Using device /dev/video2
+[h264_v4l2m2m @ 0xffff88a20060] Encoder: number of B-frames = 0
+[h264_v4l2m2m @ 0xffff88a20060] Failed to set header mode: Invalid argument
+[h264_v4l2m2m @ 0xffff88a20060] Encoder: bit rate = 200000
+[h264_v4l2m2m @ 0xffff88a20060] Failed to set frame level rate control: Invalid argument
+[h264_v4l2m2m @ 0xffff88a20060] Encoder: gop size = 30
+[h264_v4l2m2m @ 0xffff88a20060] Encoder: h264 profile = 1
+[h264_v4l2m2m @ 0xffff88a20060] Failed to set minimum video quantizer scale: Invalid argument
+[h264_v4l2m2m @ 0xffff88a20060] Failed to set maximum video quantizer scale: Invalid argument
+[out#0/mp4 @ 0xffff88a21d10]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (2242847 bytes);
+bench: utime=0.280s stime=0.486s rtime=2.810s
+bench: maxrss=24664KiB
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+# [host] 720p-ffmpeg.mp4 FFmpeg exit=0, IRQ +120
+<6>[   16.807045] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+<6>[   32.448205] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+168d4af0511366e0eda4298b560fee76410dd4b921cd58abf1901cfae8221fba  venc-vdec.nv21
+f597a78b6add75346dd0173ddec000f4ccb3874207be9e1c35029d6704b80000  venc-vdec.nv21
+61d271692fb7ecb9b2ba658ea4cf583be6c6c42805aab53ed87bace6d5d1b6c1  venc-vdec.nv21
+1b49e09ad7203d995481efe1eb855483e7264c2f10dce242e209eeba396d493f  venc-vdec.nv21
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+[h264_v4l2m2m @ 0xffff9db0ec00] Using device /dev/video2
+[h264_v4l2m2m @ 0xffff9db0ec00] Encoder: number of B-frames = 0
+[h264_v4l2m2m @ 0xffff9db0ec00] Failed to set header mode: Invalid argument
+[h264_v4l2m2m @ 0xffff9db0ec00] Encoder: bit rate = 200000
+[h264_v4l2m2m @ 0xffff9db0ec00] Failed to set frame level rate control: Invalid argument
+[h264_v4l2m2m @ 0xffff9db0ec00] Encoder: gop size = 30
+[h264_v4l2m2m @ 0xffff9db0ec00] Encoder: h264 profile = 1
+[h264_v4l2m2m @ 0xffff9db0ec00] Failed to set minimum video quantizer scale: Invalid argument
+[h264_v4l2m2m @ 0xffff9db0ec00] Failed to set maximum video quantizer scale: Invalid argument
+[out#0/h264 @ 0xffff9d815d10]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (4692018 bytes);
+bench: utime=0.424s stime=1.188s rtime=6.565s
+bench: maxrss=51156KiB
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+# [host] 1080p-ffmpeg.h264 FFmpeg exit=0, IRQ +120
+<6>[   16.807045] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+<6>[   32.448205] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+<6>[   62.355493] hi3798mv320-venc f8c80000.video-enc: drained=360 SMMU faults=0 quarantined=0
+adf5a36b04f422ce5498ef1cea45d92be7cdfdb95052b295cb2a4e2bff2f26e4  venc-vdec.nv21
+7fe54a00fd359e26f8c38f145a1b1c353ecf791afda8358bc3aadd6a3c4249d9  venc-vdec.nv21
+598538425251edf0576a033b2c567a88a38c9a94bf6a232a3edf91c7d62ed287  venc-vdec.nv21
+dc490c39cde8865a2f6ec99eab3fe453b756269425e9d40f2a8caae929a47bd6  venc-vdec.nv21
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+[h264_v4l2m2m @ 0xffff86e87060] Using device /dev/video2
+[h264_v4l2m2m @ 0xffff86e87060] Encoder: number of B-frames = 0
+[h264_v4l2m2m @ 0xffff86e87060] Failed to set header mode: Invalid argument
+[h264_v4l2m2m @ 0xffff86e87060] Encoder: bit rate = 200000
+[h264_v4l2m2m @ 0xffff86e87060] Failed to set frame level rate control: Invalid argument
+[h264_v4l2m2m @ 0xffff86e87060] Encoder: gop size = 30
+[h264_v4l2m2m @ 0xffff86e87060] Encoder: h264 profile = 1
+[h264_v4l2m2m @ 0xffff86e87060] Failed to set minimum video quantizer scale: Invalid argument
+[h264_v4l2m2m @ 0xffff86e87060] Failed to set maximum video quantizer scale: Invalid argument
+[out#0/mp4 @ 0xffff86e88d10]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (4692018 bytes);
+bench: utime=0.645s stime=1.171s rtime=6.569s
+bench: maxrss=51424KiB
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+# [host] 1080p-ffmpeg.mp4 FFmpeg exit=0, IRQ +120
+<6>[   16.807045] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+<6>[   32.448205] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+<6>[   62.355493] hi3798mv320-venc f8c80000.video-enc: drained=360 SMMU faults=0 quarantined=0
+<6>[   92.135621] hi3798mv320-venc f8c80000.video-enc: drained=480 SMMU faults=0 quarantined=0
+adf5a36b04f422ce5498ef1cea45d92be7cdfdb95052b295cb2a4e2bff2f26e4  venc-vdec.nv21
+7fe54a00fd359e26f8c38f145a1b1c353ecf791afda8358bc3aadd6a3c4249d9  venc-vdec.nv21
+598538425251edf0576a033b2c567a88a38c9a94bf6a232a3edf91c7d62ed287  venc-vdec.nv21
+dc490c39cde8865a2f6ec99eab3fe453b756269425e9d40f2a8caae929a47bd6  venc-vdec.nv21
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+G_PARM OUTPUT default 1/30; S_PARM OUTPUT and G_PARM CAPTURE 1001/30000
+control 0x990a6b = 1
+control 0x990a67 = 13
+control 0x9909d8 = 1
+control 0x9909ca = 0
+BITRATE inactive; 200000 normalized to zero
+STOP with CAPTURE queued before STOP: EOS, empty LAST, EPIPE exactly once
+STOP with CAPTURE queued after STOP: EOS, empty LAST, EPIPE exactly once
+<6>[   16.807045] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+<6>[   32.448205] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+<6>[   62.355493] hi3798mv320-venc f8c80000.video-enc: drained=360 SMMU faults=0 quarantined=0
+<6>[   92.135621] hi3798mv320-venc f8c80000.video-enc: drained=480 SMMU faults=0 quarantined=0
+CMA_USED=3209
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[   16.807045] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+<6>[   32.448205] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+<6>[   62.355493] hi3798mv320-venc f8c80000.video-enc: drained=360 SMMU faults=0 quarantined=0
+<6>[   92.135621] hi3798mv320-venc f8c80000.video-enc: drained=480 SMMU faults=0 quarantined=0
+
+## Media regression
+# [host] Lima -p 1 -n 16 matched 16/16 jobs, INTID 126 +32
+# [host] Lima -p 2 -n 16 matched 16/16 jobs, INTID 126 +32
+# [host] Lima -a -n 32 matched 32/32 jobs, INTID 126 +64
+# [host] JPGD 1080p passed, INTID 129 +1
+V0 source=3840x2160 destination=1920x1080 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.341 seconds=18.200 usr=3.90% sys=5.43% idle=90.67% peak_rss_kib=89616
+# [host] VDEC/VDP/AIAO IRQ deltas [1080, 1090, 1800], SMMU INTID 181=0
+# [host] Lima, JPGD, VDEC, VDP and AIAO regression passed
+
+## VENC ioctl trace before and after
+
+[IPPP] 720p-ffmpeg.h264
+172   ioctl(6</dev/video2<char 81:2>>, VIDIOC_QUERYCAP, {driver="hi3798-venc", card="Hi3798MV320 H.264 encoder", bus_info="platform:f8c80000.video-encoder", version=KERNEL_VERSION(7, 3, 6), capabilities=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0
+172   ioctl(6</dev/video2<char 81:2>>, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=49152, bytesperline=256}], num_planes=1}} => {fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=1382400, bytesperline=1280}], num_planes=1}}) = 0
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}} => {fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}}) = 0
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_SUBSCRIBE_EVENT, 0xffff8da295a0) = -1 EINVAL (Invalid argument)
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = -1 ENOTTY (Not a tty)
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_ENCODER_CMD, 0xffff8da4ca98) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQBUF, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, index=0, memory=V4L2_MEMORY_MMAP, m.offset=0x8da4c940, length=1, bytesused=0, flags=V4L2_BUF_FLAG_MAPPED|V4L2_BUF_FLAG_LAST|V4L2_BUF_FLAG_TIMESTAMP_COPY|V4L2_BUF_FLAG_TSTAMP_SRC_EOF, timestamp={tv_sec=3, tv_usec=866667}, ...}) = 0
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_G_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}], error_idx=1}) = -1 EINVAL (Invalid argument)
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}], error_idx=1}) = -1 EINVAL (Invalid argument)
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]}) = 0
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]}) = 0
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+172   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}], error_idx=1}) = -1 EINVAL (Invalid argument)
+
+[updated] 720p-ffmpeg.h264
+171   ioctl(6</dev/video2<char 81:2>>, VIDIOC_QUERYCAP, {driver="hi3798-venc", card="Hi3798MV320 H.264 encoder", bus_info="platform:f8c80000.video-encoder", version=KERNEL_VERSION(7, 3, 6), capabilities=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0
+171   ioctl(6</dev/video2<char 81:2>>, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=49152, bytesperline=256}], num_planes=1}} => {fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=1382400, bytesperline=1280}], num_planes=1}}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}} => {fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_SUBSCRIBE_EVENT, 0xffff918895a0) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = 0
+170   ioctl(5</dev/video2<char 81:2>>, VIDIOC_ENCODER_CMD, 0xffff918aca98) = 0
+170   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQEVENT, 0xffff918ac8b8) = 0
+170   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQBUF, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, index=0, memory=V4L2_MEMORY_MMAP, m.offset=0x918ac940, length=1, bytesused=0, flags=V4L2_BUF_FLAG_MAPPED|V4L2_BUF_FLAG_LAST|V4L2_BUF_FLAG_TIMESTAMP_COPY|V4L2_BUF_FLAG_TSTAMP_SRC_EOF, timestamp={tv_sec=3, tv_usec=866667}, ...}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_G_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=0, value64=0}]}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}], error_idx=1}) = -1 EINVAL (Invalid argument)
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]}) = 0
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+171   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}], error_idx=1}) = -1 EINVAL (Invalid argument)
+
+[IPPP] 720p-ffmpeg.mp4
+222   ioctl(6</dev/video2<char 81:2>>, VIDIOC_QUERYCAP, {driver="hi3798-venc", card="Hi3798MV320 H.264 encoder", bus_info="platform:f8c80000.video-encoder", version=KERNEL_VERSION(7, 3, 6), capabilities=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0
+222   ioctl(6</dev/video2<char 81:2>>, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=49152, bytesperline=256}], num_planes=1}} => {fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=1382400, bytesperline=1280}], num_planes=1}}) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}} => {fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}}) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_SUBSCRIBE_EVENT, 0xffff88eec5a0) = -1 EINVAL (Invalid argument)
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = -1 ENOTTY (Not a tty)
+221   ioctl(5</dev/video2<char 81:2>>, VIDIOC_ENCODER_CMD, 0xffff88f0fa98) = 0
+221   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQBUF, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, index=0, memory=V4L2_MEMORY_MMAP, m.offset=0x88f0f940, length=1, bytesused=0, flags=V4L2_BUF_FLAG_MAPPED|V4L2_BUF_FLAG_LAST|V4L2_BUF_FLAG_TIMESTAMP_COPY|V4L2_BUF_FLAG_TSTAMP_SRC_EOF, timestamp={tv_sec=3, tv_usec=866667}, ...}) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_G_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}], error_idx=1}) = -1 EINVAL (Invalid argument)
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}], error_idx=1}) = -1 EINVAL (Invalid argument)
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]}) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]}) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}], error_idx=1}) = -1 EINVAL (Invalid argument)
+
+[updated] 720p-ffmpeg.mp4
+223   ioctl(6</dev/video2<char 81:2>>, VIDIOC_QUERYCAP, {driver="hi3798-venc", card="Hi3798MV320 H.264 encoder", bus_info="platform:f8c80000.video-encoder", version=KERNEL_VERSION(7, 3, 6), capabilities=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0
+223   ioctl(6</dev/video2<char 81:2>>, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=49152, bytesperline=256}], num_planes=1}} => {fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=1382400, bytesperline=1280}], num_planes=1}}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}} => {fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_SUBSCRIBE_EVENT, 0xffff879c45a0) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_ENCODER_CMD, 0xffff879e7a98) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQEVENT, 0xffff879e78b8) = 0
+222   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQBUF, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, index=0, memory=V4L2_MEMORY_MMAP, m.offset=0x879e7940, length=1, bytesused=0, flags=V4L2_BUF_FLAG_MAPPED|V4L2_BUF_FLAG_LAST|V4L2_BUF_FLAG_TIMESTAMP_COPY|V4L2_BUF_FLAG_TSTAMP_SRC_EOF, timestamp={tv_sec=3, tv_usec=866667}, ...}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_G_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=0, value64=0}]}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}], error_idx=1}) = -1 EINVAL (Invalid argument)
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]}) = 0
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+223   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}], error_idx=1}) = -1 EINVAL (Invalid argument)
+
+[IPPP] 1080p-ffmpeg.h264
+283   ioctl(6</dev/video2<char 81:2>>, VIDIOC_QUERYCAP, {driver="hi3798-venc", card="Hi3798MV320 H.264 encoder", bus_info="platform:f8c80000.video-encoder", version=KERNEL_VERSION(7, 3, 6), capabilities=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0
+283   ioctl(6</dev/video2<char 81:2>>, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=49152, bytesperline=256}], num_planes=1}} => {fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3110400, bytesperline=1920}], num_planes=1}}) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}} => {fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=8298496, bytesperline=0}], num_planes=1}}) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_SUBSCRIBE_EVENT, 0xffffb77c45a0) = -1 EINVAL (Invalid argument)
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = -1 ENOTTY (Not a tty)
+282   ioctl(5</dev/video2<char 81:2>>, VIDIOC_ENCODER_CMD, 0xffffb77e7a98) = 0
+282   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQBUF, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, index=0, memory=V4L2_MEMORY_MMAP, m.offset=0xb77e7940, length=1, bytesused=0, flags=V4L2_BUF_FLAG_MAPPED|V4L2_BUF_FLAG_LAST|V4L2_BUF_FLAG_TIMESTAMP_COPY|V4L2_BUF_FLAG_TSTAMP_SRC_EOF, timestamp={tv_sec=3, tv_usec=866667}, ...}) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_G_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}], error_idx=1}) = -1 EINVAL (Invalid argument)
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}], error_idx=1}) = -1 EINVAL (Invalid argument)
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]}) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]}) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}], error_idx=1}) = -1 EINVAL (Invalid argument)
+
+[updated] 1080p-ffmpeg.h264
+284   ioctl(6</dev/video2<char 81:2>>, VIDIOC_QUERYCAP, {driver="hi3798-venc", card="Hi3798MV320 H.264 encoder", bus_info="platform:f8c80000.video-encoder", version=KERNEL_VERSION(7, 3, 6), capabilities=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0
+284   ioctl(6</dev/video2<char 81:2>>, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=49152, bytesperline=256}], num_planes=1}} => {fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3110400, bytesperline=1920}], num_planes=1}}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}} => {fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=8298496, bytesperline=0}], num_planes=1}}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_SUBSCRIBE_EVENT, 0xffff979875a0) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_ENCODER_CMD, 0xffff979aaa98) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQEVENT, 0xffff979aa8b8) = 0
+283   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQBUF, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, index=0, memory=V4L2_MEMORY_MMAP, m.offset=0x979aa940, length=1, bytesused=0, flags=V4L2_BUF_FLAG_MAPPED|V4L2_BUF_FLAG_LAST|V4L2_BUF_FLAG_TIMESTAMP_COPY|V4L2_BUF_FLAG_TSTAMP_SRC_EOF, timestamp={tv_sec=3, tv_usec=866667}, ...}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_G_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=0, value64=0}]}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}], error_idx=1}) = -1 EINVAL (Invalid argument)
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]}) = 0
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+284   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}], error_idx=1}) = -1 EINVAL (Invalid argument)
+
+[IPPP] 1080p-ffmpeg.mp4
+334   ioctl(6</dev/video2<char 81:2>>, VIDIOC_QUERYCAP, {driver="hi3798-venc", card="Hi3798MV320 H.264 encoder", bus_info="platform:f8c80000.video-encoder", version=KERNEL_VERSION(7, 3, 6), capabilities=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0
+334   ioctl(6</dev/video2<char 81:2>>, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=49152, bytesperline=256}], num_planes=1}} => {fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3110400, bytesperline=1920}], num_planes=1}}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}} => {fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=8298496, bytesperline=0}], num_planes=1}}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_SUBSCRIBE_EVENT, 0xffffb2dc05a0) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = -1 ENOTTY (Not a tty)
+333   ioctl(5</dev/video2<char 81:2>>, VIDIOC_ENCODER_CMD, 0xffffb2de3a98) = 0
+333   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQBUF, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, index=0, memory=V4L2_MEMORY_MMAP, m.offset=0xb2de3940, length=1, bytesused=0, flags=V4L2_BUF_FLAG_MAPPED|V4L2_BUF_FLAG_LAST|V4L2_BUF_FLAG_TIMESTAMP_COPY|V4L2_BUF_FLAG_TSTAMP_SRC_EOF, timestamp={tv_sec=3, tv_usec=866667}, ...}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_G_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}], error_idx=1}) = -1 EINVAL (Invalid argument)
+
+[updated] 1080p-ffmpeg.mp4
+334   ioctl(6</dev/video2<char 81:2>>, VIDIOC_QUERYCAP, {driver="hi3798-venc", card="Hi3798MV320 H.264 encoder", bus_info="platform:f8c80000.video-encoder", version=KERNEL_VERSION(7, 3, 6), capabilities=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0
+334   ioctl(6</dev/video2<char 81:2>>, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=49152, bytesperline=256}], num_planes=1}} => {fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3110400, bytesperline=1920}], num_planes=1}}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1280, height=720, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=3690496, bytesperline=0}], num_planes=1}} => {fmt.pix_mp={width=1920, height=1080, pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_REC709, plane_fmt=[{sizeimage=8298496, bytesperline=0}], num_planes=1}}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_SUBSCRIBE_EVENT, 0xffffa02405a0) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = 0
+333   ioctl(5</dev/video2<char 81:2>>, VIDIOC_ENCODER_CMD, 0xffffa0263a98) = 0
+333   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQEVENT, 0xffffa02638b8) = 0
+333   ioctl(5</dev/video2<char 81:2>>, VIDIOC_DQBUF, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, index=0, memory=V4L2_MEMORY_MMAP, m.offset=0xa0263940, length=1, bytesused=0, flags=V4L2_BUF_FLAG_MAPPED|V4L2_BUF_FLAG_LAST|V4L2_BUF_FLAG_TIMESTAMP_COPY|V4L2_BUF_FLAG_TSTAMP_SRC_EOF, timestamp={tv_sec=3, tv_usec=866667}, ...}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_G_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_B_FRAMES, size=0, value=0, value64=0}]}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_HEADER_MODE, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=200000, value64=200000}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_BITRATE, size=0, value=0, value64=0}]}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE, size=0, value=1, value64=1}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_GOP_SIZE, size=0, value=30, value64=30}]}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_PROFILE, size=0, value=1, value64=1}]}) = 0
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MIN_QP, size=0, value=0, value64=0}], error_idx=1}) = -1 EINVAL (Invalid argument)
+334   ioctl(5</dev/video2<char 81:2>>, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=1, controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}]} => {controls=[{id=V4L2_CID_MPEG_VIDEO_H264_MAX_QP, size=0, value=51, value64=51}], error_idx=1}) = -1 EINVAL (Invalid argument)
+
+## Legacy venc-test regression
+VENC 1280x720 NV12 GOP=1 I_QP=24 P_QP=24 frames=120 bytes=4667669 fps=43.483 avg_ms=20.995 max_ms=26.953 irq=120
+# [host] 720p-nv12-qp24-gop1 PASS, Y/U/V PSNR [50.87060469142567, 48.634536869702714, 48.942907288828586], VDEC +120
+VENC 1280x720 NV12 GOP=30 I_QP=24 P_QP=24 frames=120 bytes=2955383 fps=42.988 avg_ms=21.765 max_ms=27.892 irq=120
+# [host] 720p-nv12-qp24-gop30 PASS, Y/U/V PSNR [49.47518171197654, 47.48656375351938, 47.871016925874144], VDEC +120
+VENC 1920x1080 NV12 GOP=1 I_QP=32 P_QP=32 frames=120 bytes=5503843 fps=19.004 avg_ms=47.974 max_ms=60.038 irq=120
+# [host] 1080p-nv12-qp32-gop1 PASS, Y/U/V PSNR [43.48763851402319, 42.70389576395044, 43.00207400372433], VDEC +120
+VENC 1920x1080 NV12 GOP=30 I_QP=32 P_QP=32 frames=120 bytes=3289004 fps=17.942 avg_ms=52.091 max_ms=60.741 irq=120
+<6>[  142.150106] hi3798mv320-venc f8c80000.video-enc: drained=960 SMMU faults=0 quarantined=0
+# [host] 1080p-nv12-qp32-gop30 PASS, Y/U/V PSNR [42.47951942775796, 41.86060593308311, 41.94174888739845], VDEC +120
+<6>[  142.150106] hi3798mv320-venc f8c80000.video-enc: drained=960 SMMU faults=0 quarantined=0
+All four venc-test streams are byte-identical to the accepted IPPP baseline streams.

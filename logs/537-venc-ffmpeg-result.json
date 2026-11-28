@@ -1,0 +1,1012 @@
+{
+  "boot_img_sha256": "a30f495933a6d23e4d0da0d3e44ffdac59179374b4acfdfdb0dba7ac5164519f",
+  "boot_img_crc32": "363f05cd",
+  "ffmpeg_sha256": "85a07a3488712f3f7a7664ba70d2737cc64449e949e4338aa593f405761e8ba4",
+  "traced": false,
+  "cases": [
+    {
+      "output": "720p-ffmpeg.h264",
+      "command": "./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1280x720 -framerate 30 -i 720p-nv12-qp24.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 720p-ffmpeg.h264",
+      "exit": 0,
+      "before": {
+        "irq": 0,
+        "smmu_irq": 0,
+        "cma_free_kib": 380444,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after": {
+        "irq": 120,
+        "smmu_irq": 0,
+        "cma_free_kib": 380100,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "bytes": 2242847,
+      "sha256": "e97396aea10b50efe6331263e4dfb592e6d0b6a4677782c1491106b910384a9a",
+      "elapsed_seconds": 2.95,
+      "cpu_percent": [
+        32.31,
+        38.18,
+        12.59,
+        10.51
+      ],
+      "frames": 120,
+      "fps": 40.678,
+      "payload_mbps": 4.485694,
+      "file_mbps": 4.485694,
+      "encode_irq_delta": 120,
+      "drained_total": 120,
+      "venc_smmu_faults": 0,
+      "vdec_irq_delta": 120,
+      "vdec_batch_sha256": [
+        "168d4af0511366e0eda4298b560fee76410dd4b921cd58abf1901cfae8221fba",
+        "f597a78b6add75346dd0173ddec000f4ccb3874207be9e1c35029d6704b80000",
+        "61d271692fb7ecb9b2ba658ea4cf583be6c6c42805aab53ed87bace6d5d1b6c1",
+        "1b49e09ad7203d995481efe1eb855483e7264c2f10dce242e209eeba396d493f"
+      ],
+      "psnr_yuv": [
+        45.98472877006082,
+        43.597541834899985,
+        44.088511482603685
+      ],
+      "min_frame_psnr_yuv": [
+        45.50474021555128,
+        43.20705013464181,
+        43.779857884614735
+      ],
+      "ffprobe": {
+        "profile": "Constrained Baseline",
+        "level": 42,
+        "width": 1280,
+        "height": 720,
+        "time_base": "1/1200000",
+        "avg_frame_rate": "25/1",
+        "r_frame_rate": "60/1",
+        "packet_duration": "0.033333",
+        "has_packet_pts": false,
+        "key_frame_indices": [
+          0,
+          30,
+          60,
+          90
+        ]
+      },
+      "strict_decode_framemd5_sha256": "bab404d6f881bd5a7fc0dd5496a6ac1867e91b5c0370868cf283babc3e9612d0"
+    },
+    {
+      "output": "720p-ffmpeg.mp4",
+      "command": "./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1280x720 -framerate 30 -i 720p-nv12-qp24.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 720p-ffmpeg.mp4",
+      "exit": 0,
+      "before": {
+        "irq": 120,
+        "smmu_irq": 0,
+        "cma_free_kib": 380068,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after": {
+        "irq": 240,
+        "smmu_irq": 0,
+        "cma_free_kib": 380068,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "bytes": 2244203,
+      "sha256": "a4821511d78b383f6695d743973b1cf13fd603f885fbddc055df199d90977802",
+      "elapsed_seconds": 2.83,
+      "cpu_percent": [
+        52.65,
+        24.03,
+        15.96,
+        3.19
+      ],
+      "frames": 120,
+      "fps": 42.403,
+      "payload_mbps": 4.485694,
+      "file_mbps": 4.488406,
+      "encode_irq_delta": 120,
+      "drained_total": 240,
+      "venc_smmu_faults": 0,
+      "vdec_irq_delta": 120,
+      "vdec_batch_sha256": [
+        "168d4af0511366e0eda4298b560fee76410dd4b921cd58abf1901cfae8221fba",
+        "f597a78b6add75346dd0173ddec000f4ccb3874207be9e1c35029d6704b80000",
+        "61d271692fb7ecb9b2ba658ea4cf583be6c6c42805aab53ed87bace6d5d1b6c1",
+        "1b49e09ad7203d995481efe1eb855483e7264c2f10dce242e209eeba396d493f"
+      ],
+      "psnr_yuv": [
+        45.98472877006082,
+        43.597541834899985,
+        44.088511482603685
+      ],
+      "min_frame_psnr_yuv": [
+        45.50474021555128,
+        43.20705013464181,
+        43.779857884614735
+      ],
+      "ffprobe": {
+        "profile": "Constrained Baseline",
+        "level": 42,
+        "width": 1280,
+        "height": 720,
+        "time_base": "1/15360",
+        "avg_frame_rate": "30/1",
+        "r_frame_rate": "30/1",
+        "packet_duration": "0.033333",
+        "has_packet_pts": true,
+        "key_frame_indices": [
+          0,
+          30,
+          60,
+          90
+        ]
+      },
+      "strict_decode_framemd5_sha256": "bab404d6f881bd5a7fc0dd5496a6ac1867e91b5c0370868cf283babc3e9612d0"
+    },
+    {
+      "output": "1080p-ffmpeg.h264",
+      "command": "./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1920x1080 -framerate 30 -i 1080p-nv12-qp32.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 1080p-ffmpeg.h264",
+      "exit": 0,
+      "before": {
+        "irq": 240,
+        "smmu_irq": 0,
+        "cma_free_kib": 380132,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after": {
+        "irq": 360,
+        "smmu_irq": 0,
+        "cma_free_kib": 379564,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "bytes": 4692018,
+      "sha256": "a247fa889146d6f9477995d0c6c7342f84c3aeef87f98e1bc4b7b8fb3cef81f1",
+      "elapsed_seconds": 6.6,
+      "cpu_percent": [
+        20.73,
+        21.79,
+        34.44,
+        16.67
+      ],
+      "frames": 120,
+      "fps": 18.182,
+      "payload_mbps": 9.384036,
+      "file_mbps": 9.384036,
+      "encode_irq_delta": 120,
+      "drained_total": 360,
+      "venc_smmu_faults": 0,
+      "vdec_irq_delta": 120,
+      "vdec_batch_sha256": [
+        "adf5a36b04f422ce5498ef1cea45d92be7cdfdb95052b295cb2a4e2bff2f26e4",
+        "7fe54a00fd359e26f8c38f145a1b1c353ecf791afda8358bc3aadd6a3c4249d9",
+        "598538425251edf0576a033b2c567a88a38c9a94bf6a232a3edf91c7d62ed287",
+        "dc490c39cde8865a2f6ec99eab3fe453b756269425e9d40f2a8caae929a47bd6"
+      ],
+      "psnr_yuv": [
+        46.52416265117071,
+        44.60745127451459,
+        44.98215175159928
+      ],
+      "min_frame_psnr_yuv": [
+        46.100070050300694,
+        43.7291497137348,
+        44.12516056967446
+      ],
+      "ffprobe": {
+        "profile": "Constrained Baseline",
+        "level": 42,
+        "width": 1920,
+        "height": 1080,
+        "time_base": "1/1200000",
+        "avg_frame_rate": "25/1",
+        "r_frame_rate": "60/1",
+        "packet_duration": "0.033333",
+        "has_packet_pts": false,
+        "key_frame_indices": [
+          0,
+          30,
+          60,
+          90
+        ]
+      },
+      "strict_decode_framemd5_sha256": "31004d1f48ffc86b0cb1c069c42350c448499b87328628cdc9db4a6ff1d2fba5"
+    },
+    {
+      "output": "1080p-ffmpeg.mp4",
+      "command": "./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1920x1080 -framerate 30 -i 1080p-nv12-qp32.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 1080p-ffmpeg.mp4",
+      "exit": 0,
+      "before": {
+        "irq": 360,
+        "smmu_irq": 0,
+        "cma_free_kib": 380428,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after": {
+        "irq": 480,
+        "smmu_irq": 0,
+        "cma_free_kib": 380076,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "bytes": 4693396,
+      "sha256": "6c1409bd8f82b56ae017a5ac01e384882d5947a358413efd5353bcd55fbaefb9",
+      "elapsed_seconds": 6.62,
+      "cpu_percent": [
+        21.9,
+        17.25,
+        33.53,
+        23.72
+      ],
+      "frames": 120,
+      "fps": 18.127,
+      "payload_mbps": 9.384036,
+      "file_mbps": 9.386792,
+      "encode_irq_delta": 120,
+      "drained_total": 480,
+      "venc_smmu_faults": 0,
+      "vdec_irq_delta": 120,
+      "vdec_batch_sha256": [
+        "adf5a36b04f422ce5498ef1cea45d92be7cdfdb95052b295cb2a4e2bff2f26e4",
+        "7fe54a00fd359e26f8c38f145a1b1c353ecf791afda8358bc3aadd6a3c4249d9",
+        "598538425251edf0576a033b2c567a88a38c9a94bf6a232a3edf91c7d62ed287",
+        "dc490c39cde8865a2f6ec99eab3fe453b756269425e9d40f2a8caae929a47bd6"
+      ],
+      "psnr_yuv": [
+        46.52416265117071,
+        44.60745127451459,
+        44.98215175159928
+      ],
+      "min_frame_psnr_yuv": [
+        46.100070050300694,
+        43.7291497137348,
+        44.12516056967446
+      ],
+      "ffprobe": {
+        "profile": "Constrained Baseline",
+        "level": 42,
+        "width": 1920,
+        "height": 1080,
+        "time_base": "1/15360",
+        "avg_frame_rate": "30/1",
+        "r_frame_rate": "30/1",
+        "packet_duration": "0.033333",
+        "has_packet_pts": true,
+        "key_frame_indices": [
+          0,
+          30,
+          60,
+          90
+        ]
+      },
+      "strict_decode_framemd5_sha256": "31004d1f48ffc86b0cb1c069c42350c448499b87328628cdc9db4a6ff1d2fba5"
+    }
+  ],
+  "baseline": {
+    "irq": 0,
+    "smmu_irq": 0,
+    "cma_free_kib": 380444,
+    "cma_used_pages": 3193,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "after_encode": {
+    "irq": 480,
+    "smmu_irq": 0,
+    "cma_free_kib": 380444,
+    "cma_used_pages": 3193,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "ioctl_smoke": "pass",
+  "media_regression": "pass",
+  "final": {
+    "irq": 480,
+    "smmu_irq": 0,
+    "cma_free_kib": 380336,
+    "cma_used_pages": 3209,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "baseline_ffmpeg": {
+    "boot_img_sha256": "e7936ac99cbc346c9489d202321b7407839c19a91f11f901058529a6e74b69dd",
+    "boot_img_crc32": "5c2d0ac8",
+    "ffmpeg_sha256": "85a07a3488712f3f7a7664ba70d2737cc64449e949e4338aa593f405761e8ba4",
+    "traced": true,
+    "cases": [
+      {
+        "output": "720p-ffmpeg.h264",
+        "command": "./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1280x720 -framerate 30 -i 720p-nv12-qp24.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 720p-ffmpeg.h264",
+        "exit": 0,
+        "before": {
+          "irq": 0,
+          "smmu_irq": 0,
+          "cma_free_kib": 380444,
+          "cma_used_pages": 3193,
+          "dma_buf": [
+            0,
+            0
+          ],
+          "crg": [
+            "0x00000003",
+            "0x00000001"
+          ]
+        },
+        "after": {
+          "irq": 120,
+          "smmu_irq": 0,
+          "cma_free_kib": 380100,
+          "cma_used_pages": 3193,
+          "dma_buf": [
+            0,
+            0
+          ],
+          "crg": [
+            "0x00000003",
+            "0x00000001"
+          ]
+        },
+        "bytes": 2242807,
+        "sha256": "955fff8ce629b19a2df3f2edbb95136aac7fbb601667dca595275b6e730f1fbf",
+        "elapsed_seconds": 4.48,
+        "cpu_percent": [
+          24.11,
+          34.74,
+          23.61,
+          21.43
+        ]
+      },
+      {
+        "output": "720p-ffmpeg.mp4",
+        "command": "./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1280x720 -framerate 30 -i 720p-nv12-qp24.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 720p-ffmpeg.mp4",
+        "exit": 0,
+        "before": {
+          "irq": 120,
+          "smmu_irq": 0,
+          "cma_free_kib": 380100,
+          "cma_used_pages": 3193,
+          "dma_buf": [
+            0,
+            0
+          ],
+          "crg": [
+            "0x00000003",
+            "0x00000001"
+          ]
+        },
+        "after": {
+          "irq": 240,
+          "smmu_irq": 0,
+          "cma_free_kib": 380268,
+          "cma_used_pages": 3193,
+          "dma_buf": [
+            0,
+            0
+          ],
+          "crg": [
+            "0x00000003",
+            "0x00000001"
+          ]
+        },
+        "bytes": 2244153,
+        "sha256": "7309c3a78518a639d9170040837c6b9702f3a1cbbf461c92f9f4179001faa07c",
+        "elapsed_seconds": 4.57,
+        "cpu_percent": [
+          25.65,
+          29.32,
+          24.02,
+          26.91
+        ]
+      },
+      {
+        "output": "1080p-ffmpeg.h264",
+        "command": "./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1920x1080 -framerate 30 -i 1080p-nv12-qp32.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 1080p-ffmpeg.h264",
+        "exit": 0,
+        "before": {
+          "irq": 240,
+          "smmu_irq": 0,
+          "cma_free_kib": 380268,
+          "cma_used_pages": 3193,
+          "dma_buf": [
+            0,
+            0
+          ],
+          "crg": [
+            "0x00000003",
+            "0x00000001"
+          ]
+        },
+        "after": {
+          "irq": 360,
+          "smmu_irq": 0,
+          "cma_free_kib": 380044,
+          "cma_used_pages": 3193,
+          "dma_buf": [
+            0,
+            0
+          ],
+          "crg": [
+            "0x00000003",
+            "0x00000001"
+          ]
+        },
+        "bytes": 4691974,
+        "sha256": "00106acd8f05557c8546ba4364994af46a948437ed86b5bfd6883e0bfa58df41",
+        "elapsed_seconds": 7.99,
+        "cpu_percent": [
+          26.03,
+          28.75,
+          23.25,
+          22.9
+        ]
+      },
+      {
+        "output": "1080p-ffmpeg.mp4",
+        "command": "./ffmpeg -nostdin -y -v debug -xerror -nostats -benchmark -f rawvideo -pixel_format nv12 -video_size 1920x1080 -framerate 30 -i 1080p-nv12-qp32.raw -an -pix_fmt nv12 -c:v h264_v4l2m2m -g 30 -profile:v 578 1080p-ffmpeg.mp4",
+        "exit": 0,
+        "before": {
+          "irq": 360,
+          "smmu_irq": 0,
+          "cma_free_kib": 380044,
+          "cma_used_pages": 3193,
+          "dma_buf": [
+            0,
+            0
+          ],
+          "crg": [
+            "0x00000003",
+            "0x00000001"
+          ]
+        },
+        "after": {
+          "irq": 480,
+          "smmu_irq": 0,
+          "cma_free_kib": 380316,
+          "cma_used_pages": 3193,
+          "dma_buf": [
+            0,
+            0
+          ],
+          "crg": [
+            "0x00000003",
+            "0x00000001"
+          ]
+        },
+        "bytes": 4693341,
+        "sha256": "9fbd6ec96c57e96beba4fdbc3a7b2f8f5735a2f91bc09e5c140ac71a5642ad4a",
+        "elapsed_seconds": 8.03,
+        "cpu_percent": [
+          22.57,
+          29.3,
+          23.69,
+          25.78
+        ]
+      }
+    ],
+    "baseline": {
+      "irq": 0,
+      "smmu_irq": 0,
+      "cma_free_kib": 380444,
+      "cma_used_pages": 3193,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "after_encode": {
+      "irq": 480,
+      "smmu_irq": 0,
+      "cma_free_kib": 380316,
+      "cma_used_pages": 3193,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    }
+  },
+  "traced_ffmpeg": [
+    {
+      "output": "720p-ffmpeg.h264",
+      "sha256": "e97396aea10b50efe6331263e4dfb592e6d0b6a4677782c1491106b910384a9a",
+      "exit": 0,
+      "ioctl_success_count": {
+        "VIDIOC_SUBSCRIBE_EVENT": 1,
+        "VIDIOC_ENCODER_CMD": 1,
+        "VIDIOC_DQEVENT": 1,
+        "V4L2_BUF_FLAG_LAST": 1
+      },
+      "capture_dqbuf_count": 121,
+      "after": {
+        "irq": 120,
+        "smmu_irq": 0,
+        "cma_free_kib": 380100,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      }
+    },
+    {
+      "output": "720p-ffmpeg.mp4",
+      "sha256": "a4821511d78b383f6695d743973b1cf13fd603f885fbddc055df199d90977802",
+      "exit": 0,
+      "ioctl_success_count": {
+        "VIDIOC_SUBSCRIBE_EVENT": 1,
+        "VIDIOC_ENCODER_CMD": 1,
+        "VIDIOC_DQEVENT": 1,
+        "V4L2_BUF_FLAG_LAST": 1
+      },
+      "capture_dqbuf_count": 121,
+      "after": {
+        "irq": 240,
+        "smmu_irq": 0,
+        "cma_free_kib": 380100,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      }
+    },
+    {
+      "output": "1080p-ffmpeg.h264",
+      "sha256": "a247fa889146d6f9477995d0c6c7342f84c3aeef87f98e1bc4b7b8fb3cef81f1",
+      "exit": 0,
+      "ioctl_success_count": {
+        "VIDIOC_SUBSCRIBE_EVENT": 1,
+        "VIDIOC_ENCODER_CMD": 1,
+        "VIDIOC_DQEVENT": 1,
+        "V4L2_BUF_FLAG_LAST": 1
+      },
+      "capture_dqbuf_count": 121,
+      "after": {
+        "irq": 360,
+        "smmu_irq": 0,
+        "cma_free_kib": 380108,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      }
+    },
+    {
+      "output": "1080p-ffmpeg.mp4",
+      "sha256": "6c1409bd8f82b56ae017a5ac01e384882d5947a358413efd5353bcd55fbaefb9",
+      "exit": 0,
+      "ioctl_success_count": {
+        "VIDIOC_SUBSCRIBE_EVENT": 1,
+        "VIDIOC_ENCODER_CMD": 1,
+        "VIDIOC_DQEVENT": 1,
+        "V4L2_BUF_FLAG_LAST": 1
+      },
+      "capture_dqbuf_count": 121,
+      "after": {
+        "irq": 480,
+        "smmu_irq": 0,
+        "cma_free_kib": 380012,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      }
+    }
+  ],
+  "legacy_venc_test": [
+    {
+      "case": "720p-nv12-qp24-gop1",
+      "gop": 1,
+      "i_qp": 24,
+      "p_qp": 24,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 4667669,
+      "sha256": "bf0a31e79141965a7668b45df7bd6b73379d749b604d8fcef8074cc4465c4aeb",
+      "kbps": 9335.338,
+      "mbps": 9.335338,
+      "i_frames": 120,
+      "p_frames": 0,
+      "i_bytes_avg": 38897.24,
+      "p_bytes_avg": 0.0,
+      "fps": 43.483,
+      "avg_ms": 20.995,
+      "max_ms": 26.953,
+      "cpu": [
+        2.18,
+        3.26,
+        70.76,
+        3.64
+      ],
+      "psnr_yuv": [
+        50.87060469142567,
+        48.634536869702714,
+        48.942907288828586
+      ],
+      "min_frame_psnr_yuv": [
+        50.67992517160131,
+        48.32921088749843,
+        48.361869303563
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 480,
+        "smmu_irq": 0,
+        "cma_free_kib": 380012,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 600,
+        "smmu_irq": 0,
+        "cma_free_kib": 380280,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 600,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "c08b16211a54594eb818575e17bc83a34ecf2bd2a649c3dfdae4fee507bceddb",
+        "d8c5404df590b1eddd2c429e929a9bc5277d44ae657310b96bbb6b521a1a569a",
+        "0d35bcfb77c3127f4bf3e24ff560ae6cd726bb172c137bc9cfbc599c10841c08",
+        "00ca3d06c733f5e515f35988152b2648656584f075f26bd2adef34b8ddd749e7",
+        "fbad616ccb4ad372a16c8a7e22be2d9d99fab2091052aa6c245e8aef516f0fad",
+        "758e05179f66252d615f423904a6c5d8cdbc06b87578941aca8524b478a9ca9b",
+        "c8382c26f9e373e2e3cf8cc20acfc9940204589aac0b768bfc81c8592c198576",
+        "f47fe5214ea125633a944e43e04413ea39840811936ceaf5e31fb68e9c1ec21f",
+        "7f29619b46c97d5ccdf916b83f9dc69e9bea0bf366fd5fa4e788bd2024b8a903",
+        "f01e59ca4c63edd3b6c7a10dd948959929b3f6f4a71bcc782318d5b0050532b1"
+      ],
+      "byte_exact_vs_ippp": true
+    },
+    {
+      "case": "720p-nv12-qp24-gop30",
+      "gop": 30,
+      "i_qp": 24,
+      "p_qp": 24,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 2955383,
+      "sha256": "145eb1fb53942e637da0f7b015c2f468f0170f1be993967bcd6d4ca2c90be6ea",
+      "kbps": 5910.766,
+      "mbps": 5.910766,
+      "i_frames": 4,
+      "p_frames": 116,
+      "i_bytes_avg": 38124.75,
+      "p_bytes_avg": 24162.79,
+      "fps": 42.988,
+      "avg_ms": 21.765,
+      "max_ms": 27.892,
+      "cpu": [
+        1.44,
+        61.65,
+        13.26,
+        0.71
+      ],
+      "psnr_yuv": [
+        49.47518171197654,
+        47.48656375351938,
+        47.871016925874144
+      ],
+      "min_frame_psnr_yuv": [
+        49.01686329343572,
+        46.92744970994995,
+        47.40799181408712
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 600,
+        "smmu_irq": 0,
+        "cma_free_kib": 380280,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 720,
+        "smmu_irq": 0,
+        "cma_free_kib": 380280,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 720,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "4f60cff4908c9c30ec2e7549dcb2e60d4a7bcbbbf0e6434fd51be4bdb6bafdee",
+        "db8513b4dd95656332f9a4f945b3cbbbbe0e1e522dbde7cf418756077fb36da3",
+        "f865f819861634c19aee1009129ccc4091ac262b5f73aae0f94883566657ce05",
+        "f780d837734837e66319c1a78f8065cf6b83a5140596ca1b94a140dc65585a2f"
+      ],
+      "byte_exact_vs_ippp": true
+    },
+    {
+      "case": "1080p-nv12-qp32-gop1",
+      "gop": 1,
+      "i_qp": 32,
+      "p_qp": 32,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 5503843,
+      "sha256": "07b465790b51a0092d52efe52c6547c86672b12eccde0152dac03d9290094382",
+      "kbps": 11007.686,
+      "mbps": 11.007686,
+      "i_frames": 120,
+      "p_frames": 0,
+      "i_bytes_avg": 45865.36,
+      "p_bytes_avg": 0.0,
+      "fps": 19.004,
+      "avg_ms": 47.974,
+      "max_ms": 60.038,
+      "cpu": [
+        15.19,
+        21.87,
+        22.82,
+        21.84
+      ],
+      "psnr_yuv": [
+        43.48763851402319,
+        42.70389576395044,
+        43.00207400372433
+      ],
+      "min_frame_psnr_yuv": [
+        43.16130969868655,
+        42.31614147407829,
+        42.52468790219684
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 720,
+        "smmu_irq": 0,
+        "cma_free_kib": 380444,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 840,
+        "smmu_irq": 0,
+        "cma_free_kib": 380100,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 840,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "824123284e512a94f5633234ae40bfca77b363084c1bcbe56dd379704f09171d",
+        "156ba2ed3adbc2def115b83d1c0199be2c3bd2bfd88f4cd327bee0500b6979aa",
+        "ac28c5c1734f7884e51cf0492abd4683655c0ae271d3906d937e6d8f625005d0",
+        "5f69545470b1a6d20b2a7bd46480232ca3bf61b483077cf669ba984380c440d9",
+        "28c76ed636b46d4206fe72812528527eb3bf113939d470c5e578a0a6a58b107e",
+        "1ca5ad19c09c38461b854aead72adbd7cd325efedfb5495bcf2446d82460d0aa",
+        "554e5d98b6ff27fb34b7e1d4807442701648fb7045ef0c0aad39d0595440f912",
+        "c1a38d54128a3db2e8a7d33073dc477f0ec4503462b0ef95d084145c3690fa54",
+        "ae054b8285c891697bafa4eec5016a126ee1629dee31218137b649a3af27e033",
+        "d6354dc2af63a27a997896e02a09cd15ce7339fa7b955882cdac08bddad72064"
+      ],
+      "byte_exact_vs_ippp": true
+    },
+    {
+      "case": "1080p-nv12-qp32-gop30",
+      "gop": 30,
+      "i_qp": 32,
+      "p_qp": 32,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 3289004,
+      "sha256": "2d70fa4f460ff1e41fd20fe960f7327eb4d2534694669f5223dfcb4d6bc01b9c",
+      "kbps": 6578.008,
+      "mbps": 6.578008,
+      "i_frames": 4,
+      "p_frames": 116,
+      "i_bytes_avg": 45175.25,
+      "p_bytes_avg": 26795.72,
+      "fps": 17.942,
+      "avg_ms": 52.091,
+      "max_ms": 60.741,
+      "cpu": [
+        10.3,
+        20.63,
+        21.82,
+        25.56
+      ],
+      "psnr_yuv": [
+        42.47951942775796,
+        41.86060593308311,
+        41.94174888739845
+      ],
+      "min_frame_psnr_yuv": [
+        42.102525614752686,
+        41.41208935239877,
+        41.6138852637625
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 840,
+        "smmu_irq": 0,
+        "cma_free_kib": 380376,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 960,
+        "smmu_irq": 0,
+        "cma_free_kib": 380100,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 960,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "8e997b235c9e0aa6b4b2222d10abd73134cbb6beff295529437b07c65c4e147b",
+        "98c447a8996369641a899d75d5710636114c91c2a30f95f0dd88223e588ba7a0",
+        "5e3bc07ff10a8a6b1cea4933048ff7befe321909e2b10f6d35e20af26e18cf57",
+        "ce3af6471a63f6c226e85fc1f7579ca3293350db8f4343566274762c16d5f1d9"
+      ],
+      "byte_exact_vs_ippp": true
+    }
+  ]
+}
