@@ -25,7 +25,7 @@ from vdec_request_fixture import START_CODE, fixture
 from vdp_ram_test import count_irq
 
 
-RELEASE = b"7.3.6-hg680kd-arm64-venc"
+RELEASE = b"7.3.6-hg680kd-arm64-venc-ippp"
 NODES = (
     "/dev/video0", "/dev/video1", "/dev/video2", "/dev/media0",
     "/dev/dri/card0", "/dev/dri/renderD128", "/dev/snd/pcmC0D0p",
@@ -169,6 +169,8 @@ def metric(raw, decoded, case, frames, coded_height):
     result = np.memmap(decoded, dtype=np.uint8, mode="r", shape=(frames, coded_y * 3 // 2))
     vu = case.fmt == "NV21"
     squared = np.zeros(3, dtype=np.float64)
+    peak_mse = np.zeros(3, dtype=np.float64)
+    samples = w * h * np.array([1.0, .25, .25])
 
     def error(a, b):
         delta = a.astype(np.int32) - b
@@ -176,50 +178,79 @@ def metric(raw, decoded, case, frames, coded_height):
 
     for a, b in zip(original, result):
         ac, bc = a[w * h:], b[coded_y:coded_y + w * h // 2]
-        squared += (
+        errors = np.array([
             error(a[:w * h], b[:w * h]),
             error(ac[int(vu)::2], bc[1::2]),
             error(ac[int(not vu)::2], bc[0::2]),
-        )
-    samples = frames * w * h * np.array([1.0, .25, .25])
-    return (10 * np.log10(255 ** 2 / (squared / samples))).tolist()
+        ])
+        squared += errors
+        peak_mse = np.maximum(peak_mse, errors / samples)
+    return tuple((10 * np.log10(255 ** 2 / mse)).tolist()
+                 for mse in (squared / (frames * samples), peak_mse))
 
 
-def vdec_loopback(console, args, case, stream, raw, frames):
-    stem = args.directory / f"{case.name}-request"
-    sps, pps, slices = fixture(stream, stem, all_idr=True)
-    codes = list(START_CODE.finditer(stream.read_bytes()))
-    with stream.open("rb") as encoded:
-        types = []
-        for code in codes:
-            encoded.seek(code.end())
-            types.append(encoded.read(1)[0] & 31)
-    if (len(slices) != frames or types != [7, 8, 5] * frames or
+def verify_stream(case, stream, stem, positions, gop, p_qp):
+    sps, pps, slices = fixture(stream, stem, all_idr=gop == 1, ippp=gop > 1)
+    data = stream.read_bytes()
+    types = [data[code.end()] & 31 for code in START_CODE.finditer(data)]
+    expected_types = [kind for f in positions for kind in ([7, 8, 5] if f == 0 else [1])]
+    if (len(slices) != len(positions) or types != expected_types or
             sps["profile_idc"] != 66 or not sps["constraint_set1_flag"] or
-            pps["entropy_coding_mode_flag"] or
-            any(s["idr_pic_id"] != (i & 1) or s["slice_type"] % 5 != 2 or
-                s["slice_qp_delta"] + pps["pic_init_qp_minus26"] + 26 != case.qp
-                for i, s in enumerate(slices))):
-        raise RuntimeError("bitstream does not match single-slice Constrained Baseline IDR or QP")
+            sps["max_num_ref_frames"] != 1 or sps["pic_order_cnt_type"] != (2 if gop == 1 else 0) or
+            pps["entropy_coding_mode_flag"]):
+        raise RuntimeError("bitstream does not match single-slice Constrained Baseline IPPP")
+    idr_pic_id = 0
+    for i, (f, slc) in enumerate(zip(positions, slices)):
+        qp = p_qp if f else case.qp
+        if (slc["frame_num"] != f or not slc["nal_ref_idc"] or
+                slc["slice_type"] % 5 != (0 if f else 2) or
+                slc["slice_qp_delta"] + pps["pic_init_qp_minus26"] + 26 != qp or
+                (gop > 1 and slc["pic_order_cnt_lsb"] != 2 * f) or
+                (f and (slc["ref_pic_list_modification_flag_l0"] or
+                        slc["adaptive_ref_pic_marking_mode_flag"])) or
+                (not f and slc["idr_pic_id"] != idr_pic_id)):
+            raise RuntimeError(f"invalid slice header at frame {i}: {slc}")
+        if not f:
+            idr_pic_id ^= 1
+
+    probe = subprocess.run([
+        "ffprobe", "-v", "error", "-select_streams", "v:0", "-show_frames",
+        "-show_entries", "frame=key_frame,pict_type:stream=profile,width,height", "-of", "json",
+        str(stream),
+    ], check=True, capture_output=True, text=True)
+    info = json.loads(probe.stdout)
+    if (probe.stderr or info["streams"] != [
+            {"profile": "Constrained Baseline", "width": case.width, "height": case.height}
+    ] or [(p["key_frame"], p["pict_type"]) for p in info["frames"]] != [
+            (0, "P") if f else (1, "I") for f in positions
+    ]):
+        raise RuntimeError(f"ffprobe disagrees with expected frame structure: {probe.stderr}")
+    return sps
+
+
+def vdec_loopback(console, args, case, stream, raw, positions, gop, p_qp):
+    stem = stream.with_name(stream.stem + "-request")
+    sps = verify_stream(case, stream, stem, positions, gop, p_qp)
     lines = [line.split() for line in stem.with_suffix(".txt").read_text().splitlines()]
     sequence, rows = lines[0], lines[1:]
     w, coded_h, n = map(int, sequence[:3])
     width = w - 2 * (sps.get("frame_crop_left_offset", 0) + sps.get("frame_crop_right_offset", 0))
     height = coded_h - 2 * (sps.get("frame_crop_top_offset", 0) + sps.get("frame_crop_bottom_offset", 0))
-    if (width, height, n) != (case.width, case.height, frames):
+    if (width, height, n) != (case.width, case.height, len(positions)):
         raise RuntimeError("SPS dimensions, crop or frame count mismatch")
     reference = stem.with_suffix(".nv21")
-    psnr = metric(raw, reference, case, frames, coded_h)
-    if min(psnr) < 32:
-        raise RuntimeError(f"unexpected PSNR or chroma order: {psnr}")
+    psnr, min_psnr = metric(raw, reference, case, n, coded_h)
+    if min(psnr) < 32 or min(min_psnr) < 30:
+        raise RuntimeError(f"unexpected PSNR or chroma order: {psnr}, minima {min_psnr}")
 
-    # The existing request test retains all CAPTURE buffers in a fixture.
-    # IDRs are independent, so use bounded batches to keep CMA usage small.
+    # Each IPPP decode batch starts at an IDR and includes its references.
+    starts = list(range(0, n, 12)) if gop == 1 else [i for i, f in enumerate(positions) if not f]
+    ends = starts[1:] + [n]
     frame_bytes = w * coded_h * 3 // 2
     names, hashes = [], []
     with stem.with_suffix(".264").open("rb") as slices_file, reference.open("rb") as sw:
-        for i in range(0, n, 12):
-            batch = rows[i:i + 12]
+        for i, end in zip(starts, ends):
+            batch = rows[i:end]
             seq = sequence.copy()
             seq[2] = str(len(batch))
             name = f"{stem.name}-{i:03d}"
@@ -243,30 +274,35 @@ def vdec_loopback(console, args, case, stream, raw, frames):
     after = checked(console, IRQS)
     delta = irq_delta(before, after, 169)
     actual = [m.decode() for m in re.findall(rb"(?m)^([a-f\d]{64})  venc-vdec.nv21", out)]
-    if actual != hashes or delta != frames:
+    if actual != hashes or delta != n:
         raise RuntimeError(f"VDEC SHA256 or IRQ mismatch for {case.name}, IRQ={delta}")
     checked(console, f"/tmp/busybox.static rm -f /tmp/{stem.name}-*.txt /tmp/{stem.name}-*.264 "
             "/tmp/venc-vdec.nv21 /tmp/venc-vdec.log")
-    return psnr, hashes, delta
+    return psnr, min_psnr, hashes, delta
 
 
-def run_case(console, args, case, raw, packed):
+def run_case(console, args, case, raw, gop):
     before = snapshot(console)
-    stage(console, args, args.directory, (packed.name,))
-    checked(console, f"cd /tmp && ./busybox.static gzip -dc {packed.name} >{raw.name} && "
-            f"./busybox.static rm {packed.name}", 75)
-    stream = args.directory / f"{case.name}.h264"
-    out = checked(console, f"cd /tmp && ./venc-test /dev/video2 {case.width} {case.height} "
-                  f"{case.fmt} {case.qp} {args.frames} {raw.name} {stream.name}", 100)
+    p_qp = case.qp if args.p_qp is None else args.p_qp
+    force = "" if args.force_key_at is None else f"--force-key-at {args.force_key_at}"
+    stream = args.directory / f"{case.name}-gop{gop}.h264"
+    out = checked(console, f"cd /tmp && ./venc-test --gop {gop} --i-qp {case.qp} --p-qp {p_qp} "
+                  f"{force} /dev/video2 {case.width} {case.height} {case.fmt} "
+                  f"{args.frames} {raw.name} {stream.name}", 100)
     perf = re.search(rb"(?m)^VENC .* bytes=(\d+) fps=([.\d]+) avg_ms=([.\d]+) "
                      rb"max_ms=([.\d]+) irq=(\d+)", out)
     cpu = re.findall(rb"(?m)^CPU[0-3] ([.\d]+)%", out)
-    if not perf or int(perf[5]) != args.frames or len(cpu) != 4:
+    rate = re.search(rb"(?m)^RATE input_fps=(\d+) kbps=([.\d]+) Mbps=([.\d]+) i_frames=(\d+) "
+                     rb"p_frames=(\d+) i_bytes_avg=([.\d]+) p_bytes_avg=([.\d]+)", out)
+    positions = [(i if args.force_key_at is None or i < args.force_key_at
+                  else i - args.force_key_at) % gop for i in range(args.frames)]
+    if (not perf or int(perf[5]) != args.frames or len(cpu) != 4 or not rate or
+            (int(rate[4]), int(rate[5])) != (positions.count(0), args.frames - positions.count(0))):
         raise RuntimeError(f"missing performance measurements for {case.name}")
     size, digest = get_stream(console, args, stream)
     if size != int(perf[1]):
         raise RuntimeError("sum of bytesused does not match the stream file")
-    checked(console, f"/tmp/busybox.static rm -f /tmp/{raw.name} /tmp/{stream.name}")
+    checked(console, f"/tmp/busybox.static rm /tmp/{stream.name}")
     after = snapshot(console)
     stats = checked(console, "dmesg | grep 'SMMU faults='")
     drained, faults, quarantine = map(int, re.findall(
@@ -276,16 +312,20 @@ def run_case(console, args, case, raw, packed):
             faults or quarantine or before["cma_used_pages"] != after["cma_used_pages"] or
             before["crg"] != after["crg"] or after["dma_buf"] != [0, 0]):
         raise RuntimeError(f"VENC drain, resource or interrupt mismatch: {before} -> {after}")
-    psnr, hashes, vdec_irq = vdec_loopback(console, args, case, stream, raw, args.frames)
+    psnr, min_psnr, hashes, vdec_irq = vdec_loopback(console, args, case, stream, raw, positions, gop, p_qp)
     result = {
-        "case": case.name, "frames": args.frames, "bytes": size, "sha256": digest,
+        "case": stream.stem, "gop": gop, "i_qp": case.qp, "p_qp": p_qp,
+        "force_key_at": args.force_key_at, "source_rate_fps": int(rate[1]),
+        "frames": args.frames, "bytes": size, "sha256": digest,
+        "kbps": float(rate[2]), "mbps": float(rate[3]), "i_frames": int(rate[4]), "p_frames": int(rate[5]),
+        "i_bytes_avg": float(rate[6]), "p_bytes_avg": float(rate[7]),
         "fps": float(perf[2]), "avg_ms": float(perf[3]), "max_ms": float(perf[4]),
-        "cpu": list(map(float, cpu)), "psnr_yuv": psnr,
+        "cpu": list(map(float, cpu)), "psnr_yuv": psnr, "min_frame_psnr_yuv": min_psnr,
         "encode_irq_delta": args.frames, "decode_irq_delta": vdec_irq,
         "before": before, "after_streamoff": after, "drained_total": drained,
         "venc_smmu_faults": faults, "vdec_nv21_batch_sha256": hashes,
     }
-    console.record(f"[host] {case.name} PASS, Y/U/V PSNR {psnr}, VDEC +{vdec_irq}\n".encode())
+    console.record(f"[host] {stream.stem} PASS, Y/U/V PSNR {psnr}, VDEC +{vdec_irq}\n".encode())
     return result
 
 
@@ -306,7 +346,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("directory", type=Path)
     ap.add_argument("--log", type=Path)
-    ap.add_argument("--frames", type=int, default=60)
+    ap.add_argument("--frames", type=int, default=120)
+    ap.add_argument("--gops", type=int, nargs="+", default=[1, 30])
+    ap.add_argument("--p-qp", type=int)
+    ap.add_argument("--force-key-at", type=int)
     ap.add_argument("--cases", nargs="+", choices=[case.name for case in CASES])
     ap.add_argument("--host", default="192.168.6.172")
     ap.add_argument("--peer", default="192.168.6.249")
@@ -319,6 +362,12 @@ def main():
     args = ap.parse_args()
     if not 1 <= args.frames <= 120:
         ap.error("--frames must be between 1 and 120")
+    if not all(1 <= gop <= 32 for gop in args.gops):
+        ap.error("this VDEC fixture supports GOP lengths from 1 to 32")
+    if args.p_qp is not None and not 0 <= args.p_qp <= 51:
+        ap.error("--p-qp must be between 0 and 51")
+    if args.force_key_at is not None and not 0 <= args.force_key_at < args.frames:
+        ap.error("--force-key-at is a zero-based frame index")
     if not args.prepare_only and args.log is None:
         ap.error("--log is required for board testing")
     cases = [case for case in CASES if not args.cases or case.name in args.cases]
@@ -351,8 +400,13 @@ def main():
         checked(console, "chmod 755 /tmp/busybox.static /tmp/venc-test")
         report["baseline"] = snapshot(console)
         for case, (raw, packed) in zip(cases, inputs):
-            report["cases"].append(run_case(console, args, case, raw, packed))
-            result_path.write_text(json.dumps(report, indent=2) + "\n", encoding="ascii")
+            stage(console, args, args.directory, (packed.name,))
+            checked(console, f"cd /tmp && ./busybox.static gzip -dc {packed.name} >{raw.name} && "
+                    f"./busybox.static rm {packed.name}", 75)
+            for gop in args.gops:
+                report["cases"].append(run_case(console, args, case, raw, gop))
+                result_path.write_text(json.dumps(report, indent=2) + "\n", encoding="ascii")
+            checked(console, f"/tmp/busybox.static rm /tmp/{raw.name}")
         report["after_encode"] = snapshot(console)
         if report["after_encode"]["cma_used_pages"] != report["baseline"]["cma_used_pages"]:
             raise RuntimeError("CMA usage did not recover after the encode and decode cases")

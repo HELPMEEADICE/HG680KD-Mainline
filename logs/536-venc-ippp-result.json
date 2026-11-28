@@ -1,0 +1,1244 @@
+{
+  "boot_img_sha256": "e7936ac99cbc346c9489d202321b7407839c19a91f11f901058529a6e74b69dd",
+  "boot_img_crc32": "5c2d0ac8",
+  "cases": [
+    {
+      "case": "720p-nv12-qp24-gop1",
+      "gop": 1,
+      "i_qp": 24,
+      "p_qp": 24,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 4667669,
+      "sha256": "bf0a31e79141965a7668b45df7bd6b73379d749b604d8fcef8074cc4465c4aeb",
+      "kbps": 9335.338,
+      "mbps": 9.335338,
+      "i_frames": 120,
+      "p_frames": 0,
+      "i_bytes_avg": 38897.24,
+      "p_bytes_avg": 0.0,
+      "fps": 43.449,
+      "avg_ms": 21.042,
+      "max_ms": 27.16,
+      "cpu": [
+        7.97,
+        3.97,
+        64.86,
+        3.26
+      ],
+      "psnr_yuv": [
+        50.87060469142567,
+        48.634536869702714,
+        48.942907288828586
+      ],
+      "min_frame_psnr_yuv": [
+        50.67992517160131,
+        48.32921088749843,
+        48.361869303563
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 0,
+        "smmu_irq": 0,
+        "cma_free_kib": 380444,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 120,
+        "smmu_irq": 0,
+        "cma_free_kib": 380280,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 120,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "c08b16211a54594eb818575e17bc83a34ecf2bd2a649c3dfdae4fee507bceddb",
+        "d8c5404df590b1eddd2c429e929a9bc5277d44ae657310b96bbb6b521a1a569a",
+        "0d35bcfb77c3127f4bf3e24ff560ae6cd726bb172c137bc9cfbc599c10841c08",
+        "00ca3d06c733f5e515f35988152b2648656584f075f26bd2adef34b8ddd749e7",
+        "fbad616ccb4ad372a16c8a7e22be2d9d99fab2091052aa6c245e8aef516f0fad",
+        "758e05179f66252d615f423904a6c5d8cdbc06b87578941aca8524b478a9ca9b",
+        "c8382c26f9e373e2e3cf8cc20acfc9940204589aac0b768bfc81c8592c198576",
+        "f47fe5214ea125633a944e43e04413ea39840811936ceaf5e31fb68e9c1ec21f",
+        "7f29619b46c97d5ccdf916b83f9dc69e9bea0bf366fd5fa4e788bd2024b8a903",
+        "f01e59ca4c63edd3b6c7a10dd948959929b3f6f4a71bcc782318d5b0050532b1"
+      ],
+      "source_nv12_or_nv21_sha256": "0495439239c07d7d373e9b7d9a9a66cd16f674984022af0111513c6ada249dd0"
+    },
+    {
+      "case": "720p-nv12-qp24-gop30",
+      "gop": 30,
+      "i_qp": 24,
+      "p_qp": 24,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 2955383,
+      "sha256": "145eb1fb53942e637da0f7b015c2f468f0170f1be993967bcd6d4ca2c90be6ea",
+      "kbps": 5910.766,
+      "mbps": 5.910766,
+      "i_frames": 4,
+      "p_frames": 116,
+      "i_bytes_avg": 38124.75,
+      "p_bytes_avg": 24162.79,
+      "fps": 34.251,
+      "avg_ms": 26.541,
+      "max_ms": 33.558,
+      "cpu": [
+        18.23,
+        27.64,
+        18.0,
+        17.14
+      ],
+      "psnr_yuv": [
+        49.47518171197654,
+        47.48656375351938,
+        47.871016925874144
+      ],
+      "min_frame_psnr_yuv": [
+        49.01686329343572,
+        46.92744970994995,
+        47.40799181408712
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 120,
+        "smmu_irq": 0,
+        "cma_free_kib": 380268,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 240,
+        "smmu_irq": 0,
+        "cma_free_kib": 380280,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 240,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "4f60cff4908c9c30ec2e7549dcb2e60d4a7bcbbbf0e6434fd51be4bdb6bafdee",
+        "db8513b4dd95656332f9a4f945b3cbbbbe0e1e522dbde7cf418756077fb36da3",
+        "f865f819861634c19aee1009129ccc4091ac262b5f73aae0f94883566657ce05",
+        "f780d837734837e66319c1a78f8065cf6b83a5140596ca1b94a140dc65585a2f"
+      ],
+      "source_nv12_or_nv21_sha256": "0495439239c07d7d373e9b7d9a9a66cd16f674984022af0111513c6ada249dd0"
+    },
+    {
+      "case": "720p-nv21-qp32-gop1",
+      "gop": 1,
+      "i_qp": 32,
+      "p_qp": 32,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 2927089,
+      "sha256": "5878fcb86bd7c566ac77ad7bd95e99f929eaa641918b5ba4e8d6d2caf2d94885",
+      "kbps": 5854.178,
+      "mbps": 5.854178,
+      "i_frames": 120,
+      "p_frames": 0,
+      "i_bytes_avg": 24392.41,
+      "p_bytes_avg": 0.0,
+      "fps": 34.959,
+      "avg_ms": 25.459,
+      "max_ms": 32.718,
+      "cpu": [
+        30.99,
+        18.37,
+        11.66,
+        22.74
+      ],
+      "psnr_yuv": [
+        42.960625260776624,
+        42.0735274939358,
+        42.26365779095392
+      ],
+      "min_frame_psnr_yuv": [
+        42.58809327212916,
+        41.71428119571864,
+        41.80193124333086
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 240,
+        "smmu_irq": 0,
+        "cma_free_kib": 380444,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 360,
+        "smmu_irq": 0,
+        "cma_free_kib": 380216,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 360,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "8908f32f95bde5e64510d9c056cbe8e6e9287c6eea14c4bcaedefc007d6f2298",
+        "9340f1216ef6300b0594d6d1b490919d2e2492ecf71e6435c3732c2afc298498",
+        "3d6ed71c3f623216a56115f44940ad9ac31555f33a9804aad6e498b1df6b708b",
+        "98fc3176b5e83a4e1396cff95d435d9e7757218cf1979bb6d1df896ad009aea2",
+        "b060f6444ea3a739db322916a7bb07fdae87a46aae434c5a31bbfee11d9336f2",
+        "85dbf5e3525a1f03559923291758f8d39bb31cc9930fd63619629492cf859f24",
+        "9a53236880e8282874634e1561f083d8046330dc02782705994babf3564b697c",
+        "6df9161f6247bd7f621b71140bc5a70b3823c137030cb3aa624ee1de44451447",
+        "5fd92b470e340aebb1e42d2dff67809cf220800385d53f65b3d7d27a7d5149c4",
+        "e9f669178a5dd3d84e58dfed1fdc7fc87fa7bb1b1e5c6c745671839593931164"
+      ],
+      "source_nv12_or_nv21_sha256": "c71243ea92b8afc65fb322d911fc962469859a7559567e6fa18ec63bee919d06"
+    },
+    {
+      "case": "720p-nv21-qp32-gop30",
+      "gop": 30,
+      "i_qp": 32,
+      "p_qp": 32,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 1573932,
+      "sha256": "eb81ce0346deacaea64810feaec650f170a825f2dae311f806bc2ee1f91c938b",
+      "kbps": 3147.864,
+      "mbps": 3.147864,
+      "i_frames": 4,
+      "p_frames": 116,
+      "i_bytes_avg": 23829.0,
+      "p_bytes_avg": 12746.69,
+      "fps": 45.159,
+      "avg_ms": 20.981,
+      "max_ms": 23.58,
+      "cpu": [
+        74.44,
+        0.38,
+        0.0,
+        0.0
+      ],
+      "psnr_yuv": [
+        41.85384180518216,
+        41.069286570989576,
+        41.175015938899264
+      ],
+      "min_frame_psnr_yuv": [
+        41.443106444949066,
+        40.56811496127641,
+        40.75412940566933
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 360,
+        "smmu_irq": 0,
+        "cma_free_kib": 380272,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 480,
+        "smmu_irq": 0,
+        "cma_free_kib": 380280,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 480,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "a2b1e42a9da99fe121f9c89012855156dccf80b199ecb0ef811ee48468c4507a",
+        "b545afeb1ed7e6f50f4bae3f1f978b02f5f106d81f06f8494cf053d4bd8ab571",
+        "45c37573ca0b9468e131e7549cbe8cea3f351f6af0cdc29c6e28a566c2df8993",
+        "62576c783ed6c7eb9598b1a6097f800fcf804b51a28aa522cc73c0a35bc7699b"
+      ],
+      "source_nv12_or_nv21_sha256": "c71243ea92b8afc65fb322d911fc962469859a7559567e6fa18ec63bee919d06"
+    },
+    {
+      "case": "1080p-nv12-qp32-gop1",
+      "gop": 1,
+      "i_qp": 32,
+      "p_qp": 32,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 5503843,
+      "sha256": "07b465790b51a0092d52efe52c6547c86672b12eccde0152dac03d9290094382",
+      "kbps": 11007.686,
+      "mbps": 11.007686,
+      "i_frames": 120,
+      "p_frames": 0,
+      "i_bytes_avg": 45865.36,
+      "p_bytes_avg": 0.0,
+      "fps": 19.361,
+      "avg_ms": 47.213,
+      "max_ms": 57.451,
+      "cpu": [
+        19.84,
+        15.02,
+        25.16,
+        20.97
+      ],
+      "psnr_yuv": [
+        43.48763851402319,
+        42.70389576395044,
+        43.00207400372433
+      ],
+      "min_frame_psnr_yuv": [
+        43.16130969868655,
+        42.31614147407829,
+        42.52468790219684
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 480,
+        "smmu_irq": 0,
+        "cma_free_kib": 380068,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 600,
+        "smmu_irq": 0,
+        "cma_free_kib": 380148,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 600,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "824123284e512a94f5633234ae40bfca77b363084c1bcbe56dd379704f09171d",
+        "156ba2ed3adbc2def115b83d1c0199be2c3bd2bfd88f4cd327bee0500b6979aa",
+        "ac28c5c1734f7884e51cf0492abd4683655c0ae271d3906d937e6d8f625005d0",
+        "5f69545470b1a6d20b2a7bd46480232ca3bf61b483077cf669ba984380c440d9",
+        "28c76ed636b46d4206fe72812528527eb3bf113939d470c5e578a0a6a58b107e",
+        "1ca5ad19c09c38461b854aead72adbd7cd325efedfb5495bcf2446d82460d0aa",
+        "554e5d98b6ff27fb34b7e1d4807442701648fb7045ef0c0aad39d0595440f912",
+        "c1a38d54128a3db2e8a7d33073dc477f0ec4503462b0ef95d084145c3690fa54",
+        "ae054b8285c891697bafa4eec5016a126ee1629dee31218137b649a3af27e033",
+        "d6354dc2af63a27a997896e02a09cd15ce7339fa7b955882cdac08bddad72064"
+      ],
+      "source_nv12_or_nv21_sha256": "81096ddf4a6bdc7f85ae6d3d6ec7fb8ce3a27fe5248bdce7acbdb4be8970e5d3"
+    },
+    {
+      "case": "1080p-nv12-qp32-gop30",
+      "gop": 30,
+      "i_qp": 32,
+      "p_qp": 32,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 3289004,
+      "sha256": "2d70fa4f460ff1e41fd20fe960f7327eb4d2534694669f5223dfcb4d6bc01b9c",
+      "kbps": 6578.008,
+      "mbps": 6.578008,
+      "i_frames": 4,
+      "p_frames": 116,
+      "i_bytes_avg": 45175.25,
+      "p_bytes_avg": 26795.72,
+      "fps": 17.839,
+      "avg_ms": 52.229,
+      "max_ms": 60.999,
+      "cpu": [
+        12.63,
+        21.51,
+        20.39,
+        23.74
+      ],
+      "psnr_yuv": [
+        42.47951942775796,
+        41.86060593308311,
+        41.94174888739845
+      ],
+      "min_frame_psnr_yuv": [
+        42.102525614752686,
+        41.41208935239877,
+        41.6138852637625
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 600,
+        "smmu_irq": 0,
+        "cma_free_kib": 380364,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 720,
+        "smmu_irq": 0,
+        "cma_free_kib": 380088,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 720,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "8e997b235c9e0aa6b4b2222d10abd73134cbb6beff295529437b07c65c4e147b",
+        "98c447a8996369641a899d75d5710636114c91c2a30f95f0dd88223e588ba7a0",
+        "5e3bc07ff10a8a6b1cea4933048ff7befe321909e2b10f6d35e20af26e18cf57",
+        "ce3af6471a63f6c226e85fc1f7579ca3293350db8f4343566274762c16d5f1d9"
+      ],
+      "source_nv12_or_nv21_sha256": "81096ddf4a6bdc7f85ae6d3d6ec7fb8ce3a27fe5248bdce7acbdb4be8970e5d3"
+    },
+    {
+      "case": "1080p-nv21-qp24-gop1",
+      "gop": 1,
+      "i_qp": 24,
+      "p_qp": 24,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 8924439,
+      "sha256": "9f3a90a51e6a2bf43bf7466329fd55ca7c3a714bafd4375f958a400e4a630b83",
+      "kbps": 17848.878,
+      "mbps": 17.848878,
+      "i_frames": 120,
+      "p_frames": 0,
+      "i_bytes_avg": 74370.32,
+      "p_bytes_avg": 0.0,
+      "fps": 19.138,
+      "avg_ms": 47.362,
+      "max_ms": 58.569,
+      "cpu": [
+        10.69,
+        29.78,
+        11.0,
+        29.71
+      ],
+      "psnr_yuv": [
+        50.87063489924185,
+        49.53847772767233,
+        49.87957436658877
+      ],
+      "min_frame_psnr_yuv": [
+        50.703706821818,
+        49.11343366292261,
+        49.40626195348301
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 720,
+        "smmu_irq": 0,
+        "cma_free_kib": 380444,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 840,
+        "smmu_irq": 0,
+        "cma_free_kib": 380164,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 840,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "d74686d8808127a26c146bc52cf5cecab03be44430107a31453895b8495f35a7",
+        "d40a864b6bdac2c81e455b10ad839ccb294847621c67d1e956355b733371b405",
+        "cafefe8ca08a6ba284c25695e27721efc4f6e10796c397e2d9e2343cc59ccf96",
+        "f4ffd154d1da2d111c7b648328c0825680ac5ded658e9c8b1a21f22d6da57b97",
+        "6383352b2d9cdf011892a2315ef200e9565d6a277cdc1defb983e5f366693a17",
+        "0a6c971c3919e01a892f53f578fd4b5744fbe7e4793a30a3b85501009c0576c1",
+        "1e812fea4589ed0e124558142c1452ccd88ca3074068476b38e05e4c7106fa14",
+        "1ed7a8f18e3d1678a9da91fdd4b9b3ed498bd68037c573ad4eeb62a6cfcf1c65",
+        "038251a4b9432639e169e964ba9afe649a054d91b0b857d3239ade85fc8663fb",
+        "ff3a8ec1ce8865cb48a27c5048463c64b330a00ad1742e52e1f92c204a50652b"
+      ],
+      "source_nv12_or_nv21_sha256": "0b4ad56ae343a81ebff637318ed266a91fd2f61174018c278c958d4358c4bf21"
+    },
+    {
+      "case": "1080p-nv21-qp24-gop30",
+      "gop": 30,
+      "i_qp": 24,
+      "p_qp": 24,
+      "force_key_at": null,
+      "source_rate_fps": 30,
+      "frames": 120,
+      "bytes": 6190449,
+      "sha256": "2cc0eeb6ea9d2aecda1d65fda6877fe4e80963ef85151105aca9c81ee4b7d67e",
+      "kbps": 12380.898,
+      "mbps": 12.380898,
+      "i_frames": 4,
+      "p_frames": 116,
+      "i_bytes_avg": 73351.0,
+      "p_bytes_avg": 50836.59,
+      "fps": 18.265,
+      "avg_ms": 50.738,
+      "max_ms": 61.001,
+      "cpu": [
+        13.68,
+        25.99,
+        19.63,
+        18.45
+      ],
+      "psnr_yuv": [
+        49.835897561662456,
+        48.45137321895862,
+        48.95982052761045
+      ],
+      "min_frame_psnr_yuv": [
+        49.42090363195909,
+        47.88760376252739,
+        48.50173985418987
+      ],
+      "encode_irq_delta": 120,
+      "decode_irq_delta": 120,
+      "before": {
+        "irq": 840,
+        "smmu_irq": 0,
+        "cma_free_kib": 380376,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 960,
+        "smmu_irq": 0,
+        "cma_free_kib": 380164,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 960,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "125ba30fd2266c427453654042130ef1627e38bf13a78a4c3c863f4073d5ad27",
+        "6a60fbff864c7ef4d54560010f0c300f6909ac4b2e3dc38e66c078883681fc21",
+        "52917b0551f425db38740e550f2b777edb5c7b494f9af6cc5409ca9ef3ebf604",
+        "0b7409c9066806563db51e1a8b24270eef9bd775f8e5232244ab942e20eb232a"
+      ],
+      "source_nv12_or_nv21_sha256": "0b4ad56ae343a81ebff637318ed266a91fd2f61174018c278c958d4358c4bf21"
+    }
+  ],
+  "baseline": {
+    "irq": 0,
+    "smmu_irq": 0,
+    "cma_free_kib": 380444,
+    "cma_used_pages": 3193,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "after_encode": {
+    "irq": 960,
+    "smmu_irq": 0,
+    "cma_free_kib": 380444,
+    "cma_used_pages": 3193,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "after_media": {
+    "irq": 960,
+    "smmu_irq": 0,
+    "cma_free_kib": 380336,
+    "cma_used_pages": 3209,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "mesa_irq_delta": 179,
+  "media_regression": "pass",
+  "final": {
+    "irq": 960,
+    "smmu_irq": 0,
+    "cma_free_kib": 380240,
+    "cma_used_pages": 3217,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "all_intra_first_60_baseline_sha256": {
+    "720p-nv12-qp24": "c6b184b4a524a93654c6ace7e63bb53401a7c4ebaf934ed47fecdbc7bc12a26e",
+    "720p-nv21-qp32": "04896268877226ad06e336b7783ff8dec99881463fa5e547905a0d38d0d8f355",
+    "1080p-nv12-qp32": "0ed89fc85946f098bf8e2b5f535ad650f4d435c159686fd1fe796ba155d36d91",
+    "1080p-nv21-qp24": "fc95e368daf6319b6948d0c9ed6114c2f117cbefb4711e6ec26979c974017837"
+  },
+  "force_keyframe_smoke": {
+    "case": "720p-nv12-qp24-gop30",
+    "gop": 30,
+    "i_qp": 24,
+    "p_qp": 32,
+    "force_key_at": 4,
+    "source_rate_fps": 30,
+    "frames": 8,
+    "bytes": 145799,
+    "sha256": "049c246fbe2b678bc923832ac2576ec3cbbdd38a2fc5b2ce16e390643aec4e8c",
+    "kbps": 4373.97,
+    "mbps": 4.37397,
+    "i_frames": 2,
+    "p_frames": 6,
+    "i_bytes_avg": 37202.5,
+    "p_bytes_avg": 11899.0,
+    "fps": 39.979,
+    "avg_ms": 23.202,
+    "max_ms": 25.82,
+    "cpu": [
+      0.0,
+      10.0,
+      15.0,
+      57.14
+    ],
+    "psnr_yuv": [
+      43.688258673143174,
+      43.28519332443089,
+      43.183930793092586
+    ],
+    "min_frame_psnr_yuv": [
+      42.53825652063608,
+      42.10668025232753,
+      42.024165017963284
+    ],
+    "encode_irq_delta": 8,
+    "decode_irq_delta": 8,
+    "before": {
+      "irq": 960,
+      "smmu_irq": 0,
+      "cma_free_kib": 380240,
+      "cma_used_pages": 3217,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "after_streamoff": {
+      "irq": 968,
+      "smmu_irq": 0,
+      "cma_free_kib": 380076,
+      "cma_used_pages": 3217,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "drained_total": 968,
+    "venc_smmu_faults": 0,
+    "vdec_nv21_batch_sha256": [
+      "acf4dc4091491099ffafd82bcb0d45b45285efa8dda763f545f2e8c80b28dc86",
+      "d2ede5f6d906f9f09a76ff2f9513192f8e454c8a1c4e5606c5ccff4904602890"
+    ]
+  },
+  "restart_smoke": {
+    "gop": 30,
+    "i_qp": 24,
+    "p_qp": 32,
+    "restart_at_frame": {
+      "stop_start": 4,
+      "streamoff_streamon": 6
+    },
+    "positions": [
+      0,
+      1,
+      2,
+      3,
+      0,
+      1,
+      0,
+      1
+    ],
+    "bytes": 171110,
+    "sha256": "f837d2298cc73e584ce530e716bc933be9599e7647370592c4caa12bce5684eb",
+    "fps": "40.109",
+    "before": {
+      "irq": 968,
+      "smmu_irq": 0,
+      "cma_free_kib": 380248,
+      "cma_used_pages": 3217,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "after": {
+      "irq": 976,
+      "smmu_irq": 0,
+      "cma_free_kib": 380076,
+      "cma_used_pages": 3217,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "drained_total": 976,
+    "smmu_faults": 0,
+    "vdec_irq": 8,
+    "psnr_yuv": [
+      44.33910038126717,
+      43.87866149314422,
+      43.834865619281366
+    ],
+    "min_frame_psnr_yuv": [
+      42.53825652063608,
+      42.10668025232753,
+      42.024165017963284
+    ],
+    "vdec_nv21_batch_sha256": [
+      "acf4dc4091491099ffafd82bcb0d45b45285efa8dda763f545f2e8c80b28dc86",
+      "00be901e01c3ee3fcb389695953ae3fb56ef1f17f3bb390ffb1415bd7101f2c5",
+      "b58acf8e59c1d0743e8546d4e2e3a07a26d1602ff6b4317ae2ff8baf36bf5a54"
+    ]
+  },
+  "boot_img_size_bytes": 19826760,
+  "performance_governor_benchmark": {
+    "governor": "performance",
+    "restored_governor": "schedutil",
+    "cpu_clock_khz": 1000000,
+    "baseline": {
+      "irq": 976,
+      "smmu_irq": 0,
+      "cma_free_kib": 380264,
+      "cma_used_pages": 3217,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "final": {
+      "irq": 2896,
+      "smmu_irq": 0,
+      "cma_free_kib": 379960,
+      "cma_used_pages": 3217,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "summary": {
+      "720p-nv12-qp24-gop1": {
+        "fps": 45.42100000000001,
+        "avg_ms": 20.244500000000002
+      },
+      "720p-nv12-qp24-gop30": {
+        "fps": 44.699,
+        "avg_ms": 20.9905
+      },
+      "720p-nv21-qp32-gop1": {
+        "fps": 46.458,
+        "avg_ms": 20.044
+      },
+      "720p-nv21-qp32-gop30": {
+        "fps": 45.403,
+        "avg_ms": 20.8725
+      },
+      "1080p-nv12-qp32-gop1": {
+        "fps": 21.8095,
+        "avg_ms": 42.842
+      },
+      "1080p-nv12-qp32-gop30": {
+        "fps": 21.182000000000002,
+        "avg_ms": 44.7955
+      },
+      "1080p-nv21-qp24-gop1": {
+        "fps": 21.331000000000003,
+        "avg_ms": 43.2405
+      },
+      "1080p-nv21-qp24-gop30": {
+        "fps": 20.8315,
+        "avg_ms": 45.0255
+      }
+    },
+    "samples": [
+      {
+        "case": "720p-nv12-qp24-gop1",
+        "bytes": 4667669,
+        "fps": 45.203,
+        "avg_ms": 20.248,
+        "max_ms": 20.336,
+        "cpu": [
+          0.75,
+          30.08,
+          16.54,
+          31.95
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          60000,
+          60000
+        ]
+      },
+      {
+        "case": "720p-nv12-qp24-gop30",
+        "bytes": 2955383,
+        "fps": 44.68,
+        "avg_ms": 20.995,
+        "max_ms": 21.18,
+        "cpu": [
+          68.03,
+          0.0,
+          0.0,
+          8.58
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          60000,
+          60000
+        ]
+      },
+      {
+        "case": "720p-nv12-qp24-gop30",
+        "bytes": 2955383,
+        "fps": 44.718,
+        "avg_ms": 20.986,
+        "max_ms": 21.119,
+        "cpu": [
+          51.3,
+          24.54,
+          0.0,
+          0.0
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          60000,
+          60000
+        ]
+      },
+      {
+        "case": "720p-nv12-qp24-gop1",
+        "bytes": 4667669,
+        "fps": 45.639,
+        "avg_ms": 20.241,
+        "max_ms": 20.368,
+        "cpu": [
+          68.7,
+          0.0,
+          11.03,
+          0.0
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          60000,
+          60000
+        ]
+      },
+      {
+        "case": "720p-nv21-qp32-gop1",
+        "bytes": 2927089,
+        "fps": 46.233,
+        "avg_ms": 20.044,
+        "max_ms": 20.102,
+        "cpu": [
+          1.54,
+          25.1,
+          42.31,
+          10.04
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          61000,
+          61000
+        ]
+      },
+      {
+        "case": "720p-nv21-qp32-gop30",
+        "bytes": 1573932,
+        "fps": 45.382,
+        "avg_ms": 20.877,
+        "max_ms": 21.033,
+        "cpu": [
+          73.96,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          60000,
+          61000
+        ]
+      },
+      {
+        "case": "720p-nv21-qp32-gop30",
+        "bytes": 1573932,
+        "fps": 45.424,
+        "avg_ms": 20.868,
+        "max_ms": 21.006,
+        "cpu": [
+          22.35,
+          0.38,
+          50.76,
+          0.0
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          60000,
+          61000
+        ]
+      },
+      {
+        "case": "720p-nv21-qp32-gop1",
+        "bytes": 2927089,
+        "fps": 46.683,
+        "avg_ms": 20.044,
+        "max_ms": 20.134,
+        "cpu": [
+          79.38,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          60000,
+          61000
+        ]
+      },
+      {
+        "case": "1080p-nv12-qp32-gop1",
+        "bytes": 5503843,
+        "fps": 21.705,
+        "avg_ms": 42.842,
+        "max_ms": 42.926,
+        "cpu": [
+          21.48,
+          18.95,
+          20.8,
+          17.0
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          62000,
+          61000
+        ]
+      },
+      {
+        "case": "1080p-nv12-qp32-gop30",
+        "bytes": 3289004,
+        "fps": 21.18,
+        "avg_ms": 44.797,
+        "max_ms": 45.038,
+        "cpu": [
+          10.07,
+          22.79,
+          22.4,
+          19.05
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          61000,
+          61000
+        ]
+      },
+      {
+        "case": "1080p-nv12-qp32-gop30",
+        "bytes": 3289004,
+        "fps": 21.184,
+        "avg_ms": 44.794,
+        "max_ms": 45.036,
+        "cpu": [
+          7.42,
+          21.87,
+          22.08,
+          22.44
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          61000,
+          61000
+        ]
+      },
+      {
+        "case": "1080p-nv12-qp32-gop1",
+        "bytes": 5503843,
+        "fps": 21.914,
+        "avg_ms": 42.842,
+        "max_ms": 42.936,
+        "cpu": [
+          16.06,
+          21.21,
+          20.26,
+          20.66
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          61000,
+          61000
+        ]
+      },
+      {
+        "case": "1080p-nv21-qp24-gop1",
+        "bytes": 8924439,
+        "fps": 21.231,
+        "avg_ms": 43.241,
+        "max_ms": 43.321,
+        "cpu": [
+          15.58,
+          24.56,
+          16.81,
+          21.55
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          62000,
+          61000
+        ]
+      },
+      {
+        "case": "1080p-nv21-qp24-gop30",
+        "bytes": 6190449,
+        "fps": 20.831,
+        "avg_ms": 45.02,
+        "max_ms": 45.249,
+        "cpu": [
+          11.44,
+          11.11,
+          19.24,
+          33.16
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          61000,
+          61000
+        ]
+      },
+      {
+        "case": "1080p-nv21-qp24-gop30",
+        "bytes": 6190449,
+        "fps": 20.832,
+        "avg_ms": 45.031,
+        "max_ms": 45.221,
+        "cpu": [
+          23.61,
+          13.54,
+          16.67,
+          20.49
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          61000,
+          61000
+        ]
+      },
+      {
+        "case": "1080p-nv21-qp24-gop1",
+        "bytes": 8924439,
+        "fps": 21.431,
+        "avg_ms": 43.24,
+        "max_ms": 43.324,
+        "cpu": [
+          7.68,
+          25.76,
+          23.71,
+          20.71
+        ],
+        "freq_khz_before_after": [
+          1000000,
+          1000000
+        ],
+        "temp_mc_before_after": [
+          61000,
+          61000
+        ]
+      }
+    ],
+    "drained_total": 2896,
+    "venc_smmu_faults": 0
+  },
+  "cc": "GCC 14.2.0",
+  "build_warnings": 0
+}

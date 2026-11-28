@@ -1,0 +1,564 @@
+HG680KD Linux 7.3.6 built-in VENC IPPP RAM acceptance, 2026-11-28
+
+## Clean build
+aarch64-linux-gcc (GCC) 14.2.0
+Kernel output directory is empty
+e7936ac99cbc346c9489d202321b7407839c19a91f11f901058529a6e74b69dd  boot.img  (19826760 bytes, CRC32=5c2d0ac8, load_at=0x01fdffc0)
+Compiler and DTB warnings: 0
+
+## COM4 TFTP, benchmark, exact VDEC loopback and full regression
+Bytes transferred = 262144 (40000 hex)
+[host] CRC32 matches local image: fa236592
+[host] boot.img SHA256 e7936ac99cbc346c9489d202321b7407839c19a91f11f901058529a6e74b69dd
+Bytes transferred = 19826760 (12e8848 hex)
+[host] CRC32 matches local image: 5c2d0ac8
+[    0.481980] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+<6>[    0.481980] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:          0          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:          0          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1280x720 NV12 GOP=1 I_QP=24 P_QP=24 frames=120 bytes=4667669 fps=43.449 avg_ms=21.042 max_ms=27.160 irq=120
+RATE input_fps=30 kbps=9335.338 Mbps=9.335338 i_frames=120 p_frames=0 i_bytes_avg=38897.24 p_bytes_avg=0.00
+CPU0 7.97%
+CPU1 3.97%
+CPU2 64.86%
+CPU3 3.26%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        120          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[   13.231961] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        120          0          0          0  GICv3     133 Level     hi3798mv320-venc
+c08b16211a54594eb818575e17bc83a34ecf2bd2a649c3dfdae4fee507bceddb  venc-vdec.nv21
+d8c5404df590b1eddd2c429e929a9bc5277d44ae657310b96bbb6b521a1a569a  venc-vdec.nv21
+0d35bcfb77c3127f4bf3e24ff560ae6cd726bb172c137bc9cfbc599c10841c08  venc-vdec.nv21
+00ca3d06c733f5e515f35988152b2648656584f075f26bd2adef34b8ddd749e7  venc-vdec.nv21
+fbad616ccb4ad372a16c8a7e22be2d9d99fab2091052aa6c245e8aef516f0fad  venc-vdec.nv21
+758e05179f66252d615f423904a6c5d8cdbc06b87578941aca8524b478a9ca9b  venc-vdec.nv21
+c8382c26f9e373e2e3cf8cc20acfc9940204589aac0b768bfc81c8592c198576  venc-vdec.nv21
+f47fe5214ea125633a944e43e04413ea39840811936ceaf5e31fb68e9c1ec21f  venc-vdec.nv21
+7f29619b46c97d5ccdf916b83f9dc69e9bea0bf366fd5fa4e788bd2024b8a903  venc-vdec.nv21
+f01e59ca4c63edd3b6c7a10dd948959929b3f6f4a71bcc782318d5b0050532b1  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        120          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 720p-nv12-qp24-gop1 PASS, Y/U/V PSNR [50.87060469142567, 48.634536869702714, 48.942907288828586], VDEC +120
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        120          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1280x720 NV12 GOP=30 I_QP=24 P_QP=24 frames=120 bytes=2955383 fps=34.251 avg_ms=26.541 max_ms=33.558 irq=120
+RATE input_fps=30 kbps=5910.766 Mbps=5.910766 i_frames=4 p_frames=116 i_bytes_avg=38124.75 p_bytes_avg=24162.79
+CPU0 18.23%
+CPU1 27.64%
+CPU2 18.00%
+CPU3 17.14%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        240          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[   29.656980] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        240          0          0          0  GICv3     133 Level     hi3798mv320-venc
+4f60cff4908c9c30ec2e7549dcb2e60d4a7bcbbbf0e6434fd51be4bdb6bafdee  venc-vdec.nv21
+db8513b4dd95656332f9a4f945b3cbbbbe0e1e522dbde7cf418756077fb36da3  venc-vdec.nv21
+f865f819861634c19aee1009129ccc4091ac262b5f73aae0f94883566657ce05  venc-vdec.nv21
+f780d837734837e66319c1a78f8065cf6b83a5140596ca1b94a140dc65585a2f  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        240          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 720p-nv12-qp24-gop30 PASS, Y/U/V PSNR [49.47518171197654, 47.48656375351938, 47.871016925874144], VDEC +120
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        240          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1280x720 NV21 GOP=1 I_QP=32 P_QP=32 frames=120 bytes=2927089 fps=34.959 avg_ms=25.459 max_ms=32.718 irq=120
+RATE input_fps=30 kbps=5854.178 Mbps=5.854178 i_frames=120 p_frames=0 i_bytes_avg=24392.41 p_bytes_avg=0.00
+CPU0 30.99%
+CPU1 18.37%
+CPU2 11.66%
+CPU3 22.74%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        360          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[   48.982730] hi3798mv320-venc f8c80000.video-enc: drained=360 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        360          0          0          0  GICv3     133 Level     hi3798mv320-venc
+8908f32f95bde5e64510d9c056cbe8e6e9287c6eea14c4bcaedefc007d6f2298  venc-vdec.nv21
+9340f1216ef6300b0594d6d1b490919d2e2492ecf71e6435c3732c2afc298498  venc-vdec.nv21
+3d6ed71c3f623216a56115f44940ad9ac31555f33a9804aad6e498b1df6b708b  venc-vdec.nv21
+98fc3176b5e83a4e1396cff95d435d9e7757218cf1979bb6d1df896ad009aea2  venc-vdec.nv21
+b060f6444ea3a739db322916a7bb07fdae87a46aae434c5a31bbfee11d9336f2  venc-vdec.nv21
+85dbf5e3525a1f03559923291758f8d39bb31cc9930fd63619629492cf859f24  venc-vdec.nv21
+9a53236880e8282874634e1561f083d8046330dc02782705994babf3564b697c  venc-vdec.nv21
+6df9161f6247bd7f621b71140bc5a70b3823c137030cb3aa624ee1de44451447  venc-vdec.nv21
+5fd92b470e340aebb1e42d2dff67809cf220800385d53f65b3d7d27a7d5149c4  venc-vdec.nv21
+e9f669178a5dd3d84e58dfed1fdc7fc87fa7bb1b1e5c6c745671839593931164  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        360          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 720p-nv21-qp32-gop1 PASS, Y/U/V PSNR [42.960625260776624, 42.0735274939358, 42.26365779095392], VDEC +120
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        360          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1280x720 NV21 GOP=30 I_QP=32 P_QP=32 frames=120 bytes=1573932 fps=45.159 avg_ms=20.981 max_ms=23.580 irq=120
+RATE input_fps=30 kbps=3147.864 Mbps=3.147864 i_frames=4 p_frames=116 i_bytes_avg=23829.00 p_bytes_avg=12746.69
+CPU0 74.44%
+CPU1 0.38%
+CPU2 0.00%
+CPU3 0.00%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        480          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[   63.945479] hi3798mv320-venc f8c80000.video-enc: drained=480 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        480          0          0          0  GICv3     133 Level     hi3798mv320-venc
+a2b1e42a9da99fe121f9c89012855156dccf80b199ecb0ef811ee48468c4507a  venc-vdec.nv21
+b545afeb1ed7e6f50f4bae3f1f978b02f5f106d81f06f8494cf053d4bd8ab571  venc-vdec.nv21
+45c37573ca0b9468e131e7549cbe8cea3f351f6af0cdc29c6e28a566c2df8993  venc-vdec.nv21
+62576c783ed6c7eb9598b1a6097f800fcf804b51a28aa522cc73c0a35bc7699b  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        480          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 720p-nv21-qp32-gop30 PASS, Y/U/V PSNR [41.85384180518216, 41.069286570989576, 41.175015938899264], VDEC +120
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        480          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1920x1080 NV12 GOP=1 I_QP=32 P_QP=32 frames=120 bytes=5503843 fps=19.361 avg_ms=47.213 max_ms=57.451 irq=120
+RATE input_fps=30 kbps=11007.686 Mbps=11.007686 i_frames=120 p_frames=0 i_bytes_avg=45865.36 p_bytes_avg=0.00
+CPU0 19.84%
+CPU1 15.02%
+CPU2 25.16%
+CPU3 20.97%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        600          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[   90.703112] hi3798mv320-venc f8c80000.video-enc: drained=600 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        600          0          0          0  GICv3     133 Level     hi3798mv320-venc
+824123284e512a94f5633234ae40bfca77b363084c1bcbe56dd379704f09171d  venc-vdec.nv21
+156ba2ed3adbc2def115b83d1c0199be2c3bd2bfd88f4cd327bee0500b6979aa  venc-vdec.nv21
+ac28c5c1734f7884e51cf0492abd4683655c0ae271d3906d937e6d8f625005d0  venc-vdec.nv21
+5f69545470b1a6d20b2a7bd46480232ca3bf61b483077cf669ba984380c440d9  venc-vdec.nv21
+28c76ed636b46d4206fe72812528527eb3bf113939d470c5e578a0a6a58b107e  venc-vdec.nv21
+1ca5ad19c09c38461b854aead72adbd7cd325efedfb5495bcf2446d82460d0aa  venc-vdec.nv21
+554e5d98b6ff27fb34b7e1d4807442701648fb7045ef0c0aad39d0595440f912  venc-vdec.nv21
+c1a38d54128a3db2e8a7d33073dc477f0ec4503462b0ef95d084145c3690fa54  venc-vdec.nv21
+ae054b8285c891697bafa4eec5016a126ee1629dee31218137b649a3af27e033  venc-vdec.nv21
+d6354dc2af63a27a997896e02a09cd15ce7339fa7b955882cdac08bddad72064  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        600          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 1080p-nv12-qp32-gop1 PASS, Y/U/V PSNR [43.48763851402319, 42.70389576395044, 43.00207400372433], VDEC +120
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        600          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1920x1080 NV12 GOP=30 I_QP=32 P_QP=32 frames=120 bytes=3289004 fps=17.839 avg_ms=52.229 max_ms=60.999 irq=120
+RATE input_fps=30 kbps=6578.008 Mbps=6.578008 i_frames=4 p_frames=116 i_bytes_avg=45175.25 p_bytes_avg=26795.72
+CPU0 12.63%
+CPU1 21.51%
+CPU2 20.39%
+CPU3 23.74%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        720          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[  120.140857] hi3798mv320-venc f8c80000.video-enc: drained=720 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        720          0          0          0  GICv3     133 Level     hi3798mv320-venc
+8e997b235c9e0aa6b4b2222d10abd73134cbb6beff295529437b07c65c4e147b  venc-vdec.nv21
+98c447a8996369641a899d75d5710636114c91c2a30f95f0dd88223e588ba7a0  venc-vdec.nv21
+5e3bc07ff10a8a6b1cea4933048ff7befe321909e2b10f6d35e20af26e18cf57  venc-vdec.nv21
+ce3af6471a63f6c226e85fc1f7579ca3293350db8f4343566274762c16d5f1d9  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        720          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 1080p-nv12-qp32-gop30 PASS, Y/U/V PSNR [42.47951942775796, 41.86060593308311, 41.94174888739845], VDEC +120
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        720          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1920x1080 NV21 GOP=1 I_QP=24 P_QP=24 frames=120 bytes=8924439 fps=19.138 avg_ms=47.362 max_ms=58.569 irq=120
+RATE input_fps=30 kbps=17848.878 Mbps=17.848878 i_frames=120 p_frames=0 i_bytes_avg=74370.32 p_bytes_avg=0.00
+CPU0 10.69%
+CPU1 29.78%
+CPU2 11.00%
+CPU3 29.71%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        840          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[  156.875880] hi3798mv320-venc f8c80000.video-enc: drained=840 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        840          0          0          0  GICv3     133 Level     hi3798mv320-venc
+d74686d8808127a26c146bc52cf5cecab03be44430107a31453895b8495f35a7  venc-vdec.nv21
+d40a864b6bdac2c81e455b10ad839ccb294847621c67d1e956355b733371b405  venc-vdec.nv21
+cafefe8ca08a6ba284c25695e27721efc4f6e10796c397e2d9e2343cc59ccf96  venc-vdec.nv21
+f4ffd154d1da2d111c7b648328c0825680ac5ded658e9c8b1a21f22d6da57b97  venc-vdec.nv21
+6383352b2d9cdf011892a2315ef200e9565d6a277cdc1defb983e5f366693a17  venc-vdec.nv21
+0a6c971c3919e01a892f53f578fd4b5744fbe7e4793a30a3b85501009c0576c1  venc-vdec.nv21
+1e812fea4589ed0e124558142c1452ccd88ca3074068476b38e05e4c7106fa14  venc-vdec.nv21
+1ed7a8f18e3d1678a9da91fdd4b9b3ed498bd68037c573ad4eeb62a6cfcf1c65  venc-vdec.nv21
+038251a4b9432639e169e964ba9afe649a054d91b0b857d3239ade85fc8663fb  venc-vdec.nv21
+ff3a8ec1ce8865cb48a27c5048463c64b330a00ad1742e52e1f92c204a50652b  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        840          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 1080p-nv21-qp24-gop1 PASS, Y/U/V PSNR [50.87063489924185, 49.53847772767233, 49.87957436658877], VDEC +120
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        840          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1920x1080 NV21 GOP=30 I_QP=24 P_QP=24 frames=120 bytes=6190449 fps=18.265 avg_ms=50.738 max_ms=61.001 irq=120
+RATE input_fps=30 kbps=12380.898 Mbps=12.380898 i_frames=4 p_frames=116 i_bytes_avg=73351.00 p_bytes_avg=50836.59
+CPU0 13.68%
+CPU1 25.99%
+CPU2 19.63%
+CPU3 18.45%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[  186.994962] hi3798mv320-venc f8c80000.video-enc: drained=960 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+125ba30fd2266c427453654042130ef1627e38bf13a78a4c3c863f4073d5ad27  venc-vdec.nv21
+6a60fbff864c7ef4d54560010f0c300f6909ac4b2e3dc38e66c078883681fc21  venc-vdec.nv21
+52917b0551f425db38740e550f2b777edb5c7b494f9af6cc5409ca9ef3ebf604  venc-vdec.nv21
+0b7409c9066806563db51e1a8b24270eef9bd775f8e5232244ab942e20eb232a  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 1080p-nv21-qp24-gop30 PASS, Y/U/V PSNR [49.835897561662456, 48.45137321895862, 48.95982052761045], VDEC +120
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3193
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] Lima -p 1 -n 16 matched 16/16 jobs, INTID 126 +32
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] Lima -p 2 -n 16 matched 16/16 jobs, INTID 126 +32
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] Lima -a -n 32 matched 32/32 jobs, INTID 126 +64
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] JPGD 1080p passed, INTID 129 +1
+V0 source=3840x2160 destination=1920x1080 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.445 seconds=18.168 usr=4.35% sys=6.05% idle=89.60% peak_rss_kib=89612
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] VDEC/VDP/AIAO IRQ deltas [1080, 1090, 1800], SMMU INTID 181=0
+<6>[    0.481980] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+# [host] Lima, JPGD, VDEC, VDP and AIAO regression passed
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3209
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+LIMA_GLES_PASS frames=60 size=640x480
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] Mesa Lima GLES passed, INTID 126 +179
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[    0.481980] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+
+## Independent I/P QP and FORCE_KEY_FRAME
+<6>[    0.481980] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+<6>[   13.231961] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+<6>[   29.656980] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+<6>[   48.982730] hi3798mv320-venc f8c80000.video-enc: drained=360 SMMU faults=0 quarantined=0
+<6>[   63.945479] hi3798mv320-venc f8c80000.video-enc: drained=480 SMMU faults=0 quarantined=0
+<6>[   90.703112] hi3798mv320-venc f8c80000.video-enc: drained=600 SMMU faults=0 quarantined=0
+<6>[  120.140857] hi3798mv320-venc f8c80000.video-enc: drained=720 SMMU faults=0 quarantined=0
+<6>[  156.875880] hi3798mv320-venc f8c80000.video-enc: drained=840 SMMU faults=0 quarantined=0
+<6>[  186.994962] hi3798mv320-venc f8c80000.video-enc: drained=960 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        960          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1280x720 NV12 GOP=30 I_QP=24 P_QP=32 frames=8 bytes=145799 fps=39.979 avg_ms=23.202 max_ms=25.820 irq=8
+RATE input_fps=30 kbps=4373.970 Mbps=4.373970 i_frames=2 p_frames=6 i_bytes_avg=37202.50 p_bytes_avg=11899.00
+CPU0 0.00%
+CPU1 10.00%
+CPU2 15.00%
+CPU3 57.14%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        968          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[  266.203129] hi3798mv320-venc f8c80000.video-enc: drained=968 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        968          0          0          0  GICv3     133 Level     hi3798mv320-venc
+acf4dc4091491099ffafd82bcb0d45b45285efa8dda763f545f2e8c80b28dc86  venc-vdec.nv21
+d2ede5f6d906f9f09a76ff2f9513192f8e454c8a1c4e5606c5ccff4904602890  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        968          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] 720p-nv12-qp24-gop30 PASS, Y/U/V PSNR [43.688258673143174, 43.28519332443089, 43.183930793092586], VDEC +8
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        968          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        968          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[    0.481980] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+
+## Same-FD STOP/START and STREAMOFF/STREAMON
+<6>[    0.481980] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+<6>[   13.231961] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+<6>[   29.656980] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+<6>[   48.982730] hi3798mv320-venc f8c80000.video-enc: drained=360 SMMU faults=0 quarantined=0
+<6>[   63.945479] hi3798mv320-venc f8c80000.video-enc: drained=480 SMMU faults=0 quarantined=0
+<6>[   90.703112] hi3798mv320-venc f8c80000.video-enc: drained=600 SMMU faults=0 quarantined=0
+<6>[  120.140857] hi3798mv320-venc f8c80000.video-enc: drained=720 SMMU faults=0 quarantined=0
+<6>[  156.875880] hi3798mv320-venc f8c80000.video-enc: drained=840 SMMU faults=0 quarantined=0
+<6>[  186.994962] hi3798mv320-venc f8c80000.video-enc: drained=960 SMMU faults=0 quarantined=0
+<6>[  266.203129] hi3798mv320-venc f8c80000.video-enc: drained=968 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        968          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+VENC 1280x720 NV12 GOP=30 I_QP=24 P_QP=32 frames=8 bytes=171110 fps=40.109 avg_ms=22.666 max_ms=25.912 irq=8
+RATE input_fps=30 kbps=5133.300 Mbps=5.133300 i_frames=3 p_frames=5 i_bytes_avg=37522.00 p_bytes_avg=11708.80
+CPU0 10.00%
+CPU1 14.29%
+CPU2 0.00%
+CPU3 60.00%
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        976          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[  278.009287] hi3798mv320-venc f8c80000.video-enc: drained=976 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        976          0          0          0  GICv3     133 Level     hi3798mv320-venc
+acf4dc4091491099ffafd82bcb0d45b45285efa8dda763f545f2e8c80b28dc86  venc-vdec.nv21
+00be901e01c3ee3fcb389695953ae3fb56ef1f17f3bb390ffb1415bd7101f2c5  venc-vdec.nv21
+b58acf8e59c1d0743e8546d4e2e3a07a26d1602ff6b4317ae2ff8baf36bf5a54  venc-vdec.nv21
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        976          0          0          0  GICv3     133 Level     hi3798mv320-venc
+# [host] STOP/START at frame 4 and STREAMOFF/STREAMON at frame 6 passed
+
+## Two controlled-clock paired throughput runs
+<6>[    0.481980] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+<6>[   13.231961] hi3798mv320-venc f8c80000.video-enc: drained=120 SMMU faults=0 quarantined=0
+<6>[   29.656980] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0
+<6>[   48.982730] hi3798mv320-venc f8c80000.video-enc: drained=360 SMMU faults=0 quarantined=0
+<6>[   63.945479] hi3798mv320-venc f8c80000.video-enc: drained=480 SMMU faults=0 quarantined=0
+<6>[   90.703112] hi3798mv320-venc f8c80000.video-enc: drained=600 SMMU faults=0 quarantined=0
+<6>[  120.140857] hi3798mv320-venc f8c80000.video-enc: drained=720 SMMU faults=0 quarantined=0
+<6>[  156.875880] hi3798mv320-venc f8c80000.video-enc: drained=840 SMMU faults=0 quarantined=0
+<6>[  186.994962] hi3798mv320-venc f8c80000.video-enc: drained=960 SMMU faults=0 quarantined=0
+<6>[  266.203129] hi3798mv320-venc f8c80000.video-enc: drained=968 SMMU faults=0 quarantined=0
+<6>[  278.009287] hi3798mv320-venc f8c80000.video-enc: drained=976 SMMU faults=0 quarantined=0
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:        976          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+BEFORE 1000000
+VENC 1280x720 NV12 GOP=1 I_QP=24 P_QP=24 frames=120 bytes=4667669 fps=45.203 avg_ms=20.248 max_ms=20.336 irq=120
+RATE input_fps=30 kbps=9335.338 Mbps=9.335338 i_frames=120 p_frames=0 i_bytes_avg=38897.24 p_bytes_avg=0.00
+CPU0 0.75%
+CPU1 30.08%
+CPU2 16.54%
+CPU3 31.95%
+AFTER 1000000
+BEFORE 1000000
+VENC 1280x720 NV12 GOP=30 I_QP=24 P_QP=24 frames=120 bytes=2955383 fps=44.680 avg_ms=20.995 max_ms=21.180 irq=120
+RATE input_fps=30 kbps=5910.766 Mbps=5.910766 i_frames=4 p_frames=116 i_bytes_avg=38124.75 p_bytes_avg=24162.79
+CPU0 68.03%
+CPU1 0.00%
+CPU2 0.00%
+CPU3 8.58%
+AFTER 1000000
+BEFORE 1000000
+VENC 1280x720 NV12 GOP=30 I_QP=24 P_QP=24 frames=120 bytes=2955383 fps=44.718 avg_ms=20.986 max_ms=21.119 irq=120
+RATE input_fps=30 kbps=5910.766 Mbps=5.910766 i_frames=4 p_frames=116 i_bytes_avg=38124.75 p_bytes_avg=24162.79
+CPU0 51.30%
+CPU1 24.54%
+CPU2 0.00%
+CPU3 0.00%
+AFTER 1000000
+BEFORE 1000000
+VENC 1280x720 NV12 GOP=1 I_QP=24 P_QP=24 frames=120 bytes=4667669 fps=45.639 avg_ms=20.241 max_ms=20.368 irq=120
+RATE input_fps=30 kbps=9335.338 Mbps=9.335338 i_frames=120 p_frames=0 i_bytes_avg=38897.24 p_bytes_avg=0.00
+CPU0 68.70%
+CPU1 0.00%
+CPU2 11.03%
+CPU3 0.00%
+AFTER 1000000
+# [host] 720p-nv12-qp24 completed two reversed pairs at 1000000 kHz
+BEFORE 1000000
+VENC 1280x720 NV21 GOP=1 I_QP=32 P_QP=32 frames=120 bytes=2927089 fps=46.233 avg_ms=20.044 max_ms=20.102 irq=120
+RATE input_fps=30 kbps=5854.178 Mbps=5.854178 i_frames=120 p_frames=0 i_bytes_avg=24392.41 p_bytes_avg=0.00
+CPU0 1.54%
+CPU1 25.10%
+CPU2 42.31%
+CPU3 10.04%
+AFTER 1000000
+BEFORE 1000000
+VENC 1280x720 NV21 GOP=30 I_QP=32 P_QP=32 frames=120 bytes=1573932 fps=45.382 avg_ms=20.877 max_ms=21.033 irq=120
+RATE input_fps=30 kbps=3147.864 Mbps=3.147864 i_frames=4 p_frames=116 i_bytes_avg=23829.00 p_bytes_avg=12746.69
+CPU0 73.96%
+CPU1 0.00%
+CPU2 0.00%
+CPU3 0.00%
+AFTER 1000000
+BEFORE 1000000
+VENC 1280x720 NV21 GOP=30 I_QP=32 P_QP=32 frames=120 bytes=1573932 fps=45.424 avg_ms=20.868 max_ms=21.006 irq=120
+RATE input_fps=30 kbps=3147.864 Mbps=3.147864 i_frames=4 p_frames=116 i_bytes_avg=23829.00 p_bytes_avg=12746.69
+CPU0 22.35%
+CPU1 0.38%
+CPU2 50.76%
+CPU3 0.00%
+AFTER 1000000
+BEFORE 1000000
+VENC 1280x720 NV21 GOP=1 I_QP=32 P_QP=32 frames=120 bytes=2927089 fps=46.683 avg_ms=20.044 max_ms=20.134 irq=120
+RATE input_fps=30 kbps=5854.178 Mbps=5.854178 i_frames=120 p_frames=0 i_bytes_avg=24392.41 p_bytes_avg=0.00
+CPU0 79.38%
+CPU1 0.00%
+CPU2 0.00%
+CPU3 0.00%
+AFTER 1000000
+# [host] 720p-nv21-qp32 completed two reversed pairs at 1000000 kHz
+BEFORE 1000000
+VENC 1920x1080 NV12 GOP=1 I_QP=32 P_QP=32 frames=120 bytes=5503843 fps=21.705 avg_ms=42.842 max_ms=42.926 irq=120
+RATE input_fps=30 kbps=11007.686 Mbps=11.007686 i_frames=120 p_frames=0 i_bytes_avg=45865.36 p_bytes_avg=0.00
+CPU0 21.48%
+CPU1 18.95%
+CPU2 20.80%
+CPU3 17.00%
+AFTER 1000000
+BEFORE 1000000
+VENC 1920x1080 NV12 GOP=30 I_QP=32 P_QP=32 frames=120 bytes=3289004 fps=21.180 avg_ms=44.797 max_ms=45.038 irq=120
+RATE input_fps=30 kbps=6578.008 Mbps=6.578008 i_frames=4 p_frames=116 i_bytes_avg=45175.25 p_bytes_avg=26795.72
+CPU0 10.07%
+CPU1 22.79%
+CPU2 22.40%
+CPU3 19.05%
+AFTER 1000000
+BEFORE 1000000
+VENC 1920x1080 NV12 GOP=30 I_QP=32 P_QP=32 frames=120 bytes=3289004 fps=21.184 avg_ms=44.794 max_ms=45.036 irq=120
+RATE input_fps=30 kbps=6578.008 Mbps=6.578008 i_frames=4 p_frames=116 i_bytes_avg=45175.25 p_bytes_avg=26795.72
+CPU0 7.42%
+CPU1 21.87%
+CPU2 22.08%
+CPU3 22.44%
+AFTER 1000000
+BEFORE 1000000
+VENC 1920x1080 NV12 GOP=1 I_QP=32 P_QP=32 frames=120 bytes=5503843 fps=21.914 avg_ms=42.842 max_ms=42.936 irq=120
+RATE input_fps=30 kbps=11007.686 Mbps=11.007686 i_frames=120 p_frames=0 i_bytes_avg=45865.36 p_bytes_avg=0.00
+CPU0 16.06%
+CPU1 21.21%
+CPU2 20.26%
+CPU3 20.66%
+AFTER 1000000
+# [host] 1080p-nv12-qp32 completed two reversed pairs at 1000000 kHz
+BEFORE 1000000
+VENC 1920x1080 NV21 GOP=1 I_QP=24 P_QP=24 frames=120 bytes=8924439 fps=21.231 avg_ms=43.241 max_ms=43.321 irq=120
+RATE input_fps=30 kbps=17848.878 Mbps=17.848878 i_frames=120 p_frames=0 i_bytes_avg=74370.32 p_bytes_avg=0.00
+CPU0 15.58%
+CPU1 24.56%
+CPU2 16.81%
+CPU3 21.55%
+AFTER 1000000
+BEFORE 1000000
+VENC 1920x1080 NV21 GOP=30 I_QP=24 P_QP=24 frames=120 bytes=6190449 fps=20.831 avg_ms=45.020 max_ms=45.249 irq=120
+RATE input_fps=30 kbps=12380.898 Mbps=12.380898 i_frames=4 p_frames=116 i_bytes_avg=73351.00 p_bytes_avg=50836.59
+CPU0 11.44%
+CPU1 11.11%
+CPU2 19.24%
+CPU3 33.16%
+AFTER 1000000
+BEFORE 1000000
+VENC 1920x1080 NV21 GOP=30 I_QP=24 P_QP=24 frames=120 bytes=6190449 fps=20.832 avg_ms=45.031 max_ms=45.221 irq=120
+RATE input_fps=30 kbps=12380.898 Mbps=12.380898 i_frames=4 p_frames=116 i_bytes_avg=73351.00 p_bytes_avg=50836.59
+CPU0 23.61%
+CPU1 13.54%
+CPU2 16.67%
+CPU3 20.49%
+AFTER 1000000
+BEFORE 1000000
+VENC 1920x1080 NV21 GOP=1 I_QP=24 P_QP=24 frames=120 bytes=8924439 fps=21.431 avg_ms=43.240 max_ms=43.324 irq=120
+RATE input_fps=30 kbps=17848.878 Mbps=17.848878 i_frames=120 p_frames=0 i_bytes_avg=74370.32 p_bytes_avg=0.00
+CPU0 7.68%
+CPU1 25.76%
+CPU2 23.71%
+CPU3 20.71%
+AFTER 1000000
+# [host] 1080p-nv21-qp24 completed two reversed pairs at 1000000 kHz
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  23:       2896          0          0          0  GICv3     133 Level     hi3798mv320-venc
+CMA_USED=3217
+0x08c=0x00000003 0x32c=0x00000001
+Total 0 objects, 0 bytes
+<6>[  303.507221] hi3798mv320-venc f8c80000.video-enc: drained=1096 SMMU faults=0 quarantined=0
+<6>[  306.584693] hi3798mv320-venc f8c80000.video-enc: drained=1216 SMMU faults=0 quarantined=0
+<6>[  309.602795] hi3798mv320-venc f8c80000.video-enc: drained=1336 SMMU faults=0 quarantined=0
+<6>[  312.564767] hi3798mv320-venc f8c80000.video-enc: drained=1456 SMMU faults=0 quarantined=0
+<6>[  320.559738] hi3798mv320-venc f8c80000.video-enc: drained=1576 SMMU faults=0 quarantined=0
+<6>[  323.534446] hi3798mv320-venc f8c80000.video-enc: drained=1696 SMMU faults=0 quarantined=0
+<6>[  326.460535] hi3798mv320-venc f8c80000.video-enc: drained=1816 SMMU faults=0 quarantined=0
+<6>[  329.317687] hi3798mv320-venc f8c80000.video-enc: drained=1936 SMMU faults=0 quarantined=0
+<6>[  345.255507] hi3798mv320-venc f8c80000.video-enc: drained=2056 SMMU faults=0 quarantined=0
+<6>[  351.345915] hi3798mv320-venc f8c80000.video-enc: drained=2176 SMMU faults=0 quarantined=0
+<6>[  357.363889] hi3798mv320-venc f8c80000.video-enc: drained=2296 SMMU faults=0 quarantined=0
+<6>[  363.190730] hi3798mv320-venc f8c80000.video-enc: drained=2416 SMMU faults=0 quarantined=0
+<6>[  379.414560] hi3798mv320-venc f8c80000.video-enc: drained=2536 SMMU faults=0 quarantined=0
+<6>[  385.719838] hi3798mv320-venc f8c80000.video-enc: drained=2656 SMMU faults=0 quarantined=0
+<6>[  391.930434] hi3798mv320-venc f8c80000.video-enc: drained=2776 SMMU faults=0 quarantined=0
+<6>[  397.977944] hi3798mv320-venc f8c80000.video-enc: drained=2896 SMMU faults=0 quarantined=0
+RESTORED=schedutil
+# [host] CPU governor restored to schedutil; 1920 VENC IRQs and drains

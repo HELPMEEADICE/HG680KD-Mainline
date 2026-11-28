@@ -25,6 +25,9 @@
 #define VENC_MAX_HEIGHT		1088
 #define VENC_ALIGN		64
 #define VENC_GUARD		0xa5
+#define VENC_MAX_GOP		120
+#define VENC_FRAME_NUM_BITS	7
+#define VENC_POC_LSB_BITS	8
 #define VENC_SMMU_OFFSET	0xf000
 #define VENC_WINDOW_SIZE	0x10000
 
@@ -86,13 +89,20 @@ struct venc_dev {
 struct venc_ctx {
 	struct v4l2_fh fh;
 	struct v4l2_ctrl_handler controls;
-	struct v4l2_ctrl *qp;
+	struct v4l2_ctrl *i_qp, *p_qp, *gop_size;
 	struct venc_dev *venc;
 	struct v4l2_pix_format_mplane output, capture;
 	struct venc_layout layout;
 	struct work_struct work;
 	bool aborted;
+	bool force_key_frame;
+	u32 gop_position, idr_pic_id;
 	u32 output_sequence, capture_sequence;
+};
+
+struct venc_frame {
+	u32 index, qp;
+	bool all_intra;
 };
 
 struct venc_reg {
@@ -150,9 +160,9 @@ static size_t venc_append_nal(u8 *dst, u8 type, struct venc_bits *rbsp)
 	return used;
 }
 
-static size_t venc_headers(struct venc_ctx *ctx, u8 *params, u32 *slice, u32 *lengths)
+static size_t venc_param_sets(struct venc_ctx *ctx, u8 *params, bool all_intra)
 {
-	struct venc_bits sps = {}, pps = {}, hdr = {};
+	struct venc_bits sps = {}, pps = {};
 	u32 width = ctx->output.width, height = ctx->output.height;
 	u32 right = (ALIGN(width, 16) - width) / 2;
 	u32 bottom = (ALIGN(height, 16) - height) / 2;
@@ -162,8 +172,10 @@ static size_t venc_headers(struct venc_ctx *ctx, u8 *params, u32 *slice, u32 *le
 	venc_put_bits(&sps, 0xc0, 8);	/* Constrained Baseline */
 	venc_put_bits(&sps, 42, 8);	/* Level 4.2 */
 	venc_put_ue(&sps, 0);		/* SPS id */
-	venc_put_ue(&sps, 0);		/* 4-bit frame_num */
-	venc_put_ue(&sps, 2);		/* POC type 2 */
+	venc_put_ue(&sps, all_intra ? 0 : VENC_FRAME_NUM_BITS - 4);
+	venc_put_ue(&sps, all_intra ? 2 : 0);	/* Preserve the All-Intra SPS. */
+	if (!all_intra)
+		venc_put_ue(&sps, VENC_POC_LSB_BITS - 4);
 	venc_put_ue(&sps, 1);		/* max_num_ref_frames */
 	venc_put_bits(&sps, 0, 1);	/* No frame_num gaps */
 	venc_put_ue(&sps, DIV_ROUND_UP(width, 16) - 1);
@@ -191,16 +203,29 @@ static size_t venc_headers(struct venc_ctx *ctx, u8 *params, u32 *slice, u32 *le
 	venc_put_ue(&pps, 0);		/* Chroma QP offset */
 	venc_put_bits(&pps, 4, 3);	/* Deblocking fields present */
 
-	/* VEDU inserts first_mb_in_slice, the QP delta and deblocking fields. */
-	venc_put_ue(&hdr, 2);		/* I slice */
-	venc_put_ue(&hdr, 0);		/* PPS id */
-	venc_put_bits(&hdr, 0, 4);	/* frame_num */
-	venc_put_ue(&hdr, ctx->output_sequence & 1); /* Alternate idr_pic_id. */
-	*slice = get_unaligned_be32(hdr.data) >> (32 - hdr.count);
-	/* One zero reorder bit and two zero IDR marking bits. */
-	*lengths = FIELD_PREP(GENMASK(22, 16), hdr.count - 1) | 1;
-
 	return used + venc_append_nal(params + used, 0x68, &pps);
+}
+
+static void venc_slice_header(struct venc_ctx *ctx, const struct venc_frame *frame,
+			      u32 *slice, u32 *lengths)
+{
+	struct venc_bits hdr = {};
+	bool idr = !frame->index;
+
+	/* VEDU inserts first_mb_in_slice, the QP delta and deblocking fields. */
+	venc_put_ue(&hdr, idr ? 2 : 0);
+	venc_put_ue(&hdr, 0);		/* PPS id */
+	venc_put_bits(&hdr, frame->index, frame->all_intra ? 4 : VENC_FRAME_NUM_BITS);
+	if (idr)
+		venc_put_ue(&hdr, ctx->idr_pic_id);
+	if (!frame->all_intra)
+		venc_put_bits(&hdr, 2 * frame->index, VENC_POC_LSB_BITS);
+	if (!idr)
+		venc_put_bits(&hdr, 0, 1);	/* Use PPS default L0 length (one). */
+
+	*slice = get_unaligned_be32(hdr.data) >> (32 - hdr.count);
+	/* Reordering is zero. Marking uses two zero bits for IDR, one for P. */
+	*lengths = FIELD_PREP(GENMASK(22, 16), hdr.count - 1) | idr;
 }
 
 static u8 *venc_payload(struct venc_dev *v, enum venc_area id)
@@ -339,32 +364,43 @@ static void venc_copy_source(struct venc_ctx *ctx, const u8 *src)
 	}
 }
 
-static void venc_program_core(struct venc_ctx *ctx, u32 qp, u32 slice, u32 lengths)
+static void venc_program_core(struct venc_ctx *ctx, const struct venc_frame *frame,
+			      u32 slice, u32 lengths)
 {
 	struct venc_dev *v = ctx->venc;
 	const struct venc_layout *l = &ctx->layout;
 	const u32 w = ctx->output.width, h = ctx->output.height;
 	const u32 stride = ctx->output.plane_fmt[0].bytesperline;
 	const u32 strides = (stride << 16) | stride;
-	const u32 ref = venc_addr(v, VENC_WORK, 0);
-	const u32 rec = venc_addr(v, VENC_WORK, l->rec_size);
+	const u32 work = venc_addr(v, VENC_WORK, 0);
+	const u32 ref_slot = frame->index % 2, rec_slot = ref_slot ^ 1;
+	const u32 ref = work + ref_slot * l->rec_size;
+	const u32 rec = work + rec_slot * l->rec_size;
+	const u32 ref_m = work + l->m_offset + ref_slot * l->aux_m;
+	const u32 rec_m = work + l->m_offset + rec_slot * l->aux_m;
+	const u32 pme = work + l->p_offset;
+	const u32 qp = frame->qp;
+	const bool idr = !frame->index;
 	const u8 *headers = venc_payload(v, VENC_PARAMS);
 	const struct venc_reg dynamic[] = {
+		{ 0x018, idr ? 0x100510c6 : 0x100414c6 }, /* cfg_vcpi_mode */
 		{ 0x044, ((h - 1) << 16) | (w - 1) },
 		{ 0x048, 0x80000 | FIELD_PREP(GENMASK(15, 10), qp) },
+		{ 0x050, idr ? 0xc017 : 0xc817 },
 		{ 0x05c, BIT(16) | (qp << 8) | qp },
 		{ 0x104, venc_addr(v, VENC_SOURCE, 0) },
 		{ 0x108, venc_addr(v, VENC_SOURCE, l->src_y) },
-		{ 0x11c, ref + l->m_offset }, { 0x120, ref + l->m_offset },
-		{ 0x124, ref + l->m_offset + l->aux_m },
-		{ 0x128, ref + l->m_offset + l->aux_m },
+		{ 0x11c, ref_m }, { 0x120, ref_m },
+		{ 0x124, rec_m }, { 0x128, rec_m },
 		{ 0x12c, venc_addr(v, VENC_POINTERS, 16) },
 		{ 0x130, venc_addr(v, VENC_POINTERS, 0) },
-		{ 0x134, ref + l->p_offset + l->aux_p }, { 0x138, ref + l->p_offset },
-		{ 0x13c, ref + l->c_offset }, { 0x140, ref + l->b_offset },
-		{ 0x144, ref + l->a_offset },
+		{ 0x134, pme + ((frame->index + 1) % 3) * l->aux_p },
+		{ 0x138, pme + (frame->index % 3) * l->aux_p },
+		{ 0x13c, work + l->c_offset }, { 0x140, work + l->b_offset },
+		{ 0x144, work + l->a_offset },
 		{ 0x148, stride * h }, { 0x14c, stride * h / 2 },
-		{ 0x164, ref + l->t_offset + l->aux_t }, { 0x168, ref + l->t_offset },
+		{ 0x164, work + l->t_offset + rec_slot * l->aux_t },
+		{ 0x168, work + l->t_offset + ref_slot * l->aux_t },
 		{ 0x16c, strides }, { 0x170, strides }, { 0x160, strides },
 		{ 0x174, ref }, { 0x178, ref + l->rec_y },
 		{ 0x17c, ref }, { 0x180, ref + l->rec_y },
@@ -372,12 +408,21 @@ static void venc_program_core(struct venc_ctx *ctx, u32 qp, u32 slice, u32 lengt
 		{ 0x18c, ref }, { 0x190, ref + l->rec_y },
 		{ 0x194, rec }, { 0x198, rec + l->rec_y },
 		{ 0x19c, rec }, { 0x1a0, rec + l->rec_y },
+		{ 0x1e0, frame->all_intra ? 12 : DIV_ROUND_UP(h, 16) },
+		{ 0x1e4, frame->all_intra ? 12 : DIV_ROUND_UP(h, 16) },
 		{ 0x1f0, strides },
+		{ 0x200, idr ? 0 : 2 }, /* Single-reference H.264 search. */
+		{ 0x20c, frame->index },
+		{ 0x210, idr ? 0 : frame->index - 1 },
+		{ 0x224, idr ? 0x26010200 : 0x02010200 },
 		{ 0x23c, ctx->output.pixelformat == V4L2_PIX_FMT_NV21 ? BIT(8) : 0 },
 		{ 0x27c, l->stream_capacity },
 		{ 0x2bc, venc_addr(v, VENC_STREAM, VENC_ALIGN) },
 		{ 0x2fc, venc_addr(v, VENC_PARAMS, 0) },
+		{ 0x300, idr ? 0x11140 : 0x1100 },
+		{ 0x3dc, idr },
 		{ 0x454, slice }, { 0x474, lengths },
+		{ 0x628, frame->all_intra ? 128 : ALIGN(w, 256) / 4 },
 	};
 	unsigned int i, j;
 
@@ -474,7 +519,8 @@ static int venc_drain(struct venc_dev *v)
 	return ret;
 }
 
-static int venc_run(struct venc_ctx *ctx, const u8 *source, u8 *dest, size_t dest_size)
+static int venc_run(struct venc_ctx *ctx, const struct venc_frame *frame,
+		    const u8 *source, u8 *dest, size_t dest_size)
 {
 	struct venc_dev *v = ctx->venc;
 	struct venc_event before, after;
@@ -482,7 +528,8 @@ static int venc_run(struct venc_ctx *ctx, const u8 *source, u8 *dest, size_t des
 	u8 params[VENC_ALIGN] = {};
 	const u8 *stream = venc_payload(v, VENC_STREAM) + VENC_ALIGN;
 	u32 slice, lengths, bytes, padded, padding;
-	size_t headers;
+	size_t headers = 0;
+	bool idr = !frame->index;
 	int ret, reset;
 
 	if (READ_ONCE(v->quarantined))
@@ -490,7 +537,9 @@ static int venc_run(struct venc_ctx *ctx, const u8 *source, u8 *dest, size_t des
 	if (READ_ONCE(ctx->aborted))
 		return -ECANCELED;
 	venc_copy_source(ctx, source);
-	headers = venc_headers(ctx, params, &slice, &lengths);
+	if (idr)
+		headers = venc_param_sets(ctx, params, frame->all_intra);
+	venc_slice_header(ctx, frame, &slice, &lengths);
 	memset(venc_payload(v, VENC_PARAMS), 0, PAGE_SIZE);
 	memcpy(venc_payload(v, VENC_PARAMS), params, sizeof(params));
 	memset(venc_payload(v, VENC_POINTERS), 0, PAGE_SIZE);
@@ -502,7 +551,7 @@ static int venc_run(struct venc_ctx *ctx, const u8 *source, u8 *dest, size_t des
 	if (ret)
 		goto disable_clk;
 	writel(0, v->core + VEDU_IRQ_ENABLE);
-	venc_program_core(ctx, v4l2_ctrl_g_ctrl(ctx->qp), slice, lengths);
+	venc_program_core(ctx, frame, slice, lengths);
 
 	/* All VEDU masters use 32-bit physical DMA addresses in global bypass. */
 	writel(0x9, v->smmu + 0x000);
@@ -587,7 +636,8 @@ static int venc_run(struct venc_ctx *ctx, const u8 *source, u8 *dest, size_t des
 	bytes = padded - padding;
 	dma_rmb();
 	if (bytes < 5 || bytes + headers > dest_size || !venc_guards_ok(v) ||
-	    get_unaligned_be32(stream) != 1 || (stream[4] & 0x1f) != 5) {
+	    get_unaligned_be32(stream) != 1 || (stream[4] & 0x1f) != (idr ? 5 : 1) ||
+	    !(stream[4] & 0x60)) {
 		dev_err_ratelimited(v->dev, "invalid VENC DMA output (%u bytes)\n", bytes);
 		ret = -EIO;
 		goto disable_clk;
@@ -700,6 +750,7 @@ static int venc_s_fmt(struct file *file, void *priv, struct v4l2_format *f)
 		return -EBUSY;
 	venc_try_fmt(file, priv, f);
 	*venc_format(ctx, f->type) = f->fmt.pix_mp;
+	ctx->gop_position = 0;
 	if (V4L2_TYPE_IS_OUTPUT(f->type))
 		venc_coded_format(&ctx->capture, &ctx->output);
 	return 0;
@@ -713,6 +764,23 @@ static int venc_log_status(struct file *file, void *priv)
 		  atomic64_read(&v->drained), atomic64_read(&v->faults),
 		  READ_ONCE(v->quarantined));
 	return 0;
+}
+
+static int venc_encoder_cmd(struct file *file, void *priv, struct v4l2_encoder_cmd *cmd)
+{
+	struct venc_ctx *ctx = venc_file_to_ctx(file);
+	struct v4l2_m2m_ctx *m2m = ctx->fh.m2m_ctx;
+	bool restarting = cmd->cmd == V4L2_ENC_CMD_START && v4l2_m2m_has_stopped(m2m);
+	int ret;
+
+	if (restarting)
+		ctx->gop_position = 0;
+	ret = v4l2_m2m_encoder_cmd(file, m2m, cmd);
+	if (!ret && restarting) {
+		vb2_clear_last_buffer_dequeued(v4l2_m2m_get_dst_vq(m2m));
+		v4l2_m2m_try_schedule(m2m);
+	}
+	return ret;
 }
 
 static const struct v4l2_ioctl_ops venc_ioctls = {
@@ -736,7 +804,7 @@ static const struct v4l2_ioctl_ops venc_ioctls = {
 	.vidioc_streamon = v4l2_m2m_ioctl_streamon,
 	.vidioc_streamoff = v4l2_m2m_ioctl_streamoff,
 	.vidioc_try_encoder_cmd = v4l2_m2m_ioctl_try_encoder_cmd,
-	.vidioc_encoder_cmd = v4l2_m2m_ioctl_encoder_cmd,
+	.vidioc_encoder_cmd = venc_encoder_cmd,
 	.vidioc_log_status = venc_log_status,
 	.vidioc_subscribe_event = v4l2_ctrl_subscribe_event,
 	.vidioc_unsubscribe_event = v4l2_event_unsubscribe,
@@ -811,6 +879,7 @@ static int venc_start_streaming(struct vb2_queue *q, unsigned int count)
 		ctx->output_sequence = 0;
 	else
 		ctx->capture_sequence = 0;
+	ctx->gop_position = 0;
 	WRITE_ONCE(ctx->aborted, false);
 	v4l2_m2m_update_start_streaming_state(ctx->fh.m2m_ctx, q);
 	return 0;
@@ -824,6 +893,7 @@ static void venc_stop_streaming(struct vb2_queue *q)
 	v4l2_m2m_update_stop_streaming_state(ctx->fh.m2m_ctx, q);
 	venc_return_buffers(q, VB2_BUF_STATE_ERROR);
 	venc_free_areas(ctx->venc);
+	ctx->gop_position = 0;
 }
 
 static const struct vb2_ops venc_queue_ops = {
@@ -864,17 +934,32 @@ static void venc_work(struct work_struct *work)
 	struct vb2_v4l2_buffer *dst = v4l2_m2m_next_dst_buf(m2m);
 	const u8 *input = vb2_plane_vaddr(&src->vb2_buf, 0);
 	u8 *output = vb2_plane_vaddr(&dst->vb2_buf, 0);
+	struct venc_frame frame = {};
+	unsigned int gop;
 	int ret = -EFAULT;
 
+	mutex_lock(ctx->controls.lock);
+	gop = ctx->gop_size->cur.val;
+	frame.all_intra = gop == 1;
+	if (!ctx->force_key_frame && ctx->gop_position < gop)
+		frame.index = ctx->gop_position;
+	ctx->force_key_frame = false;
+	frame.qp = frame.index ? ctx->p_qp->cur.val : ctx->i_qp->cur.val;
+	mutex_unlock(ctx->controls.lock);
+
 	if (input && output)
-		ret = venc_run(ctx, input, output, vb2_plane_size(&dst->vb2_buf, 0));
+		ret = venc_run(ctx, &frame, input, output, vb2_plane_size(&dst->vb2_buf, 0));
+	/* Only a completed picture becomes the next reference. */
+	ctx->gop_position = ret > 0 && !frame.all_intra ? frame.index + 1 : 0;
+	if (ret > 0 && !frame.index)
+		ctx->idr_pic_id ^= 1;
 	src->sequence = ctx->output_sequence++;
 	dst->sequence = ctx->capture_sequence++;
 	v4l2_m2m_buf_copy_metadata(src, dst);
 	dst->flags &= ~(V4L2_BUF_FLAG_KEYFRAME | V4L2_BUF_FLAG_PFRAME | V4L2_BUF_FLAG_BFRAME);
 	vb2_set_plane_payload(&dst->vb2_buf, 0, ret > 0 ? ret : 0);
 	if (ret > 0)
-		dst->flags |= V4L2_BUF_FLAG_KEYFRAME;
+		dst->flags |= frame.index ? V4L2_BUF_FLAG_PFRAME : V4L2_BUF_FLAG_KEYFRAME;
 	if (v4l2_m2m_is_last_draining_src_buf(m2m, src)) {
 		dst->flags |= V4L2_BUF_FLAG_LAST;
 		v4l2_m2m_mark_stopped(m2m);
@@ -903,6 +988,18 @@ static const struct v4l2_m2m_ops venc_m2m_ops = {
 	.job_abort = venc_job_abort,
 };
 
+static int venc_force_key_frame(struct v4l2_ctrl *ctrl)
+{
+	struct venc_ctx *ctx = container_of(ctrl->handler, struct venc_ctx, controls);
+
+	ctx->force_key_frame = true;
+	return 0;
+}
+
+static const struct v4l2_ctrl_ops venc_force_key_ops = {
+	.s_ctrl = venc_force_key_frame,
+};
+
 static int venc_open(struct file *file)
 {
 	struct venc_dev *v = video_drvdata(file);
@@ -926,13 +1023,18 @@ static int venc_open(struct file *file)
 	venc_coded_format(&ctx->capture, &ctx->output);
 	INIT_WORK(&ctx->work, venc_work);
 	v4l2_fh_init(&ctx->fh, &v->video);
-	v4l2_ctrl_handler_init(&ctx->controls, 3);
-	ctx->qp = v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_H264_I_FRAME_QP,
-				   0, 51, 1, 28);
+	v4l2_ctrl_handler_init(&ctx->controls, 5);
+	ctx->i_qp = v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_H264_I_FRAME_QP,
+				     0, 51, 1, 28);
+	ctx->p_qp = v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_H264_P_FRAME_QP,
+				     0, 51, 1, 28);
 	v4l2_ctrl_new_std_menu(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_H264_PROFILE,
 			       V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE,
 			       GENMASK(0, 0), V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE);
-	v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_GOP_SIZE, 1, 1, 1, 1);
+	ctx->gop_size = v4l2_ctrl_new_std(&ctx->controls, NULL, V4L2_CID_MPEG_VIDEO_GOP_SIZE,
+					 1, VENC_MAX_GOP, 1, 30);
+	v4l2_ctrl_new_std(&ctx->controls, &venc_force_key_ops, V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME,
+			  0, 0, 0, 0);
 	ret = ctx->controls.error;
 	if (ret)
 		goto free_ctx;

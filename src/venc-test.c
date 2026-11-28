@@ -2,6 +2,7 @@
 /* Exercise the HG680KD V4L2 H.264 encoder with packed NV12 or NV21 frames. */
 #include <errno.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include <limits.h>
 #include <linux/videodev2.h>
 #include <poll.h>
@@ -56,7 +57,7 @@ static unsigned int number(const char *text)
 
 	errno = 0;
 	value = strtoul(text, &tail, 10);
-	if (!*text || *tail || errno || value > UINT_MAX)
+	if (*text < '0' || *text > '9' || *tail || errno || value > UINT_MAX)
 		fail("invalid numeric argument");
 	return value;
 }
@@ -146,7 +147,8 @@ static void queue(int fd, const struct buffer *mem, size_t len, unsigned int fra
 	CALL(fd, VIDIOC_QBUF, &buf);
 }
 
-static size_t dequeue(int fd, enum v4l2_buf_type type, unsigned int frame, int last)
+static size_t dequeue(int fd, enum v4l2_buf_type type, unsigned int frame,
+		      unsigned int expected)
 {
 	struct v4l2_plane plane = {};
 	struct v4l2_buffer buf = {
@@ -162,56 +164,117 @@ static size_t dequeue(int fd, enum v4l2_buf_type type, unsigned int frame, int l
 	CALL(fd, VIDIOC_DQBUF, &buf);
 	if ((buf.flags & V4L2_BUF_FLAG_ERROR) || buf.index || plane.data_offset)
 		fail("driver returned an invalid or errored buffer");
-	if (type == CAPTURE && last &&
+	if (type == CAPTURE && expected == V4L2_BUF_FLAG_LAST &&
 	    (!(buf.flags & V4L2_BUF_FLAG_LAST) || plane.bytesused))
 		fail("expected an empty LAST buffer at end of the stream");
-	if (type == CAPTURE && !last &&
-	    (!(buf.flags & V4L2_BUF_FLAG_KEYFRAME) || (buf.flags & V4L2_BUF_FLAG_LAST) ||
+	if (type == CAPTURE && expected != V4L2_BUF_FLAG_LAST &&
+	    ((buf.flags & (V4L2_BUF_FLAG_KEYFRAME | V4L2_BUF_FLAG_PFRAME |
+			   V4L2_BUF_FLAG_BFRAME | V4L2_BUF_FLAG_LAST)) != expected ||
 	     buf.sequence != frame || buf.timestamp.tv_sec != frame / 1000 + 1 ||
 	     buf.timestamp.tv_usec != (frame % 1000) * 1000 || !plane.bytesused))
-		fail("CAPTURE keyframe, sequence, timestamp or payload mismatch");
+		fail("CAPTURE frame type, sequence, timestamp or payload mismatch");
 	return plane.bytesused;
+}
+
+static void set_control(int fd, uint32_t id, unsigned int value)
+{
+	struct v4l2_control ctrl = { .id = id, .value = value };
+
+	CALL(fd, VIDIOC_S_CTRL, &ctrl);
+	if (id != V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME) {
+		CALL(fd, VIDIOC_G_CTRL, &ctrl);
+		if (ctrl.value != (int)value)
+			fail("V4L2 encoder control did not retain its value");
+	}
 }
 
 int main(int argc, char **argv)
 {
+	static const struct option options[] = {
+		{ "gop", required_argument, NULL, 'g' },
+		{ "i-qp", required_argument, NULL, 'i' },
+		{ "p-qp", required_argument, NULL, 'p' },
+		{ "input-fps", required_argument, NULL, 'r' },
+		{ "force-key-at", required_argument, NULL, 'k' },
+		{}
+	};
 	struct v4l2_capability cap = {};
 	struct v4l2_format format = { .type = CAPTURE };
-	struct v4l2_control ctrl = { .id = V4L2_CID_MPEG_VIDEO_H264_I_FRAME_QP };
 	struct v4l2_encoder_cmd stop = { .cmd = V4L2_ENC_CMD_STOP };
 	struct v4l2_encoder_cmd start = { .cmd = V4L2_ENC_CMD_START };
 	struct buffer src, dst;
 	struct counters before, after;
-	unsigned int w, h, qp, frames, stride, payload, fourcc, i, row;
-	unsigned long long bytes = 0;
+	unsigned int w, h, frames, stride, payload, fourcc, i, row;
+	unsigned int gop = 0, i_qp = 28, p_qp = UINT_MAX, input_fps = 30;
+	unsigned int force_key_at = UINT_MAX, gop_position = 0, i_frames = 0;
+	unsigned long long i_bytes = 0, p_bytes = 0;
 	uint64_t begin, elapsed, latency = 0, worst = 0;
 	FILE *input, *output;
-	int fd;
+	double kbps;
+	int fd, option;
 
-	if (argc != 9)
-		fail("usage: venc-test /dev/video2 WIDTH HEIGHT NV12|NV21 QP FRAMES input.raw output.h264");
-	w = number(argv[2]);
-	h = number(argv[3]);
-	if (!strcmp(argv[4], "NV12"))
+	while ((option = getopt_long(argc, argv, "", options, NULL)) != -1) {
+		switch (option) {
+		case 'g':
+			gop = number(optarg);
+			if (!gop)
+				fail("GOP must be positive");
+			break;
+		case 'i':
+			i_qp = number(optarg);
+			break;
+		case 'p':
+			p_qp = number(optarg);
+			if (p_qp > 51)
+				fail("P frame QP exceeds 51");
+			break;
+		case 'r':
+			input_fps = number(optarg);
+			break;
+		case 'k':
+			force_key_at = number(optarg);
+			break;
+		default:
+			return EXIT_FAILURE;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (argc != 7 && argc != 8)
+		fail("usage: venc-test [--gop N] [--i-qp QP] [--p-qp QP] [--input-fps FPS] "
+		     "[--force-key-at FRAME] /dev/video2 WIDTH HEIGHT NV12|NV21 [legacy QP] "
+		     "FRAMES input.raw output.h264");
+	w = number(argv[1]);
+	h = number(argv[2]);
+	if (!strcmp(argv[3], "NV12"))
 		fourcc = V4L2_PIX_FMT_NV12;
-	else if (!strcmp(argv[4], "NV21"))
+	else if (!strcmp(argv[3], "NV21"))
 		fourcc = V4L2_PIX_FMT_NV21;
 	else
 		fail("input format must be NV12 or NV21");
-	qp = number(argv[5]);
-	frames = number(argv[6]);
+	if (argc == 8) {
+		i_qp = number(argv[4]);
+		if (!gop)
+			gop = 1;
+	}
+	if (!gop)
+		gop = 30;
+	if (p_qp == UINT_MAX)
+		p_qp = i_qp;
+	frames = number(argv[argc - 3]);
 	if (w < 256 || w > 1920 || h < 128 || h > 1088 || (w | h) & 1 ||
-	    qp > 51 || !frames || frames > 100000)
-		fail("dimensions, QP or frame count are out of range");
-	input = fopen(argv[7], "rb");
+	    i_qp > 51 || gop > 120 || !input_fps || !frames || frames > 100000 ||
+	    (force_key_at != UINT_MAX && force_key_at >= frames))
+		fail("dimensions, GOP, QP, source rate or frame index are out of range");
+	input = fopen(argv[argc - 2], "rb");
 	if (!input)
 		fail("cannot open input file");
-	output = fopen(argv[8], "wb");
+	output = fopen(argv[argc - 1], "wb");
 	if (!output)
 		fail("cannot open output file");
-	fd = open(argv[1], O_RDWR | O_CLOEXEC);
+	fd = open(argv[0], O_RDWR | O_CLOEXEC);
 	if (fd < 0) {
-		perror(argv[1]);
+		perror(argv[0]);
 		return EXIT_FAILURE;
 	}
 	CALL(fd, VIDIOC_QUERYCAP, &cap);
@@ -237,11 +300,10 @@ int main(int argc, char **argv)
 	    format.fmt.pix_mp.pixelformat != V4L2_PIX_FMT_H264 ||
 	    format.fmt.pix_mp.num_planes != 1)
 		fail("unexpected CAPTURE layout");
-	ctrl.value = qp;
-	CALL(fd, VIDIOC_S_CTRL, &ctrl);
-	CALL(fd, VIDIOC_G_CTRL, &ctrl);
-	if (ctrl.value != (int)qp)
-		fail("QP control did not retain its value");
+	set_control(fd, V4L2_CID_MPEG_VIDEO_GOP_SIZE, gop);
+	set_control(fd, V4L2_CID_MPEG_VIDEO_H264_I_FRAME_QP, i_qp);
+	if (gop > 1)
+		set_control(fd, V4L2_CID_MPEG_VIDEO_H264_P_FRAME_QP, p_qp);
 	map_buffer(fd, &src, OUTPUT);
 	map_buffer(fd, &dst, CAPTURE);
 	CALL(fd, VIDIOC_STREAMON, &src.type);
@@ -252,6 +314,7 @@ int main(int argc, char **argv)
 	for (i = 0; i < frames; i++) {
 		uint64_t submit, wait;
 		size_t used;
+		int key;
 
 		if (stride == w) {
 			if (fread(src.addr, 1, payload, input) != payload)
@@ -261,10 +324,16 @@ int main(int argc, char **argv)
 				if (fread(src.addr + row * stride, 1, w, input) != w)
 					fail("short raw input row");
 		}
+		if (i == force_key_at) {
+			set_control(fd, V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME, 0);
+			gop_position = 0;
+		}
+		key = !gop_position;
+		gop_position = (gop_position + 1) % gop;
 		queue(fd, &dst, 0, 0);
 		submit = now_ns();
 		queue(fd, &src, payload, i);
-		used = dequeue(fd, CAPTURE, i, 0);
+		used = dequeue(fd, CAPTURE, i, key ? V4L2_BUF_FLAG_KEYFRAME : V4L2_BUF_FLAG_PFRAME);
 		dequeue(fd, OUTPUT, i, 0);
 		wait = now_ns() - submit;
 		latency += wait;
@@ -272,14 +341,19 @@ int main(int argc, char **argv)
 			worst = wait;
 		if (used > dst.size || fwrite(dst.addr, 1, used, output) != used)
 			fail("invalid bytesused or failed to write H.264");
-		bytes += used;
+		if (key) {
+			i_bytes += used;
+			i_frames++;
+		} else {
+			p_bytes += used;
+		}
 	}
 	elapsed = now_ns() - begin;
 	read_counters(&after);
 
 	CALL(fd, VIDIOC_ENCODER_CMD, &stop);
 	queue(fd, &dst, 0, 0);
-	dequeue(fd, CAPTURE, frames, 1);
+	dequeue(fd, CAPTURE, frames, V4L2_BUF_FLAG_LAST);
 	CALL(fd, VIDIOC_ENCODER_CMD, &start);
 	CALL(fd, VIDIOC_STREAMOFF, &src.type);
 	CALL(fd, VIDIOC_STREAMOFF, &dst.type);
@@ -291,9 +365,13 @@ int main(int argc, char **argv)
 	if (fclose(output))
 		fail("failed to close H.264 output");
 
-	printf("VENC %ux%u %s QP=%u frames=%u bytes=%llu fps=%.3f avg_ms=%.3f max_ms=%.3f irq=%llu\n",
-	       w, h, argv[4], qp, frames, bytes, frames * 1e9 / elapsed,
+	kbps = (i_bytes + p_bytes) * (8.0 * input_fps / (1000.0 * frames));
+	printf("VENC %ux%u %s GOP=%u I_QP=%u P_QP=%u frames=%u bytes=%llu fps=%.3f avg_ms=%.3f max_ms=%.3f irq=%llu\n",
+	       w, h, argv[3], gop, i_qp, p_qp, frames, i_bytes + p_bytes, frames * 1e9 / elapsed,
 	       latency / (frames * 1e6), worst / 1e6, after.interrupts - before.interrupts);
+	printf("RATE input_fps=%u kbps=%.3f Mbps=%.6f i_frames=%u p_frames=%u i_bytes_avg=%.2f p_bytes_avg=%.2f\n",
+	       input_fps, kbps, kbps / 1000, i_frames, frames - i_frames,
+	       (double)i_bytes / i_frames, frames == i_frames ? 0.0 : (double)p_bytes / (frames - i_frames));
 	for (i = 0; i < CPUS; i++) {
 		unsigned long long total = after.total[i] - before.total[i];
 		unsigned long long idle = after.idle[i] - before.idle[i];
