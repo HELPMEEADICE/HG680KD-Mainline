@@ -32,9 +32,12 @@
 #define TX_WATERMARK		0x90
 #define TX_PERIOD		0x94
 #define TX_IRQ_EN		0xa0
+#define TX_IRQ_RAW		0xa4
 #define TX_IRQ_STATUS		0xa8
 #define TX_IRQ_CLEAR		0xac
 #define TX_PERIOD_IRQ		BIT(0)
+#define TX_ALMOST_EMPTY_IRQ	BIT(2)
+#define TX_IF_FIFO_EMPTY_IRQ	BIT(4)
 #define TX_STOPPED		BIT(29)
 #define TX_START		BIT(28)
 #define TX_VOLUME		GENMASK(14, 8)
@@ -64,7 +67,8 @@
 #define HDMI_GCP_AVMUTE		0x20c
 
 #define DMA_BUFFER_MAX		SZ_64K
-#define TX_RING_GUARD_FRAMES	8
+#define TX_DMA_BURST_BYTES	32
+#define TX_RING_GUARD_FRAMES	(TX_DMA_BURST_BYTES / 4)
 
 struct mv320_aiao {
 	void __iomem *regs, *tx, *hdmi, *packets, *hdmi_reset;
@@ -73,6 +77,7 @@ struct mv320_aiao {
 	unsigned int write_ptr;
 	int irq;
 	bool running, stopping, held_tail;
+	bool draining, drain_padded, drained;
 };
 
 static void mv320_update(void __iomem *reg, u32 mask, u32 value)
@@ -154,7 +159,8 @@ static int mv320_hdmi_setup(struct mv320_aiao *aiao)
 }
 
 static const struct snd_pcm_hardware mv320_pcm_hw = {
-	.info = SNDRV_PCM_INFO_INTERLEAVED | SNDRV_PCM_INFO_BLOCK_TRANSFER,
+	.info = SNDRV_PCM_INFO_INTERLEAVED | SNDRV_PCM_INFO_BLOCK_TRANSFER |
+		SNDRV_PCM_INFO_DRAIN_TRIGGER,
 	.formats = SNDRV_PCM_FMTBIT_S16_LE,
 	.rates = SNDRV_PCM_RATE_48000,
 	.rate_min = 48000,
@@ -177,7 +183,8 @@ static int mv320_pcm_open(struct snd_pcm_substream *ss)
 	ret = snd_pcm_hw_constraint_integer(rt, SNDRV_PCM_HW_PARAM_PERIODS);
 	if (ret)
 		return ret;
-	return snd_pcm_hw_constraint_step(rt, 0, SNDRV_PCM_HW_PARAM_PERIOD_BYTES, 32);
+	return snd_pcm_hw_constraint_step(rt, 0, SNDRV_PCM_HW_PARAM_PERIOD_BYTES,
+					  TX_DMA_BURST_BYTES);
 }
 
 static int mv320_pcm_close(struct snd_pcm_substream *ss)
@@ -216,6 +223,9 @@ static void mv320_pcm_publish(struct snd_pcm_substream *ss)
 				 TX_RING_GUARD_FRAMES;
 	unsigned int pos;
 
+	if (aiao->drain_padded)
+		return;
+
 	/*
 	 * Equal byte offsets denote an empty hardware ring. ALSA may fill
 	 * its entire ring, so withhold up to one DMA burst. Recompute after
@@ -224,10 +234,27 @@ static void mv320_pcm_publish(struct snd_pcm_substream *ss)
 	aiao->held_tail = held > 0;
 	pos = frames_to_bytes(rt, (rt->control->appl_ptr % rt->buffer_size +
 			      rt->buffer_size - max(held, 0L)) % rt->buffer_size);
+	if (aiao->draining && queued <= (snd_pcm_sframes_t)rt->buffer_size -
+					2 * TX_RING_GUARD_FRAMES) {
+		unsigned int size = snd_pcm_lib_buffer_bytes(ss);
+		unsigned int bytes = ALIGN(pos, TX_DMA_BURST_BYTES) - pos +
+				     TX_DMA_BURST_BYTES;
+		unsigned int first = min(bytes, size - pos);
+
+		/*
+		 * TX2 fetches full bursts. Leave one more burst of silence
+		 * for samples still in flight when the interface FIFO empties.
+		 */
+		memset(rt->dma_area + pos, 0, first);
+		memset(rt->dma_area, 0, bytes - first);
+		pos = (pos + bytes) % size;
+		aiao->drain_padded = true;
+	}
 	if (pos == aiao->write_ptr)
 		return;
 	aiao->write_ptr = pos;
 	dma_wmb();
+	writel(TX_IF_FIFO_EMPTY_IRQ, aiao->tx + TX_IRQ_CLEAR);
 	writel(pos, aiao->tx + TX_WRITE_PTR);
 }
 
@@ -240,11 +267,37 @@ static int mv320_pcm_ack(struct snd_pcm_substream *ss)
 static snd_pcm_uframes_t mv320_pcm_pointer(struct snd_pcm_substream *ss)
 {
 	struct mv320_aiao *aiao = snd_pcm_substream_chip(ss);
+	struct snd_pcm_runtime *rt = ss->runtime;
 	unsigned int pos = readl(aiao->tx + TX_READ_PTR);
+	unsigned int size = snd_pcm_lib_buffer_bytes(ss);
+	unsigned int pending;
+	snd_pcm_uframes_t end;
 
-	if (pos >= snd_pcm_lib_buffer_bytes(ss))
+	if (pos >= size)
 		return SNDRV_PCM_POS_XRUN;
-	return bytes_to_frames(ss->runtime, pos);
+	if (!aiao->draining || aiao->held_tail)
+		return bytes_to_frames(rt, pos);
+
+	pending = (aiao->write_ptr + size - pos) % size;
+	if (pending > (aiao->drain_padded ? TX_DMA_BURST_BYTES : 0))
+		return bytes_to_frames(rt, pos);
+
+	end = rt->control->appl_ptr % rt->buffer_size;
+	/* Do not expose padding or let ALSA stop before the FIFO empties. */
+	if ((!pending && aiao->drain_padded &&
+	     (aiao->drained || (readl(aiao->tx + TX_IRQ_RAW) & TX_IF_FIFO_EMPTY_IRQ))) ||
+	     rt->status->hw_ptr == rt->control->appl_ptr)
+		return end;
+	return end ? end - 1 : rt->buffer_size - 1;
+}
+
+static void mv320_pcm_start_drain(struct snd_pcm_substream *ss)
+{
+	struct mv320_aiao *aiao = snd_pcm_substream_chip(ss);
+
+	aiao->draining = true;
+	mv320_pcm_publish(ss);
+	writel(TX_PERIOD_IRQ | TX_IF_FIFO_EMPTY_IRQ, aiao->tx + TX_IRQ_EN);
 }
 
 static int mv320_pcm_trigger(struct snd_pcm_substream *ss, int cmd)
@@ -254,11 +307,14 @@ static int mv320_pcm_trigger(struct snd_pcm_substream *ss, int cmd)
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
 		aiao->running = true;
-		writel(TX_PERIOD_IRQ, aiao->tx + TX_IRQ_EN);
+		writel(TX_PERIOD_IRQ | TX_ALMOST_EMPTY_IRQ, aiao->tx + TX_IRQ_EN);
 		mv320_update(aiao->regs + AIAO_IRQ_EN, AIAO_TX2_IRQ, AIAO_TX2_IRQ);
 		mv320_update(aiao->tx + TX_CONTROL, TX_START | TX_MUTE, TX_START);
 		if (aiao->hdmi)
 			mv320_update(aiao->hdmi + HDMI_AUD_CTRL, HDMI_AUD_MUTE, 0);
+		return 0;
+	case SNDRV_PCM_TRIGGER_DRAIN:
+		mv320_pcm_start_drain(ss);
 		return 0;
 	case SNDRV_PCM_TRIGGER_STOP:
 		if (aiao->hdmi)
@@ -268,6 +324,9 @@ static int mv320_pcm_trigger(struct snd_pcm_substream *ss, int cmd)
 		mv320_update(aiao->regs + AIAO_IRQ_EN, AIAO_TX2_IRQ, 0);
 		aiao->running = false;
 		aiao->stopping = true;
+		aiao->draining = false;
+		aiao->drain_padded = false;
+		aiao->drained = false;
 		return 0;
 	default:
 		return -EINVAL;
@@ -317,9 +376,26 @@ static irqreturn_t mv320_aiao_irq(int irq, void *data)
 	snd_pcm_stream_lock_irqsave(ss, flags);
 	status = readl(aiao->tx + TX_IRQ_STATUS);
 	writel(status, aiao->tx + TX_IRQ_CLEAR);
-	if (aiao->running && (status & TX_PERIOD_IRQ)) {
+	/*
+	 * Draining from PREPARED can issue only START. In that case ALSA
+	 * sets DRAINING after START, and short buffers may never raise PERIOD.
+	 */
+	if (aiao->running && !aiao->draining) {
+		if (ss->runtime->state == SNDRV_PCM_STATE_DRAINING)
+			mv320_pcm_start_drain(ss);
+		else if (status & TX_ALMOST_EMPTY_IRQ)
+			writel(TX_PERIOD_IRQ, aiao->tx + TX_IRQ_EN);
+	}
+	if (aiao->running && aiao->drain_padded && (status & TX_IF_FIFO_EMPTY_IRQ) &&
+	    readl(aiao->tx + TX_READ_PTR) == aiao->write_ptr)
+		aiao->drained = true;
+	if (aiao->running && ((status & TX_PERIOD_IRQ) || aiao->drained)) {
 		snd_pcm_period_elapsed_under_stream_lock(ss);
-		if (aiao->running && aiao->held_tail)
+		/* ALSA skips its state update when hw_ptr was already at appl_ptr. */
+		if (aiao->drained)
+			snd_pcm_drain_done(ss);
+		else if (aiao->running &&
+			 (aiao->held_tail || (aiao->draining && !aiao->drain_padded)))
 			mv320_pcm_publish(ss);
 	}
 	snd_pcm_stream_unlock_irqrestore(ss, flags);

@@ -15,3 +15,5 @@ scripts/build_vdec_ext_736.sh text eol=lf
 patches/0020-media-add-Hi3798MV320-venc.patch text eol=lf
 scripts/build_hdmi_drm_736.sh text eol=lf
 patches/0021-drm-hi3798mv320-native-hdmi.patch text eol=lf
+scripts/build_aiao_drain_736.sh text eol=lf
+src/hi3798mv320-aiao.c text eol=lf
