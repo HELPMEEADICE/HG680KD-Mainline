@@ -1,0 +1,505 @@
+--- a/drivers/misc/hi3798-hdmi-modeset.c
++++ b/drivers/misc/hi3798-hdmi-modeset.c
+@@ -20,6 +20,8 @@
+ 
+ #include <linux/hi3798-hdmi-modeset-audio.h>
+ 
++#include "hi3798-hdmi-scdc.h"
++
+ #define INT_STATUS		0x0004
+ #define INT_CLEAR		0x0008
+ #define INT_MASK		0x000c
+@@ -33,12 +35,15 @@
+ #define DHD_STATE		0xc2a0
+ #define DHD_IN_BLANK		BIT(1)
+ #define DHD_VT			0xc228
++#define VDP_GDM_CSC		0xd500
++#define VDP_GDM_RGB_TO_YUV	BIT(0)
+ 
+ #define PHY_PD			0x64
+ #define PHY_CHANNEL_PD		GENMASK(3, 0)
+ #define PHY_DRIVER_PD		GENMASK(8, 5)
+ #define PHY_TERM_PD		GENMASK(18, 11)
+-#define PHY_TERM_RGB8		BIT(11)
++#define PHY_TERM_LOW		BIT(11)
++#define PHY_TERM_HIGH		(0x55 << 11)
+ #define PHY_LDO_PD		GENMASK(10, 9)
+ #define PHY_RXSENSE_PD		BIT(19)
+ #define APHY_STATUS0		0x60
+@@ -46,6 +51,7 @@
+ #define PHY_CLOCK_LOCK		BIT(20)
+ #define CRG_PLL_LOCK		0x150
+ #define CRG_PLL_LOCKS		GENMASK(6, 0)
++#define HPLL_LOCK		BIT(3)
+ #define HPLL_CTRL1		0x2c
+ #define HPLL_PD			BIT(20)
+ 
+@@ -68,6 +74,10 @@
+ #define PKT_DEPTH_ENABLE	BIT(1)
+ #define PKT_GCP			0x20c
+ #define PKT_ENCODER		0x260
++#define PKT_HDMI2		BIT(0)
++#define PKT_SCRAMBLE		BIT(1)
++#define PKT_SCRAMBLE_MODE	BIT(2)
++#define PKT_BYPASS		BIT(5)
+ #define AVMUTE_SET		BIT(0)
+ #define AVMUTE_CLEAR		BIT(1)
+ #define AUD_MUTE		BIT(1)
+@@ -82,23 +92,36 @@
+ struct ram_mode {
+ 	const char *name;
+ 	u16 width, height, hfront, hsync, hback, vfront, vsync, vback;
+-	u32 pixel_khz, hpll0, hpll1, drive;
+-	u8 vic, hd0_div, tmds_div, phy_divsel;
++	u32 pixel_khz, tmds_khz, hpll0, hpll1, drive;
++	u8 vic, vdp_div, hd0_div, ssc_div, tmds_div, phy_divsel;
++	bool y420, scale_bars;
+ };
+ 
+ static const struct ram_mode modes[] = {
+ 	{
+ 		.name = "1080p60", .width = 1920, .height = 1080,
+ 		.hfront = 88, .hsync = 44, .hback = 148,
+-		.vfront = 4, .vsync = 5, .vback = 36, .pixel_khz = 148500,
++		.vfront = 4, .vsync = 5, .vback = 36, .pixel_khz = 148500, .tmds_khz = 148500,
+ 		.hpll0 = 0x11800000, .hpll1 = 0x1031, .drive = 0x0075d75d,
+-		.vic = 16, .hd0_div = 0, .tmds_div = 1, .phy_divsel = 1,
++		.vic = 16, .vdp_div = 1, .hd0_div = 0, .ssc_div = 9, .tmds_div = 1, .phy_divsel = 1,
+ 	}, {
+ 		.name = "2160p30", .width = 3840, .height = 2160,
+ 		.hfront = 176, .hsync = 88, .hback = 296,
+-		.vfront = 8, .vsync = 10, .vback = 72, .pixel_khz = 297000,
++		.vfront = 8, .vsync = 10, .vback = 72, .pixel_khz = 297000, .tmds_khz = 297000,
+ 		.hpll0 = 0x12000000, .hpll1 = 0x1063, .drive = 0x0079e79f,
+-		.vic = 95, .hd0_div = 3, .tmds_div = 0, .phy_divsel = 0,
++		.vic = 95, .vdp_div = 1, .hd0_div = 3, .ssc_div = 9, .tmds_div = 0, .phy_divsel = 0,
++	}, {
++		.name = "2160p60", .width = 3840, .height = 2160,
++		.hfront = 176, .hsync = 88, .hback = 296,
++		.vfront = 8, .vsync = 10, .vback = 72, .pixel_khz = 594000, .tmds_khz = 297000,
++		.hpll0 = 0x12000000, .hpll1 = 0x1063, .drive = 0x0079e79f,
++		.vic = 97, .hd0_div = 3, .ssc_div = 9, .y420 = true, .scale_bars = true,
++	}, {
++		.name = "2160p60-rgb", .width = 3840, .height = 2160,
++		.hfront = 176, .hsync = 88, .hback = 296,
++		.vfront = 8, .vsync = 10, .vback = 72, .pixel_khz = 594000, .tmds_khz = 594000,
++		.hpll0 = 0x12000000, .hpll1 = 0x1063, .drive = 0x00d34d2d,
++		.vic = 97, .hd0_div = 3, .ssc_div = 4, .scale_bars = true,
+ 	},
+ };
+ 
+@@ -114,6 +137,7 @@
+ 	int irq, last_error;
+ 	const char *step;
+ 	const struct ram_mode *mode;
++	struct hi3798_hdmi_sink sink;
+ 	spinlock_t stats_lock;
+ 	u64 vt1, first_ns, last_ns, underflow;
+ 	u64 transition[5];
+@@ -163,8 +187,14 @@
+ 		const struct ram_mode *mode = &modes[i];
+ 		unsigned int bar_width = mode->width / ARRAY_SIZE(colors);
+ 		size_t bytes = mode->width * mode->height * sizeof(u32);
+-		u32 *bars = dmam_alloc_coherent(dev, bytes, &test->bars_dma[i], GFP_KERNEL);
+-
++		u32 *bars;
++
++		/* Both 4K60 rows use the 1080p source through the stock GP0 scaler. */
++		if (mode->scale_bars) {
++			test->bars_dma[i] = test->bars_dma[0];
++			continue;
++		}
++		bars = dmam_alloc_coherent(dev, bytes, &test->bars_dma[i], GFP_KERNEL);
+ 		if (!bars)
+ 			return -ENOMEM;
+ 		for (y = 0; y < mode->height; y++)
+@@ -179,40 +209,47 @@
+ {
+ 	void __iomem *vdp = test->vdp;
+ 	u32 size = ((mode->height - 1) << 16) | (mode->width - 1);
+-
+-	/* G0 feeds limited-range RGB to the GP0 mixer and HDMI TX. */
+-	update(vdp, 0xd500, BIT(0), 0);
+-	writel(0x04010040, vdp + 0x0200);
++	u32 in_w = mode->width >> mode->scale_bars;
++	u32 in_h = mode->height >> mode->scale_bars;
++	u32 input = ((in_h - 1) << 16) | (in_w - 1);
++
++	/*
++	 * Full-rate ARGB fetch underflows at 594 MHz. Use the factory GP0
++	 * 2x scaler and VDP watermarks with a 1080p source in the 60 Hz UHD rows.
++	 */
++	update(vdp, VDP_GDM_CSC, VDP_GDM_RGB_TO_YUV,
++	       mode->y420 ? VDP_GDM_RGB_TO_YUV : 0);
++	writel(mode->scale_bars ? 0x04080200 : 0x04010040, vdp + 0x0200);
+ 	writel(0x2, vdp + 0x0208);
+ 	writel(0x1, vdp + 0x6908);
+ 	update(vdp, 0x8a08, BIT(10) | GENMASK(1, 0), BIT(0));
+ 	update(vdp, 0x8a20, BIT(0), BIT(0));
+ 	writel(0x68, vdp + 0x8a40);
+-	writel(size, vdp + 0x8a44);
++	writel(input, vdp + 0x8a44);
+ 	writel(0, vdp + 0x8a48);
+-	writel(size, vdp + 0x8a4c);
++	writel(input, vdp + 0x8a4c);
+ 	writel(0, vdp + 0x8a50);
+ 	writel(lower_32_bits(test->bars_dma[mode - modes]), vdp + 0x8a54);
+-	writel(mode->width * sizeof(u32) / 16, vdp + 0x8a60);
+-	writel(size, vdp + 0x500c);
++	writel(in_w * sizeof(u32) / 16, vdp + 0x8a60);
++	writel(input, vdp + 0x500c);
+ 	writel(0, vdp + 0x5080);
+-	writel(size, vdp + 0x5084);
++	writel(input, vdp + 0x5084);
+ 	writel(0, vdp + 0x5088);
+-	writel(size, vdp + 0x508c);
+-	writel(size, vdp + 0x509c);
++	writel(input, vdp + 0x508c);
++	writel(input, vdp + 0x509c);
+ 	writel(size, vdp + 0x680c);
+-	writel(size, vdp + 0x6810);
+-	writel((mode->height << 16) | mode->width, vdp + 0x6824);
++	writel(input, vdp + 0x6810);
++	writel((in_h << 16) | in_w, vdp + 0x6824);
+ 	writel(0, vdp + 0x6880);
+ 	writel(size, vdp + 0x6884);
+ 	writel(0, vdp + 0x6888);
+ 	writel(size, vdp + 0x688c);
+ 	writel(size, vdp + 0x689c);
+ 	writel(BIT(16) | (mode->width - 1), vdp + 0x6a00);
+-	writel(BIT(20), vdp + 0x6a04);
++	writel(mode->scale_bars ? 0xf7080000 : BIT(20), vdp + 0x6a04);
+ 	writel(mode->height - 1, vdp + 0x6a10);
+-	writel(BIT(12), vdp + 0x6a14);
+-	writel(0, vdp + 0x6a18);
++	writel(mode->scale_bars ? 0xf1800000 : BIT(12), vdp + 0x6a14);
++	writel(mode->scale_bars ? 0x800 : 0, vdp + 0x6a18);
+ 	update(vdp, 0x5000, BIT(31) | GENMASK(7, 0), BIT(31) | 0xff);
+ 	writel(1, vdp + 0x5004);
+ 	writel(1, vdp + 0x6804);
+@@ -274,8 +311,7 @@
+ 	test->hpll_lock_ns = ktime_get_ns() - started;
+ 	if (restore)
+ 		return restore;
+-	if (ret || !is_power_of_2(test->hpll_mask) ||
+-	    !(test->hpll_on & test->hpll_mask) || (test->hpll_off & test->hpll_mask))
++	if (ret || test->hpll_mask != HPLL_LOCK || !(test->hpll_restored & HPLL_LOCK))
+ 		return -EIO;
+ 	return 0;
+ }
+@@ -305,30 +341,30 @@
+ 	ret = regmap_update_bits(crg, 0x2c, GENMASK(27, 0), mode->hpll1);
+ 	if (ret)
+ 		return ret;
+-	ret = regmap_update_bits(crg, 0x34c, GENMASK(28, 24), BIT(24));
++	ret = regmap_update_bits(crg, 0x34c, GENMASK(28, 24), mode->vdp_div << 24);
+ 	if (ret)
+ 		return ret;
+ 	ret = regmap_update_bits(crg, 0xd8, GENMASK(19, 18), mode->hd0_div << 18);
+ 	if (ret)
+ 		return ret;
+ 	ret = regmap_update_bits(crg, CRG_TX, GENMASK(13, 10) | CRG_PIXEL_GATE,
+-				 (9 << 10) | CRG_PIXEL_GATE);
++				 (mode->ssc_div << 10) | CRG_PIXEL_GATE);
+ 	if (ret)
+ 		return ret;
+ 	ret = regmap_update_bits(crg, CRG_PHY, GENMASK(8, 6) | CRG_PHY_GATE,
+ 				 (mode->tmds_div << 6) | CRG_PHY_GATE);
+ 	if (ret)
+ 		return ret;
+-	/* Require the boot CRG lock bitmap before releasing the PHY reset. */
+-	ret = regmap_read_poll_timeout(crg, 0x150, value, (value & 0x7f) == 0x7f, 100, 20000);
++	ret = regmap_read_poll_timeout(crg, CRG_PLL_LOCK, value, value & HPLL_LOCK, 10, 20000);
+ 	if (ret)
+ 		return ret;
+ 	return regmap_update_bits(crg, CRG_PHY, CRG_PHY_RESET, 0);
+ }
+ 
+-static void configure_phy(struct modeset *test, const struct ram_mode *mode)
++static int configure_phy(struct modeset *test, const struct ram_mode *mode, bool high)
+ {
+ 	void __iomem *phy = test->phy;
++	u32 value;
+ 
+ 	update(phy, PHY_PD, PHY_LDO_PD | PHY_RXSENSE_PD | PHY_PLL_PD | PHY_DIVSEL |
+ 	       PHY_CHANNEL_PD | PHY_DRIVER_PD | PHY_TERM_PD,
+@@ -338,9 +374,9 @@
+ 	update(phy, 0x10, BIT(0), 0);
+ 	usleep_range(1000, 1500);
+ 
+-	/* 40-bit 1/10 pattern, fixed feedback and SSC disabled for both rows. */
+-	update(phy, 0x50, GENMASK(18, 9), FIELD_PREP(GENMASK(18, 9), 0x1f));
+-	update(phy, 0x54, GENMASK(29, 0), 0x01f07c1f);
++	/* Factory 40-bit clock patterns for 1/10 and 1/40, respectively. */
++	update(phy, 0x50, GENMASK(18, 9), FIELD_PREP(GENMASK(18, 9), high ? 0 : 0x1f));
++	update(phy, 0x54, GENMASK(29, 0), high ? 0x000fffff : 0x01f07c1f);
+ 	update(phy, 0xb0, BIT(27) | BIT(24) | GENMASK(23, 0), 0x640000);
+ 	update(phy, 0xb8, GENMASK(23, 0), 0);
+ 	update(phy, 0x90, GENMASK(19, 0), 0);
+@@ -348,30 +384,32 @@
+ 	       FIELD_PREP(GENMASK(17, 14), 9) | FIELD_PREP(GENMASK(11, 5), 0x35));
+ 	update(phy, 0xb0, BIT(24), BIT(24));
+ 
+-	/* MV320 EC factory spec rows c177e588/c177e5f4, converted by cur2hex. */
++	/* MV320 EC factory spec rows c177e588/c177e5f4/c177e660, converted by cur2hex. */
+ 	update(phy, 0x68, GENMASK(23, 0), mode->drive);
+ 	update(phy, 0x6c, GENMASK(17, 0), 0);
+ 	update(phy, 0x70, GENMASK(11, 0), 0);
+-	update(phy, 0x74, GENMASK(17, 6), 0x0002da00);
+-	writel(0x20202060, phy + 0x78);
+-}
+-
+-static void configure_video(struct modeset *test, void __iomem *packets, const u8 *avi)
++	update(phy, 0x74, GENMASK(17, 6), high ? 0 : 0x0002da00);
++	writel(high ? 0x60606060 : 0x20202060, phy + 0x78);
++	return readl_poll_timeout(phy + PHY_LOCK_STATUS, value, value & PHY_CLOCK_LOCK,
++				  10, 20000);
++}
++
++static void configure_video(struct modeset *test, const struct ram_mode *mode,
++			    void __iomem *packets, const u8 *avi)
+ {
+ 	void __iomem *video = test->video;
+ 	unsigned int offset;
+ 
+-	/* Pass the G0 RGB channels through at 8 bpc. */
+-	update(video, 0x134, BIT(3) | BIT(0), 0);
+-	update(video, 0x180, GENMASK(3, 0), BIT(3));
+-	update(video, 0x18c, BIT(10) | BIT(0), 0);
+-	/* The VDP drives R/G/B. Select G/B/R into the TX Y/Cb/Cr lanes. */
+-	update(video, 0x1a8, GENMASK(28, 21) | GENMASK(8, 0), 0x11);
++	/* GDM supplies BT.709 YCbCr for 4:2:0. Bypass the TX CSC in both paths. */
++	update(video, 0x134, GENMASK(11, 0), 0x440);
++	update(video, 0x180, GENMASK(3, 0), mode->y420 ? 7 : BIT(3));
++	update(video, 0x18c, BIT(10) | BIT(0), mode->y420 ? BIT(10) | BIT(0) : 0);
++	/* Route the native Y/Cb/Cr order or remap VDP RGB to the TX lanes. */
++	update(video, 0x1a8, GENMASK(28, 21) | GENMASK(8, 0), mode->y420 ? 0x88 : 0x11);
+ 	update(packets, PKT_HDR_ENABLE, GENMASK(1, 0), 0);
+ 	test->receiver_tags = false;
+ 	update(packets, 0x00, BIT(16) | GENMASK(1, 0), 0);
+ 	update(packets, PKT_LINK_MODE, BIT(1) | BIT(0), BIT(0));
+-	update(packets, PKT_ENCODER, BIT(1) | BIT(0), 0);
+ 	writel(avi[0] | (avi[1] << 8) | (avi[2] << 16), packets + PKT_AVI_HEADER);
+ 	/* Each slot holds seven packed bytes in a pair of 32-bit words. */
+ 	for (offset = 0; offset < 4; offset++) {
+@@ -385,6 +423,7 @@
+ static int wait_for_video(struct modeset *test, const struct ram_mode *mode, void __iomem *packets)
+ {
+ 	void __iomem *video = test->video;
++	/* This TX timing detector sees the full raster before chroma packing. */
+ 	u32 horizontal = ((mode->width + mode->hfront + mode->hsync + mode->hback) << 13) |
+ 			 mode->width;
+ 	u32 vertical = ((mode->height + mode->vfront + mode->vsync + mode->vback) << 13) |
+@@ -411,7 +450,7 @@
+ 	test->tmds_count = readl(video + 0xcc);
+ 	update(video, 0xb8, BIT(8), 0);
+ 	if (abs((int)test->pixel_count - (int)mode->pixel_khz) > 8 ||
+-	    abs((int)test->tmds_count - (int)mode->pixel_khz) > 8)
++	    abs((int)test->tmds_count - (int)mode->tmds_khz) > 8)
+ 		return -ERANGE;
+ 	return 0;
+ }
+@@ -422,7 +461,7 @@
+ 	int ret, sample;
+ 
+ 	update(audio->audio, AUD_N, CTS_MASK, 6144);
+-	update(audio->audio, AUD_SW_CTS, CTS_MASK, mode->pixel_khz);
++	update(audio->audio, AUD_SW_CTS, CTS_MASK, mode->tmds_khz);
+ 	update(audio->audio, AUD_ACR, AUD_ACR_FIELDS, 7);
+ 	update(audio->reset, 0, AUD_RESETS, AUD_RESETS);
+ 	udelay(10);
+@@ -430,7 +469,7 @@
+ 	/* Check consecutive hardware measurements against the nominal CTS. */
+ 	for (sample = 0; sample < 5; sample++) {
+ 		ret = readl_poll_timeout(audio->audio + AUD_HW_CTS, cts,
+-					 abs((int)(cts & CTS_MASK) - (int)mode->pixel_khz) <= 8,
++					 abs((int)(cts & CTS_MASK) - (int)mode->tmds_khz) <= 8,
+ 					 1000, 180000);
+ 		if (ret)
+ 			return ret;
+@@ -448,23 +487,26 @@
+ 	u8 avi[31] = {};
+ 	void __iomem *vdp = test->vdp, *packets = audio->packets;
+ 	unsigned long flags;
+-	u32 value;
++	bool high = mode->tmds_khz > 340000;
++	u32 value, term = high ? PHY_TERM_HIGH : PHY_TERM_LOW;
+ 	int ret;
+ 
+ 	if (!packets || !(readl(test->aon + 0x28) & BIT(0)))
+ 		return -ENOLINK;
+ 	if (SUBSTREAM_BUSY(audio->pcm->streams[SNDRV_PCM_STREAM_PLAYBACK].substream))
+ 		return -EBUSY;
+-	if (test->mode == mode)
+-		return 0;
++	ret = hi3798_sink_probe(&test->sink, mode->vic, mode->y420, mode->tmds_khz);
++	if (ret)
++		return ret;
+ 
+ 	hdmi_avi_infoframe_init(&frame);
+ 	frame.video_code = mode->vic;
+-	frame.colorspace = HDMI_COLORSPACE_RGB;
++	frame.colorspace = mode->y420 ? HDMI_COLORSPACE_YUV420 : HDMI_COLORSPACE_RGB;
+ 	frame.picture_aspect = HDMI_PICTURE_ASPECT_16_9;
+ 	frame.scan_mode = HDMI_SCAN_MODE_UNDERSCAN;
+ 	frame.colorimetry = HDMI_COLORIMETRY_ITU_709;
+-	frame.quantization_range = HDMI_QUANTIZATION_RANGE_LIMITED;
++	if (!mode->y420)
++		frame.quantization_range = HDMI_QUANTIZATION_RANGE_LIMITED;
+ 	ret = hdmi_avi_infoframe_pack(&frame, avi, sizeof(avi));
+ 	if (ret < 0)
+ 		return ret;
+@@ -490,12 +532,12 @@
+ 		ret = readl_poll_timeout(vdp + DHD_STATE, value, value & DHD_IN_BLANK,
+ 					 30, 45000);
+ 		if (ret)
+-			return ret;
++			goto disabled;
+ 		update(vdp, DHD_CTRL, DHD_ENABLE | DHD_UPDATE, DHD_UPDATE);
+ 		ret = readl_poll_timeout(vdp + DHD_CTRL, value, !(value & DHD_UPDATE),
+ 					 100, 80000);
+ 		if (ret)
+-			return ret;
++			goto disabled;
+ 	}
+ 	test->transition[1] = READ_ONCE(test->underflow);
+ 	update(test->phy, PHY_PD, PHY_PLL_PD, PHY_PLL_PD);
+@@ -503,17 +545,23 @@
+ 		!readl_poll_timeout(test->phy + PHY_LOCK_STATUS, value, !(value & PHY_CLOCK_LOCK),
+ 				    10, 3000);
+ 	lock_sample(test, &test->lock_phy_off);
++	if (!test->phy_unlock_seen) {
++		ret = -ETIMEDOUT;
++		goto disabled;
++	}
+ 
+ 	test->step = "clocks";
+ 	configure_timing(test, mode);
+ 	ret = configure_clocks(test, mode);
+ 	if (ret)
+-		return ret;
++		goto disabled;
+ 
+ 	test->transition[2] = READ_ONCE(test->underflow);
+ 	test->step = "video";
+-	configure_phy(test, mode);
+-	configure_video(test, packets, avi);
++	ret = configure_phy(test, mode, high);
++	if (ret)
++		goto disabled;
++	configure_video(test, mode, packets, avi);
+ 	configure_bars(test, mode);
+ 	test->transition[3] = READ_ONCE(test->underflow);
+ 	spin_lock_irqsave(&test->stats_lock, flags);
+@@ -526,28 +574,48 @@
+ 
+ 	ret = wait_for_video(test, mode, packets);
+ 	if (ret)
+-		return ret;
++		goto disabled;
+ 	lock_sample(test, &test->lock_active);
+-	if (!(readl(test->aon + 0x28) & BIT(0)))
+-		return -ENOLINK;
+ 	test->transition[4] = READ_ONCE(test->underflow);
+-	/* MV320 EC uses termination mode 2 for CLK and mode 3 for the data lanes. */
+-	update(test->phy, PHY_PD, PHY_CHANNEL_PD | PHY_TERM_PD, PHY_TERM_RGB8);
++
++	test->step = "scdc";
++	update(packets, PKT_ENCODER, PKT_HDMI2 | PKT_SCRAMBLE | PKT_SCRAMBLE_MODE | PKT_BYPASS,
++	       high ? PKT_HDMI2 | PKT_SCRAMBLE : 0);
++	ret = hi3798_sink_configure(&test->sink, high);
++	if (ret)
++		goto disabled;
++	if (!(readl(test->aon + 0x28) & BIT(0))) {
++		ret = -ENOLINK;
++		goto disabled;
++	}
++	/* Open PHY output within the 1–100 ms window after the sink ratio write. */
++	update(test->phy, PHY_PD, PHY_CHANNEL_PD | PHY_DRIVER_PD | PHY_TERM_PD,
++	       PHY_DRIVER_PD | term);
+ 	update(packets, PKT_AVI_ENABLE, GENMASK(1, 0), 3);
++	ret = hi3798_sink_verify(&test->sink, high);
++	if (ret)
++		goto disabled;
+ 
+ 	test->step = "audio";
+ 	ret = configure_audio(audio, mode);
+-	if (ret) {
+-		update(test->phy, PHY_PD, PHY_CHANNEL_PD | PHY_TERM_PD,
+-		       PHY_CHANNEL_PD | PHY_TERM_PD);
+-		return ret;
+-	}
++	if (ret)
++		goto disabled;
+ 	update(packets, PKT_GCP, AVMUTE_SET | AVMUTE_CLEAR, AVMUTE_CLEAR);
+ 	test->mode = mode;
+ 	test->step = "active";
+ 	WRITE_ONCE(audio->silent, false);
+ 	/* The existing PCM trigger unmutes TX Audio when the first samples start. */
+ 	return 0;
++
++disabled:
++	update(test->phy, PHY_PD, PHY_CHANNEL_PD | PHY_DRIVER_PD | PHY_TERM_PD,
++	       PHY_CHANNEL_PD | PHY_DRIVER_PD | PHY_TERM_PD);
++	update(packets, PKT_AVI_ENABLE, GENMASK(1, 0), 0);
++	update(packets, PKT_AUDIO_ENABLE, GENMASK(1, 0), 0);
++	update(audio->audio, AUD_ACR, BIT(0), 0);
++	update(packets, PKT_ENCODER, PKT_HDMI2 | PKT_SCRAMBLE | PKT_SCRAMBLE_MODE | PKT_BYPASS, 0);
++	hi3798_sink_configure(&test->sink, false);
++	return ret;
+ }
+ 
+ static void dump(struct seq_file *s, const char *name, void __iomem *base,
+@@ -566,12 +634,13 @@
+ 	static const u16 crg[] = {0x28, 0x2c, 0xd8, 0x10c, 0x110, 0x150, 0x34c};
+ 	static const u16 phy[] = {0x10, 0x50, 0x54, 0x60, 0x64, 0x68, 0x6c, 0x70, 0x74, 0x78,
+ 				  0x8c, 0x90, 0x94, 0x98, 0xb0, 0xb4, 0xb8, 0xbc};
+-	static const u16 vdp[] = {0xc004, 0xc200, 0xc208, 0xc20c, 0xc210, 0xc214, 0xc220,
++	static const u16 vdp[] = {0x0200, 0xc004, 0xc200, 0xc208, 0xc20c, 0xc210, 0xc214, 0xc220,
+ 				  0xc228, 0xc2a0, 0xc600, 0x5000, 0x5018, 0x509c, 0x6810,
+-				  0x8a54, 0x8b38, 0xd500, 0xe000};
++				  0x6a04, 0x6a14, 0x6a18, 0x8a54, 0x8b38, VDP_GDM_CSC, 0xe000};
+ 	static const u16 video[] = {0xb8, 0xc0, 0xc4, 0x134, 0x180, 0x18c, 0x1a8};
+ 	static const u16 packet[] = {0x00, 0x04, 0x18, 0x1c, 0x20, 0x3c, 0x40,
+ 				     0xa8, 0xac, 0xc4, 0xc8, 0x1a4, 0x1ac, 0x1b4, 0x208, 0x20c, 0x260};
++	static const u16 ddc[] = {0x08, 0x10, 0x30, 0x34, 0x38};
+ 	static const u16 acr[] = {0, 4, AUD_ACR, AUD_N, AUD_SW_CTS, AUD_HW_CTS};
+ 	static const u16 tx2[] = {0, 4, 0x88, 0x8c, 0xa8};
+ 	u64 vt1, first_ns, last_ns, underflow;
+@@ -608,6 +677,13 @@
+ 		if (!regmap_read(test->crg, crg[i], &value))
+ 			seq_printf(s, "crg[%03x]=%08x\n", crg[i], value);
+ 	seq_printf(s, "receiver_tags=%d\n", test->receiver_tags);
++	seq_printf(s, "edid_max_tmds_khz=%u vic_rgb=%d vic_420=%d scdc_present=%d\n",
++		   test->sink.max_tmds_khz, test->sink.rgb, test->sink.y420, test->sink.scdc);
++	seq_printf(s, "scdc_version_error=%d version=%02x config_before=%02x config_after=%02x scrambler=%02x status=%02x configured=%d verified=%d\n",
++		   test->sink.version_error, test->sink.version, test->sink.config_before,
++		   test->sink.config_after, test->sink.scrambler, test->sink.status,
++		   test->sink.configured, test->sink.verified);
++	dump(s, "ddc", test->sink.ddc, ddc, ARRAY_SIZE(ddc));
+ 	dump(s, "vdp", test->vdp, vdp, ARRAY_SIZE(vdp));
+ 	dump(s, "phy", test->phy, phy, ARRAY_SIZE(phy));
+ 	dump(s, "video", test->video, video, ARRAY_SIZE(video));
+@@ -680,6 +756,11 @@
+ 	if (i == ARRAY_SIZE(modes)) {
+ 		unsigned int marker_base = 0;
+ 
++		if (sysfs_streq(name, "scdc-read")) {
++			ret = test->mode ? hi3798_sink_verify(&test->sink, test->mode->tmds_khz > 340000)
++					 : -ENOLINK;
++			goto out;
++		}
+ 		if (sysfs_streq(name, "rx-tags-on"))
+ 			marker_base = 100;
+ 		else if (sysfs_streq(name, "rx-tags-alt"))
+@@ -736,6 +817,10 @@
+ 	test->aon = devm_platform_ioremap_resource_byname(pdev, "aon");
+ 	if (IS_ERR(test->aon))
+ 		return PTR_ERR(test->aon);
++	test->sink.aon = test->aon;
++	test->sink.ddc = devm_platform_ioremap_resource_byname(pdev, "ddc");
++	if (IS_ERR(test->sink.ddc))
++		return PTR_ERR(test->sink.ddc);
+ 	test->crg = syscon_regmap_lookup_by_phandle(dev->of_node, "hisilicon,crg");
+ 	if (IS_ERR(test->crg))
+ 		return PTR_ERR(test->crg);

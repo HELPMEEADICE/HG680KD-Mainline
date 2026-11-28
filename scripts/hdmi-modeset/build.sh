@@ -6,7 +6,7 @@ seed="$root/out/arm64-7.3.6-usb-full/clean.oVBjwItr"
 input=${1:?absolute modeset input directory required}
 variant=${2:-modeset}
 case "$variant" in
-    modeset|modeset-locks|modeset-rxtag) ;;
+    modeset|modeset-locks|modeset-rxtag|4k60) ;;
     *) printf 'Unsupported modeset variant: %s\n' "$variant" >&2; exit 2 ;;
 esac
 work="$root/out/arm64-7.3.6-hdmi-$variant"
@@ -44,8 +44,16 @@ trap 'tail -100 "$release/build.log" >&3' ERR
     if [[ $variant != modeset ]]; then
         patch -d "$linux" -p1 --fuzz=0 < "$input/locks.patch"
     fi
-    if [[ $variant == modeset-rxtag ]]; then
+    if [[ $variant == modeset-rxtag || $variant == 4k60 ]]; then
         patch -d "$linux" -p1 --fuzz=0 < "$input/receiver-tags.patch"
+    fi
+    if [[ $variant == 4k60 ]]; then
+        patch -d "$linux" -p1 --fuzz=0 < "$input/4k60.patch"
+        modeset_dts="$build/modeset.dts"
+        patch --fuzz=0 -o "$modeset_dts" "$input/modeset.dts" < "$input/4k60-dts.patch"
+        install -m644 "$input/scdc.c" "$linux/drivers/misc/hi3798-hdmi-scdc.c"
+        install -m644 "$input/scdc.h" "$linux/drivers/misc/hi3798-hdmi-scdc.h"
+        printf '\nobj-y += hi3798-hdmi-scdc.o\n' >> "$linux/drivers/misc/Makefile"
     fi
     printf '\nobj-y += hi3798-hdmi-modeset.o\n' >> "$linux/drivers/misc/Makefile"
     cp "$seed/build/.config" "$out/.config"
@@ -67,7 +75,7 @@ trap 'tail -100 "$release/build.log" >&3' ERR
     board="$root/out/arm64-7.3.6-usb-full/project-8bcbf11/src"
     "${cross}gcc" -E -P -nostdinc -undef -D__DTS__ -x assembler-with-cpp \
         -I "$board" -I "$linux/include" -I "$linux/arch/arm64/boot/dts/hisilicon" \
-        "$input/modeset.dts" -o "$out/modeset.pp.dts"
+        "${modeset_dts:-$input/modeset.dts}" -o "$out/modeset.pp.dts"
     "$out/scripts/dtc/dtc" -I dts -O dtb -o "$release/modeset.dtb" "$out/modeset.pp.dts"
     cp "$out/.config" "$release/kernel.config"
     python3 "$input/pack_arm64.py" --image "$out/arch/arm64/boot/Image" \

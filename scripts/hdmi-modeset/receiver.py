@@ -95,11 +95,17 @@ def native_snapshot(hid=None):
                    htotal == width + hblank and vtotal == height + vblank and
                    vblank - vfront - vsync == vback)
     char_hz = (128 * 48000 * cts / n) if n and cts else None
-    rgb_frame_hz = (char_hz / (htotal * vtotal)
-                    if char_hz and geometry_ok and colorspace == 0 and depth_code in (0, 4) else None)
+    # The RX horizontal counters measure TMDS characters. In 4:2:0 each
+    # character spans two horizontal pixels at 8 bpc.
+    h_scale = 2 if colorspace == 3 else 1
+    frame_hz = (char_hz / (htotal * vtotal)
+                if char_hz and geometry_ok and htotal and vtotal
+                and colorspace in (0, 3) and depth_code in (0, 4) else None)
     return {
         "active": [width, height],
         "total": [htotal, vtotal],
+        "pixel_active": [width * h_scale, height],
+        "pixel_total": [htotal * h_scale, vtotal],
         "front": [hfront, vfront],
         "sync": [hsync, vsync],
         "back": [hblank - hfront - hsync, vback],
@@ -122,7 +128,8 @@ def native_snapshot(hid=None):
         "rx_acr_cts": cts,
         "acr_reference_sample_rate": 48000,
         "acr_tmds_hz": char_hz,
-        "acr_rgb8_frame_hz": rgb_frame_hz,
+        "acr_8bpc_frame_hz": frame_hz,
+        "acr_rgb8_frame_hz": frame_hz if colorspace == 0 else None,
         "raw_e14e": signal.hex(" "),
         "raw_e184": timing.hex(" "),
         "raw_e390": acr.hex(" "),

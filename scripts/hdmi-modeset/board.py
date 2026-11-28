@@ -65,6 +65,10 @@ def analyze(directory, label):
     frames = np.frombuffer(video, dtype=np.uint8).reshape(-1, 90, 160, 3)
     samples = frames[:, [12, 45, 77], :][:, :, np.arange(10, 160, 20)]
     matching = np.all((samples >= 128) == (COLORS >= 128), axis=(1, 2, 3))
+    interior = np.arange(160).reshape(8, 20)[:, 3:-3]
+    good_interior = ((frames[:, :, interior, :] >= 128) ==
+                     (COLORS[None, None, :, None, :] >= 128))
+    intact = np.all(good_interior, axis=(1, 2, 3, 4))
     still_array = np.asarray(Image.open(still).convert("RGB"))
     y = still_array.shape[0] // 2
     points = still_array[y, (np.arange(8) * 2 + 1) * still_array.shape[1] // 16].tolist()
@@ -90,12 +94,13 @@ def analyze(directory, label):
         max_step = int(np.max(np.abs(np.diff(tone, axis=0))))
     else:
         audio_seconds, quiet_windows, peak, max_step, frequencies = 0, None, None, None, []
-    return {"frames": len(frames), "matching_bars": int(matching.sum()), "RGB_samples": points,
+    return {"frames": len(frames), "matching_bars": int(matching.sum()),
+            "intact_bar_frames": int(intact.sum()), "RGB_samples": points,
             "audio_seconds": round(audio_seconds, 3), "fft_hz": frequencies,
             "quiet_2ms_windows": quiet_windows, "steady_peak": peak, "steady_max_step": max_step}
 
 
-def measurements(before, during, after, nominal, clock, vic):
+def measurements(before, during, after, nominal, clock, vic, colorspace=0):
     def field(raw, name):
         return int(re.search(rb"(?m)^" + re.escape(name.encode()) + rb"=([a-f0-9]+)", raw)[1], 16)
 
@@ -111,8 +116,10 @@ def measurements(before, during, after, nominal, clock, vic):
     clocks = re.search(rb"pixel_count=(\d+) tmds_count=(\d+)", after)
     pixel_khz, tmds_khz = map(int, clocks.groups())
     h, v = field(after, "video[0c0]"), field(after, "video[0c4]")
+    h_scale = 2 if colorspace == 3 else 1
     result = {"pixel_khz": pixel_khz, "tmds_khz": tmds_khz,
-              "active": [h & 0x1fff, v & 0x1fff], "totals": [h >> 13 & 0x1fff, v >> 13 & 0x1fff],
+              "active": [h & 0x1fff, v & 0x1fff],
+              "totals": [h >> 13 & 0x1fff, v >> 13 & 0x1fff],
               "vt1_count": count, "vt1_hz": rate, "underflow": underflow,
               "fetch_underflow": int(stats[5], 16),
               "smmu_181": count_irq(before + during + after, 181),
@@ -128,20 +135,21 @@ def measurements(before, during, after, nominal, clock, vic):
           and result["n"] == 6144 and result["sw_cts"] == clock
           and len(cts_values) == 5 and all(abs(value - clock) <= 8 for value in cts_values)
           and header == bytes((0x82, 2, 13)) and sum(header + body) % 256 == 0
-          and body[1] == 2 and body[2] == 0xa0 and body[3] == 4 and body[4] == vic
+          and body[1] == (colorspace << 5 | 2) and body[2] == 0xa0
+          and body[3] == (0 if colorspace == 3 else 4) and body[4] == vic
           and result["tx_stable"] == 1 and result["xruns"] == 0
           and field(after, "phy[064]") & 0x7f80f == 0x800
           and not field(after, "packet[1b4]") & 3 and not field(after, "packet[260]") & 3
           and result["active"] == ([1920, 1080] if vic == 16 else [3840, 2160])
           and result["totals"] == ([2200, 1125] if vic == 16 else [4400, 2250])
-          and abs(pixel_khz - clock) <= 1 and abs(tmds_khz - clock) <= 1
+          and abs(pixel_khz - clock * h_scale) <= 1 and abs(tmds_khz - clock) <= 1
           and result["crg_150"] & 0x7f == 0x7f
           and bool(re.search(rb"(?m)^closed\r?$", after)))
     result["board_pass"] = ok
     return result
 
 
-def run_mode(console, args, label, mode, nominal, clock, vic):
+def run_mode(console, args, label, mode, nominal, clock, vic, colorspace=0):
     print(f"Switching to {mode} ({label})", flush=True)
     rc, output = shell(console, f"echo {mode} > {PROBE}; rc=$?; cat {PROBE}; (exit $rc)", 15)
     (args.directory / f"{label}-switch.txt").write_bytes(output)
@@ -169,7 +177,7 @@ def run_mode(console, args, label, mode, nominal, clock, vic):
             recording.wait()
 
     (args.directory / f"{label}-snapshot.txt").write_bytes(before + during + after)
-    result = measurements(before, during, after, nominal, clock, vic)
+    result = measurements(before, during, after, nominal, clock, vic, colorspace)
     result["rx_before"] = rx_before
     result["rx_during"] = rx_during
     result.update(analyze(args.directory, label))
@@ -179,7 +187,6 @@ def run_mode(console, args, label, mode, nominal, clock, vic):
                               result["quiet_2ms_windows"] == 0 and
                               result["steady_max_step"] < 2500 and
                               all(abs(hz - 1000) < .5 for hz in result["fft_hz"]))
-    print(json.dumps(result), flush=True)
     return result
 
 
@@ -278,6 +285,7 @@ def main():
             if not results and row[0] != args.start_at:
                 continue
             results[row[0]] = run_mode(console, args, *row)
+            print(json.dumps(results[row[0]]), flush=True)
             (args.directory / "results.json").write_text(json.dumps(results, indent=2) + "\n")
         transition_pass = not args.transition_audio or check_transition_audio(console, args)
         out = checked(console, f"dmesg; {SNAPSHOT}; cat /proc/mounts /proc/partitions", 25)

@@ -1,0 +1,1327 @@
+{
+  "1080p60-first": {
+    "pixel_khz": 148500,
+    "tmds_khz": 148500,
+    "active": [
+      1920,
+      1080
+    ],
+    "totals": [
+      2200,
+      1125
+    ],
+    "vt1_count": 733,
+    "vt1_hz": 59.99996689067677,
+    "underflow": 0,
+    "fetch_underflow": 0,
+    "smmu_181": [
+      0,
+      0,
+      0
+    ],
+    "aiao_irqs": [
+      0,
+      800
+    ],
+    "n": 6144,
+    "sw_cts": 148500,
+    "hw_cts_playing": [
+      148500,
+      148500,
+      148500,
+      148500,
+      148500
+    ],
+    "hw_cts_idle": 148500,
+    "avi": "82 02 0d b9 02 a0 04 10 00 00 00 00 00 00 00 00 00",
+    "tx_stable": 1,
+    "crg_150": 127,
+    "xruns": 0,
+    "board_pass": true,
+    "rx_before": {
+      "f006": 5,
+      "f007": 3,
+      "f030": 16,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 16,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "rx_during": {
+      "f006": 5,
+      "f007": 3,
+      "f030": 16,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 0,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "frames": 354,
+    "matching_bars": 354,
+    "intact_bar_frames": 354,
+    "RGB_samples": [
+      [
+        255,
+        255,
+        255
+      ],
+      [
+        255,
+        255,
+        16
+      ],
+      [
+        27,
+        255,
+        255
+      ],
+      [
+        8,
+        255,
+        0
+      ],
+      [
+        255,
+        0,
+        255
+      ],
+      [
+        236,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        247
+      ],
+      [
+        7,
+        7,
+        7
+      ]
+    ],
+    "audio_seconds": 7.934,
+    "fft_hz": [
+      1000.0,
+      1000.0
+    ],
+    "quiet_2ms_windows": 0,
+    "steady_peak": 8229,
+    "steady_max_step": 1338,
+    "capture_pass": true,
+    "link_at_switch": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 1,
+      "vic_420": 0,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "locks": {
+      "hpll": [
+        127,
+        119,
+        127
+      ],
+      "hpll_mask": 8,
+      "relock_ns": 29792,
+      "phy_power_sequence": [
+        [
+          127,
+          1,
+          1056769
+        ],
+        [
+          127,
+          1,
+          8194
+        ],
+        [
+          127,
+          1,
+          1056773
+        ]
+      ]
+    },
+    "link": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 1,
+      "vic_420": 0,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "expected_max_cll": 116,
+    "receiver": {
+      "active": [
+        1920,
+        1080
+      ],
+      "total": [
+        2200,
+        1125
+      ],
+      "pixel_active": [
+        1920,
+        1080
+      ],
+      "pixel_total": [
+        2200,
+        1125
+      ],
+      "front": [
+        88,
+        4
+      ],
+      "sync": [
+        44,
+        5
+      ],
+      "back": [
+        148,
+        36
+      ],
+      "geometry_consistent": true,
+      "avi": "82 02 0d b9 02 a0 04 10 00 00 00 00 00 00 00 00 00",
+      "avi_checksum_ok": true,
+      "vic": 16,
+      "avi_colorspace": 0,
+      "raw_e380": 65,
+      "gcp_depth_code": 4,
+      "gcp_reported_bpc": 8,
+      "raw_e4c0": "01 1a 00 00 ea 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 74 00 00 00",
+      "drm_checksum_ok": true,
+      "drm_infoframe": "87 01 1a ea 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 74 00 00 00",
+      "drm_eotf": 0,
+      "drm_descriptor": 0,
+      "drm_max_cll": 116,
+      "rx_clock_raw_e160": 399995,
+      "rx_acr_n": 6144,
+      "rx_acr_cts": 148500,
+      "acr_reference_sample_rate": 48000,
+      "acr_tmds_hz": 148500000.0,
+      "acr_8bpc_frame_hz": 60.0,
+      "acr_rgb8_frame_hz": 60.0,
+      "raw_e14e": "98 08 80 07 00 00 00 00 00 00 02 00 00 00 f2 06 00 00 7b 1a 06 00 23 00 00 00 38 04 00 00 92 0a 00 00 65 04",
+      "raw_e184": "80 07 18 01 58 00 2c 00 38 04 2d 00 04 00 05 00 24 00",
+      "raw_e390": "14 44 02 00 00 18 00 00",
+      "raw_e3a0": "02 0d b9 00 02 a0 04 10 00 00 00 00 00 00 00 00 00"
+    },
+    "receiver_avi_before": "82 02 0d f6 70 a8 00 61 00 00 00 00 00 00 00 00 00"
+  },
+  "2160p30": {
+    "pixel_khz": 297000,
+    "tmds_khz": 297000,
+    "active": [
+      3840,
+      2160
+    ],
+    "totals": [
+      4400,
+      2250
+    ],
+    "vt1_count": 366,
+    "vt1_hz": 30.000003897239772,
+    "underflow": 0,
+    "fetch_underflow": 0,
+    "smmu_181": [
+      0,
+      0,
+      0
+    ],
+    "aiao_irqs": [
+      800,
+      1600
+    ],
+    "n": 6144,
+    "sw_cts": 297000,
+    "hw_cts_playing": [
+      297000,
+      297000,
+      297001,
+      297000,
+      297000
+    ],
+    "hw_cts_idle": 297000,
+    "avi": "82 02 0d 6a 02 a0 04 5f 00 00 00 00 00 00 00 00 00",
+    "tx_stable": 1,
+    "crg_150": 127,
+    "xruns": 0,
+    "board_pass": true,
+    "rx_before": {
+      "f006": 5,
+      "f007": 115,
+      "f030": 17,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 0,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "rx_during": {
+      "f006": 5,
+      "f007": 115,
+      "f030": 17,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 16,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "frames": 353,
+    "matching_bars": 353,
+    "intact_bar_frames": 353,
+    "RGB_samples": [
+      [
+        255,
+        255,
+        255
+      ],
+      [
+        255,
+        255,
+        16
+      ],
+      [
+        27,
+        255,
+        255
+      ],
+      [
+        8,
+        255,
+        0
+      ],
+      [
+        255,
+        0,
+        255
+      ],
+      [
+        236,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        247
+      ],
+      [
+        7,
+        7,
+        7
+      ]
+    ],
+    "audio_seconds": 7.938,
+    "fft_hz": [
+      1000.0,
+      1000.0
+    ],
+    "quiet_2ms_windows": 0,
+    "steady_peak": 8230,
+    "steady_max_step": 1337,
+    "capture_pass": true,
+    "link_at_switch": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 1,
+      "vic_420": 0,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "locks": {
+      "hpll": [
+        127,
+        119,
+        127
+      ],
+      "hpll_mask": 8,
+      "relock_ns": 24666,
+      "phy_power_sequence": [
+        [
+          127,
+          1,
+          1056767
+        ],
+        [
+          127,
+          1,
+          8188
+        ],
+        [
+          127,
+          1,
+          1056771
+        ]
+      ]
+    },
+    "link": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 1,
+      "vic_420": 0,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "expected_max_cll": 195,
+    "receiver": {
+      "active": [
+        3840,
+        2160
+      ],
+      "total": [
+        4400,
+        2250
+      ],
+      "pixel_active": [
+        3840,
+        2160
+      ],
+      "pixel_total": [
+        4400,
+        2250
+      ],
+      "front": [
+        176,
+        8
+      ],
+      "sync": [
+        88,
+        10
+      ],
+      "back": [
+        296,
+        72
+      ],
+      "geometry_consistent": true,
+      "avi": "82 02 0d 6a 02 a0 04 5f 00 00 00 00 00 00 00 00 00",
+      "avi_checksum_ok": true,
+      "vic": 95,
+      "avi_colorspace": 0,
+      "raw_e380": 65,
+      "gcp_depth_code": 4,
+      "gcp_reported_bpc": 8,
+      "raw_e4c0": "01 1a 00 00 9b 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c3 00 00 00",
+      "drm_checksum_ok": true,
+      "drm_infoframe": "87 01 1a 9b 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c3 00 00 00",
+      "drm_eotf": 0,
+      "drm_descriptor": 0,
+      "drm_max_cll": 195,
+      "rx_clock_raw_e160": 799991,
+      "rx_acr_n": 6144,
+      "rx_acr_cts": 297000,
+      "acr_reference_sample_rate": 48000,
+      "acr_tmds_hz": 297000000.0,
+      "acr_8bpc_frame_hz": 30.0,
+      "acr_rgb8_frame_hz": 30.0,
+      "raw_e14e": "30 11 00 0f 00 00 00 00 00 00 02 00 00 00 e3 0d 00 00 f7 34 0c 00 47 00 00 00 70 08 00 00 92 0a 00 00 ca 08",
+      "raw_e184": "00 0f 30 02 b0 00 58 00 70 08 5a 00 08 00 0a 00 48 00",
+      "raw_e390": "28 88 04 00 00 18 00 00",
+      "raw_e3a0": "02 0d 6a 00 02 a0 04 5f 00 00 00 00 00 00 00 00 00"
+    },
+    "receiver_avi_before": "82 02 0d b9 02 a0 04 10 00 00 00 00 00 00 00 00 00"
+  },
+  "2160p60-first": {
+    "pixel_khz": 594000,
+    "tmds_khz": 297000,
+    "active": [
+      3840,
+      2160
+    ],
+    "totals": [
+      4400,
+      2250
+    ],
+    "vt1_count": 731,
+    "vt1_hz": 59.99999790137833,
+    "underflow": 0,
+    "fetch_underflow": 0,
+    "smmu_181": [
+      0,
+      0,
+      0
+    ],
+    "aiao_irqs": [
+      1600,
+      2401
+    ],
+    "n": 6144,
+    "sw_cts": 297000,
+    "hw_cts_playing": [
+      297000,
+      297000,
+      297000,
+      297000,
+      297000
+    ],
+    "hw_cts_idle": 297000,
+    "avi": "82 02 0d 0c 62 a0 00 61 00 00 00 00 00 00 00 00 00",
+    "tx_stable": 1,
+    "crg_150": 127,
+    "xruns": 0,
+    "board_pass": true,
+    "rx_before": {
+      "f006": 5,
+      "f007": 35,
+      "f030": 49,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 0,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "rx_during": {
+      "f006": 5,
+      "f007": 35,
+      "f030": 49,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 0,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "frames": 353,
+    "matching_bars": 353,
+    "intact_bar_frames": 353,
+    "RGB_samples": [
+      [
+        241,
+        241,
+        241
+      ],
+      [
+        239,
+        255,
+        0
+      ],
+      [
+        14,
+        255,
+        246
+      ],
+      [
+        5,
+        255,
+        0
+      ],
+      [
+        253,
+        0,
+        255
+      ],
+      [
+        245,
+        0,
+        14
+      ],
+      [
+        19,
+        3,
+        255
+      ],
+      [
+        22,
+        22,
+        22
+      ]
+    ],
+    "audio_seconds": 7.938,
+    "fft_hz": [
+      1000.0,
+      1000.0
+    ],
+    "quiet_2ms_windows": 0,
+    "steady_peak": 8229,
+    "steady_max_step": 1337,
+    "capture_pass": true,
+    "link_at_switch": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 0,
+      "vic_420": 1,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 1,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "locks": {
+      "hpll": [
+        127,
+        119,
+        127
+      ],
+      "hpll_mask": 8,
+      "relock_ns": 25125,
+      "phy_power_sequence": [
+        [
+          127,
+          1,
+          1056771
+        ],
+        [
+          127,
+          1,
+          8194
+        ],
+        [
+          127,
+          1,
+          1056771
+        ]
+      ]
+    },
+    "link": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 0,
+      "vic_420": 1,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "expected_max_cll": 197,
+    "receiver": {
+      "active": [
+        1920,
+        2160
+      ],
+      "total": [
+        2200,
+        2250
+      ],
+      "pixel_active": [
+        3840,
+        2160
+      ],
+      "pixel_total": [
+        4400,
+        2250
+      ],
+      "front": [
+        88,
+        8
+      ],
+      "sync": [
+        44,
+        10
+      ],
+      "back": [
+        148,
+        72
+      ],
+      "geometry_consistent": true,
+      "avi": "82 02 0d 0c 62 a0 00 61 00 00 00 00 00 00 00 00 00",
+      "avi_checksum_ok": true,
+      "vic": 97,
+      "avi_colorspace": 3,
+      "raw_e380": 65,
+      "gcp_depth_code": 4,
+      "gcp_reported_bpc": 8,
+      "raw_e4c0": "01 1a 00 00 99 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c5 00 00 00",
+      "drm_checksum_ok": true,
+      "drm_infoframe": "87 01 1a 99 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c5 00 00 00",
+      "drm_eotf": 0,
+      "drm_descriptor": 0,
+      "drm_max_cll": 197,
+      "rx_clock_raw_e160": 399995,
+      "rx_acr_n": 6144,
+      "rx_acr_cts": 297000,
+      "acr_reference_sample_rate": 48000,
+      "acr_tmds_hz": 297000000.0,
+      "acr_8bpc_frame_hz": 60.0,
+      "acr_rgb8_frame_hz": null,
+      "raw_e14e": "98 08 80 07 00 00 00 00 00 00 02 00 00 00 f2 06 00 00 7b 1a 06 00 47 00 00 00 70 08 00 00 92 0a 00 00 ca 08",
+      "raw_e184": "80 07 18 01 58 00 2c 00 70 08 5a 00 08 00 0a 00 48 00",
+      "raw_e390": "28 88 04 00 00 18 00 00",
+      "raw_e3a0": "02 0d 0c 00 62 a0 00 61 00 00 00 00 00 00 00 00 00"
+    },
+    "receiver_avi_before": "82 02 0d 6a 02 a0 04 5f 00 00 00 00 00 00 00 00 00"
+  },
+  "1080p60-return": {
+    "pixel_khz": 148500,
+    "tmds_khz": 148500,
+    "active": [
+      1920,
+      1080
+    ],
+    "totals": [
+      2200,
+      1125
+    ],
+    "vt1_count": 733,
+    "vt1_hz": 60.00000754915868,
+    "underflow": 0,
+    "fetch_underflow": 0,
+    "smmu_181": [
+      0,
+      0,
+      0
+    ],
+    "aiao_irqs": [
+      2401,
+      3202
+    ],
+    "n": 6144,
+    "sw_cts": 148500,
+    "hw_cts_playing": [
+      148500,
+      148500,
+      148500,
+      148500,
+      148500
+    ],
+    "hw_cts_idle": 148500,
+    "avi": "82 02 0d b9 02 a0 04 10 00 00 00 00 00 00 00 00 00",
+    "tx_stable": 1,
+    "crg_150": 127,
+    "xruns": 0,
+    "board_pass": true,
+    "rx_before": {
+      "f006": 5,
+      "f007": 3,
+      "f030": 16,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 0,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "rx_during": {
+      "f006": 5,
+      "f007": 3,
+      "f030": 16,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 16,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "frames": 354,
+    "matching_bars": 354,
+    "intact_bar_frames": 354,
+    "RGB_samples": [
+      [
+        255,
+        255,
+        255
+      ],
+      [
+        255,
+        255,
+        16
+      ],
+      [
+        27,
+        255,
+        255
+      ],
+      [
+        8,
+        255,
+        0
+      ],
+      [
+        255,
+        0,
+        255
+      ],
+      [
+        236,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        247
+      ],
+      [
+        7,
+        7,
+        7
+      ]
+    ],
+    "audio_seconds": 7.934,
+    "fft_hz": [
+      1000.0,
+      1000.0
+    ],
+    "quiet_2ms_windows": 0,
+    "steady_peak": 8229,
+    "steady_max_step": 1337,
+    "capture_pass": true,
+    "link_at_switch": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 1,
+      "vic_420": 0,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "locks": {
+      "hpll": [
+        127,
+        119,
+        127
+      ],
+      "hpll_mask": 8,
+      "relock_ns": 35917,
+      "phy_power_sequence": [
+        [
+          127,
+          1,
+          1056767
+        ],
+        [
+          127,
+          1,
+          8192
+        ],
+        [
+          127,
+          1,
+          1056771
+        ]
+      ]
+    },
+    "link": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 1,
+      "vic_420": 0,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "expected_max_cll": 116,
+    "receiver": {
+      "active": [
+        1920,
+        1080
+      ],
+      "total": [
+        2200,
+        1125
+      ],
+      "pixel_active": [
+        1920,
+        1080
+      ],
+      "pixel_total": [
+        2200,
+        1125
+      ],
+      "front": [
+        88,
+        4
+      ],
+      "sync": [
+        44,
+        5
+      ],
+      "back": [
+        148,
+        36
+      ],
+      "geometry_consistent": true,
+      "avi": "82 02 0d b9 02 a0 04 10 00 00 00 00 00 00 00 00 00",
+      "avi_checksum_ok": true,
+      "vic": 16,
+      "avi_colorspace": 0,
+      "raw_e380": 65,
+      "gcp_depth_code": 4,
+      "gcp_reported_bpc": 8,
+      "raw_e4c0": "01 1a 00 00 ea 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 74 00 00 00",
+      "drm_checksum_ok": true,
+      "drm_infoframe": "87 01 1a ea 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 74 00 00 00",
+      "drm_eotf": 0,
+      "drm_descriptor": 0,
+      "drm_max_cll": 116,
+      "rx_clock_raw_e160": 399995,
+      "rx_acr_n": 6144,
+      "rx_acr_cts": 148500,
+      "acr_reference_sample_rate": 48000,
+      "acr_tmds_hz": 148500000.0,
+      "acr_8bpc_frame_hz": 60.0,
+      "acr_rgb8_frame_hz": 60.0,
+      "raw_e14e": "98 08 80 07 00 00 00 00 00 00 02 00 00 00 f2 06 00 00 7b 1a 06 00 23 00 00 00 38 04 00 00 92 0a 00 00 65 04",
+      "raw_e184": "80 07 18 01 58 00 2c 00 38 04 2d 00 04 00 05 00 24 00",
+      "raw_e390": "14 44 02 00 00 18 00 00",
+      "raw_e3a0": "02 0d b9 00 02 a0 04 10 00 00 00 00 00 00 00 00 00"
+    },
+    "receiver_avi_before": "82 02 0d 0c 62 a0 00 61 00 00 00 00 00 00 00 00 00"
+  },
+  "2160p60-return": {
+    "pixel_khz": 594000,
+    "tmds_khz": 297000,
+    "active": [
+      3840,
+      2160
+    ],
+    "totals": [
+      4400,
+      2250
+    ],
+    "vt1_count": 732,
+    "vt1_hz": 60.000007091578176,
+    "underflow": 0,
+    "fetch_underflow": 0,
+    "smmu_181": [
+      0,
+      0,
+      0
+    ],
+    "aiao_irqs": [
+      3202,
+      4002
+    ],
+    "n": 6144,
+    "sw_cts": 297000,
+    "hw_cts_playing": [
+      297000,
+      297000,
+      297000,
+      297000,
+      297000
+    ],
+    "hw_cts_idle": 297000,
+    "avi": "82 02 0d 0c 62 a0 00 61 00 00 00 00 00 00 00 00 00",
+    "tx_stable": 1,
+    "crg_150": 127,
+    "xruns": 0,
+    "board_pass": true,
+    "rx_before": {
+      "f006": 5,
+      "f007": 35,
+      "f030": 49,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 16,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "rx_during": {
+      "f006": 5,
+      "f007": 35,
+      "f030": 49,
+      "f03e": 1,
+      "f0c0": 42,
+      "f0c1": 16,
+      "f620": 0,
+      "f621": 12,
+      "f622": 66,
+      "f623": 9,
+      "f624": 101,
+      "f625": 4,
+      "f626": 44,
+      "f627": 0,
+      "f628": 5,
+      "f629": 0
+    },
+    "frames": 353,
+    "matching_bars": 353,
+    "intact_bar_frames": 353,
+    "RGB_samples": [
+      [
+        241,
+        241,
+        241
+      ],
+      [
+        239,
+        255,
+        0
+      ],
+      [
+        14,
+        255,
+        246
+      ],
+      [
+        5,
+        255,
+        0
+      ],
+      [
+        253,
+        0,
+        255
+      ],
+      [
+        245,
+        0,
+        14
+      ],
+      [
+        19,
+        3,
+        255
+      ],
+      [
+        22,
+        22,
+        22
+      ]
+    ],
+    "audio_seconds": 7.938,
+    "fft_hz": [
+      1000.0,
+      1000.0
+    ],
+    "quiet_2ms_windows": 0,
+    "steady_peak": 8230,
+    "steady_max_step": 1337,
+    "capture_pass": true,
+    "link_at_switch": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 0,
+      "vic_420": 1,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "locks": {
+      "hpll": [
+        127,
+        119,
+        127
+      ],
+      "hpll_mask": 8,
+      "relock_ns": 24167,
+      "phy_power_sequence": [
+        [
+          127,
+          1,
+          1056771
+        ],
+        [
+          127,
+          1,
+          8194
+        ],
+        [
+          127,
+          1,
+          1056769
+        ]
+      ]
+    },
+    "link": {
+      "edid_max_tmds_khz": 300000,
+      "vic_rgb": 0,
+      "vic_420": 1,
+      "scdc_present": 0,
+      "scdc_version_error": 0,
+      "configured": 1,
+      "verified": 1,
+      "version": 0,
+      "config_before": 0,
+      "config_after": 0,
+      "scrambler": 0,
+      "status": 15,
+      "tx_encoder": 0,
+      "phy_clock_pattern": [
+        31,
+        32537631
+      ],
+      "ddc": {
+        "008": 0,
+        "010": 32,
+        "030": 0,
+        "034": 0,
+        "038": 0
+      }
+    },
+    "expected_max_cll": 197,
+    "receiver": {
+      "active": [
+        1920,
+        2160
+      ],
+      "total": [
+        2200,
+        2250
+      ],
+      "pixel_active": [
+        3840,
+        2160
+      ],
+      "pixel_total": [
+        4400,
+        2250
+      ],
+      "front": [
+        88,
+        8
+      ],
+      "sync": [
+        44,
+        10
+      ],
+      "back": [
+        148,
+        72
+      ],
+      "geometry_consistent": true,
+      "avi": "82 02 0d 0c 62 a0 00 61 00 00 00 00 00 00 00 00 00",
+      "avi_checksum_ok": true,
+      "vic": 97,
+      "avi_colorspace": 3,
+      "raw_e380": 65,
+      "gcp_depth_code": 4,
+      "gcp_reported_bpc": 8,
+      "raw_e4c0": "01 1a 00 00 99 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c5 00 00 00",
+      "drm_checksum_ok": true,
+      "drm_infoframe": "87 01 1a 99 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c5 00 00 00",
+      "drm_eotf": 0,
+      "drm_descriptor": 0,
+      "drm_max_cll": 197,
+      "rx_clock_raw_e160": 399995,
+      "rx_acr_n": 6144,
+      "rx_acr_cts": 297000,
+      "acr_reference_sample_rate": 48000,
+      "acr_tmds_hz": 297000000.0,
+      "acr_8bpc_frame_hz": 60.0,
+      "acr_rgb8_frame_hz": null,
+      "raw_e14e": "98 08 80 07 00 00 00 00 00 00 02 00 00 00 f2 06 00 00 7b 1a 06 00 47 00 00 00 70 08 00 00 92 0a 00 00 ca 08",
+      "raw_e184": "80 07 18 01 58 00 2c 00 70 08 5a 00 08 00 0a 00 48 00",
+      "raw_e390": "28 88 04 00 00 18 00 00",
+      "raw_e3a0": "02 0d 0c 00 62 a0 00 61 00 00 00 00 00 00 00 00 00"
+    },
+    "receiver_avi_before": "82 02 0d b9 02 a0 04 10 00 00 00 00 00 00 00 00 00"
+  }
+}
