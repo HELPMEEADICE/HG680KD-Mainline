@@ -1,0 +1,44 @@
+HG680KD Linux 7.3.6 dual-PP USB deployment, 2026-11-28
+
+Desktop timeout on the initial USB candidate with patch 0018
+  PPT timedout_job online=2 n=2 task=1 done=2 pp0=40/1/f19/1 pp1=0/0/f19/0 ppbc=40/1/f19/1 bc=30003/3 gic=126:1/0/0/0 type=4 gp=0 gpm=0 pm=0/0
+  PPT frame dlbu=0 geometry=1919/1079 list=3f5c000/3f5c020 dlbu_regs=3f5c000/3f5c020/0/0
+  PP1 was acknowledged. PP0 had EOF pending and did not raise a second shared SPI interrupt.
+  Patch 0019 reprograms the broadcast interrupt mask with the unfinished PPs after a partial completion.
+
+Final USB payload built with GCC 14.2.0 and zero warnings
+  boot.img size: 15,245,384 bytes
+  boot.img SHA256: 25b579f9dcc0399c71d5cc07620e4c3a8e81b1b7445ba4428b8ba4cf7eb13c3b
+  Image SHA256: 945f9bf55cc72dcdd461163498307e6d599ace062bd12730524fe283e79f2d54
+  TFTP preflight U-Boot RAM CRC32: 2e51caf2 at 0x01fdffc0
+  TFTP preflight used the USB F2FS root, with 32/32 alternating one- and two-PP jobs and 4,096/4,096 pixels each.
+  Three 1080p glmark2 runs covered build, texture and shading with the Mali450 renderer. Scores: 28, 39, 39.
+  The shared Mali INTID 126 rose from 512 to 11,945 during desktop stress. INTID 181 stayed zero.
+
+USB write and direct readback
+  Verified USB /dev/sda1 and root /dev/sda3
+  USB_RAW_LBA_4136_29777_AND_TRAILING_BYTES_OK
+  SHA256 of 29,777 sectors from LBA 4136: d4f1ea87ae888cd705500c89979ca9683a53c1a88fa240e9e4b66d6656de7baa
+  The first 15,245,384 bytes matched boot.img and the remaining 440 bytes matched the previous sector window.
+  /boot/boot.img.bak-pre-dualpp SHA256: d298dcf14df298f0bd44dd4efd6efa07f5d343ebe31c754603cb8ea5e7f047b4
+  The previous manifest was saved as /boot/BOOT-SHA256SUMS.bak-pre-dualpp.
+  USB_WRITE_AND_UNMOUNT_OK
+
+COM4 default-USB software reboot at 115200 8N1
+  Bootrom start
+  usb read: device 0 block # 4136, count 29777 ... 29777 blocks read: OK
+  VFS: Mounted root (f2fs filesystem) readonly on device 8:3.
+  Running 7.3.6-hg680kd-arm64-usb with /dev/sda3 F2FS, /dev/sda1 VFAT and 393,216 KiB CMA.
+  Mounted /boot/boot.img matches the final SHA256. Lima reports num_pp=2.
+  Direct GLX and OpenGL ES selected Mali450. Xorg glamor accelerated the display.
+  32/32 alternating jobs matched every pixel. 1080p glmark2 build, texture and shading completed, score 26.
+  No Lima timeouts or errors after the desktop workload.
+
+Media after the default boot
+  /dev/video1 JPGD: one 1080p JPEG to NV12, 1920x1088 capture, 1920-byte stride.
+  /dev/video0 VDEC and /dev/dri/card0 VDP: 2160p Main10 H0TV, 1080 decoded and displayed, 60.000 FPS.
+  Zero dropped frames, missed vblanks and VDP underflows. G0 OSD updated 100 times.
+  /dev/snd/pcmC0D0p AIAO: 864,000 PCM frames at 48 kHz, zero XRUN.
+  INTID 169 (VDEC) +1080, INTID 129 (JPGD) +1, INTID 116 (AIAO) +1800, INTID 181 (SMMU) 0.
+
+U-Boot loaded the usual stock BL31. eMMC flashing, OTP operations and saveenv executions: 0.

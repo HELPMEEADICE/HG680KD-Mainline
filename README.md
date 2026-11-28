@@ -4,7 +4,7 @@
 
 ## ARM64 Linux 7.3.6（默认 U 盘启动）
 
-`7.3.6-hg680kd-arm64-usb` 的显示修复已通过物理断电上电验证。HDMI 由 VDP 的 G0 接管，Armbian 的 Mesa 直接渲染使用单 PP Mali450。V0 2160p60 Main10 Tiled 直扫、G0 OSD、JPGD 和 HDMI 音频均通过回归。[显示修复与构建](UBOOT-USB-BOOT.md#linux-736-lima-and-native-hdmi-handoff) · [冷启动验收](logs/523-usb-7.3.6-display.txt)
+`7.3.6-hg680kd-arm64-usb` 已部署 Mali-450 双 PP 修复。默认 U-Boot USB 路径启动 Armbian，Mesa 直接渲染使用 PP0 和 PP1。HDMI 由 VDP 的 G0 接管，V0 2160p60 Main10 Tiled 直扫、G0 OSD、JPGD 和 HDMI 音频均通过回归。 [U 盘部署与回退](UBOOT-USB-BOOT.md#linux-736-dual-pp-usb-deployment) · [双 PP 根因与纯 RAM 验收](LIMA-DUALPP.md)
 
 `7.3.6-hg680kd-arm64-usb` 已通过 COM4 软件重启验证，沿默认 U-Boot USB 路径挂载 F2FS 根分区，预留 384 MiB CMA。VDEC、VDP 和 AIAO 通过 2160p60 HEVC Main10 与 48 kHz 双声道 PCM 播放测试。默认启动在 EL1，内核已编入 KVM 和 PPI 9/12 设备树。默认 USB 版在 Linux 中禁用 eMMC 控制器。[初次 USB 部署](UBOOT-USB-BOOT.md#2026-11-28-initial-linux-736-usb-deployment) · [实机记录](logs/519-usb-7.3.6-verification.txt)
 

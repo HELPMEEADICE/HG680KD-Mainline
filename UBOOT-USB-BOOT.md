@@ -1,8 +1,23 @@
 # HG680KD U-Boot USB Auto-Boot & Android Fallback
 
+## Linux 7.3.6 dual-PP USB deployment
+
+The current USB build of `7.3.6-hg680kd-arm64-usb` enables PP0, PP1 and both PP MMUs. Patch 0018 makes the broadcast interrupt mask follow the cores selected by each job and waits for the previous job's PP resets before programming the next mask. Patch 0019 narrows the interrupt mask to the unfinished cores when the shared handler observes a partial completion. The DT inherits the eight Mali interrupt entries on level-high SPI 94. GCC 14.2.0 compiled the image without warnings. The 15,245,384-byte image uses the F2FS root and 384 MiB CMA. [Diagnosis and RAM tests](LIMA-DUALPP.md) · [USB build](scripts/build_usb_736.sh)
+
+| USB boot file | SHA256 |
+| --- | --- |
+| `/boot/boot.img` | `25b579f9dcc0399c71d5cc07620e4c3a8e81b1b7445ba4428b8ba4cf7eb13c3b` |
+| `/boot/boot.img.bak-pre-dualpp` | `d298dcf14df298f0bd44dd4efd6efa07f5d343ebe31c754603cb8ea5e7f047b4` |
+
+The TFTP preflight booted the new kernel with the existing Armbian F2FS root. U-Boot read back CRC32 `2e51caf2`. All 32 alternating one- and two-PP jobs matched 4,096 pixels, and three runs of the 1080p glmark2 build, texture and shading scenes completed on Mali450 with zero Lima timeouts. The installer staged the image in tmpfs and used `dd conv=notrunc,fsync` to update the FAT32 file in place. A direct read of LBA 4136 through 33912 matched the new file and preserved the 440 trailing bytes. The sector-window SHA256 is `d4f1ea87ae888cd705500c89979ca9683a53c1a88fa240e9e4b66d6656de7baa`.
+
+COM4 captured a software reboot through the default U-Boot USB path. Linux mounted `/dev/sda3` as its F2FS root and `/dev/sda1` as VFAT. The installed kernel repeated the 32 alternating jobs and the glmark2 scenes with zero Lima timeouts. JPGD decoded a 1080p JPEG. VDEC and VDP displayed 1,080 2160p Main10 frames at 60.000 FPS with zero drops or missed vblanks, and AIAO played 864,000 PCM frames with zero XRUN. SMMU INTID 181 remained zero. [USB acceptance record](logs/533-usb-7.3.6-dualpp.txt)
+
+For rollback use `/boot/boot.img.bak-pre-dualpp` and `/boot/BOOT-SHA256SUMS.bak-pre-dualpp` with the in-place restore procedure below. A verified host copy is in `artifacts/usb-backup/2026-11-28-pre-dualpp/`.
+
 ## Linux 7.3.6 Lima and native HDMI handoff
 
-The previous USB device tree inherited `status = "disabled"` for the GPU from the VDP RAM test. The USB tree now enables Mali-450 with the existing CRG clocks and reset, shared SPI 94, and 200/300 MHz OPPs. Its internal MMUs use direct system DMA. VDP registers first as `card0`, and Lima provides `renderD128`. The USB profile advertises PP0 and its MMU. With both PP cores advertised, a job using one core could write back all pixels with no PP interrupt. The single-PP profile gives up some 3D throughput and runs the same VDEC and VDP scanout pipeline. The Lima patch gives the broadcast handler sole ownership of PP completion on the shared IRQ and checks for pending PP work before counting idle cores. [USB device tree](src/hi3798mv320-fiberhome-hg680kd-arm64-usb.dts) · [Lima patch](patches/0017-drm-lima-handle-shared-pp-irq-once.patch)
+The first USB display build enabled Mali-450 with the CRG clocks and reset, shared SPI 94, and 200/300 MHz OPPs. Its internal MMUs used direct system DMA. VDP registered first as `card0`, and Lima provided `renderD128`. This build advertised PP0 and its MMU because a job using one core in a dual-PP topology could write back all pixels with no PP interrupt. Patch 0017 gave the broadcast handler sole ownership of PP completion on the shared IRQ and checked for pending PP work before counting idle cores. [Lima patch](patches/0017-drm-lima-handle-shared-pp-irq-once.patch)
 
 The original VDP driver selected its tiled video plane as the KMS primary and omitted DRM fbdev client registration. USB now uses G0 as the RGB primary for fbcon, Xorg and Mesa kmsro. Its 1920×1080 KMS mode matches the firmware G0 canvas. On a 2160p60 firmware link, the original GP0 scaler expands G0 to the HDMI raster and the driver translates V0 destinations to physical HD0 pixels. The full-screen 3840×2160 tiled video still reaches V0 at unity, with G0 above it for alpha-blended OSD. Rebuild `vdp-player` with `scripts/build_vdec_ffmpeg.sh ~/hg680kd-mainline player` to discover V0 and G0 by supported format on both KMS layouts. [VDP driver](src/hi3798mv320-vdp.c) · [Player](src/vdp-player.c)
 

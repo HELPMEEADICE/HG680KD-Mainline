@@ -1,0 +1,48 @@
+aarch64-linux-gcc (GCC) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+make: Entering directory '/home/hedc/hg680kd-mainline/out/lima-dualpp/source'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/lima-dualpp/build'
+#
+# configuration written to .config
+#
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/lima-dualpp/build'
+make: Leaving directory '/home/hedc/hg680kd-mainline/out/lima-dualpp/source'
+make: Entering directory '/home/hedc/hg680kd-mainline/out/lima-dualpp/source'
+make[1]: Entering directory '/home/hedc/hg680kd-mainline/out/lima-dualpp/build'
+  SYNC    include/config/auto.conf
+make[2]: Nothing to be done for 'scripts_dtc'.
+  CC      drivers/gpu/drm/lima/lima_device.o
+  CC      drivers/gpu/drm/lima/lima_pp.o
+  CC      drivers/gpu/drm/lima/lima_sched.o
+  CC      drivers/gpu/drm/lima/lima_bcast.o
+  AR      drivers/gpu/drm/lima/built-in.a
+  AR      drivers/gpu/drm/built-in.a
+  AR      drivers/gpu/built-in.a
+  AR      drivers/built-in.a
+  AR      built-in.a
+  AR      built-in-fixup.a
+  COPY    vmlinux.a
+  LD      vmlinux.o
+  MODPOST vmlinux.symvers
+  KSYMS   .tmp_vmlinux0.kallsyms.S
+  AS      .tmp_vmlinux0.kallsyms.o
+  LD      .tmp_vmlinux1
+  NM      .tmp_vmlinux1.syms
+  KSYMS   .tmp_vmlinux1.kallsyms.S
+  AS      .tmp_vmlinux1.kallsyms.o
+  LD      .tmp_vmlinux2
+  NM      .tmp_vmlinux2.syms
+  KSYMS   .tmp_vmlinux2.kallsyms.S
+  AS      .tmp_vmlinux2.kallsyms.o
+  LD      vmlinux.unstripped
+  NM      System.map
+  SORTTAB vmlinux.unstripped
+  OBJCOPY vmlinux
+  GEN     modules.builtin.modinfo
+  GEN     modules.builtin
+  OBJCOPY arch/arm64/boot/Image
+make[1]: Leaving directory '/home/hedc/hg680kd-mainline/out/lima-dualpp/build'
+make: Leaving directory '/home/hedc/hg680kd-mainline/out/lima-dualpp/source'

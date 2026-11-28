@@ -26,12 +26,20 @@ printf '%s  %s\n' \
 if [[ ! -d $linux ]]; then
     cp -a --reflink=auto "$root/source/linux-7.3.6" "$linux"
 fi
-for patch_name in 0016-media-add-Hi3798MV320-jpgd.patch 0017-drm-lima-handle-shared-pp-irq-once.patch; do
-    patch_file="$project/patches/$patch_name"
+apply_patch_if_needed() {
+    local patch_file="$project/patches/$1"
     if ! patch -d "$linux" -p1 --reverse --force --dry-run --silent <"$patch_file" >/dev/null 2>&1; then
         patch -d "$linux" -p1 --forward --batch <"$patch_file"
     fi
-done
+}
+apply_patch_if_needed 0016-media-add-Hi3798MV320-jpgd.patch
+lima_final=0019-drm-lima-rearm-shared-pp-broadcast-irq.patch
+# The final patch edits earlier Lima hunks, so check it before its prerequisites.
+if ! patch -d "$linux" -p1 --reverse --force --dry-run --silent <"$project/patches/$lima_final" >/dev/null 2>&1; then
+    apply_patch_if_needed 0017-drm-lima-handle-shared-pp-irq-once.patch
+    apply_patch_if_needed 0018-drm-lima-match-pp-broadcast-to-job.patch
+    patch -d "$linux" -p1 --forward --batch <"$project/patches/$lima_final"
+fi
 install -m644 "$project/src/hi3798mv320-vdp.c" "$linux/drivers/gpu/drm/"
 install -m644 "$project/src/hi3798mv320-jpgd.c" "$linux/drivers/media/platform/"
 install -m644 "$project/src/crg-hi3798mv320-reset.c" "$linux/drivers/clk/hisilicon/"

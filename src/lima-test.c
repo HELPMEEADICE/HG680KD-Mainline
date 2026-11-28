@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Offscreen Mali-450 GP (PLBU) + dual-PP (DLBU + WB0) render verification for Lima DRM.
+ * Offscreen Mali-450 GP (PLBU) + PP (DLBU + WB0) render verification for Lima DRM.
  */
 #define _GNU_SOURCE
 #include <errno.h>
@@ -155,6 +155,7 @@ static int run_pp_clear_pass(int fd, uint32_t ctx, uint32_t num_pp,
 	struct drm_lima_gem_submit submit;
 	struct drm_lima_gem_wait wait;
 	uint32_t i, matches = 0;
+	int wait_result;
 
 	for (i = 0; i < width * height; i++)
 		pixels[i] = 0xdeadbeefU;
@@ -216,10 +217,9 @@ static int run_pp_clear_pass(int fd, uint32_t ctx, uint32_t num_pp,
 	wait.handle = fb->handle;
 	wait.op = LIMA_GEM_WAIT_READ;
 	wait.timeout_ns = now_ns() + 2000000000LL;
-	if (ioctl(fd, DRM_IOCTL_LIMA_GEM_WAIT, &wait) < 0) {
+	wait_result = ioctl(fd, DRM_IOCTL_LIMA_GEM_WAIT, &wait);
+	if (wait_result < 0)
 		perror("PP DRM_IOCTL_LIMA_GEM_WAIT");
-		return -1;
-	}
 
 	for (i = 0; i < width * height; i++) {
 		if (pixels[i] == clear_color)
@@ -230,10 +230,10 @@ static int run_pp_clear_pass(int fd, uint32_t ctx, uint32_t num_pp,
 	       clear_color, matches, width * height,
 	       pixels[0], pixels[(height / 2) * width + width / 2],
 	       pixels[width * height - 1]);
-	return matches == width * height ? 0 : -1;
+	return wait_result == 0 && matches == width * height ? 0 : -1;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	static const uint32_t pp_clear_program[8] = {
 		0x00020425, 0x0000000c, 0x01e007cf, 0xb0000000,
@@ -250,8 +250,31 @@ int main(void)
 	struct drm_lima_ctx_create ctx = { 0 };
 	struct lima_bo fb, pp_buf, plb, plbu_cmd, gp_stream, heap;
 	uint32_t num_pp, gpu_id, gp_ver, pp_ver;
+	unsigned long cores = 0, repeat = 2;
+	int alternate = 0;
 	uint32_t *rsw;
-	int fd;
+	int fd, opt;
+
+	while ((opt = getopt(argc, argv, "p:n:a")) != -1) {
+		char *end;
+		unsigned long value;
+
+		if (opt == 'a') {
+			alternate = 1;
+			continue;
+		}
+		if (opt != 'p' && opt != 'n')
+			goto usage;
+		value = strtoul(optarg, &end, 10);
+		if (*end || !value || value > (opt == 'p' ? 8 : 10000))
+			goto usage;
+		if (opt == 'p')
+			cores = value;
+		else
+			repeat = value;
+	}
+	if (optind != argc || (alternate && cores))
+		goto usage;
 
 	fd = open(path, O_RDWR);
 	if (fd < 0) {
@@ -293,6 +316,12 @@ int main(void)
 		fprintf(stderr, "Unexpected Mali-450 params\n");
 		return 1;
 	}
+	if (cores > num_pp || (alternate && num_pp < 2)) {
+		fprintf(stderr, "Requested PP count exceeds the available cores\n");
+		return 1;
+	}
+	if (!cores)
+		cores = num_pp;
 
 	if (ioctl(fd, DRM_IOCTL_LIMA_CTX_CREATE, &ctx) < 0) {
 		perror("DRM_IOCTL_LIMA_CTX_CREATE");
@@ -318,16 +347,21 @@ int main(void)
 	rsw[9] = pp_buf.va;
 	rsw[13] = 0x00000100;
 
-	if (run_gp_plbu_pass(fd, ctx.id, &plbu_cmd, &gp_stream, &plb, &heap) < 0)
-		return 1;
-	if (run_pp_clear_pass(fd, ctx.id, num_pp, &fb, &pp_buf, &plb, &heap, 0xff336699U) < 0)
-		return 1;
-	if (run_gp_plbu_pass(fd, ctx.id, &plbu_cmd, &gp_stream, &plb, &heap) < 0)
-		return 1;
-	if (run_pp_clear_pass(fd, ctx.id, num_pp, &fb, &pp_buf, &plb, &heap, 0xffaabbccU) < 0)
-		return 1;
+	for (unsigned long i = 0; i < repeat; i++) {
+		uint32_t active_pp = alternate && !(i % 2) ? 1 : cores;
+		uint32_t color = i % 2 ? 0xffaabbccU : 0xff336699U;
+
+		printf("Job %lu: cores=%u\n", i + 1, active_pp);
+		if (run_gp_plbu_pass(fd, ctx.id, &plbu_cmd, &gp_stream, &plb, &heap) < 0 ||
+		    run_pp_clear_pass(fd, ctx.id, active_pp, &fb, &pp_buf, &plb, &heap, color) < 0)
+			return 1;
+	}
 
 	printf("LIMA GP+PP OFFSCREEN RENDER TEST: PASS\n");
 	close(fd);
 	return 0;
+
+usage:
+	fprintf(stderr, "Usage: %s [-p cores | -a] [-n jobs]\n", argv[0]);
+	return 2;
 }

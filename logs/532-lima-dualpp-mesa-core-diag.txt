@@ -1,0 +1,94 @@
+^C
+
+# (uname -r; cat /proc/mounts; cat /proc/partitions; cat /proc/cmdline; ls -l /dev/video0 /dev/video1 /dev/dri/card0 /dev/dri/renderD128 /dev/snd/pcmC0D0p; readlink /sys/class/drm/card0/device/driver; ls -d /dev/sd* /dev/mmcblk* /dev/mtd* 2>/dev/null || true); printf '\nEXIT=%s\n' $?
+7.3.6-hg680kd-arm64-lima-ram
+rootfs / rootfs rw,size=809928k,nr_inodes=202482 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=809928k,nr_inodes=202482,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+major minor  #blocks  name
+
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 clk_ignore_unused cma=384M
+crw-------    1  116,  16 /dev/snd/pcmC0D0p
+crw-------    1  226, 128 /dev/dri/renderD128
+crw-------    1  226,   0 /dev/dri/card0
+crw-------    1   81,   1 /dev/video1
+crw-------    1   81,   0 /dev/video0
+../../../../bus/platform/drivers/hi3798mv320-vdp
+
+EXIT=0
+# (dmesg -n 4); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (cd /tmp && wget -q -O busybox.static http://192.168.6.172:8088/busybox.static && sha256sum busybox.static); printf '\nEXIT=%s\n' $?
+198f6f675a49ac734082e054b823d3e2e947180ca2f632852ae1c09e950fd676  busybox.static
+
+EXIT=0
+# (cd /tmp && wget -q -O mesa-runtime.tar.gz http://192.168.6.172:8088/mesa-runtime.tar.gz && sha256sum mesa-runtime.tar.gz); printf '\nEXIT=%s\n' $?
+a1b25d8e3128c0ff4f14d02f37fa8a64b28efdbf3c080a0dbb6e8fb768ec5d75  mesa-runtime.tar.gz
+
+EXIT=0
+# (chmod 755 /tmp/busybox.static); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (/tmp/busybox.static mkdir -p /tmp/mesa && /tmp/busybox.static tar -xzf /tmp/mesa-runtime.tar.gz -C /tmp/mesa); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (mount -o bind /dev /tmp/mesa/dev); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (mount -o bind /sys /tmp/mesa/sys); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (mount -o bind /proc /tmp/mesa/proc); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (grep -E 'GICv3 +(116|122|126|129|169|181) ' /proc/interrupts); printf '\nEXIT=%s\n' $?
+  17:        306          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  18:          2          0          0          0  GICv3     126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+  20:          0          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          0          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  23:          0          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+
+EXIT=0
+# (MESA_SHADER_CACHE_DISABLE=true /tmp/busybox.static chroot /tmp/mesa /usr/local/bin/lima-gles); printf '\nEXIT=%s\n' $?
+EGL render node /dev/dri/renderD128
+GL_RENDERER=Mali450 GL_VERSION=OpenGL ES 2.0 Mesa 25.2.7
+LIMA_GLES_PASS frames=60 size=640x480
+
+EXIT=0
+# (grep -E 'GICv3 +(116|122|126|129|169|181) ' /proc/interrupts); printf '\nEXIT=%s\n' $?
+  17:        306          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  18:        180          0          0          0  GICv3     126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+  20:          0          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          0          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  23:          0          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+
+EXIT=0
+# [host] Mesa run 1 INTID 126 +178
+(umount /tmp/mesa/proc); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (umount /tmp/mesa/sys); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (umount /tmp/mesa/dev); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (dmesg | grep 'PPT ppbcast-enter' | grep -E 'pp0=[[:xdigit:]]+/1/f19/1 pp1=[[:xdigit:]]+/1/f19/1' | /tmp/busybox.static wc -l); printf '\nEXIT=%s\n' $?
+60
+
+EXIT=0
+# [host] Mesa both PPs EOF samples: 60
+(dmesg | grep 'PPT ppbcast-enter' | grep -E 'pp0=[[:xdigit:]]+/1/f19/1 pp1=[[:xdigit:]]+/1/f19/1' | /tmp/busybox.static head -3); printf '\nEXIT=%s\n' $?
+<6>[   25.558276] lima f9200000.gpu: PPT ppbcast-enter online=2 n=0 task=2 done=0 pp0=40/1/f19/1 pp1=40/1/f19/1 ppbc=40/1/f19/1 bc=30003/3 gic=126:1/1/1/0 type=4 gp=0 gpm=0 pm=0/0
+<6>[   25.560521] lima f9200000.gpu: PPT ppbcast-enter online=2 n=0 task=2 done=0 pp0=40/1/f19/1 pp1=40/1/f19/1 ppbc=40/1/f19/1 bc=30003/3 gic=126:1/1/1/0 type=4 gp=0 gpm=0 pm=0/0
+<6>[   25.562584] lima f9200000.gpu: PPT ppbcast-enter online=2 n=0 task=2 done=0 pp0=40/1/f19/1 pp1=40/1/f19/1 ppbc=40/1/f19/1 bc=30003/3 gic=126:1/1/1/0 type=4 gp=0 gpm=0 pm=0/0
+
+EXIT=0
+#

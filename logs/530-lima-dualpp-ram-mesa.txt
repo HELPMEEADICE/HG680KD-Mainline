@@ -1,0 +1,326 @@
+^C
+
+# (uname -r; cat /proc/mounts; cat /proc/partitions; cat /proc/cmdline; ls -l /dev/video0 /dev/video1 /dev/dri/card0 /dev/dri/renderD128 /dev/snd/pcmC0D0p; readlink /sys/class/drm/card0/device/driver; ls -d /dev/sd* /dev/mmcblk* /dev/mtd* 2>/dev/null || true); printf '\nEXIT=%s\n' $?
+7.3.6-hg680kd-arm64-lima-ram
+rootfs / rootfs rw,size=809928k,nr_inodes=202482 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=809928k,nr_inodes=202482,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+major minor  #blocks  name
+
+console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 clk_ignore_unused cma=384M
+crw-------    1  116,  16 /dev/snd/pcmC0D0p
+crw-------    1  226, 128 /dev/dri/renderD128
+crw-------    1  226,   0 /dev/dri/card0
+crw-------    1   81,   1 /dev/video1
+crw-------    1   81,   0 /dev/video0
+../../../../bus/platform/drivers/hi3798mv320-vdp
+
+EXIT=0
+# (dmesg -n 4); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (ifconfig eth0 192.168.6.249 netmask 255.255.255.0 up); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (cd /tmp && wget -q -O busybox.static http://192.168.6.172:8088/busybox.static && sha256sum busybox.static); printf '\nEXIT=%s\n' $?
+198f6f675a49ac734082e054b823d3e2e947180ca2f632852ae1c09e950fd676  busybox.static
+
+EXIT=0
+# (cd /tmp && wget -q -O mesa-runtime.tar.gz http://192.168.6.172:8088/mesa-runtime.tar.gz && sha256sum mesa-runtime.tar.gz); printf '\nEXIT=%s\n' $?
+a1b25d8e3128c0ff4f14d02f37fa8a64b28efdbf3c080a0dbb6e8fb768ec5d75  mesa-runtime.tar.gz
+
+EXIT=0
+# (chmod 755 /tmp/busybox.static); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (/tmp/busybox.static mkdir -p /tmp/mesa && /tmp/busybox.static tar -xzf /tmp/mesa-runtime.tar.gz -C /tmp/mesa); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (mount -o bind /dev /tmp/mesa/dev); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (mount -o bind /sys /tmp/mesa/sys); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (mount -o bind /proc /tmp/mesa/proc); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (grep -E 'GICv3 +(116|122|126|129|169|181) ' /proc/interrupts); printf '\nEXIT=%s\n' $?
+  17:       2036          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  18:        128          0          0          0  GICv3     126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+  20:       1081          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          2          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  23:       1800          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+
+EXIT=0
+# (MESA_SHADER_CACHE_DISABLE=true /tmp/busybox.static chroot /tmp/mesa /usr/local/bin/lima-gles); printf '\nEXIT=%s\n' $?
+EGL render node /dev/dri/renderD128
+GL_RENDERER=Mali450 GL_VERSION=OpenGL ES 2.0 Mesa 25.2.7
+LIMA_GLES_PASS frames=60 size=640x480
+
+EXIT=0
+# (grep -E 'GICv3 +(116|122|126|129|169|181) ' /proc/interrupts); printf '\nEXIT=%s\n' $?
+  17:       2036          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  18:        308          0          0          0  GICv3     126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+  20:       1081          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          2          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  23:       1800          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+
+EXIT=0
+# [host] Mesa run 1 INTID 126 +180
+(grep -E 'GICv3 +(116|122|126|129|169|181) ' /proc/interrupts); printf '\nEXIT=%s\n' $?
+  17:       2036          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  18:        308          0          0          0  GICv3     126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+  20:       1081          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          2          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  23:       1800          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+
+EXIT=0
+# (MESA_SHADER_CACHE_DISABLE=true /tmp/busybox.static chroot /tmp/mesa /usr/local/bin/lima-gles); printf '\nEXIT=%s\n' $?
+EGL render node /dev/dri/renderD128
+GL_RENDERER=Mali450 GL_VERSION=OpenGL ES 2.0 Mesa 25.2.7
+LIMA_GLES_PASS frames=60 size=640x480
+
+EXIT=0
+# (grep -E 'GICv3 +(116|122|126|129|169|181) ' /proc/interrupts); printf '\nEXIT=%s\n' $?
+  17:       2036          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  18:        488          0          0          0  GICv3     126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+  20:       1081          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          2          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  23:       1800          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+
+EXIT=0
+# [host] Mesa run 2 INTID 126 +180
+(grep -E 'GICv3 +(116|122|126|129|169|181) ' /proc/interrupts); printf '\nEXIT=%s\n' $?
+  17:       2036          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  18:        488          0          0          0  GICv3     126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+  20:       1081          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          2          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  23:       1800          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+
+EXIT=0
+# (MESA_SHADER_CACHE_DISABLE=true /tmp/busybox.static chroot /tmp/mesa /usr/local/bin/lima-gles); printf '\nEXIT=%s\n' $?
+EGL render node /dev/dri/renderD128
+GL_RENDERER=Mali450 GL_VERSION=OpenGL ES 2.0 Mesa 25.2.7
+LIMA_GLES_PASS frames=60 size=640x480
+
+EXIT=0
+# (grep -E 'GICv3 +(116|122|126|129|169|181) ' /proc/interrupts); printf '\nEXIT=%s\n' $?
+  17:       2036          0          0          0  GICv3     122 Level     f8cc0000.display-controller
+  18:        668          0          0          0  GICv3     126 Level     gpmmu, ppmmu0, ppmmu1, gp, pp0, pp1, pp_bcast
+  20:       1081          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+  22:          2          0          0          0  GICv3     129 Level     hi3798mv320-jpgd
+  23:       1800          0          0          0  GICv3     116 Level     f8cd0000.audio-controller
+
+EXIT=0
+# [host] Mesa run 3 INTID 126 +180
+(umount /tmp/mesa/proc); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (umount /tmp/mesa/sys); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (umount /tmp/mesa/dev); printf '\nEXIT=%s\n' $?
+
+EXIT=0
+# (dmesg); printf '\nEXIT=%s\n' $?
+<6>[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x412fd050]
+<5>[    0.000000] Linux version 7.3.6-hg680kd-arm64-lima-ram (hg680kd@build) (aarch64-linux-gcc (GCC) 14.2.0, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT 2025-12-01 00:00:00 UTC
+<6>[    0.000000] Machine model: FiberHome HG680KD (ARM64)
+<6>[    0.000000] earlycon: pl11 MMIO32:0x00000000f8b00000 (options '')
+<6>[    0.000000] printk: legacy bootconsole [pl11] enabled
+<6>[    0.000000] OF: reserved mem: 0x00000000053e0000..0x0000000005bdffff (8192 KiB) nomap non-reusable firmware-log@53e0000
+<6>[    0.000000] OF: reserved mem: 0x00000000063dc000..0x00000000063dffff (16 KiB) nomap non-reusable crash-log@63dc000
+<6>[    0.000000] OF: reserved mem: 0x0000000008000000..0x00000000083fffff (4096 KiB) nomap non-reusable atf@8000000
+<6>[    0.000000] OF: reserved mem: 0x0000000017ff8000..0x0000000017ffffff (32 KiB) nomap non-reusable uboot-resmem-low@17ff8000
+<6>[    0.000000] OF: reserved mem: 0x000000007f67f000..0x000000007f6c0fff (264 KiB) nomap non-reusable uboot-resmem-high@7f67f000
+<6>[    0.000000] OF: reserved mem: 0x000000007f6c1000..0x000000007fea9fff (8100 KiB) nomap non-reusable framebuffer@7f6c1000
+<6>[    0.000000] OF: reserved mem: 0x000000007feaa000..0x000000007fffffff (1368 KiB) nomap non-reusable uboot-resmem-tail@7feaa000
+<6>[    0.000000] cma: Reserved 384 MiB at 0x0000000067000000
+<6>[    0.000000] psci: probing for conduit method from DT.
+<6>[    0.000000] psci: PSCIv1.1 detected in firmware.
+<6>[    0.000000] psci: Using standard PSCI v0.2 function IDs
+<6>[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+<6>[    0.000000] psci: SMC Calling Convention v1.2
+<6>[    0.000000] Zone ranges:
+<6>[    0.000000]   DMA      [mem 0x0000000000000000-0x000000007fffffff]
+<6>[    0.000000]   DMA32    empty
+<6>[    0.000000]   Normal   empty
+<6>[    0.000000] Movable zone start for each node
+<6>[    0.000000] Early memory node ranges
+<6>[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000053dffff]
+<6>[    0.000000]   node   0: [mem 0x00000000053e0000-0x0000000005bdffff]
+<6>[    0.000000]   node   0: [mem 0x0000000005be0000-0x00000000063dbfff]
+<6>[    0.000000]   node   0: [mem 0x00000000063dc000-0x00000000063dffff]
+<6>[    0.000000]   node   0: [mem 0x00000000063e0000-0x0000000007ffffff]
+<6>[    0.000000]   node   0: [mem 0x0000000008000000-0x00000000083fffff]
+<6>[    0.000000]   node   0: [mem 0x0000000008400000-0x0000000017ff7fff]
+<6>[    0.000000]   node   0: [mem 0x0000000017ff8000-0x0000000017ffffff]
+<6>[    0.000000]   node   0: [mem 0x0000000018000000-0x000000007f67efff]
+<6>[    0.000000]   node   0: [mem 0x000000007f67f000-0x000000007fffffff]
+<6>[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000007fffffff]
+<6>[    0.000000] percpu: Embedded 19 pages/cpu s48856 r0 d28968 u77824
+<7>[    0.000000] pcpu-alloc: s48856 r0 d28968 u77824 alloc=19*4096
+<7>[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3
+<6>[    0.000000] Detected VIPT I-cache on CPU0
+<6>[    0.000000] CPU features: detected: GICv3 CPU interface
+<6>[    0.000000] alternatives: applying boot alternatives
+<5>[    0.000000] Kernel command line: console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 clk_ignore_unused cma=384M
+<6>[    0.000000] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+<6>[    0.000000] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+<6>[    0.000000] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+<6>[    0.000000] software IO TLB: SWIOTLB bounce buffer size adjusted to 2MB
+<6>[    0.000000] software IO TLB: area num 4.
+<6>[    0.000000] software IO TLB: mapped [mem 0x0000000064d00000-0x0000000064f00000] (2MB)
+<6>[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 524288
+<6>[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+<6>[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+<6>[    0.000000] rcu: Hierarchical RCU implementation.
+<6>[    0.000000] 	Trampoline variant of Tasks RCU enabled.
+<6>[    0.000000] 	Tracing variant of Tasks RCU enabled.
+<6>[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+<6>[    0.000000] RCU Tasks: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+<6>[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+<6>[    0.000000] GICv3: 224 SPIs implemented
+<6>[    0.000000] GICv3: 0 Extended SPIs implemented
+<6>[    0.000000] Root IRQ handler: gic_handle_irq
+<6>[    0.000000] GICv3: GICv3 features: 16 PPIs
+<6>[    0.000000] GICv3: GICD_CTLR.DS=0, SCR_EL3.FIQ=0
+<6>[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0x00000000f1040000
+<6>[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+<6>[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+<6>[    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
+<6>[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+<6>[    0.000000] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+<6>[    0.008237] Console: colour dummy device 80x25
+<6>[    0.012746] printk: legacy console [tty0] enabled
+<6>[    0.017940] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+<6>[    0.028345] pid_max: default: 32768 minimum: 301
+<6>[    0.033288] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+<6>[    0.040797] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+<6>[    0.049013] VFS: Finished mounting rootfs on nullfs
+<6>[    0.055455] rcu: Hierarchical SRCU implementation.
+<6>[    0.060347] rcu: 	Max phase no-delay instances is 1000.
+<6>[    0.065938] dyndbg: Ignore empty _ddebug table in a CONFIG_DYNAMIC_DEBUG_CORE build
+<6>[    0.073875] smp: Bringing up secondary CPUs ...
+<6>[    0.078942] Detected VIPT I-cache on CPU1
+<6>[    0.079007] GICv3: CPU1: found redistributor 100 region 0:0x00000000f1060000
+<6>[    0.079045] CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
+<6>[    0.079539] Detected VIPT I-cache on CPU2
+<6>[    0.079591] GICv3: CPU2: found redistributor 200 region 0:0x00000000f1080000
+<6>[    0.079617] CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
+<6>[    0.080098] Detected VIPT I-cache on CPU3
+<6>[    0.080144] GICv3: CPU3: found redistributor 300 region 0:0x00000000f10a0000
+<6>[    0.080168] CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
+<6>[    0.080247] smp: Brought up 1 node, 4 CPUs
+<6>[    0.137806] SMP: Total of 4 processors activated.
+<6>[    0.142571] CPU: All CPU(s) started at EL1
+<6>[    0.146731] CPU features: detected: 32-bit EL0 Support
+<6>[    0.151938] CPU features: detected: 32-bit EL1 Support
+<6>[    0.157145] CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+<6>[    0.165869] CPU features: detected: CRC32 instructions
+<6>[    0.171078] CPU features: detected: RCpc load-acquire (LDAPR)
+<6>[    0.176899] CPU features: detected: LSE atomic instructions
+<6>[    0.182545] CPU features: detected: Privileged Access Never
+<6>[    0.188191] CPU features: detected: XNX
+<6>[    0.192071] CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+<6>[    0.199151] alternatives: applying system-wide alternatives
+<6>[    0.208571] Memory: 1616520K/2097152K available (9408K kernel code, 802K rwdata, 2172K rodata, 6656K init, 284K bss, 84080K reserved, 393216K cma-reserved)
+<6>[    0.223429] devtmpfs: initialized
+<6>[    0.228775] posixtimers hash table entries: 2048 (order: 3, 32768 bytes, linear)
+<6>[    0.236373] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+<6>[    0.249500] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+<6>[    0.256471] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+<6>[    0.264601] thermal_sys: Registered thermal governor 'step_wise'
+<6>[    0.264671] ASID allocator initialised with 65536 entries
+<6>[    0.276292] Serial: AMBA PL011 UART driver
+<6>[    0.281178] /soc/interrupt-controller@f1000000: Fixed dependency cycle(s) with /soc/interrupt-controller@f1000000
+<6>[    0.292181] f8b00000.serial: ttyAMA0 MMIO:0x00000000f8b00000 (irq = 14, base_baud = 0) is a PL011 rev2
+<6>[    0.301679] printk: console [ttyAMA0] enabled
+<6>[    0.310465] printk: legacy bootconsole [pl11] disabled
+<6>[    0.322491] f8b02000.serial: ttyAMA1 MMIO:0x00000000f8b02000 (irq = 15, base_baud = 0) is a PL011 rev2
+<6>[    0.331990] serial serial0: tty port ttyAMA1 registered
+<5>[    0.339505] SCSI subsystem initialized
+<6>[    0.339669] usbcore: registered new interface driver usbfs
+<6>[    0.339706] usbcore: registered new interface driver hub
+<6>[    0.339743] usbcore: registered new device driver usb
+<6>[    0.339774] mc: Linux media interface: v0.10
+<6>[    0.339817] videodev: Linux video capture interface: v2.00
+<6>[    0.340065] Advanced Linux Sound Architecture Driver Initialized.
+<6>[    0.340438] Bluetooth: Core ver 2.22
+<6>[    0.340496] NET: Registered PF_BLUETOOTH protocol family
+<6>[    0.340511] Bluetooth: HCI device and connection manager initialized
+<6>[    0.340528] Bluetooth: HCI socket layer initialized
+<6>[    0.340542] Bluetooth: L2CAP socket layer initialized
+<6>[    0.340562] Bluetooth: SCO socket layer initialized
+<6>[    0.340715] clocksource: Switched to clocksource arch_sys_counter
+<6>[    0.350400] NET: Registered PF_INET protocol family
+<6>[    0.350597] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+<6>[    0.351982] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+<6>[    0.352020] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+<6>[    0.352052] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+<6>[    0.352156] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+<6>[    0.352534] TCP: Hash tables configured (established 16384 bind 16384)
+<6>[    0.352650] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+<6>[    0.352993] NET: Registered PF_UNIX/PF_LOCAL protocol family
+<6>[    0.365314] kvm [1]: HYP mode not available
+<6>[    0.366032] workingset: timestamp_bits=62 (anon: 57) max_order=19 bucket_order=0 (anon: 0)
+<6>[    0.366533] fuse: init (API version 7.46)
+<6>[    0.371552] pl061_gpio f8b24000.gpio: PL061 GPIO chip registered
+<4>[    0.372212] dvdd: Voltage range but no REGULATOR_CHANGE_VOLTAGE
+<6>[    0.372820] hi3798mv320-vdp f8cc0000.display-controller: firmware HD0 3840x2160 totals 4400x2250 CRG 400d0019/00104000 sync 00090057 VT 87b98465
+<6>[    0.376856] [drm] Initialized hi3798mv320-vdp 1.0.0 for f8cc0000.display-controller on minor 0
+<6>[    0.398836] Console: switching to colour frame buffer device 240x67
+<6>[    0.419116] hi3798mv320-vdp f8cc0000.display-controller: [drm] fb0: hi3798mv320-vdp frame buffer device
+<6>[    0.425574] lima f9200000.gpu: gp - mali450 version major 0 minor 0
+<6>[    0.425642] lima f9200000.gpu: pp0 - mali450 version major 0 minor 0
+<6>[    0.425696] lima f9200000.gpu: pp1 - mali450 version major 0 minor 0
+<6>[    0.425750] lima f9200000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+<6>[    0.425793] lima f9200000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+<6>[    0.426144] lima f9200000.gpu: bus rate = 200000000
+<6>[    0.426181] lima f9200000.gpu: mod rate = 200000000
+<6>[    0.426887] [drm] Initialized lima 1.1.0 for f9200000.gpu on minor 1
+<6>[    0.434644] zram: Added device: zram0
+<4>[    0.435778] (unnamed net_device) (uninitialized): using random MAC address e2:ec:6e:81:ab:c3
+<6>[    0.477488] hi3798mv320-vdec f8c30000.video-decoder: H.264 stateless decoder registered as video0, PXP IRQ 20 SMMU IRQ 21
+<6>[    0.477967] hi3798mv320-jpgd f8c40000.jpeg-decoder: registered as /dev/video1
+<6>[    0.478404] Bluetooth: HCI UART driver ver 2.3
+<6>[    0.478487] Bluetooth: HCI UART protocol Three-wire (H5) registered
+<6>[    0.480471] cpufreq: cpufreq_policy_online: CPU0: Running at unlisted initial frequency: 1250000 kHz, changing to: 1000000 kHz
+<6>[    0.489630] NET: Registered PF_INET6 protocol family
+<6>[    0.490667] Segment Routing with IPv6
+<6>[    0.490759] In-situ OAM (IOAM) with IPv6
+<6>[    0.490861] NET: Registered PF_PACKET protocol family
+<4>[    0.508074] clk: Not disabling unused clocks
+<6>[    0.508147] ALSA device list:
+<6>[    0.508175]   #0: Hi3798MV320 AIAO TX2 HDMI LPCM
+<6>[    1.099807] Freeing unused kernel memory: 6656K
+<6>[    1.100041] Run /init as init process
+<7>[    1.100075]   with arguments:
+<7>[    1.100080]     /init
+<7>[    1.100086]   with environment:
+<7>[    1.100091]     HOME=/
+<7>[    1.100096]     TERM=linux
+<3>[    1.106489] Bluetooth: (null): Too short H5 packet
+<6>[    1.124319] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
+<3>[    1.520787] Bluetooth: hci0: Too short H5 packet
+<3>[    1.521036] Bluetooth: hci0: Invalid header checksum
+<6>[    1.914965] Bluetooth: hci0: RTL: rom_version status=0 version=3
+<6>[    1.915201] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_fw.bin
+<6>[    1.915537] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761btv_vat_config.bin
+<6>[    1.936979] Bluetooth: hci0: RTL: cfg_sz 110, total sz 21738
+<6>[    2.415241] hisi-gmac f9840000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+<6>[    2.620084] Bluetooth: hci0: RTL: fw version 0x1ed6b420
+<5>[    6.684893] random: crng init done
+<6>[    9.682444] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H8TV little-endian (0x56543848) 1920x1080 timing frames=1 avg_ns/frame rbsp=368750 hw=3004500 detile=0 clear=650042 sync=0
+<6>[  110.606913] hi3798mv320-vdec f8c30000.video-decoder: S265 little-endian (0x35363253) -> H0TV little-endian (0x56543048) 3840x2160 timing frames=1080 avg_ns/frame rbsp=116457 hw=10352367 detile=0 clear=1346829 sync=0
+
+EXIT=0
+#

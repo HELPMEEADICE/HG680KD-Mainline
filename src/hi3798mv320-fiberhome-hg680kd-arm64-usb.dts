@@ -12,14 +12,6 @@
 
 /* Use Lima's internal MMUs with the existing direct system DMA path. */
 &gpu {
-    /* Enable PP0 for reliable completion on the shared GPU interrupt. */
-    interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
-                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
-                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
-                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
-                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
-                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
-    interrupt-names = "gp", "gpmmu", "pp0", "ppmmu0", "pmu", "pp";
     status = "okay";
 };
 
