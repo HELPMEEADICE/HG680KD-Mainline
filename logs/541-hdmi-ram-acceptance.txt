@@ -1,0 +1,47 @@
+HG680KD Linux 7.3.6 HDMI TX and RX RAM acceptance, 2026-11-28
+
+COM4 115200 8N1, TFTP-only boot, built-in rootfs and no target block devices.
+BL31 U-Boot RAM CRC32: fa236592.
+
+Image SHA256 and verified U-Boot RAM CRC32
+arm64-7.3.6-hdmi-probe: aa15e1d6f5fa112e9aace5748e8f08be5d0f59b07bc14a6ba43790e01d7cdab1, CRC32 f7ad6c38
+arm64-7.3.6-hdmi-modeset: 1bc21a6017aff649b2ac87b33bd36ba49d3e4169c916b714003ac06db8db742f, CRC32 22f0ef0c
+arm64-7.3.6-hdmi-modeset-locks: 68153ee12b11c259cd0133a015b5fe0d7da88143856a870214d42269b5b8f7f9, CRC32 b8776a37
+arm64-7.3.6-hdmi-modeset-rx-proof: 22219e855a81d1f2ec6c5e62281e9ce2847382cae65ee62103808601a0a2fd1c, CRC32 d5f55954
+
+HPD, DDC and CEC probe
+HPD initial level=00000003 HPD=1 RxSense=1 enable=00000000 event=00000003
+HPD final level=00000003 enable=00000000 event=00000000 observed=00000003 transitions=0 IRQ delta=0
+EDID block=0 segment=0 offset=0x00 tag=00 checksum=00
+EDID block=1 segment=0 offset=0x80 tag=02 checksum=00
+DDC released req=00000000 ack=00000000 arb=00000000 status=00000020 count=00000000 addr=000000a0 aon_err=00000020 pins=0000000f
+EDID blocks=2 expected=2 release=0 abort_idle=0
+CEC Polling 4->4 result=NACK events=00000040 IRQ delta=1 r04=00000102 ctrl=00020000 rx=00000000
+CEC Polling 4->0 result=NACK events=00000040 IRQ delta=1 r04=00000102 ctrl=00020000 rx=00000000
+CEC Give Physical Address (0x83) 4->0 result=TX_FAIL events=00000040 IRQ delta=1 r04=00000102 ctrl=00020000 rx=00000000
+CEC consumed=00000040 total IRQ delta=3
+CEC controller-restored crg=60691161 r00=a08014cc r04=00000102 ctrl=10020200 bus_owner=0 rx=00000000 ping=00000000 cdc=0000f823 initiator=00000000 dest=00000000 capture=00000000 tx=00000000 aon_enable=00000000 aon_event=00000000
+# [host] VT1 [371, 519, 635, 1191], AIAO IRQ [0, 115, 307, 1200], SMMU 181 [0, 0, 0, 0]
+[host] Failed checks: none
+
+RGB8 SDR modeset and HDMI audio
+1080p60-first: VT1 60.000008 Hz, TMDS 148500 kHz, N/SW CTS 6144/148500, HW CTS [148500, 148500, 148500, 148500, 148500], color bars 353/353, XRUN 0
+2160p30: VT1 30.000003 Hz, TMDS 297000 kHz, N/SW CTS 6144/297000, HW CTS [297000, 297000, 297000, 297001, 297000], color bars 353/353, XRUN 0
+1080p60-return: VT1 60.000002 Hz, TMDS 148500 kHz, N/SW CTS 6144/148500, HW CTS [148500, 148500, 148500, 148500, 148501], color bars 353/353, XRUN 0
+PCM switch gap peaks: [37, 398] of 32768.
+
+Independent HPLL/PHY lock and HDMI RX readback
+1080p60-first
+hpll_on=0000007f hpll_off=00000077 hpll_restored=0000007f hpll_mask=00000008 relock_ns=37834
+locks_before=0000007f/00000001/00102005 phy_off=0000007f/00000001/00002002 active=0000007f/00000001/00101ffd phy_unlock=1
+RX active [1920, 1080], total [2200, 1125], AVI VIC 16, ACR-derived 60.000000 Hz, GCP CD 4, EOTF 0, MaxCLL test marker 116 -> 216.
+2160p30
+hpll_on=0000007f hpll_off=00000077 hpll_restored=0000007f hpll_mask=00000008 relock_ns=23583
+locks_before=0000007f/00000001/00102001 phy_off=0000007f/00000001/00001ffe active=0000007f/00000001/00101fff phy_unlock=1
+RX active [3840, 2160], total [4400, 2250], AVI VIC 95, ACR-derived 30.000000 Hz, GCP CD 4, EOTF 0, MaxCLL test marker None -> 195.
+1080p60-return
+hpll_on=0000007f hpll_off=00000077 hpll_restored=0000007f hpll_mask=00000008 relock_ns=37334
+locks_before=0000007f/00000001/00101ffd phy_off=0000007f/00000001/00002004 active=0000007f/00000001/00102001 phy_unlock=1
+RX active [1920, 1080], total [2200, 1125], AVI VIC 16, ACR-derived 60.000000 Hz, GCP CD 4, EOTF 0, MaxCLL test marker 195 -> 116.
+
+Final mode 1080p60, test metadata disabled, VDP underflow 0, fetch underflow 0, SMMU INTID 181 0.

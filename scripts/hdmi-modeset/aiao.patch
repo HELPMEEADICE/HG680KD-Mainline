@@ -1,0 +1,52 @@
+--- a/sound/drivers/hi3798mv320-aiao.c
++++ b/sound/drivers/hi3798mv320-aiao.c
+@@ -12,6 +12,12 @@
+ #include <linux/sizes.h>
+ #include <sound/core.h>
+ #include <sound/pcm.h>
++
++#include <linux/hi3798-hdmi-modeset-audio.h>
++
++struct hi3798_modeset_audio hi3798_ram_audio = {
++	.lock = __MUTEX_INITIALIZER(hi3798_ram_audio.lock),
++};
+ 
+ #define AIAO_IRQ_EN		0x0000
+ #define AIAO_IRQ_STATUS		0x0004
+@@ -173,6 +179,9 @@
+ 	struct snd_pcm_runtime *rt = ss->runtime;
+ 	int ret;
+ 
++	/* ALSA serializes this callback with the probe's modeset transaction. */
++	if (READ_ONCE(hi3798_ram_audio.silent))
++		return -EIO;
+ 	rt->hw = mv320_pcm_hw;
+ 	ret = snd_pcm_hw_constraint_integer(rt, SNDRV_PCM_HW_PARAM_PERIODS);
+ 	if (ret)
+@@ -384,7 +393,17 @@
+ 	if (ret)
+ 		return ret;
+ 	card->sync_irq = aiao->irq;
+-	return snd_card_register(card);
++	ret = snd_card_register(card);
++	if (ret)
++		return ret;
++	mutex_lock(&hi3798_ram_audio.lock);
++	hi3798_ram_audio.tx2 = aiao->tx;
++	hi3798_ram_audio.audio = aiao->hdmi;
++	hi3798_ram_audio.reset = aiao->hdmi_reset;
++	hi3798_ram_audio.packets = aiao->packets;
++	hi3798_ram_audio.pcm = pcm;
++	mutex_unlock(&hi3798_ram_audio.lock);
++	return 0;
+ }
+ 
+ static const struct of_device_id mv320_aiao_of_match[] = {
+@@ -397,6 +416,7 @@
+ 	.probe = mv320_aiao_probe,
+ 	.driver = {
+ 		.name = "hi3798mv320-aiao",
++		.suppress_bind_attrs = true,
+ 		.of_match_table = mv320_aiao_of_match,
+ 	},
+ };

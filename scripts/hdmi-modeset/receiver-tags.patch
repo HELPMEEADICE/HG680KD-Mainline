@@ -1,0 +1,121 @@
+--- a/drivers/misc/hi3798-hdmi-modeset.c
++++ b/drivers/misc/hi3798-hdmi-modeset.c
+@@ -61,9 +61,11 @@
+ #define PKT_AVI_HEADER		0x18
+ #define PKT_AVI_ENABLE		0x1a4
+ #define PKT_AUDIO_ENABLE	0x1ac
++#define PKT_DRM_HEADER		0xa8
+ #define PKT_HDR_ENABLE		0x1b4
+ #define PKT_GCP_ENABLE		0x1b8
+ #define PKT_LINK_MODE		0x208
++#define PKT_DEPTH_ENABLE	BIT(1)
+ #define PKT_GCP			0x20c
+ #define PKT_ENCODER		0x260
+ #define AVMUTE_SET		BIT(0)
+@@ -105,6 +107,7 @@
+ };
+ 
+ struct modeset {
++	bool receiver_tags;
+ 	void __iomem *vdp, *video, *phy, *aon;
+ 	struct regmap *crg;
+ 	dma_addr_t bars_dma[ARRAY_SIZE(modes)];
+@@ -365,6 +368,7 @@
+ 	/* The VDP drives R/G/B. Select G/B/R into the TX Y/Cb/Cr lanes. */
+ 	update(video, 0x1a8, GENMASK(28, 21) | GENMASK(8, 0), 0x11);
+ 	update(packets, PKT_HDR_ENABLE, GENMASK(1, 0), 0);
++	test->receiver_tags = false;
+ 	update(packets, 0x00, BIT(16) | GENMASK(1, 0), 0);
+ 	update(packets, PKT_LINK_MODE, BIT(1) | BIT(0), BIT(0));
+ 	update(packets, PKT_ENCODER, BIT(1) | BIT(0), 0);
+@@ -567,7 +571,7 @@
+ 				  0x8a54, 0x8b38, 0xd500, 0xe000};
+ 	static const u16 video[] = {0xb8, 0xc0, 0xc4, 0x134, 0x180, 0x18c, 0x1a8};
+ 	static const u16 packet[] = {0x00, 0x04, 0x18, 0x1c, 0x20, 0x3c, 0x40,
+-				     0x1a4, 0x1ac, 0x1b4, 0x208, 0x20c, 0x260};
++				     0xa8, 0xac, 0xc4, 0xc8, 0x1a4, 0x1ac, 0x1b4, 0x208, 0x20c, 0x260};
+ 	static const u16 acr[] = {0, 4, AUD_ACR, AUD_N, AUD_SW_CTS, AUD_HW_CTS};
+ 	static const u16 tx2[] = {0, 4, 0x88, 0x8c, 0xa8};
+ 	u64 vt1, first_ns, last_ns, underflow;
+@@ -603,6 +607,7 @@
+ 	for (i = 0; i < ARRAY_SIZE(crg); i++)
+ 		if (!regmap_read(test->crg, crg[i], &value))
+ 			seq_printf(s, "crg[%03x]=%08x\n", crg[i], value);
++	seq_printf(s, "receiver_tags=%d\n", test->receiver_tags);
+ 	dump(s, "vdp", test->vdp, vdp, ARRAY_SIZE(vdp));
+ 	dump(s, "phy", test->phy, phy, ARRAY_SIZE(phy));
+ 	dump(s, "video", test->video, video, ARRAY_SIZE(video));
+@@ -618,6 +623,40 @@
+ static int modeset_open(struct inode *inode, struct file *file)
+ {
+ 	return single_open(file, report, inode->i_private);
++}
++
++static int set_receiver_tags(struct modeset *test, void __iomem *packets, unsigned int marker_base)
++{
++	bool enable = marker_base;
++	struct hdmi_drm_infoframe frame;
++	u8 data[31] = {};
++	unsigned int i;
++	int ret;
++
++	if (!test->mode || !(readl(test->aon + 0x28) & BIT(0)))
++		return -ENOLINK;
++
++	if (enable) {
++		hdmi_drm_infoframe_init(&frame);
++		frame.eotf = HDMI_EOTF_TRADITIONAL_GAMMA_SDR;
++		frame.max_cll = marker_base + test->mode->vic;
++		ret = hdmi_drm_infoframe_pack(&frame, data, sizeof(data));
++		if (ret < 0)
++			return ret;
++		writel(get_unaligned_le24(data), packets + PKT_DRM_HEADER);
++		for (i = 0; i < 4; i++) {
++			const u8 *slot = data + 3 + i * 7;
++
++			writel(get_unaligned_le32(slot), packets + PKT_DRM_HEADER + 4 + i * 8);
++			writel(get_unaligned_le24(slot + 4), packets + PKT_DRM_HEADER + 8 + i * 8);
++		}
++	}
++
++	/* Both pixel packing and TMDS clock remain at 8 bpc. */
++	update(packets, PKT_LINK_MODE, PKT_DEPTH_ENABLE, enable ? PKT_DEPTH_ENABLE : 0);
++	update(packets, PKT_HDR_ENABLE, GENMASK(1, 0), enable ? 3 : 0);
++	test->receiver_tags = enable;
++	return 0;
+ }
+ 
+ static ssize_t modeset_write(struct file *file, const char __user *buf, size_t len, loff_t *pos)
+@@ -637,9 +676,22 @@
+ 	for (i = 0; i < ARRAY_SIZE(modes); i++)
+ 		if (sysfs_streq(name, modes[i].name))
+ 			break;
+-	if (i == ARRAY_SIZE(modes))
+-		return -EINVAL;
+ 	mutex_lock(&hi3798_ram_audio.lock);
++	if (i == ARRAY_SIZE(modes)) {
++		unsigned int marker_base = 0;
++
++		if (sysfs_streq(name, "rx-tags-on"))
++			marker_base = 100;
++		else if (sysfs_streq(name, "rx-tags-alt"))
++			marker_base = 200;
++		if (!marker_base && !sysfs_streq(name, "rx-tags-off"))
++			ret = -EINVAL;
++		else if (!hi3798_ram_audio.packets)
++			ret = -ENODEV;
++		else
++			ret = set_receiver_tags(test, hi3798_ram_audio.packets, marker_base);
++		goto out;
++	}
+ 	if (hi3798_ram_audio.pcm) {
+ 		mutex_lock(&hi3798_ram_audio.pcm->open_mutex);
+ 		ret = switch_mode(test, &modes[i]);
+@@ -647,6 +699,7 @@
+ 	} else {
+ 		ret = -ENODEV;
+ 	}
++out:
+ 	test->last_error = ret;
+ 	mutex_unlock(&hi3798_ram_audio.lock);
+ 	return ret ? ret : len;

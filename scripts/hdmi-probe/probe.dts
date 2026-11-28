@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: GPL-2.0-only
+#include "hi3798mv320-fiberhome-hg680kd-arm64-usb.dts"
+
+&{/chosen} {
+    bootargs = "console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 clk_ignore_unused cma=384M";
+};
+
+&{/soc} {
+    hdmi-probe@f8ce0038 {
+        compatible = "hisilicon,hg680kd-hdmi-ram-probe";
+        reg = <0x0 0xf8ce0038 0x0 0x3c>,
+              <0x0 0xf8ce4000 0x0 0x64>,
+              <0x0 0xf8ce4800 0x0 0x68>,
+              <0x0 0xf8000048 0x0 0x04>;
+        interrupts = <GIC_SPI 88 IRQ_TYPE_LEVEL_HIGH>,
+                     <GIC_SPI 147 IRQ_TYPE_LEVEL_HIGH>;
+        interrupt-names = "hpd", "cec";
+    };
+};
