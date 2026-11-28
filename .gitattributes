@@ -7,3 +7,5 @@ patches/0017-drm-lima-handle-shared-pp-irq-once.patch text eol=lf
 patches/0018-drm-lima-match-pp-broadcast-to-job.patch text eol=lf
 patches/0019-drm-lima-rearm-shared-pp-broadcast-irq.patch text eol=lf
 scripts/venc-probe/build.sh text eol=lf
+scripts/build_venc_736.sh text eol=lf
+patches/0020-media-add-Hi3798MV320-venc.patch text eol=lf

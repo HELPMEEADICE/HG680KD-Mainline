@@ -1,0 +1,71 @@
+HG680KD Linux 7.3.6 built-in VENC RAM acceptance, 2026-11-28
+
+## Clean GCC 14.2.0 build
+aarch64-linux-gcc (GCC) 14.2.0
+Kernel output directory is empty
+5ae17d5936db6652de5c02a915e049bd65d872c2a450f4bd84081e131af03986  boot.img  (19826760 bytes, CRC32=9d7d8e4b, load_at=0x01fdffc0)
+Compiler and DTB warnings: 0
+
+## COM4 TFTP, U-Boot RAM CRC32 and device registration
+[host] stock-bl31.bin SHA256 5f32da6063d8c49d0c2cc9fc7a1667f0e2b75931ce4d73af842f3efc51a97b7b
+[host] CRC32 matches local image: fa236592
+[host] boot.img SHA256 5ae17d5936db6652de5c02a915e049bd65d872c2a450f4bd84081e131af03986
+[host] CRC32 matches local image: 9d7d8e4b
+crw-------    1   81,   0 /dev/video0
+crw-------    1   81,   1 /dev/video1
+crw-------    1   81,   2 /dev/video2
+crw-------    1  253,   0 /dev/media0
+crw-------    1  226,   0 /dev/dri/card0
+crw-------    1  226, 128 /dev/dri/renderD128
+crw-------    1  116,  16 /dev/snd/pcmC0D0p
+[    0.472233] hi3798mv320-venc f8c80000.video-encoder: registered as /dev/video2
+
+## The four 60-frame encode and decoder loopback cases
+VENC 1280x720 NV12 QP=24 frames=60 bytes=2266698 fps=36.406 avg_ms=25.205 max_ms=27.168 irq=60
+CPU0 17.58%
+CPU1 30.91%
+CPU2 21.82%
+CPU3 15.15%
+[host] 720p-nv12-qp24 PASS, Y/U/V PSNR [50.92105934975454, 48.75525649143715, 49.067589224723605], VDEC +60
+VENC 1280x720 NV21 QP=32 frames=60 bytes=1415089 fps=45.328 avg_ms=20.442 max_ms=24.627 irq=60
+CPU0 0.00%
+CPU1 76.52%
+CPU2 3.03%
+CPU3 0.00%
+[host] 720p-nv21-qp32 PASS, Y/U/V PSNR [42.88764497802778, 42.21392610056157, 42.31355279086293], VDEC +60
+VENC 1920x1080 NV12 QP=32 frames=60 bytes=2681115 fps=19.299 avg_ms=47.845 max_ms=57.992 irq=60
+CPU0 12.54%
+CPU1 25.40%
+CPU2 30.87%
+CPU3 12.86%
+[host] 1080p-nv12-qp32 PASS, Y/U/V PSNR [43.376884115319726, 42.823549183537466, 43.00809517886695], VDEC +60
+VENC 1920x1080 NV21 QP=24 frames=60 bytes=4362943 fps=19.184 avg_ms=47.307 max_ms=56.857 irq=60
+CPU0 6.37%
+CPU1 23.64%
+CPU2 33.23%
+CPU3 18.85%
+[host] 1080p-nv21-qp24 PASS, Y/U/V PSNR [50.899907095121165, 49.67080950105196, 50.000441502220774], VDEC +60
+
+## Media regression
+[host] Lima -p 1 -n 16 matched 16/16 jobs, INTID 126 +32
+[host] Lima -p 2 -n 16 matched 16/16 jobs, INTID 126 +32
+[host] Lima -a -n 32 matched 32/32 jobs, INTID 126 +64
+[host] JPGD 1080p passed, INTID 129 +1
+KMS connector=47 CRTC=45 V0=35 mode=1920x1080@60
+V0 source=3840x2160 destination=1920x1080 fourcc=H0TV modifier=0xfe00000000000320 objects=1 planes=4
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.427 seconds=18.174 usr=4.29% sys=4.98% idle=90.73% peak_rss_kib=89668
+[host] VDEC/VDP/AIAO IRQ deltas [1080, 1090, 1800], SMMU INTID 181=0
+GL_RENDERER=Mali450 GL_VERSION=OpenGL ES 2.0 Mesa 25.2.7
+LIMA_GLES_PASS frames=60 size=640x480
+[host] Mesa Lima GLES passed, INTID 126 +180
+
+## Resource checkpoints from the measured result files
+acceptance baseline: INTID 133=0 INTID 181=0 CMA used=3193 pages CmaFree=380444 KiB DMA-BUF=0 objects/0 bytes CRG=0x00000003/0x00000001
+acceptance after_encode: INTID 133=240 INTID 181=0 CMA used=3193 pages CmaFree=380376 KiB DMA-BUF=0 objects/0 bytes CRG=0x00000003/0x00000001
+acceptance after_media: INTID 133=240 INTID 181=0 CMA used=3209 pages CmaFree=380240 KiB DMA-BUF=0 objects/0 bytes CRG=0x00000003/0x00000001
+acceptance final: INTID 133=240 INTID 181=0 CMA used=3217 pages CmaFree=380240 KiB DMA-BUF=0 objects/0 bytes CRG=0x00000003/0x00000001
+control without encoding baseline: INTID 133=0 INTID 181=0 CMA used=3193 pages CmaFree=380444 KiB DMA-BUF=0 objects/0 bytes CRG=0x00000003/0x00000001
+control without encoding after_media: INTID 133=0 INTID 181=0 CMA used=3209 pages CmaFree=380304 KiB DMA-BUF=0 objects/0 bytes CRG=0x00000003/0x00000001
+control without encoding after_mesa: INTID 133=0 INTID 181=0 CMA used=3217 pages CmaFree=380240 KiB DMA-BUF=0 objects/0 bytes CRG=0x00000003/0x00000001
+<6>[   57.333183] hi3798mv320-venc f8c80000.video-enc: drained=240 SMMU faults=0 quarantined=0

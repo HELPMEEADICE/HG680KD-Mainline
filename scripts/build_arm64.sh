@@ -7,6 +7,9 @@ variant=${3:-core}
 if [[ $variant == 7.3.6-jpgd ]]; then
     exec bash "$(dirname "$0")/build_jpgd_736.sh" "$root" "$inputs"
 fi
+if [[ $variant == 7.3.6-venc ]]; then
+    exec bash "$(dirname "$0")/build_venc_736.sh" "$root" "$inputs"
+fi
 jobs=${JOBS:-$(nproc)}
 linux_ver=${LINUX_VERSION:-6.18.64}
 base_variant=$variant

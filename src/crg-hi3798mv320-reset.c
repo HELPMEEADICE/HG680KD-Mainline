@@ -2,6 +2,7 @@
 
 #include <linux/bitfield.h>
 #include <linux/clk-provider.h>
+#include <linux/debugfs.h>
 #include <linux/delay.h>
 #include <linux/io.h>
 #include <linux/iopoll.h>
@@ -9,6 +10,7 @@
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/platform_device.h>
+#include <linux/seq_file.h>
 #include <linux/spinlock.h>
 #include <dt-bindings/clock/hisilicon,hi3798mv320-jpgd.h>
 
@@ -25,6 +27,12 @@
 #define CRG_VDEC_INIT_MASK	(GENMASK(9, 8) | GENMASK(17, 12))
 #define CRG_JPGD_CTRL		0x07c
 #define CRG_JPGD_SMMU_CTRL	0x334
+#define CRG_VENC_CTRL		0x08c
+#define CRG_VENC_SMMU_CTRL	0x32c
+#define CRG_VENC_GATES		(BIT(1) | BIT(0))
+#define CRG_VENC_SELECT		BIT(8)
+#define CRG_VENC_RESET		BIT(4)
+#define CRG_VENC_SMMU_GATE	BIT(0)
 
 #define CRG_APLL_FRAC		0x000
 #define CRG_APLL_DIV		0x004
@@ -75,6 +83,8 @@ struct hi3798mv320_crg_priv {
 	struct hi3798mv320_gpu_clk clks[2];
 	struct clk_hw cpu_clk;
 	struct clk_hw vdec_clk;
+	struct clk_hw venc_clk;
+	u32 venc_saved, venc_smmu_saved;
 };
 
 static struct hi3798mv320_gpu_clk *to_gpu_clk(struct clk_hw *hw)
@@ -175,6 +185,86 @@ static void hi3798mv320_crg_update(void __iomem *base, u32 reg, u32 mask, u32 va
 {
 	writel((readl(base + reg) & ~mask) | val, base + reg);
 }
+
+static void hi3798mv320_venc_restore(struct hi3798mv320_crg_priv *priv)
+{
+	u32 core_mask = CRG_VENC_SELECT | CRG_VENC_RESET | CRG_VENC_GATES;
+	u32 smmu_mask = CRG_VENC_RESET | CRG_VENC_SMMU_GATE;
+	void __iomem *base = priv->base;
+
+	hi3798mv320_crg_update(base, CRG_VENC_SMMU_CTRL, smmu_mask,
+			       priv->venc_smmu_saved & smmu_mask);
+	readl(base + CRG_VENC_SMMU_CTRL);
+	hi3798mv320_crg_update(base, CRG_VENC_CTRL, core_mask,
+			       priv->venc_saved & core_mask);
+	if (((readl(base + CRG_VENC_CTRL) ^ priv->venc_saved) & core_mask) ||
+	    ((readl(base + CRG_VENC_SMMU_CTRL) ^ priv->venc_smmu_saved) & smmu_mask))
+		pr_err("Hi3798MV320 VENC CRG restore failed\n");
+}
+
+static int hi3798mv320_venc_enable(struct clk_hw *hw)
+{
+	struct hi3798mv320_crg_priv *priv =
+		container_of(hw, struct hi3798mv320_crg_priv, venc_clk);
+	void __iomem *base = priv->base;
+	unsigned long flags;
+	int ret = 0;
+
+	spin_lock_irqsave(&priv->lock, flags);
+	priv->venc_saved = readl(base + CRG_VENC_CTRL);
+	priv->venc_smmu_saved = readl(base + CRG_VENC_SMMU_CTRL);
+	writel(priv->venc_smmu_saved | CRG_VENC_SMMU_GATE, base + CRG_VENC_SMMU_CTRL);
+	readl(base + CRG_VENC_SMMU_CTRL);
+	writel((priv->venc_saved & ~CRG_VENC_SELECT) | CRG_VENC_GATES,
+	       base + CRG_VENC_CTRL);
+	if ((readl(base + CRG_VENC_CTRL) & (CRG_VENC_SELECT | CRG_VENC_GATES)) !=
+	    CRG_VENC_GATES || !(readl(base + CRG_VENC_SMMU_CTRL) & CRG_VENC_SMMU_GATE)) {
+		hi3798mv320_venc_restore(priv);
+		ret = -EIO;
+	}
+	spin_unlock_irqrestore(&priv->lock, flags);
+	return ret;
+}
+
+static void hi3798mv320_venc_disable(struct clk_hw *hw)
+{
+	struct hi3798mv320_crg_priv *priv =
+		container_of(hw, struct hi3798mv320_crg_priv, venc_clk);
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->lock, flags);
+	hi3798mv320_venc_restore(priv);
+	spin_unlock_irqrestore(&priv->lock, flags);
+}
+
+static int hi3798mv320_venc_crg_show(struct seq_file *s, void *unused)
+{
+	struct hi3798mv320_crg_priv *priv = s->private;
+	unsigned long flags;
+	u32 core, smmu;
+
+	spin_lock_irqsave(&priv->lock, flags);
+	core = readl(priv->base + CRG_VENC_CTRL);
+	smmu = readl(priv->base + CRG_VENC_SMMU_CTRL);
+	spin_unlock_irqrestore(&priv->lock, flags);
+	seq_printf(s, "0x08c=%#010x 0x32c=%#010x\n", core, smmu);
+	return 0;
+}
+DEFINE_SHOW_ATTRIBUTE(hi3798mv320_venc_crg);
+
+static void hi3798mv320_venc_clk_debug_init(struct clk_hw *hw, struct dentry *dir)
+{
+	struct hi3798mv320_crg_priv *priv =
+		container_of(hw, struct hi3798mv320_crg_priv, venc_clk);
+
+	debugfs_create_file("crg_registers", 0444, dir, priv, &hi3798mv320_venc_crg_fops);
+}
+
+static const struct clk_ops hi3798mv320_venc_clk_ops = {
+	.enable = hi3798mv320_venc_enable,
+	.disable = hi3798mv320_venc_disable,
+	.debug_init = hi3798mv320_venc_clk_debug_init,
+};
 
 static int hi3798mv320_vdec_enable(struct clk_hw *hw)
 {
@@ -366,7 +456,7 @@ static int hi3798mv320_register_clks(struct platform_device *pdev,
 	struct device *dev = &pdev->dev;
 	bool dvfs = of_device_is_compatible(dev->of_node, "hisilicon,hi3798mv320-crg-dvfs");
 	bool vdec = of_device_is_compatible(dev->of_node, "hisilicon,hi3798mv320-crg-vpu-probe");
-	unsigned int num_clks = HI3798MV320_CLK_JPGD_SMMU + 1;
+	unsigned int num_clks = HI3798MV320_CLK_VENC + 1;
 	struct resource *res;
 	struct clk_hw *hw;
 	int i, ret;
@@ -439,6 +529,21 @@ static int hi3798mv320_register_clks(struct platform_device *pdev,
 	if (IS_ERR(hw))
 		return PTR_ERR(hw);
 	priv->clk_data->hws[HI3798MV320_CLK_JPGD_SMMU] = hw;
+
+	{
+		const struct clk_init_data init = {
+			.name = "venc",
+			.ops = &hi3798mv320_venc_clk_ops,
+			.flags = CLK_IGNORE_UNUSED,
+		};
+
+		/* Restore the previous CRG bits when the consumer releases the clock. */
+		priv->venc_clk.init = &init;
+		ret = devm_clk_hw_register(dev, &priv->venc_clk);
+		if (ret)
+			return ret;
+		priv->clk_data->hws[HI3798MV320_CLK_VENC] = &priv->venc_clk;
+	}
 
 	return devm_of_clk_add_hw_provider(dev, of_clk_hw_onecell_get, priv->clk_data);
 }

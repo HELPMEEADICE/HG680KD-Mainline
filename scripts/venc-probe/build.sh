@@ -39,7 +39,12 @@ kernel=(make -C "$linux" O="$out" ARCH=arm64 CROSS_COMPILE="$cross")
         grep -qx "CONFIG_$key=y" "$out/.config"
     done
     ! grep -qE '^CONFIG_(USB_STORAGE|USB_UAS|MODULES|MTD)=[ym]$' "$out/.config"
-    cp "$input"/{probe.c,r002-registers.h} "$linux/drivers/soc/hisilicon/"
+    cp "$input/probe.c" "$linux/drivers/soc/hisilicon/"
+    registers="$input/hi3798mv320-venc-r002.h"
+    if [[ ! -f $registers ]]; then
+        registers="$input/r002-registers.h"
+    fi
+    install -m644 "$registers" "$linux/drivers/soc/hisilicon/r002-registers.h"
     cp "$input/crg-venc-probe.inc" "$linux/drivers/clk/hisilicon/"
     grep -qxF 'obj-y += probe.o' "$linux/drivers/soc/hisilicon/Makefile" ||
         printf '\nobj-y += probe.o\n' >>"$linux/drivers/soc/hisilicon/Makefile"

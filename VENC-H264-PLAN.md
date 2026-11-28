@@ -4,6 +4,8 @@
 
 同板 RAM 审计已确认 VEDU 整窗 `0xf8c80000/0x10000` 可访问，核心中断使能位可写回读，CRG 两个字可恢复原值。原厂 DTB 给出高电平 SPI `101`，即 GIC INTID `133`。Linux 7.3.6 RAM 探针已通过 320×192 NV12、Constrained Baseline/CAVLC、QP 28、单 Slice IDR 的编解码验收。第 6 节记录 DMA 地址域、码流边界和总线排空实测。 [同板审计](MEDIA-CODEC-AUDIT.md#L34) · [原厂 DTB](artifacts/vpu-reverse-factory/out/factory.dts#L1135) · [历史验活读回](artifacts/arm64-7.3.6-codec-probe/board.txt#L603)
 
+正式 V4L2 驱动的实现、构建与多帧验收见 [VENC-ACCEPTANCE.md](VENC-ACCEPTANCE.md)。下文保留探针阶段的设计和证据。
+
 本文中 **静态已证**表示同板原厂 ARM32 指令可追到该访问或数据流。**推断**表示由调用链、数据结构或相邻 SDK 得出，涉及引擎行为的推断仍需板验。除单列的 CRG 和 SMMU 表外，`+0x…` 均相对于 VEDU 整窗。文中 `c09…`、`c0a…` 为原厂 ARM32 VA，按同板镜像基址 `0xc0008000` 可定位原始指令。基础反编译的 `pdt_init` 属于 VDEC。VENC 本身使用 `drv_venc_pdt_v500_r002_init`（`c09ced14`），寄存器以其回调和同板二进制为准。 [基础反编译](artifacts/vpu-reverse-factory/arm32-result.txt#L114) · [原厂符号表](artifacts/vpu-reverse-factory/hg680kd-stock-kallsyms.txt#L31936) · [HAL 分支](artifacts/media-codec-audit/stock-codecs-arm32.txt#L17489) · [原厂 HAL 回调表](artifacts/media-codec-audit/stock-codecs-arm32.txt#L27480)
 
 ## 1. 寄存器映射与上电初始化
@@ -241,7 +243,7 @@ Lima 的单 PP、双 PP、交替任务分别通过 16、16、32 个 4096 像素�
 
 ### 6.4 重建与复测
 
-使用 `scripts/remote.ps1` 及本地 DPAPI 凭据将 `probe.c`、`crg-venc-probe.inc`、`r002-registers.h`、`probe.dtsi`、`scripts/pack_arm64.py` 和补丁 0019 上传到 `/home/hedc/hg680kd-mainline/out/venc-probe/input/`。远程脚本复制现有双 PP 源树，只在副本接入探针，输出至 `out/venc-probe/release/`。取回 `boot.img` 和 `SHA256SUMS` 至本地结果目录。镜像与完整原始记录位于构建工作区的 `artifacts/arm64-7.3.6-venc-probe/`。
+使用 `scripts/remote.ps1` 及本地 DPAPI 凭据将 `probe.c`、`crg-venc-probe.inc`、`src/hi3798mv320-venc-r002.h`、`probe.dtsi`、`scripts/pack_arm64.py` 和补丁 0019 上传到 `/home/hedc/hg680kd-mainline/out/venc-probe/input/`。远程脚本复制现有双 PP 源树，只在副本接入探针，输出至 `out/venc-probe/release/`。取回 `boot.img` 和 `SHA256SUMS` 至本地结果目录。镜像与完整原始记录位于构建工作区的 `artifacts/arm64-7.3.6-venc-probe/`。
 
 ```powershell
 $hgKey = (Get-ChildItem -LiteralPath $env:TEMP -Filter 'hg680kd-ssh-*.dpapi' |

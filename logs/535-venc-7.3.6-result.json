@@ -1,0 +1,345 @@
+{
+  "boot_img_sha256": "5ae17d5936db6652de5c02a915e049bd65d872c2a450f4bd84081e131af03986",
+  "boot_img_crc32": "9d7d8e4b",
+  "cases": [
+    {
+      "case": "720p-nv12-qp24",
+      "frames": 60,
+      "bytes": 2266698,
+      "sha256": "c6b184b4a524a93654c6ace7e63bb53401a7c4ebaf934ed47fecdbc7bc12a26e",
+      "fps": 36.406,
+      "avg_ms": 25.205,
+      "max_ms": 27.168,
+      "cpu": [
+        17.58,
+        30.91,
+        21.82,
+        15.15
+      ],
+      "psnr_yuv": [
+        50.92105934975454,
+        48.75525649143715,
+        49.067589224723605
+      ],
+      "encode_irq_delta": 60,
+      "decode_irq_delta": 60,
+      "before": {
+        "irq": 0,
+        "smmu_irq": 0,
+        "cma_free_kib": 380444,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 60,
+        "smmu_irq": 0,
+        "cma_free_kib": 380216,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 60,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "c08b16211a54594eb818575e17bc83a34ecf2bd2a649c3dfdae4fee507bceddb",
+        "d8c5404df590b1eddd2c429e929a9bc5277d44ae657310b96bbb6b521a1a569a",
+        "0d35bcfb77c3127f4bf3e24ff560ae6cd726bb172c137bc9cfbc599c10841c08",
+        "00ca3d06c733f5e515f35988152b2648656584f075f26bd2adef34b8ddd749e7",
+        "fbad616ccb4ad372a16c8a7e22be2d9d99fab2091052aa6c245e8aef516f0fad"
+      ]
+    },
+    {
+      "case": "720p-nv21-qp32",
+      "frames": 60,
+      "bytes": 1415089,
+      "sha256": "04896268877226ad06e336b7783ff8dec99881463fa5e547905a0d38d0d8f355",
+      "fps": 45.328,
+      "avg_ms": 20.442,
+      "max_ms": 24.627,
+      "cpu": [
+        0.0,
+        76.52,
+        3.03,
+        0.0
+      ],
+      "psnr_yuv": [
+        42.88764497802778,
+        42.21392610056157,
+        42.31355279086293
+      ],
+      "encode_irq_delta": 60,
+      "decode_irq_delta": 60,
+      "before": {
+        "irq": 60,
+        "smmu_irq": 0,
+        "cma_free_kib": 380284,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 120,
+        "smmu_irq": 0,
+        "cma_free_kib": 380216,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 120,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "8908f32f95bde5e64510d9c056cbe8e6e9287c6eea14c4bcaedefc007d6f2298",
+        "9340f1216ef6300b0594d6d1b490919d2e2492ecf71e6435c3732c2afc298498",
+        "3d6ed71c3f623216a56115f44940ad9ac31555f33a9804aad6e498b1df6b708b",
+        "98fc3176b5e83a4e1396cff95d435d9e7757218cf1979bb6d1df896ad009aea2",
+        "b060f6444ea3a739db322916a7bb07fdae87a46aae434c5a31bbfee11d9336f2"
+      ]
+    },
+    {
+      "case": "1080p-nv12-qp32",
+      "frames": 60,
+      "bytes": 2681115,
+      "sha256": "0ed89fc85946f098bf8e2b5f535ad650f4d435c159686fd1fe796ba155d36d91",
+      "fps": 19.299,
+      "avg_ms": 47.845,
+      "max_ms": 57.992,
+      "cpu": [
+        12.54,
+        25.4,
+        30.87,
+        12.86
+      ],
+      "psnr_yuv": [
+        43.376884115319726,
+        42.823549183537466,
+        43.00809517886695
+      ],
+      "encode_irq_delta": 60,
+      "decode_irq_delta": 60,
+      "before": {
+        "irq": 120,
+        "smmu_irq": 0,
+        "cma_free_kib": 380284,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 180,
+        "smmu_irq": 0,
+        "cma_free_kib": 380164,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 180,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "824123284e512a94f5633234ae40bfca77b363084c1bcbe56dd379704f09171d",
+        "156ba2ed3adbc2def115b83d1c0199be2c3bd2bfd88f4cd327bee0500b6979aa",
+        "ac28c5c1734f7884e51cf0492abd4683655c0ae271d3906d937e6d8f625005d0",
+        "5f69545470b1a6d20b2a7bd46480232ca3bf61b483077cf669ba984380c440d9",
+        "28c76ed636b46d4206fe72812528527eb3bf113939d470c5e578a0a6a58b107e"
+      ]
+    },
+    {
+      "case": "1080p-nv21-qp24",
+      "frames": 60,
+      "bytes": 4362943,
+      "sha256": "fc95e368daf6319b6948d0c9ed6114c2f117cbefb4711e6ec26979c974017837",
+      "fps": 19.184,
+      "avg_ms": 47.307,
+      "max_ms": 56.857,
+      "cpu": [
+        6.37,
+        23.64,
+        33.23,
+        18.85
+      ],
+      "psnr_yuv": [
+        50.899907095121165,
+        49.67080950105196,
+        50.000441502220774
+      ],
+      "encode_irq_delta": 60,
+      "decode_irq_delta": 60,
+      "before": {
+        "irq": 180,
+        "smmu_irq": 0,
+        "cma_free_kib": 380384,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "after_streamoff": {
+        "irq": 240,
+        "smmu_irq": 0,
+        "cma_free_kib": 380164,
+        "cma_used_pages": 3193,
+        "dma_buf": [
+          0,
+          0
+        ],
+        "crg": [
+          "0x00000003",
+          "0x00000001"
+        ]
+      },
+      "drained_total": 240,
+      "venc_smmu_faults": 0,
+      "vdec_nv21_batch_sha256": [
+        "d74686d8808127a26c146bc52cf5cecab03be44430107a31453895b8495f35a7",
+        "d40a864b6bdac2c81e455b10ad839ccb294847621c67d1e956355b733371b405",
+        "cafefe8ca08a6ba284c25695e27721efc4f6e10796c397e2d9e2343cc59ccf96",
+        "f4ffd154d1da2d111c7b648328c0825680ac5ded658e9c8b1a21f22d6da57b97",
+        "6383352b2d9cdf011892a2315ef200e9565d6a277cdc1defb983e5f366693a17"
+      ]
+    }
+  ],
+  "baseline": {
+    "irq": 0,
+    "smmu_irq": 0,
+    "cma_free_kib": 380444,
+    "cma_used_pages": 3193,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "after_encode": {
+    "irq": 240,
+    "smmu_irq": 0,
+    "cma_free_kib": 380376,
+    "cma_used_pages": 3193,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "after_media": {
+    "irq": 240,
+    "smmu_irq": 0,
+    "cma_free_kib": 380240,
+    "cma_used_pages": 3209,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "mesa_irq_delta": 180,
+  "media_regression": "pass",
+  "final": {
+    "irq": 240,
+    "smmu_irq": 0,
+    "cma_free_kib": 380240,
+    "cma_used_pages": 3217,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "crg": [
+      "0x00000003",
+      "0x00000001"
+    ]
+  },
+  "control_without_encoding": {
+    "baseline": {
+      "irq": 0,
+      "smmu_irq": 0,
+      "cma_free_kib": 380444,
+      "cma_used_pages": 3193,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "after_media": {
+      "irq": 0,
+      "smmu_irq": 0,
+      "cma_free_kib": 380304,
+      "cma_used_pages": 3209,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    },
+    "mesa_irq_delta": 180,
+    "after_mesa": {
+      "irq": 0,
+      "smmu_irq": 0,
+      "cma_free_kib": 380240,
+      "cma_used_pages": 3217,
+      "dma_buf": [
+        0,
+        0
+      ],
+      "crg": [
+        "0x00000003",
+        "0x00000001"
+      ]
+    }
+  }
+}

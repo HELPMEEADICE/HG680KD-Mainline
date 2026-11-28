@@ -54,7 +54,7 @@ def flags(fields, names):
     return sum((1 << i) for i, name in enumerate(names) if fields.get(name, 0))
 
 
-def fixture(stream, out):
+def fixture(stream, out, *, all_idr=False):
     log = ffmpeg(
         "-loglevel", "info", "-i", stream, "-c:v", "copy",
         "-bsf:v", "trace_headers", "-f", "null", "-", capture=True,
@@ -102,7 +102,9 @@ def fixture(stream, out):
                 or fields.get("num_ref_idx_l1_active_minus1", 0)):
             raise ValueError("unexpected slice type, order or reference list")
         idr = fields["nal_unit_type"] == 5
-        if idr and not fields["first_mb_in_slice"] and pocs:
+        if all_idr and (not idr or fields["first_mb_in_slice"] or hold):
+            raise ValueError("expected one IDR slice per frame")
+        if not all_idr and idr and not fields["first_mb_in_slice"] and pocs:
             raise ValueError("fixture must contain one closed GOP")
         if fields["slice_type"] % 5 == 0 and not fields["nal_ref_idc"]:
             raise ValueError("fixture requires each P picture to be a reference")
@@ -135,11 +137,14 @@ def fixture(stream, out):
     out.with_suffix(".264").write_bytes(b"".join(units))
     raw = out.with_suffix(".nv21")
     # CAPTURE contains the coded picture, including any SPS crop margins.
-    ffmpeg("-loglevel", "error", "-apply_cropping", 0, "-i", stream,
+    strict = ("-xerror", "-err_detect", "explode") if all_idr else ()
+    ffmpeg("-loglevel", "error", *strict, "-apply_cropping", 0, "-i", stream,
            "-pix_fmt", "nv21", "-f", "rawvideo", raw)
     frame_size = width * height * 3 // 2
     if raw.stat().st_size != len(pocs) * frame_size:
         raise ValueError("software reference does not match the coded dimensions")
+    if all_idr:
+        return sps, pps, slices
     if len(pocs) != len(set(pocs)):
         raise ValueError("reference fixture POCs must be unique")
     if pocs != sorted(pocs):

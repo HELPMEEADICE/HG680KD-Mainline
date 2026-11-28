@@ -4,5 +4,6 @@
 
 #define HI3798MV320_CLK_JPGD		4
 #define HI3798MV320_CLK_JPGD_SMMU	5
+#define HI3798MV320_CLK_VENC		6
 
 #endif
