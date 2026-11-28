@@ -1,0 +1,57 @@
+HG680KD Linux 7.3.6 MPV V4L2 Request and DRM PRIME acceptance, 2026-11-28
+
+Installed package inventory
+dpkg-query: no packages found matching ffmpeg
+dpkg-query: no packages found matching mpv
+
+Image and userspace SHA256
+1d6be9d318ae3fd04526b7ce519ae1bf9a3359f4e63fed86e6ebed64b295810a  boot.img
+029be63ae3e11e6b53f3f52b20cf0a4b5833f82eac4372b96d0652806b17f3fc  mpv-runtime.tar.gz
+
+U-Boot RAM readback
+[host] CRC32 matches local image: fa236592
+[host] CRC32 matches local image: 399138e9
+
+h264-1080p60.mp4
+[AVHWFramesContext @ 0xffffa9f5cb70] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S264
+  Stream #0:0(und): Video: wrapped_avframe, 1 reference frame, drm_prime(tv, bt709/unknown/unknown, progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+[out#0/null @ 0xffffa96bbeb0]   Output stream #0:0 (video): 1080 frames encoded; 1080 packets muxed (457920 bytes);
+[vd] Using hardware decoding (v4l2request).
+[vo/gpu/drmprime-overlay] DRM PRIME overlay plane=35 fb=49 pts=0.000000 fourcc=3132564e modifier=fe00000000000320 planes=2
+[vo/gpu/drm] DRM flip msc=5802 ust_ns=153398691000 video_fb=55
+# [host] h264-1080p60.mp4 1080/1080, 59.944 FPS, 1 missed vblanks, VDH +1080
+
+mpeg2-1080p30.mkv
+[AVHWFramesContext @ 0xffff7fea9f40] Using V4L2 media driver hi3798mv320-vde (7.3.6) for MG2S
+  Stream #0:0: Video: wrapped_avframe, 1 reference frame, drm_prime(tv, bt709, progressive, left), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 30 fps, 30 tbn
+[out#0/null @ 0xffff805f0220]   Output stream #0:0 (video): 120 frames encoded; 120 packets muxed (50880 bytes);
+[vd] Using hardware decoding (v4l2request).
+[vo/gpu/drmprime-overlay] DRM PRIME overlay plane=35 fb=49 pts=0.000000 fourcc=3132564e modifier=fe00000000000320 planes=2
+[vo/gpu/drm] DRM flip msc=6178 ust_ns=159665358000 video_fb=54
+# [host] mpeg2-1080p30.mkv 120/120, 30.127 FPS, 0 missed vblanks, VDH +120
+
+main10-av.mkv
+[AVHWFramesContext @ 0xffff8f5d0f50] Using V4L2 media driver hi3798mv320-vde (7.3.6) for S265
+  Stream #0:0: Video: wrapped_avframe, 1 reference frame, drm_prime(tv, bt709/unknown/unknown, progressive, left), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 60 fps, 60 tbn (default)
+[out#0/null @ 0xffff8f1dc220]   Output stream #0:0 (video): 1080 frames encoded; 1080 packets muxed (457920 bytes);
+[vd] Using hardware decoding (v4l2request).
+[cplayer] AO: [alsa] 48000Hz stereo 2ch s16
+[ao/alsa] drain timeout
+[vo/gpu/drmprime-overlay] DRM PRIME overlay plane=35 fb=49 pts=0.000000 fourcc=56543048 modifier=fe00000000000320 planes=4
+[vo/gpu/drm] DRM flip msc=7404 ust_ns=180098682000 video_fb=49
+# [host] main10-av.mkv 1080/1080, 60.0 FPS, 0 missed vblanks, VDH +1080
+
+Final regression and resource checks
+# [host] Lima -p 1 -n 16 matched 16/16 jobs, INTID 126 +32
+# [host] Lima -p 2 -n 16 matched 16/16 jobs, INTID 126 +32
+# [host] Lima -a -n 32 matched 32/32 jobs, INTID 126 +64
+# [host] JPGD 1080p passed, INTID 129 +1
+# [host] VDEC/VDP/AIAO IRQ deltas [1080, 1090, 1800], SMMU INTID 181=0
+# [host] Lima, JPGD, VDEC, VDP and AIAO regression passed
+VENC 1920x1080 NV12 GOP=12 I_QP=32 P_QP=32 frames=12 bytes=333368 fps=17.922 avg_ms=52.157 max_ms=57.218 irq=12
+<6>[  213.426631] hi3798mv320-venc f8c80000.video-enc: drained=24 SMMU faults=0 quarantined=0
+vblank_irqs 9122 in_blank 9120 last_irq_state 007c0023 unexpected_status 00000000 underflow_irqs 0
+fetch_underflow 00000000
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+CmaFree:          380056 kB
+Total 0 objects, 0 bytes

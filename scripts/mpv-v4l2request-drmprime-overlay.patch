@@ -1,0 +1,225 @@
+diff --git a/player/video.c b/player/video.c
+index 0e1ac29..bfe46ed 100644
+--- a/player/video.c
++++ b/player/video.c
+@@ -1295,8 +1295,12 @@ void write_video(struct MPContext *mpctx)
+     // hr-seek past EOF -> returns last frame, but terminates playback. The
+     // early EOF is needed to trigger the exit before the next seek is executed.
+     // Always using early EOF breaks other cases, like images.
+-    if (logical_eof && !mpctx->num_next_frames && mpctx->ao_chain)
++    if (logical_eof && !mpctx->num_next_frames && mpctx->ao_chain) {
++        // If audio is already done, EOF can tear down the VO immediately.
++        if (mpctx->audio_status == STATUS_EOF)
++            vo_wait_frame(vo);
+         mpctx->video_status = STATUS_EOF;
++    }
+ 
+     if (mpctx->video_status != STATUS_EOF) {
+         if (mpctx->step_frames > 0) {
+diff --git a/video/out/drm_common.c b/video/out/drm_common.c
+index ffc5ebf..356bd57 100644
+--- a/video/out/drm_common.c
++++ b/video/out/drm_common.c
+@@ -95,6 +95,8 @@ const struct m_sub_options drm_conf = {
+             {"primary", DRM_OPTS_PRIMARY_PLANE},
+             {"overlay", DRM_OPTS_OVERLAY_PLANE}),
+             M_RANGE(0, INT_MAX)},
++        {"drm-v4l2request-mv320-tiled", OPT_BOOL(drm_v4l2request_mv320_tiled)},
++        {"drm-v4l2request-static-g0", OPT_BOOL(drm_v4l2request_static_g0)},
+         {"drm-format", OPT_CHOICE(drm_format,
+             {"xrgb8888",    DRM_OPTS_FORMAT_XRGB8888},
+             {"xrgb2101010", DRM_OPTS_FORMAT_XRGB2101010},
+@@ -1025,6 +1027,13 @@ static void drm_pflip_cb(int fd, unsigned int msc, unsigned int sec,
+     int64_t ust = MP_TIME_S_TO_NS(sec) + MP_TIME_US_TO_NS(usec);
+     present_sync_update_values(drm->present, ust, msc);
+     present_sync_swap(drm->present);
++    if (drm->opts->drm_v4l2request_mv320_tiled && mp_msg_test(drm->log, MSGL_DEBUG) &&
++        drm->atomic_context->drmprime_video_plane) {
++        drmModePlane *plane = drmModeGetPlane(fd, drm->atomic_context->drmprime_video_plane->id);
++        MP_DBG(drm, "DRM flip msc=%u ust_ns=%" PRId64 " video_fb=%u\n", msc, ust,
++               plane ? plane->fb_id : 0);
++        drmModeFreePlane(plane);
++    }
+     drm->waiting_for_flip = false;
+ }
+ 
+diff --git a/video/out/drm_common.h b/video/out/drm_common.h
+index ad984e9..35b5363 100644
+--- a/video/out/drm_common.h
++++ b/video/out/drm_common.h
+@@ -105,6 +105,8 @@ struct drm_opts {
+     int drm_atomic;
+     int draw_plane;
+     int drmprime_video_plane;
++    bool drm_v4l2request_mv320_tiled;
++    bool drm_v4l2request_static_g0;
+     int drm_format;
+     struct m_geometry draw_surface_size;
+     int vrr_enabled;
+diff --git a/video/out/gpu/video.c b/video/out/gpu/video.c
+index c0a1be8..363c222 100644
+--- a/video/out/gpu/video.c
++++ b/video/out/gpu/video.c
+@@ -3420,6 +3420,13 @@ void gl_video_render_frame(struct gl_video *p, struct vo_frame *frame,
+ 
+     bool has_frame = !!frame->current;
+ 
++    if (p->hwdec_overlay && ra_get_native_resource(p->ra, "drm_static_draw_plane")) {
++        p->hwdec_overlay->driver->overlay_frame(p->hwdec_overlay, frame->current,
++                                                &p->src_rect, &p->dst_rect,
++                                                frame->frame_id != p->image.id);
++        return;
++    }
++
+     struct m_color c = p->clear_color;
+     float clear_color[4] = {c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0};
+     clear_color[0] *= clear_color[3];
+diff --git a/video/out/hwdec/hwdec_drmprime_overlay.c b/video/out/hwdec/hwdec_drmprime_overlay.c
+index 61514f8..1e49d62 100644
+--- a/video/out/hwdec/hwdec_drmprime_overlay.c
++++ b/video/out/hwdec/hwdec_drmprime_overlay.c
+@@ -17,6 +17,7 @@
+ 
+ #include <assert.h>
+ #include <errno.h>
++#include <inttypes.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -24,6 +25,7 @@
+ #include <stdbool.h>
+ 
+ #include <libavutil/hwcontext.h>
++#include <libavutil/dict.h>
+ #include <libavutil/hwcontext_drm.h>
+ 
+ #include "video/hwdec.h"
+@@ -192,6 +194,12 @@ static int overlay_frame(struct ra_hwdec *hw, struct mp_image *hw_image,
+                 goto fail;
+             }
+ 
++            MP_DBG(hw, "DRM PRIME overlay plane=%u fb=%u pts=%.6f "
++                   "fourcc=%08x modifier=%016" PRIx64 " planes=%d\n",
++                   p->ctx->drmprime_video_plane->id, next_frame.fb.fb_id,
++                   hw_image->pts, desc->layers[0].format,
++                   desc->objects[0].format_modifier, desc->layers[0].nb_planes);
++
+             if (request) {
+                 drm_object_set_property(request, p->ctx->drmprime_video_plane, "FB_ID", next_frame.fb.fb_id);
+                 drm_object_set_property(request, p->ctx->drmprime_video_plane, "CRTC_ID", p->ctx->crtc->id);
+@@ -257,6 +265,7 @@ static int init(struct ra_hwdec *hw)
+     struct drm_opts *opts = mp_get_config_group(tmp, hw->global, &drm_conf);
+     draw_plane = opts->draw_plane;
+     drmprime_video_plane = opts->drmprime_video_plane;
++    bool mv320_tiled = opts->drm_v4l2request_mv320_tiled;
+     talloc_free(tmp);
+ 
+     struct mpv_opengl_drm_params_v2 *drm_params;
+@@ -303,12 +312,25 @@ static int init(struct ra_hwdec *hw)
+         .hw_imgfmt = IMGFMT_DRMPRIME,
+     };
+ 
+-    char *device = drmGetDeviceNameFromFd2(p->ctx->fd);
+-    int ret = av_hwdevice_ctx_create(&p->hwctx.av_device_ref,
+-                                     AV_HWDEVICE_TYPE_DRM, device, NULL, 0);
+-
+-    if (device)
+-        free(device);
++    enum AVHWDeviceType type = AV_HWDEVICE_TYPE_DRM;
++    AVDictionary *device_opts = NULL;
++    char *device = NULL;
++    int ret;
++    if (mv320_tiled) {
++        type = av_hwdevice_find_type_by_name("v4l2request");
++        if (type == AV_HWDEVICE_TYPE_NONE) {
++            MP_ERR(hw, "FFmpeg lacks the V4L2 Request device backend.\n");
++            goto err;
++        }
++        ret = av_dict_set(&device_opts, "mv320_tiled", "1", 0);
++        if (ret < 0)
++            goto err;
++    } else {
++        device = drmGetDeviceNameFromFd2(p->ctx->fd);
++    }
++    ret = av_hwdevice_ctx_create(&p->hwctx.av_device_ref, type, device, device_opts, 0);
++    av_dict_free(&device_opts);
++    free(device);
+ 
+     if (ret != 0) {
+         MP_VERBOSE(hw, "Failed to create hwdevice_ctx: %s\n", av_err2str(ret));
+diff --git a/video/out/opengl/context_drm_egl.c b/video/out/opengl/context_drm_egl.c
+index fc78f13..5ed703e 100644
+--- a/video/out/opengl/context_drm_egl.c
++++ b/video/out/opengl/context_drm_egl.c
+@@ -313,13 +313,14 @@ static void queue_flip(struct ra_ctx *ctx, struct gbm_frame *frame)
+ {
+     struct vo_drm_state *drm = ctx->vo->drm;
+ 
+-    update_framebuffer_from_bo(ctx, frame->bo);
+-
+     struct drm_atomic_context *atomic_ctx = drm->atomic_context;
+     int flags = DRM_MODE_ATOMIC_NONBLOCK | DRM_MODE_PAGE_FLIP_EVENT;
+-    drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "FB_ID", drm->fb->id);
+-    drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "CRTC_ID", atomic_ctx->crtc->id);
+-    drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "ZPOS", 1);
++    if (frame) {
++        update_framebuffer_from_bo(ctx, frame->bo);
++        drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "FB_ID", drm->fb->id);
++        drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "CRTC_ID", atomic_ctx->crtc->id);
++        drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "ZPOS", 1);
++    }
+ 
+     if (vo_drm_set_hdr_metadata(ctx->vo, false))
+         flags |= DRM_MODE_ATOMIC_ALLOW_MODESET;
+@@ -376,6 +377,17 @@ static void drm_egl_swap_buffers(struct ra_ctx *ctx)
+     if (!drm->active)
+         return;
+ 
++    // The initial transparent G0 stays in scanout while V0 gets a new FB.
++    if (drm->opts->drm_v4l2request_static_g0) {
++        if (drmModeAtomicGetCursor(drm->atomic_context->request) > 0) {
++            vo_drm_wait_on_flip(drm);
++            queue_flip(ctx, NULL);
++            vo_drm_wait_on_flip(drm);
++        }
++        drm->redraw = false;
++        return;
++    }
++
+     eglSwapBuffers(p->egl.display, p->egl.surface);
+ 
+     struct gbm_bo *new_bo = gbm_surface_lock_front_buffer(p->gbm.surface);
+@@ -566,6 +578,12 @@ static bool drm_egl_init(struct ra_ctx *ctx)
+         goto err;
+     }
+ 
++    if (drm->opts->drm_v4l2request_static_g0 &&
++        (!drm->opts->drm_v4l2request_mv320_tiled || p->gbm_format != argb_format)) {
++        MP_ERR(ctx, "Static G0 requires the MV320 tiled path and an alpha-capable draw plane.\n");
++        goto err;
++    }
++
+     // It is not fatal if this fails. We'll just try without modifiers.
+     probe_gbm_modifiers(ctx);
+ 
+@@ -586,6 +604,11 @@ static bool drm_egl_init(struct ra_ctx *ctx)
+     }
+ 
+     mpegl_load_functions(&p->gl, ctx->vo->log);
++    if (drm->opts->drm_v4l2request_static_g0) {
++        p->gl.ClearColor(0, 0, 0, 0);
++        p->gl.Clear(GL_COLOR_BUFFER_BIT);
++        p->gl.Finish();
++    }
+     // required by gbm_surface_lock_front_buffer
+     eglSwapBuffers(p->egl.display, p->egl.surface);
+ 
+@@ -637,6 +660,8 @@ static bool drm_egl_init(struct ra_ctx *ctx)
+ 
+     ra_add_native_resource(ctx->ra, "drm_params_v2", &p->drm_params);
+     ra_add_native_resource(ctx->ra, "drm_draw_surface_size", &p->draw_surface_size);
++    if (drm->opts->drm_v4l2request_static_g0)
++        ra_add_native_resource(ctx->ra, "drm_static_draw_plane", &drm->opts->drm_v4l2request_static_g0);
+ 
+     return true;
+ 
