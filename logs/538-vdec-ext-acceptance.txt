@@ -1,0 +1,93 @@
+HG680KD Linux 7.3.6 MPEG-1/MPEG-2 RAM acceptance, 2026-11-28
+
+## Clean GCC build
+aarch64-linux-gcc (GCC) 14.2.0
+Kernel output directory is empty
+1d6be9d318ae3fd04526b7ce519ae1bf9a3359f4e63fed86e6ebed64b295810a  boot.img  (19826760 bytes, CRC32=399138e9, load_at=0x01fdffc0)
+Compiler warnings: 0
+
+## COM4 TFTP RAM boot
+Bytes transferred = 262144 (40000 hex)
+CRC32 for 08020000 ... 0805ffff ==> fa236592
+[host] CRC32 matches local image: fa236592
+[host] boot.img SHA256 1d6be9d318ae3fd04526b7ce519ae1bf9a3359f4e63fed86e6ebed64b295810a
+Bytes transferred = 19826760 (12e8848 hex)
+CRC32 for 01fdffc0 ... 032c8807 ==> 399138e9
+[host] CRC32 matches local image: 399138e9
+
+## MPEG decode and resource counters
+  20:          0          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  21:          0          0          0          0  GICv3     181 Level     hi3798mv320-vdec-smmu
+CmaFree:          380444 kB
+CMA_USED=3193
+Total 0 objects, 0 bytes
+MPEG1 decoded=120 fps=122.237 ms=8.050 elapsed_ms=981.703
+CPU0 2.04%
+CPU1 56.12%
+CPU2 1.01%
+CPU3 0.00%
+  20:        120          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+CmaFree:          380344 kB
+MPEG1 decoded=120 fps=72.782 ms=8.622 elapsed_ms=1648.752
+CPU0 4.82%
+CPU1 23.64%
+CPU2 16.27%
+CPU3 32.53%
+  20:        240          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+CmaFree:          380408 kB
+# [host] mpeg1-1080p 120 frames, 122.237 FPS, Y/U/V PSNR [70.21680532468548, 66.65273075720489, 67.03294083693835]
+MPEG2 decoded=120 fps=117.138 ms=8.271 elapsed_ms=1024.430
+CPU0 0.00%
+CPU1 29.41%
+CPU2 32.35%
+  20:        360          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+CmaFree:          380348 kB
+MPEG2 decoded=120 fps=82.954 ms=7.388 elapsed_ms=1446.576
+CPU0 2.78%
+CPU1 20.14%
+CPU2 22.07%
+CPU3 26.21%
+  20:        480          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+CmaFree:          380412 kB
+# [host] mpeg2-1080p 120 frames, 117.138 FPS, Y/U/V PSNR [72.50086486783184, 69.3788228498982, 69.91654281616321]
+CmaFree:          380440 kB
+Tiled CAPTURE DMA-BUF exported
+MPEG2 decoded=120 fps=177.317 ms=5.381 elapsed_ms=676.753
+CPU1 39.13%
+CPU2 4.41%
+  20:        600          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+CPU0 7.69%
+CPU1 23.08%
+CPU2 41.54%
+CPU3 6.25%
+  20:       1680          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+  20:       1800          0          0          0  GICv3     169 Level     hi3798mv320-vdec-pxp
+CmaFree:          380164 kB
+CMA_USED=3217
+
+## Media regressions
+VENC 1920x1080 NV12 GOP=12 I_QP=32 P_QP=32 frames=12 bytes=333368 fps=18.534 avg_ms=50.853 max_ms=56.848 irq=12
+# [host] Lima -p 1 -n 16 matched 16/16 jobs, INTID 126 +32
+# [host] Lima -p 2 -n 16 matched 16/16 jobs, INTID 126 +32
+# [host] Lima -a -n 32 matched 32/32 jobs, INTID 126 +64
+# [host] JPGD 1080p passed, INTID 129 +1
+ALSA played=864000 frames rate=48000 xruns=0
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.406 seconds=18.180 usr=4.30% sys=6.17% idle=89.52% peak_rss_kib=89812
+# [host] VDEC/VDP/AIAO IRQ deltas [1080, 1090, 1800], SMMU INTID 181=0
+LIMA_GLES_PASS frames=60 size=640x480
+# [host] Mesa Lima GLES passed, INTID 126 +180
+PLAY decoded=120 displayed=13 dropped=107 preroll=0 seeks=0 eos=1 missed_vblanks=3 fps=48.000 wall_fps=3.743 seconds=3.473 usr=1.29% sys=9.71% idle=89.00% peak_rss_kib=64328
+
+## Additional H.264 runs and MPEG queue checks
+<6>[  168.539992] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> H8TV little-endian (0x56543848) 3840x2160 timing frames=120 avg_ns/frame rbsp=2235588 hw=16547232 detile=0 clear=5301681 sync=0
+PLAY decoded=1080 displayed=1080 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=0 fps=60.000 wall_fps=59.820 seconds=18.054 usr=1.08% sys=6.47% idle=92.45% peak_rss_kib=23112
+PLAY decoded=120 displayed=63 dropped=57 preroll=0 seeks=0 eos=1 missed_vblanks=63 fps=29.760 wall_fps=13.725 seconds=4.590 usr=1.91% sys=11.76% idle=86.34% peak_rss_kib=64296
+PLAY decoded=120 displayed=16 dropped=104 preroll=0 seeks=0 eos=1 missed_vblanks=1 fps=56.251 wall_fps=3.912 seconds=4.090 usr=1.83% sys=11.25% idle=86.92% peak_rss_kib=64316
+<6>[   12.820726] hi3798mv320-vdec f8c30000.video-decoder: S264 little-endian (0x34363253) -> H8TV little-endian (0x56543848) 3840x2160 timing frames=120 avg_ns/frame rbsp=3883083 hw=16502247 detile=0 clear=7206665 sync=0
+MPEG1 decoded=120 fps=99.930 ms=9.846 elapsed_ms=1200.841
+MPEG2 decoded=120 fps=111.076 ms=8.716 elapsed_ms=1080.344
+PLAY decoded=120 displayed=120 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=119 fps=30.000 wall_fps=28.913 seconds=4.150 usr=0.42% sys=5.06% idle=94.52% peak_rss_kib=63496
+PLAY decoded=120 displayed=26 dropped=94 preroll=0 seeks=0 eos=1 missed_vblanks=3 fps=53.571 wall_fps=10.450 seconds=2.488 usr=0.40% sys=5.73% idle=93.87% peak_rss_kib=63500
+PLAY decoded=120 displayed=120 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=119 fps=30.000 wall_fps=28.804 seconds=4.166 usr=0.72% sys=7.02% idle=92.26% peak_rss_kib=64292
+PLAY decoded=120 displayed=22 dropped=98 preroll=0 seeks=0 eos=1 missed_vblanks=3 fps=52.500 wall_fps=8.878 seconds=2.478 usr=0.40% sys=6.14% idle=93.45% peak_rss_kib=63368
+PLAY decoded=120 displayed=120 dropped=0 preroll=0 seeks=0 eos=1 missed_vblanks=119 fps=30.000 wall_fps=28.721 seconds=4.178 usr=0.72% sys=7.06% idle=92.22% peak_rss_kib=64316

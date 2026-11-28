@@ -19,6 +19,7 @@
 #include <media/media-device.h>
 #include <media/v4l2-ctrls.h>
 #include <media/v4l2-device.h>
+#include <media/v4l2-event.h>
 #include <media/v4l2-ioctl.h>
 #include <media/v4l2-mem2mem.h>
 #include <media/videobuf2-dma-contig.h>
@@ -81,6 +82,14 @@
 #define HEVC_MAX_TILE_COLUMNS	20
 #define HEVC_MAX_TILE_ROWS	22
 #define HEVC_TILE_INFO_SIZE	(2 * HEVC_TILE_MAP_SIZE + 4 * (HEVC_MAX_TILE_COLUMNS + HEVC_MAX_TILE_ROWS))
+#define MPEG_MAX_WIDTH		1920
+#define MPEG_MAX_HEIGHT		1080
+#define MPEG_WORK		0x52000
+#define MPEG_STREAM_OFFSET	(MPEG_WORK + 0x11000)
+#define MPEG_MAX_PAYLOAD	0x1fffff
+#define MPEG_SLICE_SIZE		32
+#define MPEG_MAX_SLICES		200
+#define MPEG_UP_SIZE		(HEVC_TILE_INFO - MSG_UP)
 
 static_assert(MSG_SLICE + HEVC_MAX_SLICES * SLICE_MSG_SIZE <= MSG_UP);
 static_assert(HEVC_TILE_INFO + HEVC_TILE_INFO_SIZE <= CABAC_TABLE);
@@ -88,6 +97,8 @@ static_assert(sizeof(hevc_cabac_init) <= HEVC_EXT_WORK - CABAC_TABLE);
 static_assert(EXT_WORK + H264_EXT_WORK_SIZE <= SLICE_POOL);
 static_assert(VDEC_MAX_WIDTH / 16 <= HEVC_TILE_MAP_SIZE);
 static_assert(VDEC_MAX_HEIGHT / 16 <= HEVC_TILE_MAP_SIZE);
+static_assert(MSG_SLICE + MPEG_MAX_SLICES * MPEG_SLICE_SIZE <= MSG_UP);
+static_assert(0x80 + MPEG_MAX_SLICES * 16 <= MPEG_UP_SIZE);
 
 struct vdec_dma {
 	void *cpu;
@@ -159,6 +170,12 @@ struct vdec_timing {
 	u32 frames;
 };
 
+struct vdec_mpeg1_state {
+	struct vdec_dma reference;
+	struct v4l2_ctrl_mpeg2_quantisation quant;
+	bool sequence_valid, reference_valid;
+};
+
 struct vdec_ctx {
 	struct vdec_dev *vdec;
 	const struct vdec_codec_ops *codec;
@@ -166,6 +183,7 @@ struct vdec_ctx {
 	struct v4l2_ctrl_handler controls;
 	struct v4l2_ctrl *sps, *pps, *scaling, *slice, *decode, *weights;
 	struct v4l2_ctrl *hevc_sps, *hevc_pps, *hevc_scaling, *hevc_slice, *hevc_decode;
+	struct v4l2_ctrl *mpeg2_sequence, *mpeg2_picture, *mpeg2_quant;
 	struct v4l2_pix_format_mplane output, capture;
 	struct vdec_dma workspace;
 	unsigned int stride, y_size, vu_size, tail_size, pmv_offset, pmv_size;
@@ -182,6 +200,7 @@ struct vdec_ctx {
 	struct v4l2_ctrl_hevc_pps hevc_picture_pps;
 	struct v4l2_ctrl_hevc_decode_params hevc_picture_dec;
 	struct vdec_hevc_tiles hevc_tiles;
+	struct vdec_mpeg1_state mpeg1;
 };
 
 static void vdec_set_capture(struct vdec_ctx *ctx, u32 fourcc);
@@ -201,6 +220,16 @@ static int vdec_reset(struct vdec_dev *vdec);
 static bool vdec_is_tiled(u32 fourcc)
 {
 	return fourcc == MV320_TILED_8 || fourcc == MV320_TILED_10;
+}
+
+static bool vdec_is_mpeg(u32 fourcc)
+{
+	return fourcc == V4L2_PIX_FMT_MPEG1 || fourcc == V4L2_PIX_FMT_MPEG2_SLICE;
+}
+
+static bool vdec_stateful(const struct vdec_ctx *ctx)
+{
+	return ctx->codec->pixelformat == V4L2_PIX_FMT_MPEG1;
 }
 
 static void vdec_map_pages(struct vdec_dev *vdec, u32 iova, dma_addr_t dma, size_t size)
@@ -943,7 +972,8 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 	u64 clear_ns, hw_ns;
 	int ret;
 
-	ctx->codec->end_picture(ctx);
+	if (ctx->codec->end_picture)
+		ctx->codec->end_picture(ctx);
 	if (ctx->vdec->dead)
 		return -EIO;
 
@@ -982,6 +1012,10 @@ static int vdec_finish_picture(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *dst
 	}
 	timing->detile_ns += ktime_sub(ktime_get(), start);
 complete:
+	if (vdec_stateful(ctx)) {
+		swap(out->surface, ctx->mpeg1.reference);
+		ctx->mpeg1.reference_valid = true;
+	}
 	timing->rbsp_ns += ctx->picture_rbsp_ns;
 	timing->hw_ns += hw_ns;
 	timing->clear_ns += clear_ns;
@@ -1718,6 +1752,364 @@ static int vdec_hevc_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *
 	return 0;
 }
 
+/* V4L2 supplies matrices in scan order, while the VDH reads grouped columns. */
+static const u8 mpeg_zigzag[64] = {
+	 0,  1,  8, 16,  9,  2,  3, 10, 17, 24, 32, 25, 18, 11,  4,  5,
+	12, 19, 26, 33, 40, 48, 41, 34, 27, 20, 13,  6,  7, 14, 21, 28,
+	35, 42, 49, 56, 57, 50, 43, 36, 29, 22, 15, 23, 30, 37, 44, 51,
+	58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62, 63,
+};
+
+static void vdec_mpeg_matrix(u8 *dst, const u8 *scan)
+{
+	unsigned int i;
+
+	for (i = 0; i < ARRAY_SIZE(mpeg_zigzag); i++) {
+		unsigned int raster = mpeg_zigzag[i];
+		unsigned int x = raster % 8, y = raster / 8;
+
+		dst[x * 8 + (y % 2) * 4 + y / 2] = scan[i];
+	}
+}
+
+static int vdec_mpeg_prepare_workspace(struct vdec_ctx *ctx)
+{
+	return vdec_dma_alloc(ctx->vdec, &ctx->workspace,
+			      MPEG_STREAM_OFFSET + ctx->output.plane_fmt[0].sizeimage +
+			      VDEC_STREAM_PAD, false);
+}
+
+static unsigned int vdec_mpeg_start_code(const u8 *data, unsigned int start, unsigned int size)
+{
+	for (; start + 4 <= size; start++)
+		if (data[start] == 0 && data[start + 1] == 0 && data[start + 2] == 1)
+			return start;
+	return size;
+}
+
+static int vdec_mpeg_pack_picture(struct vdec_ctx *ctx, u32 out, u32 forward, u32 backward,
+				  const struct v4l2_ctrl_mpeg2_picture *picture,
+				  const struct v4l2_ctrl_mpeg2_quantisation *quant,
+				  const u8 *stream, unsigned int bytes, bool mpeg1,
+				  u32 full_pel)
+{
+	unsigned int mbw = DIV_ROUND_UP(ctx->output.width, 16);
+	unsigned int mbh = DIV_ROUND_UP(ctx->output.height, 16);
+	unsigned int surface = ctx->y_size + ctx->vu_size, offset = 0, count = 0, i;
+	u32 flags = picture->flags, geometry = (mbw - 1) | (mbh - 1) << 16;
+	void *work;
+	__le32 *pub, *core, *pic, *slice;
+	u32 base;
+
+	if (bytes < 5 || bytes > MPEG_MAX_PAYLOAD || stream[0] || stream[1] ||
+	    stream[2] != 1 || stream[3] != 1)
+		return -EINVAL;
+
+	work = ctx->workspace.cpu;
+	base = ctx->workspace.iova;
+	pub = work;
+	core = work + MSG_CORE;
+	pic = work + MSG_PICTURE;
+	slice = work + MSG_SLICE;
+	memset(work, 0, MSG_STRIDE);
+	memset(work + MSG_UP, 0, MPEG_UP_SIZE);
+
+	/* Each row start code needs its own 32-byte descriptor. The first
+	 * segment begins at the vertical position byte, after the prefix.
+	 */
+	while (offset < bytes) {
+		unsigned int start = offset + 3;
+		unsigned int next = vdec_mpeg_start_code(stream, offset + 4, bytes);
+		u8 code = stream[start];
+
+		if (code == 0xb7 && next == bytes) {
+			bytes = offset;
+			break;
+		}
+		if (count == MPEG_MAX_SLICES || !code || code > mbh || next - offset < 5)
+			return -EINVAL;
+		memset(slice, 0, MPEG_SLICE_SIZE);
+		slice[0] = cpu_to_le32((start % 16 * 8) << 24 | ((next - start) * 8));
+		slice[1] = cpu_to_le32(start / 16);
+		slice[7] = vdec_addr(base, MSG_SLICE + ++count * MPEG_SLICE_SIZE);
+		slice += MPEG_SLICE_SIZE / sizeof(*slice);
+		offset = next;
+	}
+	slice[-1] = 0;
+	memcpy(work + MPEG_STREAM_OFFSET, stream, bytes);
+	memset(work + MPEG_STREAM_OFFSET + bytes, 0, VDEC_STREAM_PAD);
+
+	/* MPEG-1 and MPEG-2 share protocol 3. Picture word 0 selects the syntax. */
+	pub[2] = cpu_to_le32(0x41400000 | (mbw * mbh - 1));
+	pub[3] = cpu_to_le32(0x0003c003);
+	pub[4] = vdec_addr(base, MSG_PICTURE);
+	pub[5] = vdec_addr(base, MSG_UP);
+	pub[6] = vdec_addr(base, MPEG_STREAM_OFFSET);
+	pub[8] = cpu_to_le32(1);
+	pub[9] = vdec_addr(out, 0);
+	pub[10] = cpu_to_le32(ctx->stride);
+	pub[12] = cpu_to_le32(ctx->y_size);
+	pub[20] = vdec_addr(out, surface);
+	pub[22] = vdec_addr(base, MPEG_WORK + 0x4500);
+	pub[23] = vdec_addr(out, ctx->pmv_offset);
+	pub[24] = vdec_addr(base, MPEG_WORK + 0x8100);
+	pub[30] = vdec_addr(base, MPEG_WORK + 0xbd00);
+	pub[31] = cpu_to_le32(geometry);
+
+	core[28] = vdec_addr(base, MSG_SLICE);
+	core[32] = vdec_addr(base, HEVC_SLICE_UP);
+	core[36] = cpu_to_le32(count);
+	core[0x500 / 4] = vdec_addr(forward, 0);
+	core[0x504 / 4] = vdec_addr(backward, 0);
+	core[0x540 / 4] = vdec_addr(forward, surface);
+	core[0x544 / 4] = vdec_addr(backward, surface);
+	for (i = 0; i < 3; i++) {
+		core[0x5cc / 4 + i] = cpu_to_le32((mbw * 16) | (mbh * 16) << 16);
+		core[0x5d8 / 4 + i] = cpu_to_le32(ctx->y_size);
+		core[0x5fc / 4 + i] = cpu_to_le32(ctx->stride);
+	}
+	core[0x614 / 4] = vdec_addr(out, surface);
+	core[0x61c / 4] = vdec_addr(out, 0);
+
+	pic[0] = cpu_to_le32(geometry | (mpeg1 ? BIT(25) : 0));
+	pic[1] = cpu_to_le32((u32)picture->picture_coding_type << 24 | full_pel |
+			     (flags & V4L2_MPEG2_PIC_FLAG_CONCEALMENT_MV ? BIT(16) : 0) |
+			     V4L2_MPEG2_PIC_FRAME << 8 | BIT(10) |
+			     !!(flags & V4L2_MPEG2_PIC_FLAG_FRAME_PRED_DCT));
+	pic[2] = cpu_to_le32((u32)picture->f_code[0][0] << 24 |
+			     (u32)picture->f_code[0][1] << 16 |
+			     (u32)picture->f_code[1][0] << 8 | picture->f_code[1][1] |
+			     (flags & V4L2_MPEG2_PIC_FLAG_TOP_FIELD_FIRST ? BIT(31) : 0));
+	pic[3] = cpu_to_le32(picture->intra_dc_precision |
+			     (flags & V4L2_MPEG2_PIC_FLAG_Q_SCALE_TYPE ? BIT(8) : 0) |
+			     (flags & V4L2_MPEG2_PIC_FLAG_INTRA_VLC ? BIT(16) : 0) |
+			     (flags & V4L2_MPEG2_PIC_FLAG_ALT_SCAN ? BIT(24) : 0));
+	pic[4] = vdec_addr(backward, 0);
+	pic[5] = vdec_addr(forward, 0);
+	pic[6] = vdec_addr(out, 0);
+	pic[7] = pub[23];
+	pic[9] = cpu_to_le32(bytes * 8);
+	vdec_mpeg_matrix((u8 *)&pic[16], quant->intra_quantiser_matrix);
+	vdec_mpeg_matrix((u8 *)&pic[32], quant->non_intra_quantiser_matrix);
+	pic[63] = core[28];
+
+	ctx->num_slices = count;
+	return 0;
+}
+
+static int vdec_mpeg2_pack_request(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
+				   struct vb2_v4l2_buffer *dst, unsigned int controls)
+{
+	const struct v4l2_ctrl_mpeg2_sequence *seq = ctx->mpeg2_sequence->p_cur.p_mpeg2_sequence;
+	const struct v4l2_ctrl_mpeg2_picture *pic = ctx->mpeg2_picture->p_cur.p_mpeg2_picture;
+	const struct v4l2_ctrl_mpeg2_quantisation *quant = ctx->mpeg2_quant->p_cur.p_mpeg2_quantisation;
+	struct vdec_buffer *out = to_vdec_buffer(&dst->vb2_buf);
+	struct vdec_buffer *forward = out, *backward = out;
+	unsigned int offset = src->planes[0].data_offset;
+	unsigned int bytes = vb2_get_plane_payload(&src->vb2_buf, 0) - offset;
+	const u8 *stream = vb2_plane_vaddr(&src->vb2_buf, 0);
+	unsigned int i, j;
+	int ret;
+
+	out->decoded = false;
+	if (!(controls & REQUEST_PICTURE) || (src->flags & V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF) ||
+	    !stream || seq->chroma_format != 1 ||
+	    seq->horizontal_size != ctx->output.width || seq->vertical_size != ctx->output.height ||
+	    !(seq->flags & V4L2_MPEG2_SEQ_FLAG_PROGRESSIVE) ||
+	    pic->picture_structure != V4L2_MPEG2_PIC_FRAME ||
+	    pic->picture_coding_type < V4L2_MPEG2_PIC_CODING_TYPE_I ||
+	    pic->picture_coding_type > V4L2_MPEG2_PIC_CODING_TYPE_B ||
+	    pic->intra_dc_precision > 3)
+		return -EINVAL;
+	for (i = 0; i < 2; i++)
+		for (j = 0; j < 2; j++)
+			if (pic->f_code[i][j] > 15)
+				return -EINVAL;
+	if (pic->picture_coding_type != V4L2_MPEG2_PIC_CODING_TYPE_I) {
+		forward = vdec_find_buffer(ctx, out, pic->forward_ref_ts);
+		if (!forward)
+			return -ENOENT;
+	}
+	if (pic->picture_coding_type == V4L2_MPEG2_PIC_CODING_TYPE_B) {
+		backward = vdec_find_buffer(ctx, out, pic->backward_ref_ts);
+		if (!backward)
+			return -ENOENT;
+	}
+	if (!ctx->workspace.cpu) {
+		ret = ctx->codec->prepare_workspace(ctx);
+		if (ret)
+			return ret;
+	}
+	ctx->held_timestamp = src->vb2_buf.timestamp;
+	return vdec_mpeg_pack_picture(ctx, out->surface.iova, forward->surface.iova,
+				     backward->surface.iova, pic, quant, stream + offset,
+				     bytes, false, 0);
+}
+
+static unsigned int vdec_mpeg2_request_controls(struct v4l2_ctrl_handler *hdl)
+{
+	if (v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_MPEG2_SEQUENCE) &&
+	    v4l2_ctrl_request_hdl_ctrl_find(hdl, V4L2_CID_STATELESS_MPEG2_PICTURE))
+		return REQUEST_PICTURE;
+	return 0;
+}
+
+static const u8 mpeg_default_intra[64] = {
+	 8, 16, 19, 22, 26, 27, 29, 34,
+	16, 16, 22, 24, 27, 29, 34, 37,
+	19, 22, 26, 27, 29, 34, 34, 38,
+	22, 22, 26, 27, 29, 34, 37, 40,
+	22, 26, 27, 29, 32, 35, 40, 48,
+	26, 27, 29, 32, 35, 40, 48, 58,
+	26, 27, 29, 34, 38, 46, 56, 69,
+	27, 29, 35, 38, 46, 56, 69, 83,
+};
+
+struct vdec_mpeg_bits {
+	const u8 *data;
+	unsigned int size, bit;
+	bool invalid;
+};
+
+static u32 vdec_mpeg_bits_get(struct vdec_mpeg_bits *bits, unsigned int count)
+{
+	u32 value = 0;
+	unsigned int i;
+
+	if (bits->bit + count > bits->size * 8) {
+		bits->invalid = true;
+		return 0;
+	}
+	for (i = bits->bit; i < bits->bit + count; i++)
+		value = value << 1 | ((bits->data[i / 8] >> (7 - i % 8)) & 1);
+	bits->bit += count;
+	return value;
+}
+
+static int vdec_mpeg1_sequence(struct vdec_ctx *ctx, struct vdec_mpeg_bits *bits)
+{
+	struct v4l2_ctrl_mpeg2_quantisation quant = {};
+	unsigned int width, height, i;
+	bool load;
+
+	width = vdec_mpeg_bits_get(bits, 12);
+	height = vdec_mpeg_bits_get(bits, 12);
+	if (width != ctx->output.width || height != ctx->output.height)
+		return -EINVAL;
+	vdec_mpeg_bits_get(bits, 26);
+	if (vdec_mpeg_bits_get(bits, 1) != 1)
+		return -EINVAL;
+	vdec_mpeg_bits_get(bits, 11);
+	load = vdec_mpeg_bits_get(bits, 1);
+	for (i = 0; i < 64; i++)
+		quant.intra_quantiser_matrix[i] = load ? vdec_mpeg_bits_get(bits, 8) :
+						       mpeg_default_intra[mpeg_zigzag[i]];
+	load = vdec_mpeg_bits_get(bits, 1);
+	for (i = 0; i < 64; i++)
+		quant.non_intra_quantiser_matrix[i] = load ? vdec_mpeg_bits_get(bits, 8) : 16;
+	if (bits->invalid)
+		return -EINVAL;
+	ctx->mpeg1.quant = quant;
+	ctx->mpeg1.sequence_valid = true;
+	return 0;
+}
+
+static int vdec_mpeg1_picture(struct vdec_mpeg_bits *bits,
+			      struct v4l2_ctrl_mpeg2_picture *pic, u32 *full_pel)
+{
+	vdec_mpeg_bits_get(bits, 10);
+	pic->picture_coding_type = vdec_mpeg_bits_get(bits, 3);
+	vdec_mpeg_bits_get(bits, 16);
+	if (pic->picture_coding_type == V4L2_MPEG2_PIC_CODING_TYPE_P) {
+		*full_pel = vdec_mpeg_bits_get(bits, 1) << 27;
+		pic->f_code[0][0] = vdec_mpeg_bits_get(bits, 3);
+		pic->f_code[0][1] = pic->f_code[0][0];
+		if (!pic->f_code[0][0])
+			return -EINVAL;
+	} else if (pic->picture_coding_type != V4L2_MPEG2_PIC_CODING_TYPE_I) {
+		return -EOPNOTSUPP;
+	}
+	while (vdec_mpeg_bits_get(bits, 1))
+		vdec_mpeg_bits_get(bits, 8);
+	return bits->invalid ? -EINVAL : 0;
+}
+
+static int vdec_mpeg1_pack_frame(struct vdec_ctx *ctx, struct vb2_v4l2_buffer *src,
+				struct vb2_v4l2_buffer *dst, unsigned int controls)
+{
+	struct v4l2_ctrl_mpeg2_picture pic = {
+		.picture_structure = V4L2_MPEG2_PIC_FRAME,
+		.flags = V4L2_MPEG2_PIC_FLAG_FRAME_PRED_DCT,
+	};
+	struct vdec_buffer *out = to_vdec_buffer(&dst->vb2_buf);
+	unsigned int offset = src->planes[0].data_offset;
+	unsigned int bytes = vb2_get_plane_payload(&src->vb2_buf, 0) - offset;
+	const u8 *data = vb2_plane_vaddr(&src->vb2_buf, 0);
+	unsigned int pos, next, slice = bytes;
+	u32 full_pel = 0, forward;
+	int ret;
+
+	if (!data || bytes > MPEG_MAX_PAYLOAD)
+		return -EINVAL;
+	data += offset;
+	for (pos = vdec_mpeg_start_code(data, 0, bytes); pos < bytes; pos = next) {
+		struct vdec_mpeg_bits bits = { .data = data + pos + 4 };
+		u8 code = data[pos + 3];
+
+		next = vdec_mpeg_start_code(data, pos + 4, bytes);
+		bits.size = next - pos - 4;
+		if (code >= 1 && code <= 0xaf) {
+			if (!pic.picture_coding_type)
+				return -EINVAL;
+			if (slice == bytes)
+				slice = pos;
+			continue;
+		}
+		if (code == 0xb7 && next == bytes)
+			break;
+		if (slice != bytes || code == 0xb5)
+			return -EINVAL;
+		if (code == 0xb3) {
+			if (pic.picture_coding_type)
+				return -EINVAL;
+			ret = vdec_mpeg1_sequence(ctx, &bits);
+			if (ret)
+				return ret;
+		} else if (code == 0) {
+			if (pic.picture_coding_type || !ctx->mpeg1.sequence_valid)
+				return -EINVAL;
+			ret = vdec_mpeg1_picture(&bits, &pic, &full_pel);
+			if (ret)
+				return ret;
+		}
+	}
+	if (slice == bytes || !pic.picture_coding_type)
+		return -EINVAL;
+	forward = out->surface.iova;
+	if (pic.picture_coding_type == V4L2_MPEG2_PIC_CODING_TYPE_P) {
+		if (!ctx->mpeg1.reference_valid)
+			return -ENOENT;
+		vdec_surface_sync(ctx, &ctx->mpeg1.reference, true);
+		forward = ctx->mpeg1.reference.iova;
+	}
+	if (!ctx->mpeg1.reference.cpu) {
+		ret = vdec_dma_alloc(ctx->vdec, &ctx->mpeg1.reference,
+				     ctx->pmv_offset + ctx->pmv_size, true);
+		if (ret)
+			return ret;
+	}
+	if (!ctx->workspace.cpu) {
+		ret = ctx->codec->prepare_workspace(ctx);
+		if (ret)
+			return ret;
+	}
+	out->decoded = false;
+	ctx->held_timestamp = src->vb2_buf.timestamp;
+	return vdec_mpeg_pack_picture(ctx, out->surface.iova, forward, out->surface.iova,
+				     &pic, &ctx->mpeg1.quant, data + slice, bytes - slice,
+				     true, full_pel);
+}
+
 static unsigned int vdec_hevc_request_controls(struct v4l2_ctrl_handler *hdl)
 {
 	unsigned int controls = 0;
@@ -1756,6 +2148,13 @@ static unsigned int vdec_request_controls(struct vdec_ctx *ctx, struct media_req
 	return controls;
 }
 
+static void vdec_queue_eos(struct vdec_ctx *ctx)
+{
+	static const struct v4l2_event eos = { .type = V4L2_EVENT_EOS };
+
+	v4l2_event_queue_fh(&ctx->fh, &eos);
+}
+
 static void vdec_worker(struct work_struct *work)
 {
 	struct vdec_dev *vdec = container_of(work, struct vdec_dev, work);
@@ -1763,7 +2162,8 @@ static void vdec_worker(struct work_struct *work)
 	struct vb2_v4l2_buffer *src = v4l2_m2m_next_src_buf(ctx->fh.m2m_ctx);
 	struct vb2_v4l2_buffer *dst = v4l2_m2m_next_dst_buf(ctx->fh.m2m_ctx);
 	struct media_request *req = src->vb2_buf.req_obj.req;
-	unsigned int controls = vdec_request_controls(ctx, req);
+	unsigned int controls = req ? vdec_request_controls(ctx, req) : 0;
+	bool last = false;
 	int ret;
 
 	src->sequence = ctx->sequence_out++;
@@ -1773,7 +2173,7 @@ static void vdec_worker(struct work_struct *work)
 	vb2_set_plane_payload(&dst->vb2_buf, 0, 0);
 
 	mutex_lock(&vdec->hw_lock);
-	ret = v4l2_ctrl_request_setup(req, &ctx->controls);
+	ret = req ? v4l2_ctrl_request_setup(req, &ctx->controls) : 0;
 	if (!ret) {
 		mutex_lock(ctx->controls.lock);
 		ret = ctx->codec->pack_request(ctx, src, dst, controls);
@@ -1782,6 +2182,7 @@ static void vdec_worker(struct work_struct *work)
 		mutex_unlock(ctx->controls.lock);
 	}
 	if (ret) {
+		ctx->mpeg1.reference_valid = false;
 		ctx->num_slices = 0;
 		ctx->picture_rbsp_ns = 0;
 		ctx->picture_sync_ns = 0;
@@ -1791,9 +2192,17 @@ static void vdec_worker(struct work_struct *work)
 	if (!(src->flags & V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF))
 		ctx->sequence_cap++;
 
-	v4l2_ctrl_request_complete(req, &ctx->controls);
+	if (req)
+		v4l2_ctrl_request_complete(req, &ctx->controls);
+	if (vdec_stateful(ctx) && v4l2_m2m_is_last_draining_src_buf(ctx->fh.m2m_ctx, src)) {
+		dst->flags |= V4L2_BUF_FLAG_LAST;
+		v4l2_m2m_mark_stopped(ctx->fh.m2m_ctx);
+		last = true;
+	}
 	v4l2_m2m_buf_done_and_job_finish(vdec->m2m, ctx->fh.m2m_ctx,
 					 ret ? VB2_BUF_STATE_ERROR : VB2_BUF_STATE_DONE);
+	if (last)
+		vdec_queue_eos(ctx);
 	mutex_unlock(&vdec->hw_lock);
 }
 
@@ -1936,15 +2345,30 @@ static int vdec_buf_out_validate(struct vb2_buffer *vb)
 static void vdec_buf_queue(struct vb2_buffer *vb)
 {
 	struct vdec_ctx *ctx = vb2_get_drv_priv(vb->vb2_queue);
+	struct vb2_v4l2_buffer *buf = to_vb2_v4l2_buffer(vb);
 
-	v4l2_m2m_buf_queue(ctx->fh.m2m_ctx, to_vb2_v4l2_buffer(vb));
+	if (vdec_stateful(ctx) && !V4L2_TYPE_IS_OUTPUT(vb->type)) {
+		mutex_lock(&ctx->vdec->hw_lock);
+		if (v4l2_m2m_dst_buf_is_last(ctx->fh.m2m_ctx)) {
+			vb2_set_plane_payload(vb, 0, 0);
+			buf->sequence = ctx->sequence_cap++;
+			v4l2_m2m_last_buffer_done(ctx->fh.m2m_ctx, buf);
+			vdec_queue_eos(ctx);
+		} else {
+			v4l2_m2m_buf_queue(ctx->fh.m2m_ctx, buf);
+		}
+		mutex_unlock(&ctx->vdec->hw_lock);
+	} else {
+		v4l2_m2m_buf_queue(ctx->fh.m2m_ctx, buf);
+	}
 }
 
 static void vdec_buf_request_complete(struct vb2_buffer *vb)
 {
 	struct vdec_ctx *ctx = vb2_get_drv_priv(vb->vb2_queue);
 
-	v4l2_ctrl_request_complete(vb->req_obj.req, &ctx->controls);
+	if (vb->req_obj.req)
+		v4l2_ctrl_request_complete(vb->req_obj.req, &ctx->controls);
 }
 
 static int vdec_start_streaming(struct vb2_queue *vq, unsigned int count)
@@ -1955,6 +2379,8 @@ static int vdec_start_streaming(struct vb2_queue *vq, unsigned int count)
 		ctx->sequence_out = 0;
 	else
 		ctx->sequence_cap = 0;
+	if (vdec_stateful(ctx))
+		v4l2_m2m_update_start_streaming_state(ctx->fh.m2m_ctx, vq);
 	return 0;
 }
 
@@ -1967,6 +2393,13 @@ static void vdec_stop_streaming(struct vb2_queue *vq)
 	struct vb2_v4l2_buffer *buf;
 	unsigned int i;
 
+	if (vdec_stateful(ctx)) {
+		bool stopped = v4l2_m2m_has_stopped(ctx->fh.m2m_ctx);
+
+		v4l2_m2m_update_stop_streaming_state(ctx->fh.m2m_ctx, vq);
+		if (!stopped && v4l2_m2m_has_stopped(ctx->fh.m2m_ctx))
+			vdec_queue_eos(ctx);
+	}
 	while ((buf = output ? v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx) :
 			       v4l2_m2m_dst_buf_remove(ctx->fh.m2m_ctx))) {
 		if (output)
@@ -1998,6 +2431,11 @@ static void vdec_stop_streaming(struct vb2_queue *vq)
 	}
 	if (output)
 		vdec_dma_free(ctx->vdec, &ctx->workspace);
+	if (vdec_stateful(ctx)) {
+		vdec_dma_free(ctx->vdec, &ctx->mpeg1.reference);
+		ctx->mpeg1.reference_valid = false;
+		ctx->mpeg1.sequence_valid = false;
+	}
 	mutex_unlock(&ctx->vdec->hw_lock);
 }
 
@@ -2066,6 +2504,9 @@ static const struct v4l2_ctrl_ops vdec_hevc_sps_ops = {
 };
 
 static const struct v4l2_ctrl_config vdec_ctrls[] = {
+	{ .id = V4L2_CID_STATELESS_MPEG2_SEQUENCE },
+	{ .id = V4L2_CID_STATELESS_MPEG2_PICTURE },
+	{ .id = V4L2_CID_STATELESS_MPEG2_QUANTISATION },
 	{ .id = V4L2_CID_STATELESS_H264_SPS },
 	{ .id = V4L2_CID_STATELESS_H264_PPS },
 	{ .id = V4L2_CID_STATELESS_H264_SCALING_MATRIX },
@@ -2134,6 +2575,9 @@ static int vdec_init_ctrls(struct vdec_ctx *ctx)
 	ctx->hevc_scaling = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_SCALING_MATRIX);
 	ctx->hevc_slice = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_SLICE_PARAMS);
 	ctx->hevc_decode = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_HEVC_DECODE_PARAMS);
+	ctx->mpeg2_sequence = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_MPEG2_SEQUENCE);
+	ctx->mpeg2_picture = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_MPEG2_PICTURE);
+	ctx->mpeg2_quant = v4l2_ctrl_find(hdl, V4L2_CID_STATELESS_MPEG2_QUANTISATION);
 	ctx->fh.ctrl_handler = hdl;
 	return 0;
 }
@@ -2165,6 +2609,9 @@ static int vdec_request_validate(struct media_request *req)
 	ret = 0;
 	if (!v4l2_ctrl_request_hdl_ctrl_find(hdl, ctx->codec->slice_control))
 		ret = -ENOENT;
+	else if (ctx->codec->pixelformat == V4L2_PIX_FMT_MPEG2_SLICE &&
+		 !vdec_mpeg2_request_controls(hdl))
+		ret = -ENOENT;
 
 	v4l2_ctrl_request_hdl_put(hdl);
 	return ret ?: vb2_request_validate(req);
@@ -2188,18 +2635,36 @@ static int vdec_querycap(struct file *file, void *priv, struct v4l2_capability *
 static void vdec_fill_output(struct v4l2_pix_format_mplane *pix)
 {
 	unsigned int size = pix->plane_fmt[0].sizeimage;
-	unsigned int step = pix->pixelformat == V4L2_PIX_FMT_HEVC_SLICE ? 8 : 16;
+	unsigned int step, max_width, max_height;
 
-	pix->width = ALIGN(clamp(pix->width, VDEC_MIN_SIZE, VDEC_MAX_WIDTH), step);
-	pix->height = ALIGN(clamp(pix->height, VDEC_MIN_SIZE, VDEC_MAX_HEIGHT), step);
-	if (pix->pixelformat != V4L2_PIX_FMT_HEVC_SLICE)
+	switch (pix->pixelformat) {
+	case V4L2_PIX_FMT_MPEG1:
+	case V4L2_PIX_FMT_MPEG2_SLICE:
+		step = 2;
+		max_width = MPEG_MAX_WIDTH;
+		max_height = MPEG_MAX_HEIGHT;
+		break;
+	case V4L2_PIX_FMT_HEVC_SLICE:
+		step = 8;
+		max_width = VDEC_MAX_WIDTH;
+		max_height = VDEC_MAX_HEIGHT;
+		break;
+	default:
 		pix->pixelformat = V4L2_PIX_FMT_H264_SLICE;
+		step = 16;
+		max_width = VDEC_MAX_WIDTH;
+		max_height = VDEC_MAX_HEIGHT;
+		break;
+	}
+	pix->width = ALIGN(clamp(pix->width, VDEC_MIN_SIZE, max_width), step);
+	pix->height = ALIGN(clamp(pix->height, VDEC_MIN_SIZE, max_height), step);
 	pix->field = V4L2_FIELD_NONE;
 	pix->num_planes = 1;
 	pix->flags = 0;
 	memset(pix->reserved, 0, sizeof(pix->reserved));
 	memset(pix->plane_fmt, 0, sizeof(pix->plane_fmt));
-	pix->plane_fmt[0].sizeimage = size ? clamp(size, 4096U, VDEC_MAX_STREAM) :
+	pix->plane_fmt[0].sizeimage = size ? clamp(size, 4096U, vdec_is_mpeg(pix->pixelformat) ?
+						    MPEG_MAX_PAYLOAD : VDEC_MAX_STREAM) :
 					    max_t(unsigned int, SZ_64K, pix->width * pix->height);
 	if (!pix->colorspace)
 		pix->colorspace = V4L2_COLORSPACE_REC709;
@@ -2257,8 +2722,24 @@ static const struct vdec_codec_ops vdec_hevc_ops = {
 	.request_controls = vdec_hevc_request_controls,
 };
 
+static const struct vdec_codec_ops vdec_mpeg2_ops = {
+	.pixelformat = V4L2_PIX_FMT_MPEG2_SLICE,
+	.slice_control = V4L2_CID_STATELESS_MPEG2_PICTURE,
+	.surface_layout = vdec_h264_surface_layout,
+	.prepare_workspace = vdec_mpeg_prepare_workspace,
+	.pack_request = vdec_mpeg2_pack_request,
+	.request_controls = vdec_mpeg2_request_controls,
+};
+
+static const struct vdec_codec_ops vdec_mpeg1_ops = {
+	.pixelformat = V4L2_PIX_FMT_MPEG1,
+	.surface_layout = vdec_h264_surface_layout,
+	.prepare_workspace = vdec_mpeg_prepare_workspace,
+	.pack_request = vdec_mpeg1_pack_frame,
+};
+
 static const struct vdec_codec_ops * const vdec_codecs[] = {
-	&vdec_h264_ops, &vdec_hevc_ops,
+	&vdec_h264_ops, &vdec_hevc_ops, &vdec_mpeg2_ops, &vdec_mpeg1_ops,
 };
 
 static void vdec_set_capture(struct vdec_ctx *ctx, u32 fourcc)
@@ -2280,9 +2761,23 @@ static void vdec_set_capture(struct vdec_ctx *ctx, u32 fourcc)
 
 static void vdec_set_output(struct vdec_ctx *ctx, struct v4l2_pix_format_mplane *pix)
 {
-	ctx->codec = pix->pixelformat == V4L2_PIX_FMT_HEVC_SLICE ? &vdec_hevc_ops : &vdec_h264_ops;
+	unsigned int i;
+
+	for (i = 0; i < ARRAY_SIZE(vdec_codecs); i++)
+		if (pix->pixelformat == vdec_codecs[i]->pixelformat) {
+			ctx->codec = vdec_codecs[i];
+			break;
+		}
 	ctx->output = *pix;
 	vdec_set_capture(ctx, V4L2_PIX_FMT_NV21);
+	if (ctx->fh.m2m_ctx) {
+		struct vb2_queue *out = v4l2_m2m_get_src_vq(ctx->fh.m2m_ctx);
+		bool stateful = vdec_stateful(ctx);
+
+		out->supports_requests = !stateful;
+		out->requires_requests = !stateful;
+		out->subsystem_flags = stateful ? 0 : VB2_V4L2_FL_SUPPORTS_M2M_HOLD_CAPTURE_BUF;
+	}
 }
 
 static int vdec_enum_fmt(struct file *file, void *priv, struct v4l2_fmtdesc *f)
@@ -2293,8 +2788,12 @@ static int vdec_enum_fmt(struct file *file, void *priv, struct v4l2_fmtdesc *f)
 		if (f->index >= ARRAY_SIZE(vdec_codecs))
 			return -EINVAL;
 		f->pixelformat = vdec_codecs[f->index]->pixelformat;
+		if (vdec_is_mpeg(f->pixelformat))
+			f->flags |= V4L2_FMT_FLAG_COMPRESSED;
 	} else if (!f->index) {
 		f->pixelformat = V4L2_PIX_FMT_NV21;
+	} else if (vdec_stateful(ctx)) {
+		return -EINVAL;
 	} else if (f->index == 1 && ctx->codec == &vdec_hevc_ops) {
 		f->pixelformat = V4L2_PIX_FMT_P010;
 	} else if (f->index == (ctx->codec == &vdec_hevc_ops ? 2 : 1)) {
@@ -2317,18 +2816,22 @@ static int vdec_enum_framesizes(struct file *file, void *priv, struct v4l2_frmsi
 
 	if (f->index || (f->pixel_format != V4L2_PIX_FMT_H264_SLICE &&
 			 f->pixel_format != V4L2_PIX_FMT_HEVC_SLICE &&
+			 !vdec_is_mpeg(format) &&
 			 f->pixel_format != V4L2_PIX_FMT_NV21 &&
 			 f->pixel_format != V4L2_PIX_FMT_P010 && !vdec_is_tiled(format)))
 		return -EINVAL;
 	if (format == V4L2_PIX_FMT_NV21 || vdec_is_tiled(format))
 		format = ctx->codec->pixelformat;
-	step = format == V4L2_PIX_FMT_H264_SLICE ? 16 : 8;
+	if (vdec_is_mpeg(format))
+		step = 2;
+	else
+		step = format == V4L2_PIX_FMT_H264_SLICE ? 16 : 8;
 	f->type = V4L2_FRMSIZE_TYPE_STEPWISE;
 	f->stepwise.min_width = VDEC_MIN_SIZE;
-	f->stepwise.max_width = VDEC_MAX_WIDTH;
+	f->stepwise.max_width = vdec_is_mpeg(format) ? MPEG_MAX_WIDTH : VDEC_MAX_WIDTH;
 	f->stepwise.step_width = step;
 	f->stepwise.min_height = VDEC_MIN_SIZE;
-	f->stepwise.max_height = VDEC_MAX_HEIGHT;
+	f->stepwise.max_height = vdec_is_mpeg(format) ? MPEG_MAX_HEIGHT : VDEC_MAX_HEIGHT;
 	f->stepwise.step_height = step;
 	return 0;
 }
@@ -2350,7 +2853,9 @@ static int vdec_try_fmt(struct file *file, void *priv, struct v4l2_format *f)
 		vdec_fill_output(&f->fmt.pix_mp);
 		return 0;
 	}
-	if (fourcc != V4L2_PIX_FMT_NV21 && fourcc != MV320_TILED_8 &&
+	if (vdec_stateful(ctx))
+		fourcc = V4L2_PIX_FMT_NV21;
+	else if (fourcc != V4L2_PIX_FMT_NV21 && fourcc != MV320_TILED_8 &&
 	    ((fourcc != V4L2_PIX_FMT_P010 && fourcc != MV320_TILED_10) ||
 	     ctx->codec != &vdec_hevc_ops))
 		fourcc = ctx->capture.pixelformat;
@@ -2374,6 +2879,9 @@ static int vdec_s_fmt(struct file *file, void *priv, struct v4l2_format *f)
 	}
 	if (vb2_is_streaming(out) || out->uses_requests || out->queued_count)
 		return -EBUSY;
+	if (vb2_is_busy(out) && vdec_stateful(ctx) !=
+	    (f->fmt.pix_mp.pixelformat == V4L2_PIX_FMT_MPEG1))
+		return -EBUSY;
 	for (i = 0; i < out->max_num_buffers; i++) {
 		struct vb2_buffer *vb = vb2_get_buffer(out, i);
 
@@ -2392,6 +2900,25 @@ static int vdec_flush(struct file *file, void *priv, struct v4l2_decoder_cmd *cm
 	struct vb2_v4l2_buffer *dst;
 	int ret;
 
+	if (vdec_stateful(ctx)) {
+		bool stopped;
+
+		ret = v4l2_m2m_ioctl_try_decoder_cmd(file, priv, cmd);
+		if (ret || !vb2_is_streaming(v4l2_m2m_get_src_vq(m2m)) ||
+		    !vb2_is_streaming(v4l2_m2m_get_dst_vq(m2m)))
+			return ret;
+		mutex_lock(&ctx->vdec->hw_lock);
+		stopped = v4l2_m2m_has_stopped(m2m);
+		ret = v4l2_m2m_decoder_cmd(file, m2m, cmd);
+		if (!ret && cmd->cmd == V4L2_DEC_CMD_START && stopped) {
+			vb2_clear_last_buffer_dequeued(v4l2_m2m_get_dst_vq(m2m));
+			v4l2_m2m_try_schedule(m2m);
+		} else if (!ret && !stopped && v4l2_m2m_has_stopped(m2m)) {
+			vdec_queue_eos(ctx);
+		}
+		mutex_unlock(&ctx->vdec->hw_lock);
+		return ret;
+	}
 	ret = v4l2_m2m_ioctl_stateless_try_decoder_cmd(file, priv, cmd);
 	if (ret)
 		return ret;
@@ -2409,6 +2936,21 @@ static int vdec_flush(struct file *file, void *priv, struct v4l2_decoder_cmd *cm
 	}
 	mutex_unlock(&ctx->vdec->hw_lock);
 	return ret;
+}
+
+static int vdec_try_decoder_cmd(struct file *file, void *priv, struct v4l2_decoder_cmd *cmd)
+{
+	if (vdec_stateful(file_to_ctx(file)))
+		return v4l2_m2m_ioctl_try_decoder_cmd(file, priv, cmd);
+	return v4l2_m2m_ioctl_stateless_try_decoder_cmd(file, priv, cmd);
+}
+
+static int vdec_subscribe_event(struct v4l2_fh *fh, const struct v4l2_event_subscription *sub)
+{
+	if (sub->type == V4L2_EVENT_EOS &&
+	    vdec_stateful(container_of(fh, struct vdec_ctx, fh)))
+		return v4l2_event_subscribe(fh, sub, 0, NULL);
+	return v4l2_ctrl_subscribe_event(fh, sub);
 }
 
 static const struct v4l2_ioctl_ops vdec_ioctl_ops = {
@@ -2431,8 +2973,10 @@ static const struct v4l2_ioctl_ops vdec_ioctl_ops = {
 	.vidioc_dqbuf = v4l2_m2m_ioctl_dqbuf,
 	.vidioc_streamon = v4l2_m2m_ioctl_streamon,
 	.vidioc_streamoff = v4l2_m2m_ioctl_streamoff,
-	.vidioc_try_decoder_cmd = v4l2_m2m_ioctl_stateless_try_decoder_cmd,
+	.vidioc_try_decoder_cmd = vdec_try_decoder_cmd,
 	.vidioc_decoder_cmd = vdec_flush,
+	.vidioc_subscribe_event = vdec_subscribe_event,
+	.vidioc_unsubscribe_event = v4l2_event_unsubscribe,
 };
 
 static int vdec_open(struct file *file)

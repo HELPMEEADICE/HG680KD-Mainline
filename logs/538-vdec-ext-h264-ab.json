@@ -1,0 +1,111 @@
+{
+  "h264-1080p60.mp4": {
+    "status": 0,
+    "vdh_irq_delta": 1080,
+    "vdp_irq_delta": 1086,
+    "decoded": 1080,
+    "displayed": 1080,
+    "dropped": 0,
+    "missed_vblanks": 0,
+    "fps": 60.0,
+    "pass": true
+  },
+  "h264-2160p30.mp4": {
+    "status": 0,
+    "vdh_irq_delta": 120,
+    "vdp_irq_delta": 290,
+    "decoded": 120,
+    "displayed": 63,
+    "dropped": 57,
+    "missed_vblanks": 63,
+    "fps": 29.76,
+    "pass": false
+  },
+  "baseline_2160p60": {
+    "status": 0,
+    "vdh_irq_delta": 120,
+    "vdp_irq_delta": 242,
+    "decoded": 120,
+    "displayed": 16,
+    "dropped": 104,
+    "missed_vblanks": 1,
+    "fps": 56.251,
+    "pass": false
+  },
+  "restored_ram": {
+    "cma_free_kib": 380444,
+    "cma_used_pages": 3193,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "vdh_irq": 0,
+    "smmu_irq": 0
+  },
+  "v4l2_enum_and_queue_caps": "pass",
+  "h264-2160p30-pad.mp4": {
+    "status": 0,
+    "vdh_irq_delta": 120,
+    "vdp_irq_delta": 247,
+    "decoded": 120,
+    "displayed": 120,
+    "dropped": 0,
+    "missed_vblanks": 119,
+    "fps": 30.0,
+    "pass": true
+  },
+  "h264-2160p60-pad.mp4": {
+    "status": 0,
+    "vdh_irq_delta": 120,
+    "vdp_irq_delta": 165,
+    "decoded": 120,
+    "displayed": 26,
+    "dropped": 94,
+    "missed_vblanks": 3,
+    "fps": 53.571,
+    "pass": false
+  },
+  "baseline_2160p30": {
+    "status": 0,
+    "vdh_irq_delta": 120,
+    "vdp_irq_delta": 247,
+    "decoded": 120,
+    "displayed": 120,
+    "dropped": 0,
+    "missed_vblanks": 119,
+    "fps": 30.0,
+    "pass": true
+  },
+  "baseline_2160p60_pad": {
+    "status": 0,
+    "vdh_irq_delta": 120,
+    "vdp_irq_delta": 164,
+    "decoded": 120,
+    "displayed": 22,
+    "dropped": 98,
+    "missed_vblanks": 3,
+    "fps": 52.5,
+    "pass": false
+  },
+  "fresh_2160p30": {
+    "status": 0,
+    "vdh_irq_delta": 120,
+    "vdp_irq_delta": 247,
+    "decoded": 120,
+    "displayed": 120,
+    "dropped": 0,
+    "missed_vblanks": 119,
+    "fps": 30.0,
+    "pass": true
+  },
+  "final_after_h264": {
+    "cma_free_kib": 380252,
+    "cma_used_pages": 3193,
+    "dma_buf": [
+      0,
+      0
+    ],
+    "vdh_irq": 120,
+    "smmu_irq": 0
+  }
+}

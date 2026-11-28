@@ -125,7 +125,7 @@ def snapshot(console):
     }
 
 
-def get_stream(console, args, local):
+def get_stream(console, args, local, timeout=50):
     remote = f"/tmp/{local.name}"
     state = checked(console, f"/tmp/busybox.static stat -c 'SIZE=%s' {remote} && sha256sum {remote}")
     size_match = re.search(rb"(?m)^SIZE=(\d+)", state)
@@ -144,7 +144,7 @@ def get_stream(console, args, local):
             while remaining:
                 data = link.recv(min(remaining, 1 << 16))
                 if not data:
-                    raise IOError("H.264 upload ended early")
+                    raise IOError("Board upload ended early")
                 output.write(data)
                 remaining -= len(data)
 
@@ -154,11 +154,11 @@ def get_stream(console, args, local):
         listener.listen(1)
         listener.settimeout(25)
         transfer = pool.submit(receive, listener)
-        checked(console, f"/tmp/busybox.static nc -w 20 {args.host} {args.upload_port} <{remote}", 50)
+        checked(console, f"/tmp/busybox.static nc -w 20 {args.host} {args.upload_port} <{remote}", timeout)
         transfer.result(timeout=5)
     with local.open("rb") as source:
         if file_digest(source, "sha256").hexdigest() != expected:
-            raise IOError("H.264 upload SHA256 mismatch")
+            raise IOError("Board upload SHA256 mismatch")
     return size, expected
 
 
