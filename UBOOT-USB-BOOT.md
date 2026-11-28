@@ -1,5 +1,7 @@
 # HG680KD U-Boot USB Auto-Boot & Android Fallback
 
+The current production image is `7.3.6-hg680kd-arm64-usb-final`. It adds native HDMI DRM and the AIAO drain fix to the USB boot path, with the matching `vdp-player` and musl MPV runtime installed on the F2FS root. The existing LBA 4136 read window still loads the padded legacy uImage. The verified prior image is available as `/boot/boot.img.bak`. [Current build, deployment and cold-boot evidence](USB-FINAL-ACCEPTANCE.md)
+
 ## Linux 7.3.6 full-media USB deployment
 
 The HG680KD boots `7.3.6-hg680kd-arm64-usb` from the SanDisk USB disk. The board DTB keeps the F2FS root, `cma=384M`, USB storage and the disabled Linux eMMC node. It enables both Mali-450 PPs and PP MMUs, VDEC, JPGD, VENC, VDP and AIAO. VDP exposes G0 as the primary plane and V0 as the video overlay. The kernel includes KVM and the GIC maintenance and hypervisor timer interrupts. The stock BL31 enters Linux at EL1 and KVM reports `HYP mode not available` on this boot path. [Board DTS](src/hi3798mv320-fiberhome-hg680kd-arm64-usb.dts) · [Resolved config](src/arm64-7.3.6-usb-full.config)

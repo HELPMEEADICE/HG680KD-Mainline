@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: GPL-2.0-only
+#include "hi3798mv320-fiberhome-hg680kd-arm64-hdmi-drm.dts"
+
+&{/chosen} {
+	bootargs = "console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 clk_ignore_unused root=PARTLABEL=HG680KD_ROOT rootfstype=f2fs rootflags=compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime rootwait cma=384M";
+};
+
+&{/soc/usb@f98a0000} {
+	status = "okay";
+	/* Keep the PHY default trim without mapping the OTP resource. */
+	reg = <0x0 0xf98a0000 0x0 0x10000>,
+	      <0x0 0xf9866000 0x0 0x1000>,
+	      <0x0 0xf9960000 0x0 0x1000>;
+	reg-names = "xhci", "phy0", "phy1";
+};

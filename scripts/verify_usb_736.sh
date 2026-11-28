@@ -14,10 +14,15 @@ player=/opt/vdp-player/run
 test "$(findmnt -nro FSTYPE -T "$PWD")" = tmpfs
 test "$(findmnt -nro SOURCE,FSTYPE -M /)" = '/dev/sda3 f2fs'
 test "$(lsblk -dn -o TRAN /dev/sda)" = usb
-test "$(uname -r)" = 7.3.6-hg680kd-arm64-usb
+release=7.3.6-hg680kd-arm64-usb
+final=0
+case "$case_name" in
+    cold-final|cold-final-media) release+=-final; final=1 ;;
+esac
+test "$(uname -r)" = "$release"
 test ! -e /dev/mmcblk0
 case "$case_name" in
-    cold) test "$(findmnt -nro SOURCE,FSTYPE -M /boot)" = '/dev/sda1 vfat'
+    cold|cold-final|cold-final-media) test "$(findmnt -nro SOURCE,FSTYPE -M /boot)" = '/dev/sda1 vfat'
           printf '%s  /boot/boot.img\n' "$boot_sum" | sha256sum -c - ;;
     preflight) ! mountpoint -q /boot ;;
     *) exit 1 ;;
@@ -41,6 +46,12 @@ grep -Fx connected /sys/class/drm/card0-HDMI-A-1/status
 readlink -f /sys/class/drm/card0/device/driver /sys/class/drm/renderD128/device/driver
 sha256sum -c TEST-SHA256SUMS
 chmod 755 lima-test jpgd-test vdec-mpeg-test ffmpeg venc-ioctl-smoke
+if [[ $final = 1 ]]; then
+    chmod 755 modetest drm-vblank-measure
+    source ./verify_usb_hdmi_736.sh
+    native_inventory "${5:?MPV SHA256 required}"
+    cat /proc/sys/kernel/random/boot_id
+fi
 
 irq() {
     awk -v irq="$1" '$6 == "GICv3" && $7 == irq { print $2 + $3 + $4 + $5; seen++ }
@@ -80,11 +91,31 @@ grep -F 'LIMA GP+PP OFFSCREEN RENDER TEST: PASS' lima.log
 
 systemctl stop lightdm
 trap 'systemctl start lightdm' EXIT
+if [[ $final = 1 ]]; then
+    trap 'native_cleanup; systemctl start lightdm' EXIT
+    cp "$kms_state" console.before
+fi
+if [[ $case_name = cold-final ]]; then
+    native_hdmi_and_pcm
+fi
 for attempt in $(seq 1 10); do
     if grep -Eq '^Total 0 objects, 0 bytes' "$dmabuf"; then break; fi
     sleep 1
 done
 grep -E '^Total 0 objects, 0 bytes' "$dmabuf"
+if [[ $case_name = cold-final ]]; then
+    mpv_cma=$(cat "$cma")
+    snapshot BEFORE_MPV
+    native_mpv
+    snapshot AFTER_MPV
+    test "$(cat "$cma")" -le "$mpv_cma"
+    grep -E '^Total 0 objects, 0 bytes' "$dmabuf"
+    native_cleanup
+    sleep 1
+    cp "$kms_state" console.after-mpv
+    grep -F 'mode: "1920x1080": 60 ' console.after-mpv
+    check_scanout
+fi
 baseline_cma=$(cat "$cma")
 baseline_free=$(awk '/^CmaFree:/ {print $2}' /proc/meminfo)
 baseline_crg=$(cat "$crg")
@@ -132,17 +163,41 @@ grep -F 'SMMU faults=0 quarantined=0' venc-status.log
 sha256sum venc-usb.h264
 
 snapshot AFTER_MEDIA
-test "$(cat "$cma")" = "$baseline_cma"
+if [[ $final = 1 ]]; then
+    test "$(cat "$cma")" -le "$baseline_cma"
+else
+    test "$(cat "$cma")" = "$baseline_cma"
+fi
 test "$(( baseline_free - $(awk '/^CmaFree:/ {print $2}' /proc/meminfo) ))" -le 4096
 test "$(cat "$crg")" = "$baseline_crg"
 grep -E '^Total 0 objects, 0 bytes' "$dmabuf"
 grep -E '^vblank_irqs .*underflow_irqs 0$' "$display"
 grep -Fx 'fetch_underflow 00000000' "$display"
 
+if [[ $final = 1 ]]; then
+    native_cleanup
+    sleep 1
+    cp "$kms_state" console.after
+    grep -F 'mode: "1920x1080": 60 ' console.after
+    check_scanout
+fi
 systemctl start lightdm
 trap - EXIT
 test "$(systemctl is-active lightdm)" = active
 test "$(irq 181)" = 0
+if [[ $final = 1 ]]; then
+    for attempt in {1..20}; do
+        if xrandr --current > desktop-restored.log 2>&1; then break; fi
+        sleep .5
+    done
+    grep -E ' connected( primary)? [0-9]+x[0-9]+\+' desktop-restored.log
+    check_scanout
+    dmesg --color=never > dmesg.log
+fi
 dmesg --color=never -l warn,err,crit,alert,emerg
 if dmesg --color=never | grep -Ei 'lima.*(error|time ?out)|SMMU (fault|error)([^s]|$)|CRG restore failed|USB disconnect|I/O error|Kernel panic|external abort|Oops:|BUG:'; then exit 1; fi
-echo USB_FULL_ACCEPTANCE_OK
+if [[ $case_name = cold-final-media ]]; then
+    echo USB_FINAL_MEDIA_ACCEPTANCE_OK
+else
+    echo USB_FULL_ACCEPTANCE_OK
+fi
