@@ -20,10 +20,11 @@ def irq_delta(before, after, number):
     return new[0] - old[0]
 
 
-def regressions(console, args):
+def regressions(console, args, player_dir=DISPLAY):
     stage(console, args, LIMA, ("lima-test",))
-    stage(console, args, DISPLAY, ("jpgd-test", "1080p.jpg", "vdp-player", "main10-av.mkv",
+    stage(console, args, DISPLAY, ("jpgd-test", "1080p.jpg", "main10-av.mkv",
                                   "ld-musl-aarch64.so.1", "libdrm.so.2", "libudev.so.1"))
+    stage(console, args, player_dir, ("vdp-player",))
     checked(console, "cd /tmp && chmod 755 lima-test jpgd-test vdp-player ld-musl-aarch64.so.1")
     for opts, jobs, expected_irq in (("-p 1 -n 16", 16, 32), ("-p 2 -n 16", 16, 32),
                                      ("-a -n 32", 32, 64)):

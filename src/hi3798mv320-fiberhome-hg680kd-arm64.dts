@@ -134,5 +134,21 @@
 			interrupts = <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>;
 			status = "disabled";
 		};
+
+		vdp: display-controller@f8cc0000 {
+			compatible = "hisilicon,hi3798mv320-vdp";
+			reg = <0x0 0xf8cc0000 0x0 0x10000>,
+			      <0x0 0xf8ce0000 0x0 0x134>,
+			      <0x0 0xf8ce0800 0x0 0x1ac>,
+			      <0x0 0xf8ce1000 0x0 0x54>,
+			      <0x0 0xf8ce1800 0x0 0x284>,
+			      <0x0 0xf8ce4000 0x0 0x64>,
+			      <0x0 0xf8d30000 0x0 0xc0>;
+			reg-names = "vdp", "tx", "video", "audio", "packets", "aon", "phy";
+			interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 88 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "vblank", "hpd";
+			status = "disabled";
+		};
 	};
 };

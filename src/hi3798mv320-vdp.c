@@ -35,6 +35,7 @@
 #include <drm/drm_rect.h>
 #include <drm/drm_vblank.h>
 
+#include "hi3798mv320-hdmi.h"
 #include "hi3798mv320-tiled.h"
 
 #define VDP_INT_STATUS		0x0004
@@ -128,9 +129,20 @@
 #define G0_FDR_STRIDE		0x8a60
 #define G0_FDR_ACTIVE_ADDR	0x8b38
 #define GP0_IN_SIZE		0x6810
+#define GP0_UPDATE		0x6804
+#define GP0_DISP_SIZE		0x680c
+#define GP0_GLOBAL_IN_SIZE	0x6824
+#define GP0_DISP_FIRST		0x6880
+#define GP0_DISP_LAST		0x6884
+#define GP0_VIDEO_FIRST		0x6888
+#define GP0_VIDEO_LAST		0x688c
+#define GP0_OUT_SIZE		0x689c
 #define GP0_MIX_PRIO		0x6908
+#define GP0_ZME_HSIZE		0x6a00
 #define GP0_ZME_HCTRL		0x6a04
+#define GP0_ZME_VSIZE		0x6a10
 #define GP0_ZME_VCTRL		0x6a14
+#define GP0_ZME_VOFFSET		0x6a18
 #define LAYER_ENABLE		BIT(31)
 #define V0_FDR_CTRL		0x8200
 #define V0_FDR_MRG		BIT(19)
@@ -156,14 +168,23 @@
 #define V0_FDR_PITCH2		0x8294
 #define V0_FDR_ACTIVE_Y		0x8338
 #define HD0_CTRL		0xc200
+#define HD0_ENABLE		BIT(31)
+#define HD0_PROGRESSIVE		BIT(4)
 #define HD0_UPDATE		BIT(0)
 #define HD0_VACTIVE		0xc208
+#define HD0_VFRONT		0xc20c
 #define HD0_HACTIVE		0xc210
+#define HD0_HFRONT		0xc214
+#define HD0_SYNC_WIDTH		0xc220
 #define HD0_VT			0xc228
 #define HD0_VT1_LINE		GENMASK(12, 0)
 #define HD0_VT1_BACK_PORCH	12
 #define HD0_STATE		0xc2a0
 #define HD0_IN_BLANK		BIT(1)
+#define HD0_ROUTE		0xc004
+#define HD0_HDMI_CTRL		0xc600
+#define HD0_GDM_CTRL		0xd500
+#define HD0_GDM_RGB_TO_YUV	BIT(0)
 #define VDP_SMMU_CTRL		0xe000
 #define V0_CSC_CTRL		0xb000
 #define V0_CSC_ENABLE		BIT(4)
@@ -187,6 +208,7 @@ struct mv320_vdp {
 	struct drm_crtc crtc;
 	struct drm_encoder encoder;
 	struct drm_connector connector;
+	struct mv320_hdmi *hdmi;
 	struct drm_display_mode mode;
 	struct drm_display_mode scanout_mode;
 	unsigned int g0_scale_x, g0_scale_y;
@@ -195,6 +217,7 @@ struct mv320_vdp {
 	dma_addr_t zme_coeff_dma;
 	bool zme_coeff_loaded;
 	bool csc_dirty;
+	bool timing_running;
 	void __iomem *regs;
 	struct drm_pending_vblank_event *flip;
 	atomic64_t irqs;
@@ -203,6 +226,18 @@ struct mv320_vdp {
 	u32 last_irq_state;
 	u32 unexpected_status;
 };
+
+struct mv320_crtc_state {
+	struct drm_crtc_state base;
+	const struct mv320_hdmi_mode *link;
+	bool hdmi_sink;
+	bool scdc;
+};
+
+static struct mv320_crtc_state *to_mv320_crtc_state(struct drm_crtc_state *state)
+{
+	return container_of(state, struct mv320_crtc_state, base);
+}
 
 static inline struct mv320_vdp *to_vdp(struct drm_device *drm)
 {
@@ -304,10 +339,21 @@ static int mv320_dumb_create(struct drm_file *file, struct drm_device *drm,
 static void mv320_commit_tail(struct drm_atomic_commit *state)
 {
 	struct drm_device *drm = state->dev;
+	struct mv320_vdp *vdp = to_vdp(drm);
+	struct drm_crtc_state *s = drm_atomic_get_new_crtc_state(state, &vdp->crtc);
 
 	drm_atomic_helper_commit_modeset_disables(drm, state);
 	drm_atomic_helper_commit_modeset_enables(drm, state);
 	drm_atomic_helper_commit_planes(drm, state, DRM_PLANE_COMMIT_ACTIVE_ONLY);
+	if (vdp->hdmi && vdp->timing_running && s && s->active && drm_atomic_crtc_needs_modeset(s)) {
+		struct mv320_crtc_state *native = to_mv320_crtc_state(s);
+		int ret = mv320_hdmi_enable(vdp->hdmi, native->link, native->hdmi_sink, native->scdc);
+
+		if (ret) {
+			mv320_hdmi_disable(vdp->hdmi);
+			drm_err(drm, "HDMI link enable failed: %d\n", ret);
+		}
+	}
 	drm_atomic_helper_fake_vblank(state);
 	drm_atomic_helper_commit_hw_done(state);
 	drm_atomic_helper_wait_for_flip_done(drm, state);
@@ -508,6 +554,11 @@ static const struct drm_plane_helper_funcs mv320_plane_helpers = {
 	.atomic_disable = mv320_plane_disable,
 };
 
+static unsigned int mv320_g0_scale(const struct drm_crtc_state *state)
+{
+	return state->mode.clock == 594000 ? 2 : 1;
+}
+
 static int mv320_g0_check(struct drm_plane *plane, struct drm_atomic_commit *state)
 {
 	struct mv320_vdp *vdp = to_vdp(plane->dev);
@@ -517,22 +568,24 @@ static int mv320_g0_check(struct drm_plane *plane, struct drm_atomic_commit *sta
 	struct drm_framebuffer *fb = p->fb;
 	dma_addr_t addr;
 	u64 end;
+	unsigned int scale_x, scale_y;
 
 	if (!p->crtc || !fb)
 		return 0;
-	if (!vdp->g0_scale_x || !vdp->g0_scale_y)
-		return -EINVAL;
 	crtc_state = drm_atomic_get_new_crtc_state(state, p->crtc);
 	mode = &crtc_state->mode;
+	scale_x = vdp->hdmi ? mv320_g0_scale(crtc_state) : vdp->g0_scale_x;
+	scale_y = vdp->hdmi ? scale_x : vdp->g0_scale_y;
+	if (!scale_x || !scale_y)
+		return -EINVAL;
 	addr = to_drm_gem_dma_obj(drm_gem_fb_get_obj(fb, 0))->dma_addr + fb->offsets[0];
 	end = (u64)addr + (u64)fb->pitches[0] * (fb->height - 1) + fb->width * 4;
 	if (!IS_ALIGNED(addr, 16) || !IS_ALIGNED(fb->pitches[0], 16) ||
 	    fb->pitches[0] / 16 > U16_MAX || end - 1 > U32_MAX ||
 	    p->src_x || p->src_y || p->src_w != fb->width << 16 ||
 	    p->src_h != fb->height << 16 || p->crtc_x < 0 || p->crtc_y < 0 ||
-	    p->crtc_x % vdp->g0_scale_x || p->crtc_y % vdp->g0_scale_y ||
-	    p->crtc_w != fb->width * vdp->g0_scale_x ||
-	    p->crtc_h != fb->height * vdp->g0_scale_y ||
+	    p->crtc_x % scale_x || p->crtc_y % scale_y ||
+	    p->crtc_w != fb->width * scale_x || p->crtc_h != fb->height * scale_y ||
 	    p->crtc_w > mode->hdisplay || p->crtc_h > mode->vdisplay ||
 	    p->crtc_x > mode->hdisplay - p->crtc_w || p->crtc_y > mode->vdisplay - p->crtc_h)
 		return -EINVAL;
@@ -545,10 +598,13 @@ static void mv320_g0_update(struct drm_plane *plane, struct drm_atomic_commit *s
 {
 	struct mv320_vdp *vdp = to_vdp(plane->dev);
 	struct drm_plane_state *p = drm_atomic_get_new_plane_state(state, plane);
+	struct drm_crtc_state *crtc_state = drm_atomic_get_new_crtc_state(state, p->crtc);
 	struct drm_framebuffer *fb = p->fb;
 	dma_addr_t addr = to_drm_gem_dma_obj(drm_gem_fb_get_obj(fb, 0))->dma_addr + fb->offsets[0];
 	u32 size = ((fb->height - 1) << 16) | (fb->width - 1);
-	u32 x = p->crtc_x / vdp->g0_scale_x, y = p->crtc_y / vdp->g0_scale_y;
+	unsigned int scale_x = vdp->hdmi ? mv320_g0_scale(crtc_state) : vdp->g0_scale_x;
+	unsigned int scale_y = vdp->hdmi ? scale_x : vdp->g0_scale_y;
+	u32 x = p->crtc_x / scale_x, y = p->crtc_y / scale_y;
 	u32 start = (y << 16) | x;
 	u32 end = ((y + fb->height - 1) << 16) | (x + fb->width - 1);
 	u32 blend = G0_PIXEL_ALPHA_255;
@@ -653,22 +709,103 @@ static int mv320_enable_vblank(struct drm_crtc *crtc)
 {
 	struct mv320_vdp *vdp = to_vdp(crtc->dev);
 
-	writel(HD0_SCANOUT_IRQS, vdp->regs + VDP_INT_CLEAR);
+	if (vdp->hdmi && !vdp->timing_running)
+		return -EIO;
+	writel(HD0_VT1, vdp->regs + VDP_INT_CLEAR);
 	writel(HD0_SCANOUT_IRQS, vdp->regs + VDP_INT_MASK);
 	return 0;
 }
 
 static void mv320_disable_vblank(struct drm_crtc *crtc)
 {
-	writel(0, to_vdp(crtc->dev)->regs + VDP_INT_MASK);
+	struct mv320_vdp *vdp = to_vdp(crtc->dev);
+
+	writel(vdp->hdmi ? HD0_UNDERFLOW : 0, vdp->regs + VDP_INT_MASK);
+}
+
+static int mv320_stop_timing(struct mv320_vdp *vdp)
+{
+	u32 value;
+	int ret;
+
+	if (!(readl(vdp->regs + HD0_CTRL) & HD0_ENABLE))
+		return 0;
+	ret = readl_poll_timeout(vdp->regs + HD0_STATE, value, value & HD0_IN_BLANK, 30, 45000);
+	if (ret)
+		return ret;
+	mv320_update_bits(vdp, HD0_CTRL, HD0_ENABLE | HD0_UPDATE, HD0_UPDATE);
+	return readl_poll_timeout(vdp->regs + HD0_CTRL, value, !(value & HD0_UPDATE), 100, 80000);
+}
+
+static void mv320_program_timing(struct mv320_vdp *vdp, const struct drm_display_mode *m)
+{
+	u32 hsync = m->hsync_end - m->hsync_start;
+	u32 vsync = m->vsync_end - m->vsync_start;
+
+	/* The hardware back porch includes the sync pulse. */
+	writel(((m->vtotal - m->vsync_start - 1) << 16) | (m->vdisplay - 1),
+	       vdp->regs + HD0_VACTIVE);
+	writel(((m->htotal - m->hsync_start - 1) << 16) | (m->hdisplay - 1),
+	       vdp->regs + HD0_HACTIVE);
+	mv320_update_bits(vdp, HD0_VFRONT, GENMASK(15, 0), m->vsync_start - m->vdisplay - 1);
+	mv320_update_bits(vdp, HD0_HFRONT, GENMASK(15, 0), m->hsync_start - m->hdisplay - 1);
+	mv320_update_bits(vdp, HD0_SYNC_WIDTH, GENMASK(23, 0), ((vsync - 1) << 16) | (hsync - 1));
+	mv320_update_bits(vdp, HD0_VT, HD0_VT1_LINE, HD0_VT1_BACK_PORCH);
+	mv320_update_bits(vdp, HD0_ROUTE, GENMASK(14, 13), BIT(13));
+	mv320_update_bits(vdp, HD0_HDMI_CTRL, BIT(6), BIT(6));
+}
+
+static void mv320_program_gp0(struct mv320_vdp *vdp, const struct drm_crtc_state *s)
+{
+	const struct drm_display_mode *m = &s->mode;
+	unsigned int scale = mv320_g0_scale(s);
+	u32 width = m->hdisplay / scale, height = m->vdisplay / scale;
+	u32 size = ((m->vdisplay - 1) << 16) | (m->hdisplay - 1);
+	u32 input = ((height - 1) << 16) | (width - 1);
+
+	writel(size, vdp->regs + GP0_DISP_SIZE);
+	writel(input, vdp->regs + GP0_IN_SIZE);
+	writel((height << 16) | width, vdp->regs + GP0_GLOBAL_IN_SIZE);
+	writel(0, vdp->regs + GP0_DISP_FIRST);
+	writel(size, vdp->regs + GP0_DISP_LAST);
+	writel(0, vdp->regs + GP0_VIDEO_FIRST);
+	writel(size, vdp->regs + GP0_VIDEO_LAST);
+	writel(size, vdp->regs + GP0_OUT_SIZE);
+	mv320_update_bits(vdp, GP0_MIX_PRIO, GENMASK(7, 0), 1);
+	writel(BIT(16) | (m->hdisplay - 1), vdp->regs + GP0_ZME_HSIZE);
+	writel(m->vdisplay - 1, vdp->regs + GP0_ZME_VSIZE);
+	/* Factory 2x FIR controls, Q20 horizontal and Q12 vertical bypass. */
+	writel(scale == 2 ? 0xf7080000 : BIT(20), vdp->regs + GP0_ZME_HCTRL);
+	writel(scale == 2 ? 0xf1800000 : BIT(12), vdp->regs + GP0_ZME_VCTRL);
+	writel(scale == 2 ? 0x800 : 0, vdp->regs + GP0_ZME_VOFFSET);
+	writel(1, vdp->regs + GP0_UPDATE);
 }
 
 static void mv320_crtc_enable(struct drm_crtc *crtc, struct drm_atomic_commit *state)
 {
 	static const s16 ifir_coefficients[] = { -7, 12, -17, 25, -38, 58, -105, 328 };
 	struct mv320_vdp *vdp = to_vdp(crtc->dev);
-	u32 size = ((vdp->scanout_mode.vdisplay - 1) << 16) | (vdp->scanout_mode.hdisplay - 1);
+	struct drm_crtc_state *s = drm_atomic_get_new_crtc_state(state, crtc);
+	struct mv320_crtc_state *native = to_mv320_crtc_state(s);
+	const struct drm_display_mode *m = &s->adjusted_mode;
+	u32 size = ((m->vdisplay - 1) << 16) | (m->hdisplay - 1);
 	unsigned int i;
+	int ret;
+
+	if (vdp->hdmi) {
+		mv320_hdmi_disable(vdp->hdmi);
+		ret = mv320_stop_timing(vdp);
+		if (ret)
+			goto failed;
+		mv320_program_timing(vdp, m);
+		ret = mv320_hdmi_prepare(vdp->hdmi, native->link, native->hdmi_sink);
+		if (ret)
+			goto failed;
+		mv320_update_bits(vdp, HD0_GDM_CTRL, HD0_GDM_RGB_TO_YUV,
+				  native->link->y420 ? HD0_GDM_RGB_TO_YUV : 0);
+		writel(native->link->y420 ? 0x04080200 : 0x04010040, vdp->regs + HD0_MIX_BG);
+		mv320_program_gp0(vdp, s);
+	}
 
 	/* Factory V0 IFIR mode and coefficients restore chroma ahead of ZME. */
 	for (i = 0; i < ARRAY_SIZE(ifir_coefficients); i += 2) {
@@ -682,12 +819,15 @@ static void mv320_crtc_enable(struct drm_crtc *crtc, struct drm_atomic_commit *s
 	vdp->zme_coeff_loaded = false;
 
 	mv320_update_bits(vdp, V0_LINK_CTRL, BIT(0), 0);
-	/* VP0 mixes YCbCr for the inherited HDMI link. */
+	/* VP0 receives limited-range BT.709 video from V0. */
 	mv320_update_bits(vdp, V0_CSC_CTRL, V0_CSC_ENABLE | V0_CSC_GLOBAL_ENABLE |
 			  V0_HDR_ENABLE, 0);
 
-	/* G0 coordinates are in the inherited GP0 canvas. */
+	/* Arm G0 only when the atomic plane update has a framebuffer. */
+	mv320_plane_disable(&vdp->v0, state);
+	writel(1, vdp->regs + V0_UPDATE);
 	mv320_g0_disable(&vdp->g0, state);
+	writel(1, vdp->regs + G0_UPDATE);
 	mv320_update_bits(vdp, HD0_MIX_PRIO, GENMASK(7, 0), HD0_MIX_VP0_GP0);
 
 	/* V0 feeds HD0 through the VP0 video mixer. Slot 0 selects V0. */
@@ -702,7 +842,18 @@ static void mv320_crtc_enable(struct drm_crtc *crtc, struct drm_atomic_commit *s
 	writel(0, vdp->regs + VP0_VIDEO_FIRST);
 	writel(size, vdp->regs + VP0_VIDEO_LAST);
 	writel(1, vdp->regs + VP0_UPDATE);
+	if (vdp->hdmi) {
+		mv320_update_bits(vdp, HD0_CTRL, HD0_ENABLE | HD0_PROGRESSIVE | HD0_UPDATE,
+				  HD0_ENABLE | HD0_PROGRESSIVE | HD0_UPDATE);
+		vdp->timing_running = true;
+		s->no_vblank = false;
+	}
 	drm_crtc_vblank_on(crtc);
+	return;
+
+failed:
+	s->no_vblank = true;
+	drm_err(crtc->dev, "HDMI timing setup failed: %d\n", ret);
 }
 
 static void mv320_crtc_disable(struct drm_crtc *crtc, struct drm_atomic_commit *state)
@@ -712,19 +863,29 @@ static void mv320_crtc_disable(struct drm_crtc *crtc, struct drm_atomic_commit *
 	unsigned long flags;
 	u32 ctrl;
 
+	if (vdp->hdmi)
+		mv320_hdmi_disable(vdp->hdmi);
+
 	mv320_plane_disable(&vdp->v0, state);
 	writel(1, vdp->regs + V0_UPDATE);
 	mv320_g0_disable(&vdp->g0, state);
 	writel(1, vdp->regs + G0_UPDATE);
 	mv320_update_bits(vdp, VP0_CTRL, LAYER_ENABLE, 0);
 	writel(1, vdp->regs + VP0_UPDATE);
-	if (readl_poll_timeout(vdp->regs + V0_ACTIVE_CTRL, ctrl,
+	if ((!vdp->hdmi || vdp->timing_running) &&
+	    readl_poll_timeout(vdp->regs + V0_ACTIVE_CTRL, ctrl,
 			       !(ctrl & LAYER_ENABLE), 100, 50000))
 		drm_err(crtc->dev, "V0 disable did not latch\n");
-	if (readl_poll_timeout(vdp->regs + G0_ACTIVE_CTRL, ctrl,
+	if ((!vdp->hdmi || vdp->timing_running) &&
+	    readl_poll_timeout(vdp->regs + G0_ACTIVE_CTRL, ctrl,
 			       !(ctrl & LAYER_ENABLE), 100, 50000))
 		drm_err(crtc->dev, "G0 disable did not latch\n");
 	drm_crtc_vblank_off(crtc);
+	if (vdp->hdmi) {
+		if (mv320_stop_timing(vdp))
+			drm_err(crtc->dev, "HD0 timing did not stop in blanking\n");
+		vdp->timing_running = false;
+	}
 	spin_lock_irqsave(&crtc->dev->event_lock, flags);
 	if (!s->active && s->event) {
 		drm_crtc_send_vblank_event(crtc, s->event);
@@ -739,7 +900,7 @@ static void mv320_crtc_flush(struct drm_crtc *crtc, struct drm_atomic_commit *st
 	struct drm_crtc_state *s = drm_atomic_get_new_crtc_state(state, crtc);
 	struct drm_pending_vblank_event *event = s->event;
 	unsigned long flags;
-	int ret = event && s->active ? drm_crtc_vblank_get(crtc) : -EINVAL;
+	int ret = event && s->active && !s->no_vblank ? drm_crtc_vblank_get(crtc) : -EINVAL;
 
 	spin_lock_irqsave(&crtc->dev->event_lock, flags);
 	if (s->active && vdp->csc_dirty) {
@@ -761,40 +922,109 @@ static void mv320_crtc_flush(struct drm_crtc *crtc, struct drm_atomic_commit *st
 static enum drm_mode_status mv320_mode_valid(struct drm_crtc *crtc,
 					    const struct drm_display_mode *mode)
 {
-	return drm_mode_equal(mode, &to_vdp(crtc->dev)->mode) ? MODE_OK : MODE_BAD;
+	struct mv320_vdp *vdp = to_vdp(crtc->dev);
+
+	if (vdp->hdmi)
+		return mv320_hdmi_find_mode(mode) ? MODE_OK : MODE_BAD;
+	return drm_mode_equal(mode, &vdp->mode) ? MODE_OK : MODE_BAD;
 }
 
 static bool mv320_mode_fixup(struct drm_crtc *crtc, const struct drm_display_mode *mode,
 			     struct drm_display_mode *adjusted_mode)
 {
-	drm_mode_copy(adjusted_mode, &to_vdp(crtc->dev)->scanout_mode);
+	struct mv320_vdp *vdp = to_vdp(crtc->dev);
+
+	if (!vdp->hdmi)
+		drm_mode_copy(adjusted_mode, &vdp->scanout_mode);
 	drm_mode_set_crtcinfo(adjusted_mode, 0);
 	return true;
+}
+
+static int mv320_crtc_check(struct drm_crtc *crtc, struct drm_atomic_commit *state)
+{
+	struct mv320_vdp *vdp = to_vdp(crtc->dev);
+	struct drm_connector *connector = &vdp->connector;
+	struct drm_crtc_state *s = drm_atomic_get_new_crtc_state(state, crtc);
+	struct mv320_crtc_state *native = to_mv320_crtc_state(s);
+	struct drm_connector_state *conn_state;
+
+	if (!vdp->hdmi || !s->enable || !drm_atomic_crtc_needs_modeset(s))
+		return 0;
+	conn_state = drm_atomic_get_connector_state(state, connector);
+	if (IS_ERR(conn_state))
+		return PTR_ERR(conn_state);
+	native->link = mv320_hdmi_select_mode(vdp->hdmi, &s->mode);
+	if (!native->link)
+		return -EINVAL;
+	native->hdmi_sink = connector->display_info.is_hdmi || !connector->edid_blob_ptr;
+	native->scdc = connector->display_info.hdmi.scdc.supported;
+	conn_state->hdmi.output_bpc = 8;
+	conn_state->hdmi.output_format = native->link->y420 ?
+		DRM_OUTPUT_COLOR_FORMAT_YCBCR420 : DRM_OUTPUT_COLOR_FORMAT_RGB444;
+	conn_state->hdmi.tmds_char_rate = native->link->tmds_khz * 1000ULL;
+	conn_state->hdmi.is_limited_range = native->hdmi_sink;
+	return 0;
 }
 
 static const struct drm_crtc_helper_funcs mv320_crtc_helpers = {
 	.mode_valid = mv320_mode_valid,
 	.mode_fixup = mv320_mode_fixup,
+	.atomic_check = mv320_crtc_check,
 	.atomic_enable = mv320_crtc_enable,
 	.atomic_disable = mv320_crtc_disable,
 	.atomic_flush = mv320_crtc_flush,
 };
 
+static void mv320_crtc_reset(struct drm_crtc *crtc)
+{
+	struct mv320_crtc_state *s;
+
+	if (crtc->state) {
+		__drm_atomic_helper_crtc_destroy_state(crtc->state);
+		kfree(to_mv320_crtc_state(crtc->state));
+		crtc->state = NULL;
+	}
+	s = kzalloc(sizeof(*s), GFP_KERNEL);
+	if (s)
+		__drm_atomic_helper_crtc_reset(crtc, &s->base);
+}
+
+static struct drm_crtc_state *mv320_crtc_duplicate_state(struct drm_crtc *crtc)
+{
+	struct mv320_crtc_state *s;
+
+	s = kmemdup(to_mv320_crtc_state(crtc->state), sizeof(*s), GFP_KERNEL);
+	if (!s)
+		return NULL;
+	__drm_atomic_helper_crtc_duplicate_state(crtc, &s->base);
+	return &s->base;
+}
+
+static void mv320_crtc_destroy_state(struct drm_crtc *crtc, struct drm_crtc_state *s)
+{
+	__drm_atomic_helper_crtc_destroy_state(s);
+	kfree(to_mv320_crtc_state(s));
+}
+
 static const struct drm_crtc_funcs mv320_crtc_funcs = {
 	.set_config = drm_atomic_helper_set_config,
 	.page_flip = drm_atomic_helper_page_flip,
 	.destroy = drm_crtc_cleanup,
-	.reset = drm_atomic_helper_crtc_reset,
-	.atomic_duplicate_state = drm_atomic_helper_crtc_duplicate_state,
-	.atomic_destroy_state = drm_atomic_helper_crtc_destroy_state,
+	.reset = mv320_crtc_reset,
+	.atomic_duplicate_state = mv320_crtc_duplicate_state,
+	.atomic_destroy_state = mv320_crtc_destroy_state,
 	.enable_vblank = mv320_enable_vblank,
 	.disable_vblank = mv320_disable_vblank,
 };
 
 static int mv320_get_modes(struct drm_connector *connector)
 {
-	struct drm_display_mode *mode = drm_mode_duplicate(connector->dev, &to_vdp(connector->dev)->mode);
+	struct mv320_vdp *vdp = to_vdp(connector->dev);
+	struct drm_display_mode *mode;
 
+	if (vdp->hdmi)
+		return mv320_hdmi_get_modes(vdp->hdmi);
+	mode = drm_mode_duplicate(connector->dev, &vdp->mode);
 	if (!mode)
 		return 0;
 	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
@@ -802,11 +1032,29 @@ static int mv320_get_modes(struct drm_connector *connector)
 	return 1;
 }
 
+static enum drm_connector_status mv320_detect(struct drm_connector *connector, bool force)
+{
+	struct mv320_vdp *vdp = to_vdp(connector->dev);
+
+	return !vdp->hdmi || mv320_hdmi_detect(vdp->hdmi) ?
+		connector_status_connected : connector_status_disconnected;
+}
+
+static enum drm_mode_status mv320_connector_mode_valid(struct drm_connector *connector,
+						     const struct drm_display_mode *mode)
+{
+	struct mv320_hdmi *hdmi = to_vdp(connector->dev)->hdmi;
+
+	return !hdmi || mv320_hdmi_select_mode(hdmi, mode) ? MODE_OK : MODE_BAD;
+}
+
 static const struct drm_connector_helper_funcs mv320_connector_helpers = {
 	.get_modes = mv320_get_modes,
+	.mode_valid = mv320_connector_mode_valid,
 };
 
 static const struct drm_connector_funcs mv320_connector_funcs = {
+	.detect = mv320_detect,
 	.fill_modes = drm_helper_probe_single_connector_modes,
 	.destroy = drm_connector_cleanup,
 	.reset = drm_atomic_helper_connector_reset,
@@ -920,7 +1168,7 @@ static const struct drm_driver mv320_drm_driver = {
 	.driver_features = DRIVER_GEM | DRIVER_MODESET | DRIVER_ATOMIC,
 	.fops = &mv320_fops,
 	.name = "hi3798mv320-vdp",
-	.desc = "Hi3798MV320 V0 firmware handoff",
+	.desc = "Hi3798MV320 VDP and HDMI TX",
 	.major = 1,
 	.dumb_create = mv320_dumb_create,
 	.gem_prime_import_sg_table = mv320_import,
@@ -936,6 +1184,8 @@ static int mv320_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct mv320_vdp *vdp;
 	struct drm_device *drm;
+	struct regmap *crg;
+	bool native_hdmi;
 	unsigned int gp_width, gp_height;
 	u32 gp_size;
 	u8 *coefficients;
@@ -950,37 +1200,38 @@ static int mv320_probe(struct platform_device *pdev)
 	if (IS_ERR(vdp))
 		return PTR_ERR(vdp);
 	drm = &vdp->drm;
+	native_hdmi = of_device_is_compatible(dev->of_node, "hisilicon,hi3798mv320-vdp");
 	vdp->regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(vdp->regs))
 		return PTR_ERR(vdp->regs);
-	ret = mv320_firmware_mode(vdp, dev);
-	if (ret)
-		return ret;
-	drm_mode_copy(&vdp->mode, &vdp->scanout_mode);
 	vdp->v0_scale_x = 1;
 	vdp->v0_scale_y = 1;
 	vdp->g0_primary = of_property_read_bool(dev->of_node, "hisilicon,g0-primary");
-	gp_size = readl(vdp->regs + GP0_IN_SIZE);
-	gp_width = (gp_size & U16_MAX) + 1;
-	gp_height = (gp_size >> 16) + 1;
-	if (gp_width == vdp->mode.hdisplay || gp_width * 2 == vdp->mode.hdisplay)
-		vdp->g0_scale_x = vdp->mode.hdisplay / gp_width;
-	if (gp_height == vdp->mode.vdisplay || gp_height * 2 == vdp->mode.vdisplay)
-		vdp->g0_scale_y = vdp->mode.vdisplay / gp_height;
-	if (vdp->g0_primary) {
-		/*
-		 * Keep the firmware GP0 scaler and publish its input size to
-		 * fbdev and desktop clients. V0 still uses physical HD0 pixels.
-		 */
-		if (gp_width != mv320_modes[0].hdisplay || gp_height != mv320_modes[0].vdisplay ||
-		    !vdp->g0_scale_x || !vdp->g0_scale_y)
-			return dev_err_probe(dev, -EINVAL, "unsupported firmware GP0 %ux%u\n",
-					     gp_width, gp_height);
-		drm_mode_copy(&vdp->mode, &mv320_modes[0]);
-		vdp->v0_scale_x = vdp->g0_scale_x;
-		vdp->v0_scale_y = vdp->g0_scale_y;
-		vdp->g0_scale_x = 1;
-		vdp->g0_scale_y = 1;
+	if (!(readl(vdp->regs + VDP_SMMU_CTRL) & BIT(0)))
+		return dev_err_probe(dev, -EINVAL, "VDP SMMU bypass required\n");
+	if (!native_hdmi) {
+		ret = mv320_firmware_mode(vdp, dev);
+		if (ret)
+			return ret;
+		drm_mode_copy(&vdp->mode, &vdp->scanout_mode);
+		gp_size = readl(vdp->regs + GP0_IN_SIZE);
+		gp_width = (gp_size & U16_MAX) + 1;
+		gp_height = (gp_size >> 16) + 1;
+		if (gp_width == vdp->mode.hdisplay || gp_width * 2 == vdp->mode.hdisplay)
+			vdp->g0_scale_x = vdp->mode.hdisplay / gp_width;
+		if (gp_height == vdp->mode.vdisplay || gp_height * 2 == vdp->mode.vdisplay)
+			vdp->g0_scale_y = vdp->mode.vdisplay / gp_height;
+		if (vdp->g0_primary) {
+			if (gp_width != mv320_modes[0].hdisplay || gp_height != mv320_modes[0].vdisplay ||
+			    !vdp->g0_scale_x || !vdp->g0_scale_y)
+				return dev_err_probe(dev, -EINVAL, "unsupported firmware GP0 %ux%u\n",
+						     gp_width, gp_height);
+			drm_mode_copy(&vdp->mode, &mv320_modes[0]);
+			vdp->v0_scale_x = vdp->g0_scale_x;
+			vdp->v0_scale_y = vdp->g0_scale_y;
+			vdp->g0_scale_x = 1;
+			vdp->g0_scale_y = 1;
+		}
 	}
 	coefficients = dmam_alloc_coherent(dev, 4 * V0_ZME_TABLE_BYTES, &vdp->zme_coeff_dma,
 					  GFP_KERNEL);
@@ -1051,6 +1302,17 @@ static int mv320_probe(struct platform_device *pdev)
 	ret = drm_connector_attach_encoder(&vdp->connector, &vdp->encoder);
 	if (ret)
 		return ret;
+	if (native_hdmi) {
+		crg = syscon_regmap_lookup_by_phandle(dev->of_node, "hisilicon,crg");
+		if (IS_ERR(crg))
+			return PTR_ERR(crg);
+		vdp->hdmi = mv320_hdmi_init(pdev, crg, &vdp->connector);
+		if (IS_ERR(vdp->hdmi))
+			return dev_err_probe(dev, PTR_ERR(vdp->hdmi), "cannot initialize HDMI TX\n");
+		vdp->connector.ycbcr_420_allowed = true;
+		vdp->connector.polled = DRM_CONNECTOR_POLL_HPD |
+					DRM_CONNECTOR_POLL_CONNECT | DRM_CONNECTOR_POLL_DISCONNECT;
+	}
 
 	ret = drm_vblank_init(drm, 1);
 	if (ret)
@@ -1078,6 +1340,11 @@ static int mv320_probe(struct platform_device *pdev)
 		device_remove_file(dev, &dev_attr_scanout);
 		return ret;
 	}
+	if (vdp->hdmi) {
+		writel(HD0_UNDERFLOW, vdp->regs + VDP_INT_MASK);
+		drm_kms_helper_poll_init(drm);
+		mv320_hdmi_hpd_enable(vdp->hdmi);
+	}
 	if (vdp->g0_primary)
 		drm_client_setup_with_fourcc(drm, DRM_FORMAT_XRGB8888);
 	return 0;
@@ -1087,12 +1354,17 @@ static void mv320_remove(struct platform_device *pdev)
 {
 	struct mv320_vdp *vdp = platform_get_drvdata(pdev);
 
+	if (vdp->hdmi) {
+		mv320_hdmi_hpd_disable(vdp->hdmi);
+		drm_kms_helper_poll_fini(&vdp->drm);
+	}
 	device_remove_file(&pdev->dev, &dev_attr_scanout);
 	drm_dev_unregister(&vdp->drm);
 	drm_atomic_helper_shutdown(&vdp->drm);
 }
 
 static const struct of_device_id mv320_of_match[] = {
+	{ .compatible = "hisilicon,hi3798mv320-vdp" },
 	{ .compatible = "hisilicon,hi3798mv320-vdp-handoff" },
 	{ }
 };
@@ -1109,5 +1381,5 @@ static struct platform_driver mv320_platform_driver = {
 };
 module_platform_driver(mv320_platform_driver);
 
-MODULE_DESCRIPTION("Hi3798MV320 VDP V0 DRM/KMS firmware handoff");
+MODULE_DESCRIPTION("Hi3798MV320 VDP and HDMI TX DRM/KMS");
 MODULE_LICENSE("GPL");

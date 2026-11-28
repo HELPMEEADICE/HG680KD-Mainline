@@ -11,14 +11,8 @@
 	status = "disabled";
 };
 
-&{/soc} {
-	display-controller@f8cc0000 {
-		compatible = "hisilicon,hi3798mv320-vdp-handoff";
-		reg = <0x0 0xf8cc0000 0x0 0x20000>;
-		interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-names = "vblank";
-		/* Firmware owns clock programming and reset during handoff. */
-		hisilicon,crg = <&crg>;
-		/* Default CMA pool, direct 32-bit DMA. The VDP SMMU is bypassed. */
-	};
+&vdp {
+	hisilicon,crg = <&crg>;
+	/* Default CMA pool, direct 32-bit DMA. The VDP SMMU is bypassed. */
+	status = "okay";
 };

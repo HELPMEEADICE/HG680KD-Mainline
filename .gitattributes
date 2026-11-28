@@ -13,5 +13,5 @@ scripts/build_venc_736.sh text eol=lf
 scripts/build_venc_ffmpeg.sh text eol=lf
 scripts/build_vdec_ext_736.sh text eol=lf
 patches/0020-media-add-Hi3798MV320-venc.patch text eol=lf
-scripts/hdmi-probe/* text eol=lf
-scripts/hdmi-modeset/* text eol=lf
+scripts/build_hdmi_drm_736.sh text eol=lf
+patches/0021-drm-hi3798mv320-native-hdmi.patch text eol=lf

@@ -205,8 +205,11 @@ if [[ $vdec ]]; then
 fi
 if [[ $vdp ]]; then
     variant_key+=" DRM_HI3798MV320_VDP DRM_GEM_DMA_HELPER"
-    apply_board_patch "$inputs/0014-drm-add-Hi3798MV320-vdp.patch"
-    install -m644 "$inputs/hi3798mv320-vdp.c" "$inputs/hi3798mv320-tiled.h" "$linux/drivers/gpu/drm/"
+    if ! grep -q '^config DRM_HI3798MV320_VDP$' "$linux/drivers/gpu/drm/Kconfig"; then
+        apply_board_patch "$inputs/0014-drm-add-Hi3798MV320-vdp.patch"
+    fi
+    apply_board_patch "$inputs/0021-drm-hi3798mv320-native-hdmi.patch"
+    install -m644 "$inputs"/hi3798mv320-{vdp.c,hdmi.c,hdmi.h,tiled.h} "$linux/drivers/gpu/drm/"
     board=hi3798mv320-fiberhome-hg680kd-arm64-vdp
     install -m644 "$inputs/$board.dts" "$linux/arch/arm64/boot/dts/hisilicon/"
 fi

@@ -2,7 +2,7 @@
 
 基线为 HG680KD 的 Linux 7.3.6。仓库提交 `f3970e1` 验收 MPV V4L2 Request 和 VDP 零拷贝，`9223587` 记录 USB 全媒体基线。静态取证使用工作区既有日志、原厂 ARM32 内核、kallsyms、DTB 和 Linux 源码。原厂 SDK 构建标识为 `HiHuanglong_V100R009C01SPC023_v2024111912`，通过其板载驱动产物核对实现，未取得同版 SDK 的完整源树或板级原理图。第 6–9 节记录 COM4 TFTP 纯 RAM 探针、SDR 切档与接收端回读。 [USB 全媒体基线](logs/539-usb-7.3.6-full.txt) · [MPV 验收](logs/540-mpv-v4l2-drm-acceptance.txt) · [原厂 SDK 产物来源](VPU-REVERSE.md) · [Git 验收摘录](logs/541-hdmi-ram-acceptance.txt)
 
-**结论。** DDC/EDID 和 HPD 轮询已有足够的寄存器依据，可先在固件链路上接入。第 7–9 节记录了 1080p60 RGB8、2160p30 RGB8 与 2160p60 YCbCr 4:2:0 8 bpc 的原生切档。24p、23.976p 和高于 340 MHz 的 TMDS 链路待实测。HDR10 静态包的具体槽位已定位。端到端 10 bpc PQ 需要验证 DHD0 至 TX 的位深与色彩、sink 能力以及高带宽链路。CEC 有片内控制器、门控和复位，HG680KD 插座侧的电气连通性待验证。海思公开规格支持 HDMI TX 4K60 和 10-bit 解码，可用作芯片能力交叉核对。 [海思 Hi3798MV320 产品规格](https://www.hisilicon.com/cn/products/smart-media/STB/Hi3798MV320)
+Linux 7.3.6 的内建 `hi3798mv320-vdp` 已接入 HDMI-A connector、HPD IRQ、DDC/EDID 和原生 SDR Atomic KMS。第 6–9 节保留探针实测过程，第 10 节记录正式驱动的接管边界。原生档位包括 1080p60 RGB8、2160p30 RGB8 和 2160p60 YCbCr 4:2:0 8 bpc。24p、23.976p、高于 340 MHz 的 TMDS 实体链路、端到端 10 bpc PQ 与 CEC 插座连通仍待实测。 [正式驱动验收](HDMI-DRM-ACCEPTANCE.md) · [海思 Hi3798MV320 产品规格](https://www.hisilicon.com/cn/products/smart-media/STB/Hi3798MV320)
 
 本文的 **回读** 指既有实机日志，**反汇编** 指可以从原厂二进制复核的指令或数据，**推导** 指按已知字段、协议或时序计算所得，**待验证** 指缺少本板动态证据。原厂内核 SHA-256 为 `a47592ad5a842035f0bd6e41fdce71cb89c2238aff57e2b333d60213af176724`，DTB SHA-256 为 `e289000306072f9fd2e140dc5a837fb646b9c803dae15c2b4d0b99c32cf63517`。复核指令用 A32 小端，VA 减 `0xc0008000` 得平坦映像文件偏移。文中的 `c0…` 和 `c1…` 为原厂虚拟地址，MMIO 用物理地址。 [原厂内核](artifacts/vpu-reverse-factory/hg680kd-stock-kernel.bin) · [kallsyms](artifacts/vpu-reverse-factory/hg680kd-stock-kallsyms.txt) · [原厂 DTB](artifacts/vpu-reverse-factory/inputs/factory.dtb) · [反编译 DTS](artifacts/vpu-reverse-factory/out/factory.dts)
 
@@ -31,7 +31,9 @@
 
 CRG `+0x10c` 的 gate 为 bit 0 SSC 输入、1 SSC bypass、2 24 MHz、4 OS、5 AS、16 pixel，复位请求为 bit 6 总线、7 TX 控制、9 SSC，`[13:10]` 是 SSC 分频编码，bit 19 选 SSC bypass clock。`+0x110[0]` 为 PHY TMDS gate，bit 4/5 为 PHY/TMDS reset，`[8:6]` 为 TMDS 分频编码。`drv_hdmi_prod_crg_div_set`（`c086fa70`）对两个表内除数都先减 1 再写字段。历史活动值为 `0x00012437/0x00000001`，两处分频字段解码为 ÷10、÷1，与固件 420 8 bpc 所选表项一致。按字段更新共享 CRG，保留其它位及设备的时钟所有权。 [原厂时钟与复位记录](HDMI-REVERSE.md#时钟复位与原厂初始化) · [kallsyms 中的 CRG accessor](artifacts/vpu-reverse-factory/hg680kd-stock-kallsyms.txt)
 
-### 1.2 固件交接与最小 DRM 接管面
+### 1.2 原生接管前的固件交接
+
+本节描述全媒体验收基线及当时的接管设计。正式实现和 DT 资源分配见第 10 节。
 
 - 当下 `mv320_firmware_mode()` 读取 CRG 和 HD0 的使能、活动尺寸及总计，只匹配两组内建 60 Hz 时序。`mv320_mode_valid()` 只放行固定逻辑 mode，`mode_fixup()` 将 adjusted mode 指向既有扫描时序。单个 HDMI-A connector 提供一个 preferred mode，没有硬件 `detect`、EDID 或 bridge。内核已管 G0/V0、mixer 部分字段、VT1 IRQ 和更新锁存，U-Boot 保有 DHD0 物理时序、HPLL/路由、TX/PHY 和视频包的模式。USB 验收的 1920×1080 KMS 桌面与 3840×2160p60 HD0 同时成立，信号为 VIC 97、YCbCr 4:2:0、8-bit SDR，297 MHz TMDS 字符率。 [VDP 固定模式与 connector](src/hi3798mv320-vdp.c#L761) · [U-Boot 点查](logs/240-hdmi-uboot-capture-card.txt) · [音频链路交接](AIAO-HDMI-PLAN.md)
 - **先接管 connector。** 最小窗口为 AON `+0x20/24/28/30/34/40/54/5c` 与 TX 控制 `+0x38–0x50、+0x68–0x70`。给 bridge/connector 提供 HPD detect、DDC adapter/EDID、缓存失效和 hotplug 通知。首个 RAM 验证仍以固件 mode 做硬件 allowlist，物理时序切换进入下一阶段。
@@ -171,7 +173,7 @@ HG680KD 的既有回读 `0x37980320` 和 feature `0xc0100000` 匹配 `drv_sys_ge
 3. **接收。** 读取 AON RX 事件及 FIFO 状态，读取 `+0x0c` 的头和长度及 `+0x38–44` 数据字，校验长度及错误位后清当前条目并按需循环收空，W1C 仅写已消费的事件位。保护共享 AON mask 的 RMW，使 HPD 与 CEC 能并行。RX count 的边界、无 opcode 消息及 capture mask 的广播行为均加入回归。
 4. **接框架。** 用 `cec_allocate_adapter()` / `cec_register_adapter()`，实现 `adap_enable`、`adap_log_addr`、`adap_transmit`，以 `cec_transmit_attempt_done()` 或 `cec_transmit_done()` 上报结果，用 `cec_received_msg()` 上报 RX。通过 HDMI CEC helper 或 notifier 在 EDID 更新时设置物理地址，拔插时清失效地址并遵循实测的无 HPD 行为。板端连通通过后，基本收发的改动量为中等，重点在时钟生命周期、IRQ 递送、重试和 signal-free time，待机唤醒另需核对 MCU 与 CPU 的所有权。 [Linux CEC 驱动 API](https://docs.kernel.org/driver-api/media/cec-core.html) · [Linux 7.3.6 bridge CEC 接口](https://raw.githubusercontent.com/gregkh/linux/v7.3.6/drivers/gpu/drm/display/drm_bridge_connector.c)
 
-## 5. 实施优先级、风险与最小 RAM 验证
+## 5. 探针阶段的实施优先级
 
 | 优先级 | 范围 | 投入、收益和完成条件 |
 | --- | --- | --- |
@@ -197,9 +199,9 @@ HG680KD 保持 USB2 Video 采集卡直连。软件已验证 HPD/RxSense 稳态�
 
 ### 6.1 镜像与操作边界
 
-在 `hedc@ArchLinux-E5-Server:/home/hedc/hg680kd-mainline` 复制已验收的全媒体 Linux 7.3.6 源码与配置，从空输出目录用 GCC 14.2.0 和 `CONFIG_WERROR=y` 构建，日志零警告。构建脚本复用已验收的 AIAO initramfs，禁用 Linux MMC 和 USB 存储，探针仅编入这一镜像及其 DTS。驱动绑定时映射资源、解析 IRQ 并创建 debugfs，探针的寄存器写入和 IRQ 申请由用户写入 `hi3798_hdmi_probe/run` 触发。命令为 `hpd`（1 秒稳态采样）、`watch`（12 秒边沿采样）、`edid` 和 `cec`。结果经 `report` 读取，`edid` 文件提供校验通过的二进制块。 [构建脚本](scripts/hdmi-probe/build.sh) · [探针](scripts/hdmi-probe/probe.c) · [仅测试镜像使用的 DTS](scripts/hdmi-probe/probe.dts) · [构建日志](artifacts/arm64-7.3.6-hdmi-probe/build.log)
+在 `hedc@ArchLinux-E5-Server:/home/hedc/hg680kd-mainline` 复制已验收的全媒体 Linux 7.3.6 源码与配置，从空输出目录用 GCC 14.2.0 和 `CONFIG_WERROR=y` 构建，日志零警告。构建脚本复用已验收的 AIAO initramfs，禁用 Linux MMC 和 USB 存储，探针仅编入这一镜像及其 DTS。驱动绑定时映射资源、解析 IRQ 并创建 debugfs，探针的寄存器写入和 IRQ 申请由用户写入 `hi3798_hdmi_probe/run` 触发。命令为 `hpd`（1 秒稳态采样）、`watch`（12 秒边沿采样）、`edid` 和 `cec`。结果经 `report` 读取，`edid` 文件提供校验通过的二进制块。 [构建脚本](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-probe/build.sh) · [探针](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-probe/probe.c) · [仅测试镜像使用的 DTS](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-probe/probe.dts) · [构建日志](artifacts/arm64-7.3.6-hdmi-probe/build.log)
 
-COM4 按 115200 8N1 单进程独占。已验收的原厂 BL31 副本和测试镜像均由 TFTP 装入 RAM，分别回读 CRC32 `fa236592` 和 `f7ad6c38`。`boot.img` 从 `0x01fdffc0` 启动，共 19,626,056 字节，SHA256 为 `aa15e1d6f5fa112e9aace5748e8f08be5d0f59b07bc14a6ba43790e01d7cdab1`。Linux 根为内置 `rootfs`，`/proc/partitions` 无条目。U-Boot 网络环境只在 RAM 中设置。全程未写 U 盘 `/boot/boot.img` 或 U 盘根分区，未刷写 eMMC、访问 OTP 或执行 `saveenv`。 [镜像](artifacts/arm64-7.3.6-hdmi-probe/boot.img) · [SHA256 清单](artifacts/arm64-7.3.6-hdmi-probe/SHA256SUMS) · [验收脚本](scripts/hdmi-probe/board.py)
+COM4 按 115200 8N1 单进程独占。已验收的原厂 BL31 副本和测试镜像均由 TFTP 装入 RAM，分别回读 CRC32 `fa236592` 和 `f7ad6c38`。`boot.img` 从 `0x01fdffc0` 启动，共 19,626,056 字节，SHA256 为 `aa15e1d6f5fa112e9aace5748e8f08be5d0f59b07bc14a6ba43790e01d7cdab1`。Linux 根为内置 `rootfs`，`/proc/partitions` 无条目。U-Boot 网络环境只在 RAM 中设置。全程未写 U 盘 `/boot/boot.img` 或 U 盘根分区，未刷写 eMMC、访问 OTP 或执行 `saveenv`。 [镜像](artifacts/arm64-7.3.6-hdmi-probe/boot.img) · [SHA256 清单](artifacts/arm64-7.3.6-hdmi-probe/SHA256SUMS) · [验收脚本](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-probe/board.py)
 
 ### 6.2 HPD 和 DDC
 
@@ -248,13 +250,13 @@ VDP 沿用固件 HD0 3840×2160、总计 4400×2250。静置时 DRM 会按空闲
 
 ### 7.1 探针与操作边界
 
-独立测试 DT 让 `scripts/hdmi-modeset/` 的探针独占 VDP/DHD0。开机继承 U-Boot 档位，读 `/sys/kernel/debug/hi3798_hdmi_modeset` 查看状态与寄存器，写入 `1080p60` 或 `2160p30` 才切换。G0 使用两个按目标尺寸预填的 DMA 彩条画布，GP0 设为 1:1。临时 AIAO 补丁复用 AIAO 已映射的 TX 音频和包寄存器，通过 ALSA PCM 打开锁串行化切档。播放设备打开期间返回 `EBUSY`，切档失败时保持静音。补丁仅应用于远端干净构建副本。 [临时驱动](scripts/hdmi-modeset/modeset.c) · [测试 DT](scripts/hdmi-modeset/modeset.dts) · [AIAO 补丁](scripts/hdmi-modeset/aiao.patch)
+独立测试 DT 让 `scripts/hdmi-modeset/` 的探针独占 VDP/DHD0。开机继承 U-Boot 档位，读 `/sys/kernel/debug/hi3798_hdmi_modeset` 查看状态与寄存器，写入 `1080p60` 或 `2160p30` 才切换。G0 使用两个按目标尺寸预填的 DMA 彩条画布，GP0 设为 1:1。临时 AIAO 补丁复用 AIAO 已映射的 TX 音频和包寄存器，通过 ALSA PCM 打开锁串行化切档。播放设备打开期间返回 `EBUSY`，切档失败时保持静音。补丁仅应用于远端干净构建副本。 [临时驱动](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/modeset.c) · [测试 DT](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/modeset.dts) · [AIAO 补丁](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/aiao.patch)
 
 探针先静音并发送 AVMUTE，停音频和 AVI 包，关 PHY 通道。在旧档消隐区停 DHD0 并等待更新锁存，保留旧 G0 直到停扫。然后按第 2 节的表项设置 HPLL、VDP 分频、TX 像素门控、PHY TMDS 门控与复位。PHY 使用原厂 MV320 EC 驱动表 `c177e588/c177e5f4` 和 1/10 图样，并在打开通道时恢复原厂端接模式，CLK 用模式 2，D0–D2 用模式 3。DHD0 恢复后，TX 核对活动区、总计、像素时钟、TMDS 时钟和稳定状态，再打开 PHY 通道。音频用 48 kHz 对应的 N/CTS 重配 ACR，连续读取 HW CTS 后清 AVMUTE，后续 PCM trigger 按现有路径解静音。
 
 彩条路径旁路 VDP GDM 和 TX CSC，G0 limited RGB 直接送到 TX。Video `+0x1a8[8:0]=0x11` 将 VDP R/G/B 路由成 TX 输入的 G/B/R 通道顺序。TX 设为 HDMI、8 bpc，关闭 420 分频、HDR GEN 槽位和本地加扰。AVI payload 为 RGB、BT.709、16:9、underscan 和 limited range，VIC 16 与 95 的校验字节分别为 `0xb9` 和 `0x6a`。TX2 MCLK/BCLK 沿用 12.288 MHz / 3.072 MHz，切档中复位窗口限于 TX Audio FIFO/ACR/Audio。 [原厂 AVI 槽位](#32-avi-与-hdr-静态包) · [Linux AVI 封包](https://raw.githubusercontent.com/gregkh/linux/v7.3.6/drivers/video/hdmi.c)
 
-COM4 115200 8N1 由单进程独占。经 TFTP 将已校验 BL31 副本载入 `0x08020000`，将测试镜像载入 `0x01fdffc0` 并执行 `bootm`。U-Boot TFTP 变量只设置在 RAM。内核配置禁用 MMC、MTD、USB Mass Storage 和 UAS，Linux 运行在内置 `rootfs`，`/proc/partitions` 无设备。U 盘、eMMC、OTP 及持久 U-Boot 环境均零写入。 [远端构建脚本](scripts/hdmi-modeset/build.sh) · [COM4 验收脚本](scripts/hdmi-modeset/board.py)
+COM4 115200 8N1 由单进程独占。经 TFTP 将已校验 BL31 副本载入 `0x08020000`，将测试镜像载入 `0x01fdffc0` 并执行 `bootm`。U-Boot TFTP 变量只设置在 RAM。内核配置禁用 MMC、MTD、USB Mass Storage 和 UAS，Linux 运行在内置 `rootfs`，`/proc/partitions` 无设备。U 盘、eMMC、OTP 及持久 U-Boot 环境均零写入。 [远端构建脚本](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/build.sh) · [COM4 验收脚本](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/board.py)
 
 ### 7.2 构建与实机结果
 
@@ -295,7 +297,7 @@ U-Boot 初始档为 VIC 97、3840×2160p60 YCbCr 4:2:0 8 bpc，TMDS 297 MHz。Li
 
 ### 8.1 HPLL 与 PHY 锁定状态
 
-同族海思 HDMI 头文件把 `CRG+0x2c[20]` 定义为 `hpll_pd`，并区分 PHY `+0x60[2]` 的 `ad_txpll_lock` 与 `+0x98[20]` 的 `hdmi_clk_lock`。本板 RAM 探针在 AVMUTE、PHY 输出关断和 DHD0 停扫后，仅翻转目标 PLL 的掉电位。试验前后的控制字按原掩码恢复，随后运行正常切档。 [海思 CRG 定义](https://github.com/JasonFreeLab/HiSTBLinuxV100R005C00SPC060/blob/a82e5fee18a794ecdf28401b21c25cddec0d21fb/source/msp/drv/hdmi/hdmi_2_0/product/hisiv100/regs/hdmi_reg_crg.h#L150-L173) · [海思 PHY 定义](https://github.com/JasonFreeLab/HiSTBLinuxV100R005C00SPC060/blob/a82e5fee18a794ecdf28401b21c25cddec0d21fb/source/msp/drv/hdmi/hdmi_2_0/hal/phy/hisiv100/regs/hdmi_reg_dphy.h#L598-L639) · [测试补丁](scripts/hdmi-modeset/locks.patch)
+同族海思 HDMI 头文件把 `CRG+0x2c[20]` 定义为 `hpll_pd`，并区分 PHY `+0x60[2]` 的 `ad_txpll_lock` 与 `+0x98[20]` 的 `hdmi_clk_lock`。本板 RAM 探针在 AVMUTE、PHY 输出关断和 DHD0 停扫后，仅翻转目标 PLL 的掉电位。试验前后的控制字按原掩码恢复，随后运行正常切档。 [海思 CRG 定义](https://github.com/JasonFreeLab/HiSTBLinuxV100R005C00SPC060/blob/a82e5fee18a794ecdf28401b21c25cddec0d21fb/source/msp/drv/hdmi/hdmi_2_0/product/hisiv100/regs/hdmi_reg_crg.h#L150-L173) · [海思 PHY 定义](https://github.com/JasonFreeLab/HiSTBLinuxV100R005C00SPC060/blob/a82e5fee18a794ecdf28401b21c25cddec0d21fb/source/msp/drv/hdmi/hdmi_2_0/hal/phy/hisiv100/regs/hdmi_reg_dphy.h#L598-L639) · [测试补丁](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/locks.patch)
 
 - **HPLL 锁定位是 `0xf8a22150[3]`。** PHY 保持隔离时，单独置位 `0xf8a2202c[20]`，CRG 锁字由 `0x7f` 变为 `0x77`。复原后回到 `0x7f`。三次切换均只翻转 bit 3。恢复旧参数后首次读回锁定所需约 37–44 µs，该时间包含软件轮询。
 - **PHY 可用的锁定位是 `0xf8d30098[20]`。** 单独置位 `0xf8d30064[20]` 给 PHY TXPLL 掉电时，CRG 锁字保持 `0x7f`，PHY 状态 bit 20 由 1 变 0，恢复 PHY 后回到 1。同族头文件标注的 `0xf8d30060[2]` 在本板三态均为 0，`+0x60` 实读为 `0x1`。TX `Packet+0x04[0]` 继续作为 TX 内部同步状态。 [三档锁位与接收端原始数据](artifacts/arm64-7.3.6-hdmi-modeset-locks/locks-rx.json) · [负对照串口记录](artifacts/arm64-7.3.6-hdmi-modeset-locks/locks-rx-com4.txt)
@@ -304,7 +306,7 @@ U-Boot 初始档为 VIC 97、3840×2160p60 YCbCr 4:2:0 8 bpc，TMDS 297 MHz。Li
 
 ### 8.2 MacroSilicon MS2131 原生时序
 
-通过采集卡 `345f:2131` 的 HID `B5` 读取 HDMI RX 的 XDATA。原始 `E184/E18C` 为活动区，`E184–E195` 同时包含前肩、消隐和同步宽度，`E14E/E170` 的总计与活动区加消隐互相核对。AVI 在 `E3A0` 起回读，两档包版本、长度及校验和通过。接收端 `E390/E394` 保存实际收到的 ACR CTS/N，以测试流 48 kHz 为参考按 `Fchar=128×Fs×CTS/N` 计算 TMDS 字符率，再按 RGB 24 bit 时的字符率与像素率等值及接收端总计计算刷新率。`E160–E162` 的原始字段随两档字符率约成 1∶2，换算系数尚未校准。 [只读回读实现](scripts/hdmi-modeset/receiver.py) · [MS213x 活动区线索](https://github.com/BertoldVdb/ms-tools/blob/main/ms213x_patch/asm/readinfo2.asm) · [接收端原始读数](artifacts/arm64-7.3.6-hdmi-modeset-locks/locks-rx.json)
+通过采集卡 `345f:2131` 的 HID `B5` 读取 HDMI RX 的 XDATA。原始 `E184/E18C` 为活动区，`E184–E195` 同时包含前肩、消隐和同步宽度，`E14E/E170` 的总计与活动区加消隐互相核对。AVI 在 `E3A0` 起回读，两档包版本、长度及校验和通过。接收端 `E390/E394` 保存实际收到的 ACR CTS/N，以测试流 48 kHz 为参考按 `Fchar=128×Fs×CTS/N` 计算 TMDS 字符率，再按 RGB 24 bit 时的字符率与像素率等值及接收端总计计算刷新率。`E160–E162` 的原始字段随两档字符率约成 1∶2，换算系数尚未校准。 [只读回读实现](scripts/hdmi_receiver.py) · [MS213x 活动区线索](https://github.com/BertoldVdb/ms-tools/blob/main/ms213x_patch/asm/readinfo2.asm) · [接收端原始读数](artifacts/arm64-7.3.6-hdmi-modeset-locks/locks-rx.json)
 
 | 切换档位 | HDMI RX 活动区 / 总计 | 水平前肩 / 同步 / 后肩 | 垂直前肩 / 同步 / 后肩 | RX AVI VIC / 格式 | RX ACR N / CTS | ACR 推算刷新率 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -316,7 +318,7 @@ U-Boot 初始档为 VIC 97、3840×2160p60 YCbCr 4:2:0 8 bpc，TMDS 297 MHz。Li
 
 ### 8.3 线端 GCP 位深与 SDR EOTF
 
-用纯 RAM 的 `modeset-rxtag` 镜像手动开关 24-bit GCP 标记和 SDR DRM InfoFrame。HDMI RX `E380[7:4]` 的 CD=4 表示每通道 8 bit。`E4C0/E4C1` 保存 DRM 版本 1 和长度 26，`E4C4` 为校验和，`E4C5[2:0]` 的 EOTF=0 表示传统 Gamma SDR。三档独立回读完整包时校验和均有效。 [GCP 位深编码](https://docs.altera.com/r/docs/823533/26.1/gts-hdmi-ip-user-guide/source-general-control-packet-gcp) · [Linux DRM EOTF 枚举](https://raw.githubusercontent.com/gregkh/linux/v7.3.6/include/linux/hdmi.h) · [测试补丁](scripts/hdmi-modeset/receiver-tags.patch)
+用纯 RAM 的 `modeset-rxtag` 镜像手动开关 24-bit GCP 标记和 SDR DRM InfoFrame。HDMI RX `E380[7:4]` 的 CD=4 表示每通道 8 bit。`E4C0/E4C1` 保存 DRM 版本 1 和长度 26，`E4C4` 为校验和，`E4C5[2:0]` 的 EOTF=0 表示传统 Gamma SDR。三档独立回读完整包时校验和均有效。 [GCP 位深编码](https://docs.altera.com/r/docs/823533/26.1/gts-hdmi-ip-user-guide/source-general-control-packet-gcp) · [Linux DRM EOTF 枚举](https://raw.githubusercontent.com/gregkh/linux/v7.3.6/include/linux/hdmi.h) · [测试补丁](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/receiver-tags.patch)
 
 RX 可在停止发送后保留上次的 GCP 和 DRM。每档先采样接收缓存，然后在 SDR DRM 中放入与缓存不同的 MaxCLL 值作为新包标记，再要求 RX 回读该标记。标记仅用于确认包的新鲜度。发包测试不改变 RGB 像素打包和原生时序。最初的对照还在两档都测到开启位深标记时 `E380` 由 `0x01` 变 `0x41`。 [1080p60 初次原始包对照](artifacts/arm64-7.3.6-hdmi-modeset-rxtag/1080p60-first-tags-on-rx-e300.bin) · [2160p30 初次原始包对照](artifacts/arm64-7.3.6-hdmi-modeset-rxtag/2160p30-tags-on-rx-e300.bin)
 
@@ -332,13 +334,13 @@ RX 可在停止发送后保留上次的 GCP 和 DRM。每档先采样接收缓�
 
 ### 9.1 视频与时钟路径
 
-`4k60` 构建变体沿用第 8 节的临时探针。切档轮询 `0xf8a22150[3]` 和 `0xf8d30098[20]`。VIC 97 的 DHD0 使用 3840×2160 活动区和 4400×2250 总计，像素时钟为 594 MHz。2160p60 彩条沿用固件的 GP0 二倍缩放，G0 读取 1920×1080 ARGB，GP0 输出完整 UHD 光栅。首轮 3840×2160 ARGB 直读触发了 VDP underflow。 [临时探针补丁](scripts/hdmi-modeset/4k60.patch) · [原厂 GP0 回读](artifacts/arm64-7.3.6-hdmi-modeset/uboot-extra.txt) · [全宽 ARGB 对照](artifacts/arm64-7.3.6-hdmi-4k60/preflight-full-raster/trial-2160p60-switch.txt)
+`4k60` 构建变体沿用第 8 节的临时探针。切档轮询 `0xf8a22150[3]` 和 `0xf8d30098[20]`。VIC 97 的 DHD0 使用 3840×2160 活动区和 4400×2250 总计，像素时钟为 594 MHz。2160p60 彩条沿用固件的 GP0 二倍缩放，G0 读取 1920×1080 ARGB，GP0 输出完整 UHD 光栅。首轮 3840×2160 ARGB 直读触发了 VDP underflow。 [临时探针补丁](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/4k60.patch) · [原厂 GP0 回读](artifacts/arm64-7.3.6-hdmi-modeset/uboot-extra.txt) · [全宽 ARGB 对照](artifacts/arm64-7.3.6-hdmi-4k60/preflight-full-raster/trial-2160p60-switch.txt)
 
 4:2:0 档启用固件预置的 VDP GDM RGB→YCbCr CSC（`VDP+0xd500[0]`）。TX CSC 旁路，TX Video `+0x180=0x7`、`+0x18c=0x401`、`+0x1a8=0x88` 选择 Y/Cb/Cr 输入、横纵向采样及二分频。RGB 档关闭 GDM，恢复 `+0x180=0x8`、`+0x18c=0x0`、`+0x1a8=0x11`。两条通路均为 8 bpc。 [原厂 TX Video 回读](artifacts/arm64-7.3.6-hdmi-modeset/uboot-initial.txt) · [只用 TX CSC 的偏色对照](artifacts/arm64-7.3.6-hdmi-4k60/preflight-tx-csc/trial-2160p60.png)
 
 ### 9.2 EDID 与 SCDC
 
-现场 EDID 给出 300 MHz TMDS 上限、VIC 97 仅限 YCbCr 4:2:0，且无 HDMI Forum SCDC 或 4:2:0 deep-color 声明。MS2131 仍会应答 `0x54`，`Sink_Version (0x01)` 返回 `0x00`。低速切档经 DDC 读改写 `TMDS_Config (0x20)[1:0]` 为零，回读 `0x20`、`Scrambler_Status (0x21)` 与 `Status_Flags_0 (0x40)`。TX `Packet+0x260` 清加扰与 HDMI2 encoder 位，PHY 使用 `0x1f / 0x01f07c1f` 的 1/10 图样。 [EDID 解码](artifacts/arm64-7.3.6-hdmi-probe/edid-decode.txt) · [DDC/SCDC 实现](scripts/hdmi-modeset/scdc.c)
+现场 EDID 给出 300 MHz TMDS 上限、VIC 97 仅限 YCbCr 4:2:0，且无 HDMI Forum SCDC 或 4:2:0 deep-color 声明。MS2131 仍会应答 `0x54`，`Sink_Version (0x01)` 返回 `0x00`。低速切档经 DDC 读改写 `TMDS_Config (0x20)[1:0]` 为零，回读 `0x20`、`Scrambler_Status (0x21)` 与 `Status_Flags_0 (0x40)`。TX `Packet+0x260` 清加扰与 HDMI2 encoder 位，PHY 使用 `0x1f / 0x01f07c1f` 的 1/10 图样。 [EDID 解码](artifacts/arm64-7.3.6-hdmi-probe/edid-decode.txt) · [DDC/SCDC 实现](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/scdc.c)
 
 探针另有受 EDID 和 SCDC 版本约束的 594 MHz RGB8 分支。满足能力时按同一模式提交启用 `TMDS_Config[1:0]`、TX 加扰和 PHY 1/40，回读加扰与锁定位。当前 MS2131 对该档返回 `-EOPNOTSUPP`，切入前的 AVI 保持不变。1/40 的线端验证需要另一台声明对应模式、TMDS 带宽和 SCDC 的接收端。 [594 MHz 拒绝回读](artifacts/arm64-7.3.6-hdmi-4k60/reject-2160p60-rgb.txt)
 
@@ -348,7 +350,7 @@ RX 可在停止发送后保留上次的 GCP 和 DRM。每档先采样接收缓�
 
 ### 9.4 五次原生切档实测
 
-MS2131 通过 HID 独立读出 HDMI RX 的活动区、总计、AVI、GCP、SDR DRM 和 ACR。4:2:0 档 RX 横向按 TMDS 字符计数，一个字符覆盖两个水平像素，原始 1920／2200 对应像素 3840／4400。TX Video 内部时序检测和 DHD0 均回读完整光栅。以 48 kHz PCM 为参考，RX 刷新率按 `(128 × 48000 × CTS / N) / (RX 字符总计 × Vtotal)` 计算。30 Hz 和两次 60 Hz UHD 的接收端 ACR 均为 `6144 / 297000`。 [验收脚本](scripts/hdmi-modeset/accept_4k60.py) · [逐档原始 RX 与 TX 读数](logs/542-hdmi-4k60-result.json)
+MS2131 通过 HID 独立读出 HDMI RX 的活动区、总计、AVI、GCP、SDR DRM 和 ACR。4:2:0 档 RX 横向按 TMDS 字符计数，一个字符覆盖两个水平像素，原始 1920／2200 对应像素 3840／4400。TX Video 内部时序检测和 DHD0 均回读完整光栅。以 48 kHz PCM 为参考，RX 刷新率按 `(128 × 48000 × CTS / N) / (RX 字符总计 × Vtotal)` 计算。30 Hz 和两次 60 Hz UHD 的接收端 ACR 均为 `6144 / 297000`。 [验收脚本](https://github.com/HELPMEEADICE/HG680KD-Mainline/blob/629cfc8e4de045ee405569eedb82610d88127ef3/scripts/hdmi-modeset/accept_4k60.py) · [逐档原始 RX 与 TX 读数](logs/542-hdmi-4k60-result.json)
 
 | 顺序 | MS2131 原始活动区 / 总计 | AVI VIC / Y / 校验字节 | 像素 / TMDS MHz | RX ACR Hz | VDP VT1 Hz | N / SW CTS / 播放中 HW CTS | 通过彩条帧 |
 | --- | --- | --- | --- | ---: | ---: | --- | ---: |
@@ -362,3 +364,12 @@ MS2131 通过 HID 独立读出 HDMI RX 的活动区、总计、AVI、GCP、SDR D
 - 五次切档的 SCDC `0x20` 写前和回读均为 `0x00`，`0x21=0x00`。第一次切入 2160p60 时 `0x40` 从 `0x01` 收敛至 `0x0f`，其余四次切档已读到 `0x0f`。五档稳态均为 `0x0f`，DDC 请求、应答与仲裁归零，TX `Packet+0x260=0x00`，PHY 保持 1/10。 [2160p60 切入](artifacts/arm64-7.3.6-hdmi-4k60/2160p60-first-switch.txt) · [2160p60 稳态](artifacts/arm64-7.3.6-hdmi-4k60/2160p60-first-scdc-stable.txt) · [1080p60 回切稳态](artifacts/arm64-7.3.6-hdmi-4k60/1080p60-return-scdc-stable.txt)
 - 每档稳定后以 1920×1080 MJPEG 30 FPS 采集，共核验 1,767 帧，彩条未见偏色、撕裂或黑帧。每档 AIAO 播放 384,000 帧、48 kHz 立体声 PCM，采集双声道均测得 1 kHz，稳态静音窗口及 ALSA XRUN 均为 0。 [2160p60 彩条](artifacts/arm64-7.3.6-hdmi-4k60/2160p60-first.png) · [2160p60 再切录制](artifacts/arm64-7.3.6-hdmi-4k60/2160p60-return.mkv) · [1080p60 回切录制](artifacts/arm64-7.3.6-hdmi-4k60/1080p60-return.mkv)
 - HPLL 每档隔离回读 `0x7f → 0x77 → 0x7f`，PHY TXPLL bit 20 每档为 `1 → 0 → 1`。最终验收整轮的 VDP underflow、fetch underflow 和 SMMU INTID 181 都为 0。板子停在 2160p60 RAM 档，`/proc/partitions` 无设备。U 盘 `/boot/boot.img`、根分区和 eMMC 的写入次数为 0。U-Boot 命令限于易失网络变量设置、TFTP、RAM 校验和引导，`saveenv` 和 OTP 访问次数均为 0。 [COM4 完整日志](artifacts/arm64-7.3.6-hdmi-4k60/4k60-com4.txt) · [最终 IRQ、寄存器与挂载](artifacts/arm64-7.3.6-hdmi-4k60/final.txt)
+
+## 10. 内建 DRM 驱动接管
+
+- 基础板级 DTS 声明 VDP、TX 控制和 DDC、TX Video/Audio/Packet、AON、PHY 及 SPI 88。VDP 通过 syscon 使用 `0xf8a22000` CRG，AIAO 仅映射 TX2 所在的 AIAO 窗口。旧 DTB 继续使用原有固件交接兼容项。 [基础 DTS](src/hi3798mv320-fiberhome-hg680kd-arm64.dts) · [AIAO DTS](src/hi3798mv320-fiberhome-hg680kd-arm64-aiao.dts)
+- HDMI-A connector 以 AON HPD 位为接入状态，SPI 88 处理 HPD/RxSense 事件，DRM 轮询补充通知。DDC 仲裁后逐块读取 EDID，7.3.6 的 `drm_edid_read_custom`、`drm_edid_connector_update` 和 `drm_edid_connector_add_modes` 解析校验并发布 EDID 与模式。连接期间复用 DRM 已发布的 EDID，检测到断连或 HPD 边沿后重新读取。无 EDID 时提供 1080p60。带宽与逐 VIC Y420 能力来自 DRM 的 EDID 解析，594 MHz RGB8 要求对端同时声明足够 TMDS 带宽和 SCDC。 [HDMI TX 驱动](src/hi3798mv320-hdmi.c)
+- Atomic KMS 使用真实的 DHD0 时序。切档先 AVMUTE、隔离 PHY 与停扫，重配并轮询 HPLL `+0x150[3]` 和 PHY `+0x98[20]`，再配置 GP0、GDM、TX Video、AVI、SDR DRM InfoFrame 和 SCDC。TX 拥有 ACR、音频复位及数据包，48 kHz 用 `N=6144` 和按 TMDS 字符率计算的 SW CTS。AIAO 的 DMA 和 ALSA PCM 生命周期独立于切档。 [VDP Atomic 流程](src/hi3798mv320-vdp.c) · [AIAO PCM](src/hi3798mv320-aiao.c)
+- fbdev 优先选择 1080p60。2160p60 用 1920×1080 G0 缓冲区经 GP0 放大两倍，V0 使用完整 UHD 坐标及原有 8+2 bit Tiled DMA-BUF 格式。临时 HDMI 探针补丁、测试 DT 和 debugfs 控制接口已从现行构建移除，历史日志和实验版本保存在归档提交。 [纯 RAM 构建](scripts/build_hdmi_drm_736.sh) · [正式驱动验收](HDMI-DRM-ACCEPTANCE.md)
+
+最终镜像通过 COM4 TFTP RAM 启动和五次标准 DRM 切档。MPV 在原生 2160p60 实测 60.000 FPS、`detile=0`、零掉帧、零漏 vblank 与零 XRUN。全媒体回归覆盖双 PP Lima、四格式 VDEC、JPGD 和 FFmpeg VENC。实测条件、重试记录、SHA256 与 U-Boot RAM CRC32 见验收报告。 [HDMI DRM 验收](HDMI-DRM-ACCEPTANCE.md)

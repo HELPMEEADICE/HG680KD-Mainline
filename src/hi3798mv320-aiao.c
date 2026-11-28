@@ -257,10 +257,12 @@ static int mv320_pcm_trigger(struct snd_pcm_substream *ss, int cmd)
 		writel(TX_PERIOD_IRQ, aiao->tx + TX_IRQ_EN);
 		mv320_update(aiao->regs + AIAO_IRQ_EN, AIAO_TX2_IRQ, AIAO_TX2_IRQ);
 		mv320_update(aiao->tx + TX_CONTROL, TX_START | TX_MUTE, TX_START);
-		mv320_update(aiao->hdmi + HDMI_AUD_CTRL, HDMI_AUD_MUTE, 0);
+		if (aiao->hdmi)
+			mv320_update(aiao->hdmi + HDMI_AUD_CTRL, HDMI_AUD_MUTE, 0);
 		return 0;
 	case SNDRV_PCM_TRIGGER_STOP:
-		mv320_update(aiao->hdmi + HDMI_AUD_CTRL, HDMI_AUD_MUTE, HDMI_AUD_MUTE);
+		if (aiao->hdmi)
+			mv320_update(aiao->hdmi + HDMI_AUD_CTRL, HDMI_AUD_MUTE, HDMI_AUD_MUTE);
 		mv320_update(aiao->tx + TX_CONTROL, TX_START | TX_MUTE, TX_MUTE);
 		writel(0, aiao->tx + TX_IRQ_EN);
 		mv320_update(aiao->regs + AIAO_IRQ_EN, AIAO_TX2_IRQ, 0);
@@ -343,13 +345,18 @@ static int mv320_aiao_probe(struct platform_device *pdev)
 	if (IS_ERR(aiao->regs))
 		return PTR_ERR(aiao->regs);
 	aiao->tx = aiao->regs + AIAO_TX2;
-	aiao->hdmi_reset = devm_platform_ioremap_resource_byname(pdev, "hdmi-audio-reset");
-	if (IS_ERR(aiao->hdmi_reset))
-		return PTR_ERR(aiao->hdmi_reset);
-	aiao->hdmi = devm_platform_ioremap_resource_byname(pdev, "hdmi-audio");
-	if (IS_ERR(aiao->hdmi))
-		return PTR_ERR(aiao->hdmi);
-	aiao->packets = devm_platform_ioremap_resource_byname(pdev, "hdmi-packets");
+	/* Older DTBs delegate the firmware link's audio registers to AIAO. */
+	if (platform_get_resource_byname(pdev, IORESOURCE_MEM, "hdmi-audio")) {
+		aiao->hdmi_reset = devm_platform_ioremap_resource_byname(pdev, "hdmi-audio-reset");
+		if (IS_ERR(aiao->hdmi_reset))
+			return PTR_ERR(aiao->hdmi_reset);
+		aiao->hdmi = devm_platform_ioremap_resource_byname(pdev, "hdmi-audio");
+		if (IS_ERR(aiao->hdmi))
+			return PTR_ERR(aiao->hdmi);
+		aiao->packets = devm_platform_ioremap_resource_byname(pdev, "hdmi-packets");
+		if (IS_ERR(aiao->packets))
+			return PTR_ERR(aiao->packets);
+	}
 	if (IS_ERR(aiao->packets))
 		return PTR_ERR(aiao->packets);
 	aiao->crg = syscon_regmap_lookup_by_phandle(dev->of_node, "hisilicon,crg");
@@ -362,9 +369,11 @@ static int mv320_aiao_probe(struct platform_device *pdev)
 	ret = mv320_aiao_power_on(aiao);
 	if (ret)
 		return dev_err_probe(dev, ret, "cannot initialize TX2\n");
-	ret = mv320_hdmi_setup(aiao);
-	if (ret)
-		return dev_err_probe(dev, ret, "expected firmware HDMI VIC 97 YCbCr 4:2:0\n");
+	if (aiao->hdmi) {
+		ret = mv320_hdmi_setup(aiao);
+		if (ret)
+			return dev_err_probe(dev, ret, "expected firmware HDMI VIC 97 YCbCr 4:2:0\n");
+	}
 
 	ret = snd_pcm_new(card, "HDMI PCM", 0, 1, 0, &pcm);
 	if (ret)

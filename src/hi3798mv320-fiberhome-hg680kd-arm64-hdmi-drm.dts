@@ -1,0 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0-only
+#include "hi3798mv320-fiberhome-hg680kd-arm64-venc.dts"
+
+&{/chosen} {
+	bootargs = "console=tty0 console=ttyAMA0,115200n8 earlycon=pl011,mmio32,0xf8b00000 clk_ignore_unused cma=384M";
+};

@@ -238,17 +238,17 @@ static void open_display(struct display *d, const char *path, bool show_osd)
 		fail("KMS does not provide monotonic flip timestamps");
 	res = drmModeGetResources(d->fd);
 	if (!res || res->count_connectors != 1 || res->count_crtcs != 1)
-		fail("expected the HG680KD handoff connector and CRTC");
+		fail("expected the HG680KD HDMI connector and CRTC");
 	d->connector = res->connectors[0];
 	d->crtc = res->crtcs[0];
 	drmModeFreeResources(res);
 	conn = drmModeGetConnector(d->fd, d->connector);
-	if (!conn || conn->connection != DRM_MODE_CONNECTED || conn->count_modes != 1)
-		fail("firmware HDMI handoff mode is unavailable");
+	if (!conn || conn->connection != DRM_MODE_CONNECTED || !conn->count_modes)
+		fail("no HDMI mode is available");
 	d->mode = conn->modes[0];
 	drmModeFreeConnector(conn);
 	check_drm(drmModeCreatePropertyBlob(d->fd, &d->mode, sizeof(d->mode), &d->mode_blob),
-		  "create firmware mode blob");
+		  "create HDMI mode blob");
 	planes = drmModeGetPlaneResources(d->fd);
 	if (!planes)
 		fail("cannot enumerate KMS planes");
@@ -288,7 +288,7 @@ static void open_display(struct display *d, const char *path, bool show_osd)
 	if (show_osd) {
 		if (!((d->mode.hdisplay == 3840 && d->mode.vdisplay == 2160) ||
 		      (d->mode.hdisplay == 1920 && d->mode.vdisplay == 1080)))
-			fail("G0 OSD requires a supported firmware mode");
+			fail("G0 OSD requires a supported HDMI mode");
 		d->blend = property(d->fd, d->g0, DRM_MODE_OBJECT_PLANE, "pixel blend mode", NULL);
 		d->coverage = enum_value(d->fd, d->blend, "Coverage");
 		for (int i = 0; i < 2; i++)

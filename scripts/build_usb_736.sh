@@ -45,7 +45,9 @@ if ! patch -d "$linux" -p1 --reverse --force --dry-run --silent <"$project/patch
     patch -d "$linux" -p1 --forward --batch <"$project/patches/$lima_final"
 fi
 apply_patch_if_needed 0020-media-add-Hi3798MV320-venc.patch
-install -m644 "$project/src/hi3798mv320-vdp.c" "$linux/drivers/gpu/drm/"
+apply_patch_if_needed 0021-drm-hi3798mv320-native-hdmi.patch
+install -m644 "$project/src"/hi3798mv320-{vdp.c,hdmi.c,hdmi.h} "$linux/drivers/gpu/drm/"
+install -m644 "$project/src/hi3798mv320-aiao.c" "$linux/sound/drivers/"
 install -m644 "$project/src/hi3798mv320-jpgd.c" "$linux/drivers/media/platform/"
 install -m644 "$project/src/hi3798mv320-vdec.c" "$linux/drivers/media/platform/hi3798mv320-vdec-core.c"
 install -m644 "$project/src"/hi3798mv320-venc{.c,-r002.h} "$linux/drivers/media/platform/"
@@ -56,7 +58,7 @@ install -m644 "$project/src/hi3798mv320-fiberhome-hg680kd-arm64.dts" \
     "$linux/arch/arm64/boot/dts/hisilicon/"
 # Register the native display card before Lima's non-modesetting primary node.
 drm_makefile="$linux/drivers/gpu/drm/Makefile"
-sed -i '/^obj-\$(CONFIG_DRM_HI3798MV320_VDP)/d; /^obj-\$(CONFIG_DRM_LIMA)/i obj-$(CONFIG_DRM_HI3798MV320_VDP) += hi3798mv320-vdp.o' \
+sed -i '/^obj-\$(CONFIG_DRM_HI3798MV320_VDP)/d; /^obj-\$(CONFIG_DRM_LIMA)/i obj-$(CONFIG_DRM_HI3798MV320_VDP) += hi3798mv320-drm.o' \
     "$drm_makefile"
 cmdline=$(sed -nE 's/^[[:space:]]*bootargs = "(.*)";$/\1/p' "$board_dts")
 [[ "$cmdline" == *' root=PARTLABEL=HG680KD_ROOT rootfstype=f2fs '* && "$cmdline" == *' rootwait cma=384M' ]]

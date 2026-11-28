@@ -1,0 +1,20 @@
+--- a/drivers/gpu/drm/Kconfig
++++ b/drivers/gpu/drm/Kconfig
+@@ -489,8 +489,9 @@
+ config DRM_HI3798MV320_VDP
+-	tristate "HiSilicon Hi3798MV320 VDP firmware handoff"
++	tristate "HiSilicon Hi3798MV320 VDP and HDMI TX"
+ 	depends on ARM64 && OF
+ 	select DRM_KMS_HELPER
+ 	select DRM_GEM_DMA_HELPER
++	select HDMI
+ 	help
+-	  Enable the V0 video plane and DRM/KMS on the bootloader's HD0 link.
++	  Enable DRM/KMS for the Hi3798MV320 VDP and HDMI transmitter.
+ 	  Supports the native Hi3798MV320 tiled video layouts via DMA-BUF.
+--- a/drivers/gpu/drm/Makefile
++++ b/drivers/gpu/drm/Makefile
+@@ -219 +219,2 @@
+-obj-$(CONFIG_DRM_HI3798MV320_VDP) += hi3798mv320-vdp.o
++hi3798mv320-drm-y := hi3798mv320-vdp.o hi3798mv320-hdmi.o
++obj-$(CONFIG_DRM_HI3798MV320_VDP) += hi3798mv320-drm.o

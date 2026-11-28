@@ -3,6 +3,7 @@
 import argparse
 from pathlib import Path
 import shlex
+import socket
 import sys
 import warnings
 
@@ -13,6 +14,7 @@ import paramiko
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--host", default="ArchLinux-E5-Server")
+    parser.add_argument("--address", help="Connect to this address while verifying the key for --host")
     parser.add_argument("--user", default="hedc")
     sub = parser.add_subparsers(dest="action", required=True)
     run = sub.add_parser("run")
@@ -36,6 +38,7 @@ def main():
         client.load_system_host_keys()
         client.connect(
             args.host.lower(),
+            sock=socket.create_connection((args.address, 22), 10) if args.address else None,
             username=args.user,
             password=password,
             allow_agent=False,

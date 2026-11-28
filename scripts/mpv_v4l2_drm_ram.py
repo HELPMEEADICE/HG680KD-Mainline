@@ -96,7 +96,8 @@ def console_state(out):
     return [(int(plane), crtc.decode(), int(fb)) for plane, crtc, fb in planes]
 
 
-def playback(console, args, case, report):
+def playback(console, args, case, report, native_uhd=False, video_sync="display-resample",
+             extra_options=()):
     clip, frames, fps, fourcc, planes, audio = case
     filename = f"{Path(clip).stem}.mpv.log"
     status_format = "MPV_STATUS vo_drop=${frame-drop-count} dec_drop=${decoder-frame-drop-count}"
@@ -105,8 +106,10 @@ def playback(console, args, case, report):
            "--gpu-hwdec-interop=drmprime-overlay --drm-draw-plane=primary "
            "--drm-drmprime-video-plane=overlay --drm-v4l2request-mv320-tiled "
            "--hwdec=v4l2request --hwdec-codecs=h264,hevc,mpeg2video --hwdec-software-fallback=no "
-           "--osd-level=0 --swapchain-depth=1 --video-sync=display-resample "
+           f"--osd-level=0 --swapchain-depth=1 --video-sync={video_sync} "
            f"--term-status-msg={shlex.quote(status_format)} "
+           + ("--drm-mode=3840x2160@60 --drm-draw-surface-size=1920x1080 " if native_uhd else "")
+           + "".join(f"{shlex.quote(option)} " for option in extra_options)
            + ("--drm-v4l2request-static-g0 --framedrop=no --ao=alsa --audio-device=alsa/hw:0,0 --audio-format=s16 "
               "--audio-samplerate=48000 --audio-channels=stereo " if audio else "--no-audio ")
            + f"/tmp/{clip}")
